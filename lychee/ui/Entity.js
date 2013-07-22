@@ -141,40 +141,6 @@ lychee.define('lychee.ui.Entity').includes([
 		 * CUSTOM API
 		 */
 
-		setPosition: function(position) {
-
-			if (position instanceof Object) {
-
-				this.position.x = typeof position.x === 'number' ? position.x : this.position.x;
-				this.position.y = typeof position.y === 'number' ? position.y : this.position.y;
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-		getStateMap: function() {
-			return this.__states[this.state];
-		},
-
-		setState: function(id) {
-
-			id = typeof id === 'string' ? id : null;
-
-			if (id !== null && this.__states[id] !== undefined) {
-				this.state = id;
-				return true;
-			}
-
-
-			return false;
-
-		},
-
 		setShape: function(shape) {
 
 			if (typeof shape !== 'number') return false;
@@ -198,6 +164,44 @@ lychee.define('lychee.ui.Entity').includes([
 
 
 			return found;
+
+		},
+
+		getStateMap: function() {
+			return this.__states[this.state];
+		},
+
+		setState: function(id) {
+
+			id = typeof id === 'string' ? id : null;
+
+
+			if (id !== null && this.__states[id] !== undefined) {
+
+				this.state = id;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setPosition: function(position) {
+
+			if (position instanceof Object) {
+
+				this.position.x = typeof position.x === 'number' ? position.x : this.position.x;
+				this.position.y = typeof position.y === 'number' ? position.y : this.position.y;
+
+				return true;
+
+			}
+
+
+			return false;
 
 		},
 
