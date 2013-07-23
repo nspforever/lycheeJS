@@ -87,6 +87,7 @@ lychee.define('lychee.ui.Entity').includes([
 		this.setShape(settings.shape);
 		this.setState(settings.state);
 		this.setPosition(settings.position);
+		this.setTween(settings.tween);
 		this.setVisible(settings.visible);
 
 
@@ -105,9 +106,11 @@ lychee.define('lychee.ui.Entity').includes([
 
 
 	Class.TWEEN = {
-		linear:  0,
-		easein:  1,
-		easeout: 2
+		linear:        0,
+		easein:        1,
+		easeout:       2,
+		bounceeasein:  3,
+		bounceeaseout: 4
 	};
 
 
@@ -180,7 +183,6 @@ lychee.define('lychee.ui.Entity').includes([
 
 			var tween = this.__tween;
 
-
 			// 2. Tweening
 			if (
 				   tween.active === true
@@ -191,6 +193,7 @@ lychee.define('lychee.ui.Entity').includes([
 
 				if (t <= 1) {
 
+					var type = tween.type;
 					var from = tween.fromposition;
 					var to   = tween.toposition;
 
@@ -200,8 +203,61 @@ lychee.define('lychee.ui.Entity').includes([
 
 					var cache = this.__cache.tween;
 
-					cache.x = from.x + t * dx;
-					cache.y = from.y + t * dy;
+					if (type === Class.TWEEN.linear) {
+
+						cache.x = from.x + t * dx;
+						cache.y = from.y + t * dy;
+
+					} else if (type === Class.TWEEN.easein) {
+
+						var f = 1 * Math.pow(t, 3);
+
+						cache.x = from.x + f * dx;
+						cache.y = from.y + f * dy;
+
+					} else if (type === Class.TWEEN.easeout) {
+
+						var f = Math.pow(t - 1, 3) + 1;
+
+						cache.x = from.x + f * dx;
+						cache.y = from.y + f * dy;
+
+					} else if (type === Class.TWEEN.bounceeasein) {
+
+						var k = 1 - t;
+						var f;
+
+						if ((k /= 1) < ( 1 / 2.75 )) {
+							f = 1 * ( 7.5625 * Math.pow(k, 2) );
+						} else if (k < ( 2 / 2.75 )) {
+							f = 7.5625 * ( k -= ( 1.5 / 2.75 )) * k + .75;
+						} else if (k < ( 2.5 / 2.75 )) {
+							f = 7.5625 * ( k -= ( 2.25 / 2.75 )) * k + .9375;
+						} else {
+							f = 7.5625 * ( k -= ( 2.625 / 2.75 )) * k + .984375;
+						}
+
+						cache.x = from.x + (1 - f) * dx;
+						cache.y = from.y + (1 - f) * dy;
+
+					} else if (type === Class.TWEEN.bounceeaseout) {
+
+						var f;
+
+						if ((t /= 1) < ( 1 / 2.75 )) {
+							f = 1 * ( 7.5625 * Math.pow(t, 2) );
+						} else if (t < ( 2 / 2.75 )) {
+							f = 7.5625 * ( t -= ( 1.5 / 2.75 )) * t + .75;
+						} else if (t < ( 2.5 / 2.75 )) {
+							f = 7.5625 * ( t -= ( 2.25 / 2.75 )) * t + .9375;
+						} else {
+							f = 7.5625 * ( t -= ( 2.625 / 2.75 )) * t + .984375;
+						}
+
+						cache.x = from.x + f * dx;
+						cache.y = from.y + f * dy;
+
+					}
 
 
 					this.setPosition(cache);
@@ -318,6 +374,10 @@ lychee.define('lychee.ui.Entity').includes([
 
 			return false;
 
+		},
+
+		clearTween: function() {
+			this.__tween.active = false;
 		},
 
 		setVisible: function(visible) {

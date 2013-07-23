@@ -203,12 +203,11 @@ lychee.define('game.logic.Level').requires([
 							this.__cache.x = offsetX + tile / 2 + x * tile;
 							this.__cache.y = offsetY + tile / 2 + y * tile;
 
-							replacement.setTween(
-								500,
-								this.__cache,
-								lychee.game.Entity.TWEEN.bounceEaseOut
-							);
-
+							replacement.setTween({
+								duration: 500,
+								position: this.__cache,
+								type: lychee.game.Entity.TWEEN.bounceeaseout
+							});
 
 							this.setByPosition(x, y,     replacement);
 							this.setByPosition(x, y - 1, null);
@@ -234,12 +233,11 @@ lychee.define('game.logic.Level').requires([
 								this.__cache.x = offsetX + tile / 2 + x * tile;
 								this.__cache.y = offsetY + tile / 2 + y * tile;
 
-								replacement.setTween(
-									500,
-									this.__cache,
-									lychee.game.Entity.TWEEN.bounceEaseOut
-								);
-
+								replacement.setTween({
+									duration: 500,
+									position: this.__cache,
+									type: lychee.game.Entity.TWEEN.bounceeaseout
+								});
 
 								this.setByPosition(x, y, replacement);
 								this.__queueclock = clock + 500;

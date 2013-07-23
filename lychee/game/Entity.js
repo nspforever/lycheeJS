@@ -67,13 +67,12 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 			loop:     false
 		};
 		this.__tween   = {
-			active:   false,
-			start:    null,
-			duration: 0,
-			from:     { x: 0, y: 0, z: 0 },
-			to:       { x: 0, y: 0, z: 0 },
-			callback: null,
-			scope:    null
+			active:       false,
+			type:         Class.TWEEN.linear,
+			start:        null,
+			duration:     0,
+			fromposition: { x: 0, y: 0 },
+			toposition:   { x: 0, y: 0 }
 		};
 
 
@@ -104,6 +103,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		this.setShape(settings.shape);
 		this.setState(settings.state);
 		this.setPosition(settings.position);
+		this.setTween(settings.tween);
 		this.setVelocity(settings.velocity);
 
 		settings = null;
@@ -163,142 +163,11 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 
 	Class.TWEEN = {
-
-		linear: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			cache.x = t * dx;
-			cache.y = t * dy;
-			cache.z = t * dz;
-
-			return cache;
-
-		},
-
-		easeIn: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var f = 1 * Math.pow(t, 3);
-
-			cache.x = f * dx;
-			cache.y = f * dy;
-			cache.z = f * dz;
-
-			return cache;
-
-		},
-
-		easeOut: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var f = Math.pow(t - 1, 3) + 1;
-
-			cache.x = f * dx;
-			cache.y = f * dy;
-			cache.z = f * dz;
-
-			return cache;
-
-		},
-
-		easeInOut: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var f;
-
-			if ((t /= 0.5) < 1) {
-				f = 0.5 * Math.pow(t, 3);
-			} else {
-				f = 0.5 * (Math.pow(t - 2, 3) + 2);
-			}
-
-			cache.x = f * dx;
-			cache.y = f * dy;
-			cache.z = f * dz;
-
-			return cache;
-
-		},
-
-		bounceEaseIn: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var k = 1 - t;
-			var f;
-			if ((k /= 1) < ( 1 / 2.75 )) {
-				f = 1 * ( 7.5625 * Math.pow(k, 2) );
-			} else if (k < ( 2 / 2.75 )) {
-				f = 7.5625 * ( k -= ( 1.5 / 2.75 )) * k + .75;
-			} else if (k < ( 2.5 / 2.75 )) {
-				f = 7.5625 * ( k -= ( 2.25 / 2.75 )) * k + .9375;
-			} else {
-				f = 7.5625 * ( k -= ( 2.625 / 2.75 )) * k + .984375;
-			}
-
-			cache.x = (1 - f) * dx;
-			cache.y = (1 - f) * dy;
-			cache.z = (1 - f) * dz;
-
-			return cache;
-
-		},
-
-		bounceEaseOut: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var f;
-			if ((t /= 1) < ( 1 / 2.75 )) {
-				f = 1 * ( 7.5625 * Math.pow(t, 2) );
-			} else if (t < ( 2 / 2.75 )) {
-				f = 7.5625 * ( t -= ( 1.5 / 2.75 )) * t + .75;
-			} else if (t < ( 2.5 / 2.75 )) {
-				f = 7.5625 * ( t -= ( 2.25 / 2.75 )) * t + .9375;
-			} else {
-				f = 7.5625 * ( t -= ( 2.625 / 2.75 )) * t + .984375;
-			}
-
-			cache.x = f * dx;
-			cache.y = f * dy;
-			cache.z = f * dz;
-
-			return cache;
-
-		},
-
-		sinEaseIn: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var f = -1 * Math.cos(t * Math.PI / 2 ) + 1;
-
-			cache.x = f * dx;
-			cache.y = f * dy;
-			cache.z = f * dz;
-
-			return cache;
-
-		},
-
-		sinEaseOut: function(t, dx, dy, dz) {
-
-			var cache = this.__cache.tween;
-
-			var f = 1 * Math.sin(t * Math.PI / 2);
-
-			cache.x = f * dx;
-			cache.y = f * dy;
-			cache.z = f * dz;
-
-			return cache;
-
-		}
-
+		linear:        0,
+		easein:        1,
+		easeout:       2,
+		bounceeasein:  3,
+		bounceeaseout: 4
 	};
 
 
@@ -408,35 +277,86 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 			// 2. Tweening
 			if (
-				tween.active === true
+				   tween.active === true
 				&& tween.start !== null
 			) {
 
-				t = (this.__clock - tween.start) / tween.duration;
+				var t = (this.__clock - tween.start) / tween.duration;
 
 				if (t <= 1) {
 
-					var from = tween.from;
-					var to   = tween.to;
-
+					var type = tween.type;
+					var from = tween.fromposition;
+					var to   = tween.toposition;
 
 					var dx = to.x - from.x;
 					var dy = to.y - from.y;
-					var dz = to.z - from.z;
 
 
-					cache = tween.callback.call(tween.scope, t, dx, dy, dz);
+					var cache = this.__cache.tween;
 
-					cache.x = from.x + cache.x;
-					cache.y = from.y + cache.y;
-					cache.z = from.z + cache.z;
+					if (type === Class.TWEEN.linear) {
+
+						cache.x = from.x + t * dx;
+						cache.y = from.y + t * dy;
+
+					} else if (type === Class.TWEEN.easein) {
+
+						var f = 1 * Math.pow(t, 3);
+
+						cache.x = from.x + f * dx;
+						cache.y = from.y + f * dy;
+
+					} else if (type === Class.TWEEN.easeout) {
+
+						var f = Math.pow(t - 1, 3) + 1;
+
+						cache.x = from.x + f * dx;
+						cache.y = from.y + f * dy;
+
+					} else if (type === Class.TWEEN.bounceeasein) {
+
+						var k = 1 - t;
+						var f;
+
+						if ((k /= 1) < ( 1 / 2.75 )) {
+							f = 1 * ( 7.5625 * Math.pow(k, 2) );
+						} else if (k < ( 2 / 2.75 )) {
+							f = 7.5625 * ( k -= ( 1.5 / 2.75 )) * k + .75;
+						} else if (k < ( 2.5 / 2.75 )) {
+							f = 7.5625 * ( k -= ( 2.25 / 2.75 )) * k + .9375;
+						} else {
+							f = 7.5625 * ( k -= ( 2.625 / 2.75 )) * k + .984375;
+						}
+
+						cache.x = from.x + (1 - f) * dx;
+						cache.y = from.y + (1 - f) * dy;
+
+					} else if (type === Class.TWEEN.bounceeaseout) {
+
+						var f;
+
+						if ((t /= 1) < ( 1 / 2.75 )) {
+							f = 1 * ( 7.5625 * Math.pow(t, 2) );
+						} else if (t < ( 2 / 2.75 )) {
+							f = 7.5625 * ( t -= ( 1.5 / 2.75 )) * t + .75;
+						} else if (t < ( 2.5 / 2.75 )) {
+							f = 7.5625 * ( t -= ( 2.25 / 2.75 )) * t + .9375;
+						} else {
+							f = 7.5625 * ( t -= ( 2.625 / 2.75 )) * t + .984375;
+						}
+
+						cache.x = from.x + f * dx;
+						cache.y = from.y + f * dy;
+
+					}
 
 
 					this.setPosition(cache);
 
 				} else {
 
-					this.setPosition(tween.to);
+					this.setPosition(tween.toposition);
 					tween.active = false;
 
 				}
@@ -446,7 +366,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 			var velocity = this.velocity;
 
-			// 3. Velocities
+			// 3. Velocity
 			if (
 				   velocity.x !== 0
 				|| velocity.y !== 0
@@ -679,6 +599,40 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		},
 
+		setTween: function(settings) {
+
+			if (settings instanceof Object) {
+
+				var tween = this.__tween;
+
+				tween.type     = _validate_enum(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
+				tween.duration = typeof settings.duration === 'number'      ? settings.duration : 1000;
+
+				if (settings.position instanceof Object) {
+					tween.toposition.x = typeof settings.position.x === 'number' ? settings.position.x : this.position.x;
+					tween.toposition.y = typeof settings.position.y === 'number' ? settings.position.y : this.position.y;
+				}
+
+				tween.fromposition.x = this.position.x;
+				tween.fromposition.y = this.position.y;
+
+				tween.start  = this.__clock;
+				tween.active = true;
+
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		clearTween: function() {
+			this.__tween.active = false;
+		},
+
 		setVelocity: function(velocity) {
 
 			if (velocity instanceof Object) {
@@ -753,48 +707,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 			this.__effect.active = false;
 
-		},
-
-		setTween: function(duration, position, callback, scope) {
-
-			duration = typeof duration === 'number' ? duration : null;
-			callback = callback instanceof Function ? callback : Class.TWEEN.linear;
-			scope    = scope !== undefined          ? scope    : this;
-
-
-			if (duration !== null && position instanceof Object) {
-
-				position.x = typeof position.x === 'number' ? position.x : this.position.x;
-				position.y = typeof position.y === 'number' ? position.y : this.position.y;
-				position.z = typeof position.z === 'number' ? position.z : this.position.z;
-
-
-				var pos   = this.position;
-				var tween = this.__tween;
-
-				tween.start    = this.__clock;
-				tween.active   = true;
-				tween.duration = duration;
-				tween.from.x   = pos.x;
-				tween.from.y   = pos.y;
-				tween.from.z   = pos.z;
-				tween.to.x     = position.x;
-				tween.to.y     = position.y;
-				tween.to.z     = position.z;
-				tween.callback = callback;
-				tween.scope    = scope;
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-		clearTween: function() {
-			this.__tween.active = false;
 		}
 
 	};
