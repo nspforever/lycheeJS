@@ -9,8 +9,8 @@
 				"Arrow":    [ "js", "json", "png" ],
 				"Button":   [ "js", "json", "png" ],
 				"Font":     [ "js", "headline.fnt", "normal.fnt" ],
-				"lycheeJS": [ "js", "png" ],
-				"Menu":     [ "js", "png" ]
+				"Menu":     [ "js", "json", "png" ],
+				"Title":    [ "js", "png" ]
 			},
 
 			"Background": [ "js", "png" ],

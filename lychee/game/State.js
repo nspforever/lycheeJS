@@ -51,6 +51,11 @@ lychee.define('lychee.game.State').requires([
 		}
 
 
+		if (entity.visible === false) {
+			result = false;
+		}
+
+
 		return result;
 
 	};

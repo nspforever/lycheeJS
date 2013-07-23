@@ -116,6 +116,9 @@ lychee.define('lychee.ui.Layer').includes([
 
 		update: function(clock, delta) {
 
+			lychee.ui.Entity.prototype.update.call(this, clock, delta);
+
+
 			var entities = this.entities;
 			for (var e = 0, el = entities.length; e < el; e++) {
 				entities[e].update(clock, delta);

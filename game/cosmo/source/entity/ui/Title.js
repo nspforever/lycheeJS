@@ -1,10 +1,13 @@
 
-lychee.define('game.entity.ui.Arrow').includes([
+lychee.define('game.entity.ui.Title').includes([
 	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _texture = attachments["png"];
-	var _config  = attachments["json"];
+	var _config  = {
+		width:  512,
+		height: 144
+	};
 
 
 	var Class = function(settings) {
@@ -15,11 +18,9 @@ lychee.define('game.entity.ui.Arrow').includes([
 
 
 		settings.texture = _texture;
-		settings.map     = _config.map;
-		settings.states  = _config.states;
 
-		settings.radius = _config.radius;
-		settings.shape  = lychee.ui.Entity.SHAPE.circle;
+		settings.width     = _config.width;
+		settings.height    = _config.height;
 
 
 		lychee.ui.Sprite.call(this, settings);
@@ -30,10 +31,6 @@ lychee.define('game.entity.ui.Arrow').includes([
 
 
 	Class.prototype = {
-
-		/*
-		 * CUSTOM API
-		 */
 
 	};
 

@@ -7,6 +7,38 @@ lychee.define('lychee.ui.Entity').includes([
 	var _default_states = { 'default': null, 'active': null };
 
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _validate_enum = function(enumobject, value) {
+
+		if (typeof value !== 'number') return false;
+
+
+		var found = false;
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				found = true;
+				break;
+			}
+
+		}
+
+
+		return found;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
@@ -24,6 +56,17 @@ lychee.define('lychee.ui.Entity').includes([
 
 		this.__clock  = null;
 		this.__states = _default_states;
+		this.__cache  = {
+			tween: { x: 0, y: 0 }
+		};
+		this.__tween  = {
+			active:       false,
+			type:         Class.TWEEN.linear,
+			start:        null,
+			duration:     0,
+			fromposition: { x: 0, y: 0 },
+			toposition:   { x: 0, y: 0 }
+		};
 
 
 		if (settings.states instanceof Object) {
@@ -58,6 +101,13 @@ lychee.define('lychee.ui.Entity').includes([
 	Class.SHAPE = {
 		circle:    0,
 		rectangle: 2
+	};
+
+
+	Class.TWEEN = {
+		linear:  0,
+		easein:  1,
+		easeout: 2
 	};
 
 
@@ -102,17 +152,13 @@ lychee.define('lychee.ui.Entity').includes([
 
 		},
 
-		// Allows sync(null, true) for reset
-		sync: function(clock, force) {
-
-			force = force === true;
-
-			if (force === true) {
-				this.__clock = clock;
-			}
-
+		sync: function(clock) {
 
 			if (this.__clock === null) {
+
+				if (this.__tween.active === true && this.__tween.start === null) {
+					this.__tween.start = clock;
+				}
 
 				this.__clock = clock;
 
@@ -130,6 +176,45 @@ lychee.define('lychee.ui.Entity').includes([
 			if (this.__clock === null) {
 				this.sync(clock);
 			}
+
+
+			var tween = this.__tween;
+
+
+			// 2. Tweening
+			if (
+				   tween.active === true
+				&& tween.start !== null
+			) {
+
+				var t = (this.__clock - tween.start) / tween.duration;
+
+				if (t <= 1) {
+
+					var from = tween.fromposition;
+					var to   = tween.toposition;
+
+					var dx = to.x - from.x;
+					var dy = to.y - from.y;
+
+
+					var cache = this.__cache.tween;
+
+					cache.x = from.x + t * dx;
+					cache.y = from.y + t * dy;
+
+
+					this.setPosition(cache);
+
+				} else {
+
+					this.setPosition(tween.toposition);
+					tween.active = false;
+
+				}
+
+			}
+
 
 			this.__clock = clock;
 
@@ -195,6 +280,36 @@ lychee.define('lychee.ui.Entity').includes([
 
 				this.position.x = typeof position.x === 'number' ? position.x : this.position.x;
 				this.position.y = typeof position.y === 'number' ? position.y : this.position.y;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setTween: function(settings) {
+
+			if (settings instanceof Object) {
+
+				var tween = this.__tween;
+
+				tween.type     = _validate_enum(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
+				tween.duration = typeof settings.duration === 'number'      ? settings.duration : 1000;
+
+				if (settings.position instanceof Object) {
+					tween.toposition.x = typeof settings.position.x === 'number' ? settings.position.x : this.position.x;
+					tween.toposition.y = typeof settings.position.y === 'number' ? settings.position.y : this.position.y;
+				}
+
+				tween.fromposition.x = this.position.x;
+				tween.fromposition.y = this.position.y;
+
+				tween.start  = this.__clock;
+				tween.active = true;
+
 
 				return true;
 

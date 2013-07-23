@@ -120,6 +120,9 @@ lychee.define('lychee.ui.Sprite').includes([
 
 		render: function(renderer, offsetX, offsetY) {
 
+			if (this.visible === false) return;
+
+
 			var texture = this.texture;
 			if (texture !== null) {
 

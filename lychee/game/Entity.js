@@ -5,6 +5,38 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 	var _default_states = { 'default': null };
 
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _validate_enum = function(enumobject, value) {
+
+		if (typeof value !== 'number') return false;
+
+
+		var found = false;
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				found = true;
+				break;
+			}
+
+		}
+
+
+		return found;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
@@ -24,7 +56,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		this.__clock   = null;
 		this.__states  = _default_states;
 
-		this.__effect = {
+		this.__effect  = {
 			start:    null,
 			active:   false,
 			duration: 0,
@@ -580,53 +612,31 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		setCollision: function(collision) {
 
-			if (typeof collision !== 'number') return false;
+			if (_validate_enum(Class.COLLISION, collision) === true) {
 
-
-			var found = false;
-
-			for (var id in Class.COLLISION) {
-
-				if (collision === Class.COLLISION[id]) {
-					found = true;
-					break;
-				}
-
-			}
-
-
-			if (found === true) {
 				this.collision = collision;
+
+				return true;
+
 			}
 
 
-			return found;
+			return false;
 
 		},
 
 		setShape: function(shape) {
 
-			if (typeof shape !== 'number') return false;
+			if (_validate_enum(Class.SHAPE, shape) === true) {
 
-
-			var found = false;
-
-			for (var id in Class.SHAPE) {
-
-				if (shape === Class.SHAPE[id]) {
-					found = true;
-					break;
-				}
-
-			}
-
-
-			if (found === true) {
 				this.shape = shape;
+
+				return true;
+
 			}
 
 
-			return found;
+			return false;
 
 		},
 
