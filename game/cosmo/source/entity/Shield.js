@@ -38,6 +38,8 @@ lychee.define('game.entity.Shield').includes([
 
 		lychee.game.Sprite.call(this, settings);
 
+		settings = null;
+
 	};
 
 

@@ -2,7 +2,7 @@
 lychee.define('game.state.Game').requires([
 	'lychee.ui.Layer',
 	'lychee.ui.Button',
-	'game.entity.Button'
+	'game.entity.ui.Button'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
@@ -144,7 +144,7 @@ lychee.define('game.state.Game').requires([
 
 
 
-				entity = new game.entity.Button({
+				entity = new game.entity.ui.Button({
 					label: 'Continue',
 					font:  this.game.fonts.normal,
 					state: 'continue',
@@ -158,7 +158,7 @@ lychee.define('game.state.Game').requires([
 				resultroot.addEntity(entity);
 
 
-				entity = new game.entity.Button({
+				entity = new game.entity.ui.Button({
 					label: 'Restart',
 					font:  this.game.fonts.normal,
 					state: 'continue',
@@ -172,7 +172,7 @@ lychee.define('game.state.Game').requires([
 				resultroot.addEntity(entity);
 
 
-				entity = new game.entity.Button({
+				entity = new game.entity.ui.Button({
 					label: 'Menu',
 					font:  this.game.fonts.normal,
 					state: 'cancel',

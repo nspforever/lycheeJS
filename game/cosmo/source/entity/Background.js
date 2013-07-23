@@ -26,6 +26,8 @@ lychee.define('game.entity.Background').includes([
 
 		lychee.game.Background.call(this, settings);
 
+		setting = null;
+
 	};
 
 

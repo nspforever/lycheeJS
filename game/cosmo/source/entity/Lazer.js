@@ -29,6 +29,8 @@ lychee.define('game.entity.Lazer').includes([
 
 		lychee.game.Sprite.call(this, settings);
 
+		settings = null;
+
 	};
 
 

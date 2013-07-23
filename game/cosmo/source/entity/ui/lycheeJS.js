@@ -1,6 +1,6 @@
 
-lychee.define('game.entity.lycheeJS').includes([
-	'lychee.game.Sprite'
+lychee.define('game.entity.ui.lycheeJS').includes([
+	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _texture = attachments["png"];
@@ -23,7 +23,9 @@ lychee.define('game.entity.lycheeJS').includes([
 		settings.height    = _config.height;
 
 
-		lychee.game.Sprite.call(this, settings);
+		lychee.ui.Sprite.call(this, settings);
+
+		settings = null;
 
 	};
 

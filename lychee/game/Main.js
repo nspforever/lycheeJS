@@ -40,6 +40,7 @@ lychee.define('lychee.game.Main').requires([
 	var Class = function(settings) {
 
 		this.settings = _extend_recursive({}, this.defaults, settings);
+		this.defaults = _extend_recursive({}, this.settings);
 
 		this.input    = null;
 		this.loop     = null;

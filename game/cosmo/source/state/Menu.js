@@ -1,7 +1,7 @@
 
 lychee.define('game.state.Menu').requires([
 	'game.entity.Background',
-	'game.entity.lycheeJS',
+	'game.entity.ui.lycheeJS',
 	'lychee.ui.Layer',
 	'lychee.ui.Button'
 ]).includes([
@@ -91,7 +91,7 @@ lychee.define('game.state.Menu').requires([
 				welcome.addEntity(entity);
 
 
-				entity = new game.entity.lycheeJS({
+				entity = new game.entity.ui.lycheeJS({
 					position: {
 						x: 0,
 						y: height / 2 - 32
@@ -181,7 +181,7 @@ lychee.define('game.state.Menu').requires([
 				settings.addEntity(entity);
 
 
-				entity = new game.entity.lycheeJS({
+				entity = new game.entity.ui.lycheeJS({
 					position: {
 						x: 0,
 						y: height / 2 - 32

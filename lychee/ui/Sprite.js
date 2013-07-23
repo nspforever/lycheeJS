@@ -1,6 +1,6 @@
 
-lychee.define('lychee.game.Sprite').includes([
-	'lychee.game.Entity'
+lychee.define('lychee.ui.Sprite').includes([
+	'lychee.ui.Entity'
 ]).exports(function(lychee, global) {
 
 	var Class = function(data) {
@@ -29,7 +29,7 @@ lychee.define('lychee.game.Sprite').includes([
 		delete settings.map;
 
 
-		lychee.game.Entity.call(this, settings);
+		lychee.ui.Entity.call(this, settings);
 
 		settings = null;
 
@@ -44,7 +44,7 @@ lychee.define('lychee.game.Sprite').includes([
 
 		serialize: function() {
 
-			var data = lychee.game.Entity.prototype.serialize.call(this);
+			var data = lychee.ui.Entity.prototype.serialize.call(this);
 			data['constructor'] = 'lyche.game.Sprite';
 
 			var settings = data['arguments'][0];
@@ -114,7 +114,7 @@ lychee.define('lychee.game.Sprite').includes([
 
 			}
 
-			lychee.game.Entity.prototype.sync.call(this, clock, force);
+			lychee.ui.Entity.prototype.sync.call(this, clock, force);
 
 		},
 
@@ -160,7 +160,7 @@ lychee.define('lychee.game.Sprite').includes([
 
 		update: function(clock, delta) {
 
-			lychee.game.Entity.prototype.update.call(this, clock, delta);
+			lychee.ui.Entity.prototype.update.call(this, clock, delta);
 
 
 			var animation = this.__animation;

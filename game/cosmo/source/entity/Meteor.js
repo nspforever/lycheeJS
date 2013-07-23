@@ -42,6 +42,8 @@ lychee.define('game.entity.Meteor').includes([
 
 		lychee.game.Sprite.call(this, settings);
 
+		settings = null;
+
 	};
 
 

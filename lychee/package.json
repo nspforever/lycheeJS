@@ -116,6 +116,7 @@
 			"Layer": [ "js" ],
 			"Select": [ "js" ],
 			"Slider": [ "js" ],
+			"Sprite": [ "js" ],
 			"Textarea": [ "js" ]
 		},
 

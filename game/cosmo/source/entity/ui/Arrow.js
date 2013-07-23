@@ -1,6 +1,6 @@
 
-lychee.define('game.entity.Blackhole').includes([
-	'lychee.game.Sprite'
+lychee.define('game.entity.ui.Arrow').includes([
+	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _texture = attachments["png"];
@@ -14,21 +14,16 @@ lychee.define('game.entity.Blackhole').includes([
 		}
 
 
-		this.health = Infinity;
-		this.points = 500;
-
-
 		settings.texture = _texture;
 		settings.map     = _config.map;
 		settings.state   = "default";
 		settings.states  = _config.states;
 
 		settings.radius    = _config.radius;
-		settings.collision = lychee.game.Entity.COLLISION.A;
-		settings.shape     = lychee.game.Entity.SHAPE.circle;
+		settings.shape     = lychee.ui.Entity.SHAPE.circle;
 
 
-		lychee.game.Sprite.call(this, settings);
+		lychee.ui.Sprite.call(this, settings);
 
 		settings = null;
 

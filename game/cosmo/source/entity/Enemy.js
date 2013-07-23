@@ -37,6 +37,8 @@ lychee.define('game.entity.Enemy').includes([
 
 		lychee.game.Sprite.call(this, settings);
 
+		settings = null;
+
 	};
 
 

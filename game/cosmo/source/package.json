@@ -4,22 +4,23 @@
 	"tree": {
 
 		"entity": {
-			"lycheeJS": [ "js", "png" ],
+
+			"ui": {
+				"Arrow":    [ "js", "json", "png" ],
+				"Button":   [ "js", "json", "png" ],
+				"Font":     [ "js", "headline.fnt", "normal.fnt" ],
+				"lycheeJS": [ "js", "png" ],
+				"Menu":     [ "js", "png" ]
+			},
 
 			"Background": [ "js", "png" ],
-			"Blackhole": [ "js", "json", "png" ],
-			"Enemy": [ "js", "json", "png" ],
-			"Lazer": [ "js", "json", "png" ],
-			"Meteor": [ "js", "json", "png" ],
-			"Shield": [ "js", "png" ],
-			"Ship": [ "js", "json", "png" ],
+			"Blackhole":  [ "js", "json", "png" ],
+			"Enemy":      [ "js", "json", "png" ],
+			"Lazer":      [ "js", "json", "png" ],
+			"Meteor":     [ "js", "json", "png" ],
+			"Shield":     [ "js", "png" ],
+			"Ship":       [ "js", "json", "red.png", "green.png", "blue.png" ]
 
-			"Button": [ "js", "json", "png" ],
-			"Font": [
-				"js",
-				"headline.fnt",
-				"normal.fnt"
-			]
 		},
 
 		"logic": {

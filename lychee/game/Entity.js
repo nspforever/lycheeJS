@@ -20,18 +20,10 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		this.state     = _default_state;
 		this.position  = { x: 0, y: 0, z: 0 };
 		this.velocity  = { x: 0, y: 0, z: 0 };
-		this.frame     = 0;
 
 		this.__clock   = null;
 		this.__states  = _default_states;
 
-		this.__animation = {
-			active:   false,
-			start:    null,
-			frames:   0,
-			duration: 0,
-			loop:     false
-		};
 		this.__effect = {
 			start:    null,
 			active:   false,
@@ -42,7 +34,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 			scope:    null,
 			loop:     false
 		};
-		this.__tween = {
+		this.__tween   = {
 			active:   false,
 			start:    null,
 			duration: 0,
@@ -81,7 +73,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		this.setState(settings.state);
 		this.setPosition(settings.position);
 		this.setVelocity(settings.velocity);
-		this.setAnimation(settings.animation);
 
 		settings = null;
 
@@ -330,18 +321,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 			}
 
 
-			if (this.__animation.active === true) {
-
-				settings.animation = {};
-
-				if (this.__animation.duration !== 1000) settings.animation.duration = this.__animation.duration;
-				if (this.frame !== 0)                   settings.animation.frame    = this.frame;
-				if (this.__animation.frames !== 25)     settings.animation.frames   = this.__animation.frames;
-				if (this.__animation.loop !== false)    settings.animation.loop     = true;
-
-			}
-
-
 			return {
 				'constructor': 'lychee.game.Entity',
 				'arguments':   [ settings ]
@@ -368,10 +347,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 				if (this.__effect.active === true && this.__effect.start === null) {
 					this.__effect.start = clock;
-				}
-
-				if (this.__animation.active === true && this.__animation.start === null) {
-					this.__animation.start = clock;
 				}
 
 				this.__clock = clock;
@@ -493,34 +468,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 						effect.start = this.__clock;
 					} else {
 						effect.active = false;
-					}
-
-				}
-
-			}
-
-
-			var animation = this.__animation;
-
-			// 5. Animation (Interpolation)
-			if (
-				animation.active === true
-				&& animation.start !== null
-			) {
-
-				t = (this.__clock - animation.start) / animation.duration;
-
-				if (t <= 1) {
-
-					this.frame = Math.max(0, Math.ceil(t * animation.frames) - 1);
-
-				} else {
-
-					if (animation.loop === true) {
-						animation.start = this.__clock;
-					} else {
-						this.frame = animation.frames - 1;
-						animation.active = false;
 					}
 
 				}
@@ -737,40 +684,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 			return false;
 
-		},
-
-		setAnimation: function(settings) {
-
-			if (settings instanceof Object) {
-
-				var duration = typeof settings.duration === 'number' ? settings.duration : 1000;
-				var frame    = typeof settings.frame === 'number'    ? settings.frame    : 0;
-				var frames   = typeof settings.frames === 'number'   ? settings.frames   : 25;
-				var loop     = settings.loop === true;
-
-
-				var animation = this.__animation;
-
-				animation.start    = this.__clock;
-				animation.active   = true;
-				animation.duration = duration;
-				animation.frames   = frames;
-				animation.loop     = loop;
-
-				this.frame = frame;
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-		clearAnimation: function() {
-			this.__animation.active = false;
-			this.frame = 0;
 		},
 
 		setEffect: function(duration, enumdata, settings, scope, loop) {

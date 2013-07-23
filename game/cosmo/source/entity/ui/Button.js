@@ -1,6 +1,6 @@
 
-lychee.define('game.entity.Button').includes([
-	'lychee.game.Sprite'
+lychee.define('game.entity.ui.Button').includes([
+	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _texture = attachments["png"];
@@ -33,11 +33,10 @@ lychee.define('game.entity.Button').includes([
 		settings.map     = _config.map;
 		settings.states  = _config.states;
 
-		settings.collision = lychee.game.Entity.COLLISION.none;
 		settings.shape     = lychee.game.Entity.SHAPE.rectangle;
 
 
-		lychee.game.Sprite.call(this, settings);
+		lychee.ui.Sprite.call(this, settings);
 
 		settings = null;
 

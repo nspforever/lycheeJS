@@ -1,7 +1,7 @@
 
 lychee.define('game.Main').requires([
 	'game.Jukebox',
-	'game.entity.Font',
+	'game.entity.ui.Font',
 	'game.logic.Game',
 	'game.state.Game',
 	'game.state.Menu',
@@ -16,7 +16,7 @@ lychee.define('game.Main').requires([
 
 			title: 'Cosmo',
 
-			fullscreen: true,
+			fullscreen: false,
 
 			music: true,
 			sound: true,
@@ -30,8 +30,8 @@ lychee.define('game.Main').requires([
 
 			renderer: {
 				id:     'game',
-				width:  640,
-				height: 480
+				width:  800,
+				height: 600
 			}
 
 		}, data);
@@ -76,8 +76,8 @@ lychee.define('game.Main').requires([
 
 
 			this.fonts = {};
-			this.fonts.headline = new game.entity.Font('headline');
-			this.fonts.normal   = new game.entity.Font('normal');
+			this.fonts.headline = new game.entity.ui.Font('headline');
+			this.fonts.normal   = new game.entity.ui.Font('normal');
 
 			this.jukebox = new game.Jukebox(this);
 			this.logic   = new game.logic.Game(this);
