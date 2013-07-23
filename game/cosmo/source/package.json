@@ -10,7 +10,10 @@
 				"Button":   [ "js", "json", "png" ],
 				"Font":     [ "js", "headline.fnt", "normal.fnt" ],
 				"Menu":     [ "js", "json", "png" ],
-				"Title":    [ "js", "png" ]
+				"Title":    [ "js", "png" ],
+
+				"HUDLayer":    [ "js", "json", "png" ],
+				"ResultLayer": [ "js", "json", "png" ]
 			},
 
 			"Background": [ "js", "png" ],

@@ -306,6 +306,8 @@ lychee.define('lychee.ui.Layer').includes([
 
 			if (entities instanceof Array) {
 
+				this.entities = [];
+
 				for (var e = 0, el = entities.length; e < el; e++) {
 
 					var result = this.addEntity(entities[e]);

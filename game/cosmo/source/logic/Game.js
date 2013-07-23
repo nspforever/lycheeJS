@@ -143,9 +143,9 @@ lychee.define('game.logic.Game').requires([
 			this.trigger('success', [ data ]);
 		},
 
-		__processFail: function(data) {
+		__processFailure: function(data) {
 			this.__isRunning = false;
-			this.trigger('fail', [ data ]);
+			this.trigger('failure', [ data ]);
 		},
 
 		__controlLeft: function() {
@@ -290,7 +290,7 @@ lychee.define('game.logic.Game').requires([
 		enter: function(newstage, width, height) {
 
 			if (this.__level !== null) {
-				this.__level.unbind('fail');
+				this.__level.unbind('failure');
 				this.__level.unbind('success');
 				this.__level.unbind('update');
 			}
@@ -299,7 +299,7 @@ lychee.define('game.logic.Game').requires([
 			this.__height = height;
 
 			this.__level = new game.logic.Level();
-			this.__level.bind('fail',    this.__processFail,    this);
+			this.__level.bind('failure', this.__processFailure, this);
 			this.__level.bind('success', this.__processSuccess, this);
 			this.__level.bind('update',  this.__processUpdate,  this);
 

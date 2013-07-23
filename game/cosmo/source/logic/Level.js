@@ -179,7 +179,7 @@ lychee.define('game.logic.Level').requires([
 			if (entity instanceof _ship) {
 
 				this.__data.missed += this.entities.length;
-				this.trigger('fail', [ this.__data ]);
+				this.trigger('failure', [ this.__data ]);
 
 			} else if (
 				   this.entities.length === 1
