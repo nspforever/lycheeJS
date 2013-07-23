@@ -24,17 +24,20 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	 * HELPERS
 	 */
 
+	var _show_statistics = function(data) {
+	};
+
 
 
 	/*
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(settings, game, state) {
+	var Class = function(settings, game, gamestate) {
 
 		// Required because of Font integration
-		this.game  = game;
-		this.state = state;
+		this.game        = game;
+		this.__gamestate = gamestate;
 
 
 		if (settings === undefined) {
@@ -105,6 +108,9 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 				x: -128,
 				y:  156 - 32
 			});
+			entity.bind('touch', function() {
+				this.game.changeState('menu');
+			}, this);
 			this.setEntity('menu', entity);
 
 
@@ -114,6 +120,14 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 				x: 128,
 				y: 156 - 32
 			});
+			entity.bind('touch', function() {
+
+				var stglvl = this.__gamestate.stagelevel;
+
+				this.__gamestate.leave();
+				this.__gamestate.enter(stglvl);
+
+			}, this);
 			this.setEntity('restart', entity);
 
 
@@ -123,6 +137,14 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 				x: 128,
 				y: 156 - 32
 			});
+			entity.bind('touch', function() {
+
+				var stglvl = parseInt(this.__gamestate.stagelevel.substr(-1), 10);
+
+				this.__gamestate.leave();
+				this.__gamestate.enter('stage' + (stglvl + 1));
+
+			}, this);
 			this.setEntity('continue', entity);
 
 		},

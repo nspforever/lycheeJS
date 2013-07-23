@@ -128,6 +128,9 @@ lychee.define('lychee.ui.Layer').includes([
 
 		render: function(renderer, offsetX, offsetY) {
 
+			if (this.visible === false) return;
+
+
 			var position = this.position;
 
 			var ox = position.x + offsetX;

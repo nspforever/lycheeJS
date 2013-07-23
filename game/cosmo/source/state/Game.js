@@ -14,7 +14,7 @@ lychee.define('game.state.Game').requires([
 		lychee.game.State.call(this, game);
 
 
-		this.__stagelevel = 'stage1';
+		this.stagelevel = 'stage1';
 
 		this.__result = new _resultlayer({}, game, this);
 //		this.__hud    = new _hudlayer({}, this);
@@ -23,7 +23,7 @@ lychee.define('game.state.Game').requires([
 this.__hud = {
 	visible: false,
 	update: function(data) {
-		console.log('HUD UPDATE', data);
+//		console.log('HUD UPDATE', data);
 	}
 };
 
@@ -90,13 +90,17 @@ this.__hud = {
 				}, this);
 
 
-				this.__stagelevel = stage;
+				this.stagelevel = stage;
 
 				var env = renderer.getEnvironment();
-				logic.enter(this.__stagelevel, env.width, env.height);
+				logic.enter(this.stagelevel, env.width, env.height);
 
 
 			}
+
+
+			this.__result.visible = false;
+			this.__hud.visible    = true;
 
 
 			if (this.game.settings.music === true) {
@@ -178,38 +182,6 @@ this.__hud = {
 
 			logic.key(key);
 
-/*
-			if (resultlayer.visible === true) {
-
-				if (key === 'return') {
-
-					if (this.__restart.visible === true) {
-
-						this.leave();
-						this.enter(this.__stagelevel);
-
-					} else if (this.__continue.visible === true) {
-
-						var stglvl = parseInt(this.__stagelevel.substr(-1), 10);
-
-						this.leave();
-						this.enter('stage' + (stglvl + 1));
-
-					}
-
-				} else if (key === 'escape') {
-
-					this.game.changeState('menu');
-
-				}
-
-			} else if (logic !== null) {
-
-				logic.key(key);
-
-			}
-*/
-
 		},
 
 		processSwipe: function(id, type, position, delta, swipe) {
@@ -220,20 +192,28 @@ this.__hud = {
 
 		processTouch: function(id, position, delta) {
 
-			var renderer = this.renderer;
-			if (renderer !== null) {
+			var result = this.__result;
+			if (result.visible === true) {
 
-				var env = renderer.getEnvironment();
+				lychee.game.State.prototype.processTouch.call(this, id, position, delta);
 
-				position.x -= env.width / 2;
-				position.y -= env.height / 2;
+			} else {
 
-			}
+				var renderer = this.renderer;
+				if (renderer !== null) {
+
+					var env = renderer.getEnvironment();
+
+					position.x -= env.width / 2;
+					position.y -= env.height / 2;
+
+				}
 
 
-			var logic = this.game.logic;
-			if (logic !== null) {
-				logic.touch(position);
+				var logic = this.game.logic;
+				if (logic !== null) {
+					logic.touch(position);
+				}
 			}
 
 		},
