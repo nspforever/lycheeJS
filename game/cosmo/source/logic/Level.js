@@ -39,16 +39,16 @@ lychee.define('game.logic.Level').requires([
 		this.entities = [];
 		this.width    = 0;
 
-		this.__cache    = { x: 0, y: 0 };
-		this.__data     = {
+		this.__cache = { x: 0, y: 0 };
+		this.__data  = {
 			health:    0,
 			points:    0,
 			destroyed: 0,
 			missed:    0
 		};
-		this.__enemies  = [];
-		this.__stage    = null;
-		this.__boundY   = 0;
+		this.__enemies = [];
+		this.__stage   = null;
+		this.__boundY  = 0;
 
 		this.__ship = new _ship();
 

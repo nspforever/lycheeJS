@@ -25,6 +25,60 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	 */
 
 	var _show_statistics = function(data) {
+
+		var percentage = data.destroyed / (data.destroyed + data.missed) * 100;
+		var hits       = (percentage + '').substr(0, 5) + '%';
+		var shield     = (data.health < 0 ? 0 : data.health) + '%';
+		var score      = data.points + '';
+
+
+		if (hits === 'NaN%') {
+			hits = '0%';
+		}
+
+		var rank = 'A';
+		if (percentage < 80 || isNaN(percentage)) {
+
+			rank = 'B';
+
+			if (data.health < 50) {
+				rank = 'C';
+			}
+
+		}
+
+
+		var ehits   = this.getEntity('hits');
+		var eshield = this.getEntity('shield');
+		var escore  = this.getEntity('score');
+
+		var maxlength = Math.max(
+			'Hits:   '.length + hits.length,
+			'Shield: '.length + shield.length,
+			'Score:  '.length + score.length
+		);
+
+
+		for (var l = 'Hits:   '.length + hits.length; l < maxlength; l++) {
+			hits = ' ' + hits;
+		}
+
+		for (var l = 'Shield: '.length + shield.length; l < maxlength; l++) {
+			shield = ' ' + shield;
+		}
+
+		for (var l = 'Score:  '.length + score.length; l < maxlength; l++) {
+			score = ' ' + score;
+		}
+
+
+		  ehits.setLabel('Hits:   ' + hits);
+		eshield.setLabel('Shield: ' + shield);
+		 escore.setLabel('Score:  ' + score);
+
+
+		this.getEntity('rank').setLabel('Rank:'     + rank);
+
 	};
 
 
@@ -91,10 +145,10 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 			entity = new lychee.ui.Button({
 				label: 'Game Over',
-				font: this.game.fonts.headline,
+				font: this.game.fonts.normal,
 				position: {
 					x:  0,
-					y: -1/2 * height - 24 - 16
+					y: -1/2 * height + 48
 				}
 			});
 
@@ -146,6 +200,47 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 			}, this);
 			this.setEntity('continue', entity);
+
+
+			entity = new lychee.ui.Button({
+				font: this.game.fonts.small,
+				position: {
+					x: 0,
+					y: -48
+				}
+			});
+			this.setEntity('hits', entity);
+
+			entity = new lychee.ui.Button({
+				font: this.game.fonts.small,
+				position: {
+					x: 0,
+					y: -24
+				}
+			});
+			this.setEntity('shield', entity);
+
+			entity = new lychee.ui.Button({
+				font: this.game.fonts.small,
+				position: {
+					x: 0,
+					y: 0
+				}
+			});
+			this.setEntity('score', entity);
+
+
+			entity = new lychee.ui.Button({
+				font: this.game.fonts.normal,
+				position: {
+					x: 0,
+					y: 48
+				}
+			});
+			this.setEntity('rank', entity);
+
+
+			this.__hits = entity;
 
 		},
 
