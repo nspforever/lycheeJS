@@ -12,8 +12,8 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	var _sprite = lychee.ui.Sprite;
 	var _spriteconfig = {
 		texture: _texture,
-		width:   _config.width,
-		height:  _config.height,
+		width:   _config.spritewidth,
+		height:  _config.spriteheight,
 		states:  _config.states,
 		map:     _config.map
 	};
@@ -45,8 +45,8 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		}
 
 
-		settings.width  = 512;
-		settings.height = 312;
+		settings.width  = _config.width;
+		settings.height = _config.height;
 		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
 
 		settings.position = {
@@ -155,7 +155,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		 * CUSTOM API
 		 */
 
-		success: function(data) {
+		processSuccess: function(data) {
 
 			var headline = this.getEntity('headline');
 
@@ -172,7 +172,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 		},
 
-		failure: function(data) {
+		processFailure: function(data) {
 
 			var headline = this.getEntity('headline');
 

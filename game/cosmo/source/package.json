@@ -8,7 +8,7 @@
 			"ui": {
 				"Arrow":    [ "js", "json", "png" ],
 				"Button":   [ "js", "json", "png" ],
-				"Font":     [ "js", "headline.fnt", "normal.fnt" ],
+				"Font":     [ "js", "hud.fnt", "headline.fnt", "normal.fnt" ],
 				"Menu":     [ "js", "json", "png" ],
 				"Title":    [ "js", "png" ],
 
@@ -27,7 +27,7 @@
 		},
 
 		"logic": {
-			"Game": [ "js" ],
+			"Game":  [ "js", "json" ],
 			"Level": [ "js", "json" ]
 		},
 
@@ -37,8 +37,8 @@
 		},
 
 		"DeviceSpecificHacks": [ "js" ],
-		"Jukebox": [ "js" ],
-		"Main": [ "js", "css" ]
+		"Jukebox":             [ "js" ],
+		"Main":                [ "js", "css" ]
 
 	}
 }

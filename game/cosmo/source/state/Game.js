@@ -1,5 +1,6 @@
 
 lychee.define('game.state.Game').requires([
+	'game.entity.ui.HUDLayer',
 	'game.entity.ui.ResultLayer'
 ]).includes([
 	'lychee.game.State'
@@ -17,15 +18,7 @@ lychee.define('game.state.Game').requires([
 		this.stagelevel = 'stage1';
 
 		this.__result = new _resultlayer({}, game, this);
-//		this.__hud    = new _hudlayer({}, this);
-
-// TODO: HUD integration
-this.__hud = {
-	visible: false,
-	update: function(data) {
-//		console.log('HUD UPDATE', data);
-	}
-};
+		this.__hud    = new _hudlayer({}, game, this);
 
 		this.reset();
 
@@ -48,9 +41,24 @@ this.__hud = {
 
 			var layer = new lychee.game.Layer();
 
-// TODO: HUD integration
-//			layer.addEntity(this.__hud);
+			layer.addEntity(this.__hud);
 			layer.addEntity(this.__result);
+
+
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				var env    = renderer.getEnvironment();
+				var width  = env.width;
+				var height = env.height;
+
+
+				this.__hud.setPosition({
+					x: -1/2 * width + 96,
+					y: -1/2 * height + 64
+				});
+
+			}
 
 
 			this.setLayer('ui', layer);
@@ -70,14 +78,14 @@ this.__hud = {
 			) {
 
 				logic.bind('update', function(data) {
-					this.__hud.update(data);
+					this.__hud.processUpdate(data);
 				}, this);
 
 				logic.bind('success', function(data) {
 
 					this.__hud.visible    = false;
 					this.__result.visible = true;
-					this.__result.success(data);
+					this.__result.processSuccess(data);
 
 				}, this);
 
@@ -85,7 +93,7 @@ this.__hud = {
 
 					this.__hud.visible    = false;
 					this.__result.visible = true;
-					this.__result.failure(data);
+					this.__result.processFailure(data);
 
 				}, this);
 

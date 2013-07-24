@@ -8,6 +8,9 @@ lychee.define('game.logic.Game').requires([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _config = attachments["json"];
+
+
 	var _background = game.entity.Background;
 	var _blackhole  = game.entity.Blackhole;
 	var _enemy      = game.entity.Enemy;
@@ -16,6 +19,60 @@ lychee.define('game.logic.Game').requires([
 	var _shield     = game.entity.Shield;
 	var _ship       = game.entity.Ship;
 
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _get_ship_level = function(points, downgrade) {
+
+		downgrade = downgrade === true;
+
+
+		var shiplevel = 0;
+
+		for (var lvlid in _config.upgrade) {
+
+			var lvl = parseInt(lvlid, 10);
+			var min = _config.upgrade[lvl];
+
+			if (points > min) {
+				shiplevel = lvl;
+			}
+
+		}
+
+
+		if (downgrade === true) {
+
+			shiplevel = -1;
+
+
+			for (var lvlid in _config.downgrade) {
+
+				var lvl = parseInt(lvlid, 10);
+				var min = _config.downgrade[lvlid].min;
+				var max = _config.downgrade[lvlid].max;
+
+				if (points > min && points < max) {
+					shiplevel = lvl;
+				}
+
+			}
+
+		}
+
+
+		return shiplevel;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(game) {
 
@@ -49,33 +106,7 @@ lychee.define('game.logic.Game').requires([
 		 * PRIVATE API
 		 */
 
-		__processUpdate: function(data, checkdowngrade) {
-
-			checkdowngrade = checkdowngrade === true;
-
-
-			var points = data.points;
-			var newlvl = 0;
-			if (points > 2000)   newlvl = 1;
-			if (points > 20000)  newlvl = 2;
-			if (points > 50000)  newlvl = 3;
-			if (points > 75000)  newlvl = 4;
-			if (points > 100000) newlvl = 5;
-
-
-			if (checkdowngrade === true) {
-
-				// Reserved lvl for no downgrade
-				newlvl = -1;
-
-				if (points < 1500)                    newlvl = 0;
-				if (points > 2000  && points < 19000) newlvl = 1;
-				if (points > 20000 && points < 49000) newlvl = 2;
-				if (points > 50000 && points < 74000) newlvl = 3;
-				if (points > 75000 && points < 99000) newlvl = 4;
-
-			}
-
+		__processUpdate: function(data, downgrade) {
 
 			var ship     = this.__level.getShip();
 			var oldstate = ship.state;
@@ -85,9 +116,11 @@ lychee.define('game.logic.Game').requires([
 				oldlvl = parseInt(oldstate.substr(-1), 10);
 			}
 
+			var newlvl = _get_ship_level(data.points, downgrade);
+
 
 			if (
-				oldlvl !== newlvl
+				   oldlvl !== newlvl
 				&& newlvl !== -1
 			) {
 
