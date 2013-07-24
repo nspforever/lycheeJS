@@ -23,7 +23,7 @@ lychee.define('tool.Font').requires([
 		this.__generator.bind('ready', this.__export, this);
 
 
-		this.__lightbox = new ui.Lightbox('font-lightbox', 'Exported lychee.Font');
+		this.__lightbox = new ui.Lightbox('font-lightbox', 'Exported Font');
 		ui.Main.get('main').add(this.__lightbox);
 
 
@@ -46,7 +46,6 @@ lychee.define('tool.Font').requires([
 			background: 'transparent',
 			firstChar: 32,
 			lastChar: 127,
-			spritemap: tool.FontGenerator.SPRITEMAP.x,
 
 			backend: null
 
@@ -120,21 +119,6 @@ lychee.define('tool.Font').requires([
 			}, this));
 
 
-			select = new ui.Select(function(value) {
-				var _value = tool.FontGenerator.SPRITEMAP[value] || this.settings.spritemap;
-				this.settings.spritemap = _value;
-				this.__refresh();
-			}, this);
-
-			new ui.Option('none (single images)', 'none').addTo(select);
-			new ui.Option('horizontal (x)', 'x').addTo(select);
-			new ui.Option('quadratic (xy)', 'xy').addTo(select);
-
-			select.set(this.settings.spritemap);
-
-			navi.add('Spritemap', select);
-
-
 			navi.add('Debug Mode', new ui.Radios([ 'on', 'off' ], 'off', function(value) {
 
 				if (value === 'on') {
@@ -187,14 +171,13 @@ lychee.define('tool.Font').requires([
 			viewport.clear();
 
 
-			if (data.images) {
+			if (data.texture) {
 
-				for (var i = 0, l = data.images.length; i < l; i++) {
-					viewport.add(data.images[i]);
-				}
+				var img = new Image();
+				img.src = data.texture;
 
-			} else if (data.sprite) {
-				viewport.add(data.sprite);
+				viewport.add(img);
+
 			}
 
 		},
@@ -206,87 +189,25 @@ lychee.define('tool.Font').requires([
 				this.__lightbox.set(null);
 
 
-				var code, desc, wrapper;
+				var wrapper = document.createElement('div');
+				wrapper.id  = 'font-lightbox-wrapper';
 
-				desc = document.createElement('h3');
-				desc.innerHTML = '1. Right Click / Save Image:';
-				this.__lightbox.add(desc);
-
-
-				wrapper = document.createElement('div');
-				wrapper.id = 'font-lightbox-wrapper';
-
-
-				var code = '// Preload image(s) using the lychee.Preloader, then create lychee.Font instance via:\n';
-
-
-				if (data.images) {
-
-					for (var i = 0, l = data.images.length; i < l; i++) {
-						wrapper.appendChild(data.images[i]);
-					}
-
-					code += '// @images {Array}\n\n';
-					code += 'new lychee.Font(\n\timages,\n\t' + data.settings + '\n);';
-
-				} else if (data.sprite) {
-
-					wrapper.appendChild(data.sprite);
-
-					code += '// @image {Image}\n\n';
-					code += 'new lychee.Font(\n\timage,\n\t' + data.settings + '\n);';
-
-				}
 
 				this.__lightbox.add(wrapper);
 
 
-				desc = document.createElement('h3');
-				desc.innerHTML = '2. Use lychee.Font:';
+				var desc = document.createElement('h3');
+				desc.innerHTML = 'Save as Font.&lt;name&gt;.fnt in entity/ folder:';
 				this.__lightbox.add(desc);
 
 
-				var textarea = new ui.Textarea(code);
+				var textarea = new ui.Textarea(JSON.stringify(data));
 				this.__lightbox.add(textarea);
 
 
 				this.__lightbox.show();
 
-
-				if (
-					this.settings.backend !== null
-					&& this.settings.spritemap === tool.FontGenerator.SPRITEMAP.none
-					&& global.confirm('Do you want to send the sliced images to the server?\nThis will store them in the same folder.') === true
-				) {
-					this.__sendToBackend(data.images);
-				}
-
 				this.__refresh();
-
-			}
-
-
-		},
-
-		__sendToBackend: function(images) {
-
-			if (this.settings.backend !== null) {
-
-				var url = this.settings.backend;
-				var id = this.settings.firstChar;
-
-				for (var i = 0, l = images.length; i < l; i++) {
-
-					var data = images[i].src;
-
-					var xhr = new XMLHttpRequest();
-					xhr.open('POST', url, false);
-					xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-					xhr.send('id=' + id + '&data=' + data);
-
-					id++;
-
-				}
 
 			}
 

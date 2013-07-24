@@ -16,12 +16,6 @@ lychee.define('tool.FontGenerator').tags({
 
 	};
 
-	Class.SPRITEMAP = {
-		none: 'none',
-		x:    'x',
-		xy:   'xy'
-	};
-
 
 	Class.prototype = {
 
@@ -34,8 +28,7 @@ lychee.define('tool.FontGenerator').tags({
 			outline: 1,
 			outlineColor: '#000',
 			firstChar: 32,
-			lastChar: 127,
-			spritemap: Class.SPRITEMAP.x
+			lastChar: 127
 		},
 
 		__updateFont: function(font, style, size) {
@@ -274,280 +267,19 @@ lychee.define('tool.FontGenerator').tags({
 			var baseline = this.__getBaseline(charset, widthMap, settings.spacing);
 
 
-			// 5. Generate Image and Settings for Spriting
-			var sprite = new Image();
-			sprite.src = this.__canvas.toDataURL('image/png');
-
-
+			// 5. Export settings
 			var exported = {
-				baseline: baseline,
-				charset: charset.join(''),
-				kerning: 0,
-				spacing: settings.spacing
+				texture:    this.__canvas.toDataURL('image/png'),
+				lineheight: this.__canvas.height,
+				map:        widthMap,
+				baseline:   baseline,
+				charset:    charset.join(''),
+				kerning:    0,
+				spacing:    settings.spacing
 			};
 
 
-			// 6. Sprite the Font now
-			var that = this;
-			sprite.onload = function() {
-
-				that.__sprite(this, that.__canvas.width, that.__canvas.height, exported, settings, widthMap);
-
-				settings = null;
-
-			};
-
-		},
-
-
-		__sprite: function(sprite, width, height, exported, settings, widthMap) {
-
-			switch (settings.spritemap) {
-
-				case Class.SPRITEMAP.none:
-
-					var images = [];
-					var outline = settings.outline;
-
-					for (var w = 0, margin = settings.spacing, l = widthMap.length; w < l; w++) {
-
-						var frameWidth = widthMap[w];
-
-						this.__canvas.width = frameWidth + settings.spacing * 2;
-						this.__canvas.height = height;
-
-						this.__ctx.drawImage(
-							sprite,
-							margin - settings.spacing,
-							0,
-							frameWidth + settings.spacing * 2,
-							height,
-							0,
-							0,
-							frameWidth + settings.spacing * 2,
-							height
-						);
-
-
-						var image = new Image();
-						image.src = this.__canvas.toDataURL('image/png');
-
-						images.push(image);
-
-						margin += frameWidth + settings.spacing * 2;
-
-					}
-
-
-					this.trigger('ready', [{
-						sprite: sprite,
-						images: images,
-						settings: JSON.stringify(exported)
-					}]);
-
-				break;
-
-
-				case Class.SPRITEMAP.x:
-
-					exported.map = widthMap;
-
-
-					var offset = settings.spacing;
-					for (var w = 0, l = widthMap.length; w < l; w++) {
-
-						var frame = {
-							width: widthMap[w],
-							height: height,
-							x: offset,
-							y: 0
-						};
-
-
-						offset += frame.width + settings.spacing * 2;
-
-
-						if (lychee.debug === true) {
-							this.__ctx.lineWidth = 1;
-							this.__ctx.strokeStyle = 'blue';
-							this.__ctx.strokeRect(frame.x, frame.y, frame.width, frame.height);
-						}
-
-					}
-
-
-					if (lychee.debug === true) {
-						this.__createShadowCopy(this.__canvas);
-					}
-
-
-					this.trigger('ready', [{
-						sprite: sprite,
-						settings: JSON.stringify(exported)
-					}]);
-
-				break;
-
-				case Class.SPRITEMAP.xy:
-
-					// 1. Determination of best matching sprite width
-					var spriteWidth = Math.round(Math.sqrt(width * height));
-					var spriteHeight = height;
-
-
-					// 2. Determination of sprite height && generation of spritemap
-					var spriteMap = [];
-					var srcOffsetX = settings.spacing;
-					var offsetX = 0;
-					var offsetY = 0;
-					for (var w = 0, l = widthMap.length; w < l; w++) {
-
-						var frame = {
-							width: widthMap[w] + settings.spacing * 2,
-							height: height,
-							sx: srcOffsetX - settings.spacing,
-							sy: 0,
-							dx: offsetX,
-							dy: offsetY
-						};
-
-
-						if (lychee.debug === true) {
-							this.__ctx.lineWidth = 1;
-							this.__ctx.strokeStyle = 'blue';
-							this.__ctx.strokeRect(srcOffsetX, 0, widthMap[w], height);
-							this.__ctx.strokeStyle = 'red';
-							this.__ctx.strokeRect(frame.sx, frame.sy, frame.width, frame.height);
-						}
-
-
-						spriteMap.push(frame);
-
-
-						offsetX += frame.width;
-						srcOffsetX += frame.width;
-
-
-						var nextFrameWidth = 0;
-						if (widthMap[w + 1] !== undefined) {
-							nextFrameWidth = widthMap[w + 1] + settings.spacing * 2;
-						}
-
-
-						if (offsetX + nextFrameWidth > spriteWidth) {
-							offsetX = 0;
-							offsetY += height;
-							spriteHeight += height;
-						}
-
-					}
-
-
-					if (lychee.debug === true) {
-						this.__createShadowCopy(this.__canvas);
-					}
-
-
-					// 3. Re-draw the sprite image
-					this.__canvas.width = spriteWidth;
-					this.__canvas.height = spriteHeight;
-
-
-					for (var s = 0, l = spriteMap.length; s < l; s++) {
-
-						var frame = spriteMap[s];
-
-						this.__ctx.drawImage(
-							sprite,
-							frame.sx,
-							frame.sy,
-							frame.width,
-							frame.height,
-							frame.dx,
-							frame.dy,
-							frame.width,
-							frame.height
-						);
-
-					}
-
-
-					// 4. Regenerate sprite image (data)
-					sprite = new Image();
-					sprite.src = this.__canvas.toDataURL('image/png');
-
-
-					// 5. Regenerate sprite map
-					widthMap = [];
-
-					for (var s = 0, l = spriteMap.length; s < l; s++) {
-
-						var frame = spriteMap[s];
-
-						widthMap.push({
-							width: frame.width - settings.spacing * 2,
-							height: frame.height,
-							x: frame.dx + settings.spacing,
-							y: frame.dy
-						});
-
-					}
-
-
-					if (lychee.debug === true) {
-
-						var that = this;
-
-						for (var w = 0, l = widthMap.length; w < l; w++) {
-
-							var map = widthMap[w];
-
-							this.__ctx.lineWidth = 1;
-							this.__ctx.strokeStyle = 'blue';
-							this.__ctx.strokeRect(map.x, map.y, map.width, map.height);
-							this.__ctx.strokeStyle = 'red';
-							this.__ctx.strokeRect(map.x - settings.spacing, map.y, map.width + settings.spacing * 2, map.height);
-
-						}
-
-					}
-
-					if (lychee.debug === true) {
-						this.__createShadowCopy(this.__canvas);
-					}
-
-
-					exported.map = widthMap;
-
-
-					this.trigger('ready', [{
-						sprite: sprite,
-						settings: JSON.stringify(
-							exported,
-							null,
-							'\t'
-						)
-					}]);
-
-					break;
-
-
-				default:
-
-					this.trigger('error', [ 'Invalid Spritemap Settings' ]);
-
-					break;
-
-			}
-
-		},
-
-		__createShadowCopy: function(canvas) {
-
-			var image = new Image();
-			image.src = canvas.toDataURL('image/png');
-
-			ui.Main.get('log').add(image);
+			this.trigger('ready', [ exported ]);
 
 		}
 

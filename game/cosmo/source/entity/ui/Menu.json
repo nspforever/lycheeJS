@@ -7,8 +7,9 @@
 
 		"singleplayer": { "animation": false },
 		"multiplayer":  { "animation": false },
+		"settings":     { "animation": false },
 		"highscores":   { "animation": false },
-		"settings":     { "animation": false }
+		"blank":        { "animation": false }
 
 	},
 
@@ -16,8 +17,9 @@
 
 		"singleplayer": [ { "x":   0, "y":   0, "w": 512, "h": 312} ],
 		"multiplayer":  [ { "x": 512, "y":   0, "w": 512, "h": 312} ],
-		"highscores":   [ { "x":   0, "y": 312, "w": 512, "h": 312} ],
-		"settings":     [ { "x": 512, "y": 312, "w": 512, "h": 312} ]
+		"settings":     [ { "x":   0, "y": 312, "w": 512, "h": 312} ],
+		"highscores":   [ { "x": 512, "y": 312, "w": 512, "h": 312} ],
+		"blank":        [ { "x":   0, "y": 624, "w": 512, "h": 312} ]
 
 	}
 
