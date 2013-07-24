@@ -9,7 +9,6 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	var _texture = attachments["png"];
 	var _config  = attachments["json"];
 
-	var _sprite = lychee.ui.Sprite;
 	var _spriteconfig = {
 		texture: _texture,
 		width:   _config.spritewidth,
@@ -148,7 +147,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 				font: this.game.fonts.normal,
 				position: {
 					x:  0,
-					y: -1/2 * height + 48
+					y: -1/2 * height + 32
 				}
 			});
 

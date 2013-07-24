@@ -12,8 +12,10 @@
 				"Menu":     [ "js", "json", "png" ],
 				"Title":    [ "js", "png" ],
 
-				"HUDLayer":    [ "js", "json", "png" ],
-				"ResultLayer": [ "js", "json", "png" ]
+				"HUDLayer":         [ "js", "json", "png" ],
+				"MultiplayerLayer": [ "js", "json", "png" ],
+				"ResultLayer":      [ "js", "json", "png" ],
+				"SettingsLayer":    [ "js" ]
 			},
 
 			"Background": [ "js", "png" ],

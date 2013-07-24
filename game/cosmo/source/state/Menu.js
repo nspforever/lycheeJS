@@ -4,6 +4,8 @@ lychee.define('game.state.Menu').requires([
 	'game.entity.ui.Arrow',
 	'game.entity.ui.Menu',
 	'game.entity.ui.Title',
+	'game.entity.ui.MultiplayerLayer',
+	'game.entity.ui.SettingsLayer',
 	'lychee.ui.Layer'
 ]).includes([
 	'lychee.game.State'
@@ -238,6 +240,11 @@ lychee.define('game.state.Menu').requires([
 				root.addEntity(entity);
 
 
+
+				/*
+				 * MULTI PLAYER
+				 */
+
 				entity = new game.entity.ui.Menu({
 					state: 'multiplayer',
 					position: {
@@ -247,12 +254,36 @@ lychee.define('game.state.Menu').requires([
 				});
 
 				entity.bind('touch', function() {
+
 					if (this.__locked === true) return false;
-					console.log('MULTI PLAYER');
+
+
+					var layer = this.getLayer('ui').getEntity('root').getEntity('multiplayer-layer');
+					if (layer !== null) {
+						layer.resetCode();
+					}
+
+					_navigate_vertical.call(this, 1);
+
 				}, this);
 
 				root.addEntity(entity);
 
+
+				entity = new game.entity.ui.MultiplayerLayer({
+					position: {
+						x: -1/2 * width,
+						y:  1/2 * height
+					}
+				}, this.game);
+
+				root.setEntity('multiplayer-layer', entity);
+
+
+
+				/*
+				 * SETTINGS
+				 */
 
 				entity = new game.entity.ui.Menu({
 					state: 'settings',
@@ -269,92 +300,20 @@ lychee.define('game.state.Menu').requires([
 
 				root.addEntity(entity);
 
-
-				entity = new game.entity.ui.Menu({
-					state: 'blank',
+				entity = new game.entity.ui.SettingsLayer({
 					position: {
 						x: 1/2 * width,
 						y: 1/2 * height
 					}
-				});
+				}, this.game);
 
-				root.addEntity(entity);
-
-
-				var settings = new lychee.ui.Layer({
-					width: width,
-					height: height,
-					position: {
-						x: 1/2 * width,
-						y: 1/2 * height
-					}
-				});
-
-				entity = new lychee.ui.Button({
-					label: 'Fullscreen:' + ((this.game.settings.fullscreen === true) ? ' On': 'Off'),
-					font:  this.game.fonts.normal,
-					position: {
-						x: 0,
-						y: -48
-					}
-				});
-
-				entity.bind('#touch', function(entity) {
-
-					var s = this.game.settings;
-					s.fullscreen = !s.fullscreen;
-
-					entity.setLabel('Fullscreen:' + ((s.fullscreen === true) ? ' On': 'Off'));
-
-					this.game.reset(true);
-
-				}, this);
-
-				settings.addEntity(entity);
-
-				entity = new lychee.ui.Button({
-					label: 'Music:     ' + ((this.game.settings.music === true) ? ' On': 'Off'),
-					font:  this.game.fonts.normal,
-					position: {
-						x: 0,
-						y: 0
-					}
-				});
-
-				entity.bind('#touch', function(entity) {
-
-					var s = this.game.settings;
-					s.music = !s.music;
-
-					entity.setLabel('Music:     ' + ((s.music === true) ? ' On': 'Off'));
-
-				}, this);
-
-				settings.addEntity(entity);
-
-				entity = new lychee.ui.Button({
-					label: 'Sound:     ' + ((this.game.settings.sound === true) ? ' On': 'Off'),
-					font:  this.game.fonts.normal,
-					position: {
-						x: 0,
-						y: 48
-					}
-				});
-
-				entity.bind('#touch', function(entity) {
-
-					var s = this.game.settings;
-					s.sound = !s.sound;
-
-					entity.setLabel('Sound:     ' + ((s.sound === true) ? ' On': 'Off'));
-
-				}, this);
-
-				settings.addEntity(entity);
+				root.setEntity('settings-layer', entity);
 
 
-				root.addEntity(settings);
 
+				/*
+				 * HIGH SCORES
+				 */
 
 				entity = new game.entity.ui.Menu({
 					state: 'highscores',
