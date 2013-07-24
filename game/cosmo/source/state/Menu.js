@@ -149,11 +149,6 @@ lychee.define('game.state.Menu').requires([
 		// TODO: Load Highscores via WebService
 		console.log('Loading Highscores...');
 
-		var loading = this.__loading;
-		if (loading !== null) {
-			loading.setLabel('Service unreachable.');
-		}
-
 	};
 
 
@@ -168,7 +163,6 @@ lychee.define('game.state.Menu').requires([
 
 
 		this.__background = null;
-		this.__loading    = null;
 
 		this.__cache      = { x: 0, y: 0 };
 		this.__locked     = false;
@@ -186,14 +180,9 @@ lychee.define('game.state.Menu').requires([
 			if (renderer !== null) {
 
 				var entity = null;
-				var width  = renderer.getEnvironment().width;
-				var height = renderer.getEnvironment().height;
-
-
-				this.__background = new game.entity.Background({
-					width:  width,
-					height: height
-				});
+				var env    = renderer.getEnvironment();
+				var width  = env.width;
+				var height = env.height;
 
 
 				this.removeLayer('ui');
@@ -201,216 +190,291 @@ lychee.define('game.state.Menu').requires([
 
 				var layer = new lychee.game.Layer();
 
-
-				entity = new game.entity.ui.Title({
-					position: {
-						x: 0,
-						y: -1/2 * height + 72
-					}
-				});
-
-				layer.setEntity('title', entity);
-
-
-				var root = new lychee.ui.Layer({
-					width:  4 * width,
-					height: 2 * height,
-					position: {
-						x: 3/2 * width,
-						y: 1/2 * height
-					}
-				});
-
-				layer.setEntity('root', root);
-
-
-				entity = new game.entity.ui.Menu({
-					state: 'singleplayer',
-					position: {
-						x: -3/2 * width,
-						y: -1/2 * height
-					}
-				});
-
-				entity.bind('touch', function() {
-					if (this.__locked === true) return false;
-					this.game.changeState('game');
-				}, this);
-
-				root.addEntity(entity);
-
-
-
-				/*
-				 * MULTI PLAYER
-				 */
-
-				entity = new game.entity.ui.Menu({
-					state: 'multiplayer',
-					position: {
-						x: -1/2 * width,
-						y: -1/2 * height
-					}
-				});
-
-				entity.bind('touch', function() {
-
-					if (this.__locked === true) return false;
-
-
-					var layer = this.getLayer('ui').getEntity('root').getEntity('multiplayer-layer');
-					if (layer !== null) {
-						layer.resetCode();
-					}
-
-					_navigate_vertical.call(this, 1);
-
-				}, this);
-
-				root.addEntity(entity);
-
-
-				entity = new game.entity.ui.MultiplayerLayer({
-					position: {
-						x: -1/2 * width,
-						y:  1/2 * height
-					}
-				}, this.game);
-
-				root.setEntity('multiplayer-layer', entity);
-
-
-
-				/*
-				 * SETTINGS
-				 */
-
-				entity = new game.entity.ui.Menu({
-					state: 'settings',
-					position: {
-						x:  1/2 * width,
-						y: -1/2 * height
-					}
-				});
-
-				entity.bind('touch', function() {
-					if (this.__locked === true) return false;
-					_navigate_vertical.call(this, 1);
-				}, this);
-
-				root.addEntity(entity);
-
-				entity = new game.entity.ui.SettingsLayer({
-					position: {
-						x: 1/2 * width,
-						y: 1/2 * height
-					}
-				}, this.game);
-
-				root.setEntity('settings-layer', entity);
-
-
-
-				/*
-				 * HIGH SCORES
-				 */
-
-				entity = new game.entity.ui.Menu({
-					state: 'highscores',
-					position: {
-						x:  3/2 * width,
-						y: -1/2 * height
-					}
-				});
-
-				entity.bind('touch', function() {
-					if (this.__locked === true) return false;
-					_navigate_vertical.call(this, 1);
-					_load_highscores.call(this);
-				}, this);
-
-				root.addEntity(entity);
-
-
-				var highscores = new lychee.ui.Layer({
-					width: width,
-					height: height,
-					position: {
-						x: 3/2 * width,
-						y: 1/2 * height
-					}
+				this.__background = new game.entity.Background({
+					width:  width,
+					height: height
 				});
 
 
-				entity = new lychee.ui.Button({
-					label: 'Loading...',
-					font: this.game.fonts.normal,
-					position: {
-						x: 0,
-						y: 0
-					}
-				});
+				if (
+					   width >= 640
+					&& height >= 440
+				) {
 
-				this.__loading = entity;
+					entity = new game.entity.ui.Title({
+						position: {
+							x: 0,
+							y: -1/2 * height + 64
+						}
+					});
 
-				highscores.addEntity(entity);
-
-
-				root.addEntity(highscores);
+					layer.setEntity('title', entity);
 
 
+					var root = new lychee.ui.Layer({
+						width:  4 * width,
+						height: 2 * height,
+						position: {
+							x: 3/2 * width,
+							y: 1/2 * height
+						}
+					});
 
-				/*
-				 * NAVIGATION ARROWS
-				 */
+					layer.setEntity('root', root);
 
-				entity = new game.entity.ui.Arrow({
-					state: 'top',
-					position: {
-						x: 0,
-						y: -1 * (156 + 64)
-					},
-					visible: false
-				});
 
-				entity.bind('touch', function() {
-					if (this.__locked === true) return false;
-					_navigate_vertical.call(this, -1);
-				}, this);
+					entity = new game.entity.ui.Menu({
+						state: 'singleplayer',
+						position: {
+							x: -3/2 * width,
+							y: -1/2 * height
+						}
+					});
 
-				layer.setEntity('top', entity);
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
+						this.game.changeState('game');
+					}, this);
 
-				entity = new game.entity.ui.Arrow({
-					state: 'left',
-					position: {
-						x: -1 * (256 + 64),
-						y:  0
-					},
-					visible: false
-				});
+					root.addEntity(entity);
 
-				entity.bind('touch', function() {
-					if (this.__locked === true) return false;
-					_navigate_horizontal.call(this, -1);
-				}, this);
 
-				layer.setEntity('left', entity);
 
-				entity = new game.entity.ui.Arrow({
-					state: 'right',
-					position: {
-						x: 1 * (256 + 64),
-						y: 0
-					}
-				});
+					/*
+					 * MULTI PLAYER
+					 */
 
-				entity.bind('touch', function() {
-					if (this.__locked === true) return false;
-					_navigate_horizontal.call(this, 1);
-				}, this);
+					entity = new game.entity.ui.Menu({
+						state: 'multiplayer',
+						position: {
+							x: -1/2 * width,
+							y: -1/2 * height
+						}
+					});
 
-				layer.setEntity('right', entity);
+					entity.bind('touch', function() {
 
+						if (this.__locked === true) return false;
+
+
+						var layer = this.getLayer('ui').getEntity('root').getEntity('multiplayer-layer');
+						if (layer !== null) {
+							layer.resetCode();
+						}
+
+						_navigate_vertical.call(this, 1);
+
+					}, this);
+
+					root.addEntity(entity);
+
+
+					entity = new game.entity.ui.MultiplayerLayer({
+						position: {
+							x: -1/2 * width,
+							y:  1/2 * height
+						}
+					}, this.game);
+
+					root.setEntity('multiplayer-layer', entity);
+
+
+
+					/*
+					 * SETTINGS
+					 */
+
+					entity = new game.entity.ui.Menu({
+						state: 'settings',
+						position: {
+							x:  1/2 * width,
+							y: -1/2 * height
+						}
+					});
+
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
+						_navigate_vertical.call(this, 1);
+					}, this);
+
+					root.addEntity(entity);
+
+					entity = new game.entity.ui.SettingsLayer({
+						position: {
+							x: 1/2 * width,
+							y: 1/2 * height
+						}
+					}, this.game);
+
+					root.setEntity('settings-layer', entity);
+
+
+
+					/*
+					 * HIGH SCORES
+					 */
+
+					entity = new game.entity.ui.Menu({
+						state: 'highscores',
+						position: {
+							x:  3/2 * width,
+							y: -1/2 * height
+						}
+					});
+
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
+						_navigate_vertical.call(this, 1);
+						_load_highscores.call(this);
+					}, this);
+
+					root.addEntity(entity);
+
+
+					var highscores = new lychee.ui.Layer({
+						width: width,
+						height: height,
+						position: {
+							x: 3/2 * width,
+							y: 1/2 * height
+						}
+					});
+
+
+					entity = new lychee.ui.Button({
+						label: 'Loading...',
+						font: this.game.fonts.normal,
+						position: {
+							x: 0,
+							y: 0
+						}
+					});
+
+					highscores.addEntity(entity);
+
+
+					root.addEntity(highscores);
+
+
+
+					/*
+					 * NAVIGATION ARROWS
+					 */
+
+					entity = new game.entity.ui.Arrow({
+						state: 'top',
+						position: {
+							x: 0,
+							y: -1 * (156 + 32)
+						},
+						visible: false
+					});
+
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
+						_navigate_vertical.call(this, -1);
+					}, this);
+
+					layer.setEntity('top', entity);
+
+					entity = new game.entity.ui.Arrow({
+						state: 'left',
+						position: {
+							x: -1 * (256 + 32),
+							y:  0
+						},
+						visible: false
+					});
+
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
+						_navigate_horizontal.call(this, -1);
+					}, this);
+
+					layer.setEntity('left', entity);
+
+					entity = new game.entity.ui.Arrow({
+						state: 'right',
+						position: {
+							x: 1 * (256 + 32),
+							y: 0
+						}
+					});
+
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
+						_navigate_horizontal.call(this, 1);
+					}, this);
+
+					layer.setEntity('right', entity);
+
+				} else {
+
+					layer.addEntity(new game.entity.ui.Menu({
+						state: 'blank',
+						position: {
+							x: 0,
+							y: 0
+						}
+					}));
+
+					entity = new lychee.ui.Button({
+						label: 'Sorry,but...',
+						font: this.game.fonts.normal,
+						position: {
+							x: 0,
+							y: -1/2 * 312 + 32
+						}
+					});
+
+					layer.addEntity(entity);
+
+
+					entity = new lychee.ui.Button({
+						label: 'Cosmo requires a',
+						font: this.game.fonts.small,
+						position: {
+							x: 0,
+							y: -48
+						}
+					});
+
+					layer.addEntity(entity);
+
+					entity = new lychee.ui.Button({
+						label: 'minimum resolution',
+						font: this.game.fonts.small,
+						position: {
+							x: 0,
+							y: -24
+						}
+					});
+
+					layer.addEntity(entity);
+
+					entity = new lychee.ui.Button({
+						label: 'of',
+						font: this.game.fonts.small,
+						position: {
+							x: 0,
+							y: 0
+						}
+					});
+
+					layer.addEntity(entity);
+
+					entity = new lychee.ui.Button({
+						label: '640 x 440',
+						font: this.game.fonts.normal,
+						position: {
+							x: 0,
+							y: 48
+						}
+					});
+
+					layer.addEntity(entity);
+
+				}
 
 
 				this.setLayer('ui', layer);

@@ -16,7 +16,7 @@ lychee.define('game.Main').requires([
 
 			title: 'Cosmo',
 
-			fullscreen: false,
+			fullscreen: true,
 
 			music: false,
 			sound: true,
