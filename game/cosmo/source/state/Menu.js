@@ -233,6 +233,22 @@ lychee.define('game.state.Menu').requires([
 
 					entity.bind('touch', function() {
 						if (this.__locked === true) return false;
+						_navigate_vertical.call(this, 1);
+					}, this);
+
+					root.addEntity(entity);
+
+
+					entity = new game.entity.ui.Menu({
+						state: 'controls',
+						position: {
+							x: -3/2 * width,
+							y:  1/2 * height
+						}
+					});
+
+					entity.bind('touch', function() {
+						if (this.__locked === true) return false;
 						this.game.changeState('game');
 					}, this);
 
