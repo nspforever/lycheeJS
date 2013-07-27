@@ -46,6 +46,43 @@ lychee.define('game.Main').requires([
 
 	Class.prototype = {
 
+		reshape: function(orientation, rotation, width, height) {
+
+			var resetstates = false;
+
+			var renderer = this.renderer;
+			if (
+				   width !== undefined
+				&& height !== undefined
+				&& renderer !== null
+			) {
+
+				var env = renderer.getEnvironment();
+
+				if (
+					this.settings.fullscreen === true
+					&& (
+						   env.width !== width
+						|| env.height !== height
+					)
+				) {
+
+					resetstates = true;
+
+				}
+
+			}
+
+
+			lychee.game.Main.prototype.reshape.call(this, orientation, rotation, width, height);
+
+
+			if (resetstates === true) {
+				this.resetStates();
+			}
+
+		},
+
 		reset: function(state) {
 
 			game.DeviceSpecificHacks.call(this);

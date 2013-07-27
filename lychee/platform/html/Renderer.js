@@ -35,6 +35,7 @@ lychee.define('Renderer').tags({
 
 		id = typeof id === 'string' ? id : null;
 
+
 		this.__id     = id;
 		this.__canvas = global.document.createElement('canvas');
 		this.__ctx    = this.__canvas.getContext('2d');
@@ -60,6 +61,7 @@ lychee.define('Renderer').tags({
 
 
 		if (!this.__canvas.parentNode) {
+			this.__canvas.className = 'lychee-Renderer-canvas';
 			global.document.body.appendChild(this.__canvas);
 		}
 

@@ -6,9 +6,11 @@ lychee.define('Viewport').tags({
 ]).supports(function(lychee, global) {
 
 	if (
-		typeof global.addEventListener === 'function'
+		   typeof global.addEventListener === 'function'
 		&& typeof global.innerWidth === 'number'
 		&& typeof global.innerHeight === 'number'
+		&& typeof document !== 'undefined'
+		&& typeof document.getElementsByClassName === 'function'
 	) {
 		return true;
 	}
@@ -18,13 +20,26 @@ lychee.define('Viewport').tags({
 
 }).exports(function(lychee, global) {
 
-	// I know, there's null and 0.
-	// This is wanted. See below.
+	var _active = true;
 	var _clock = {
 		orientationchange: null,
 		resize:            0
 	};
-	var _active = true;
+
+
+	var _webkit_hack = function() {
+
+		var elements = document.getElementsByClassName('lychee-Renderer-canvas');
+		for (var e = 0, el = elements.length; e < el; e++) {
+
+			var element = elements[e];
+
+			element.style.width  = '1px';
+			element.style.height = '1px';
+
+		}
+
+	};
 
 
 	var _instances = [];
@@ -42,31 +57,27 @@ lychee.define('Viewport').tags({
 
 		resize: function() {
 
-			// This fixes the multiple resize events bug
-			// The DOM-concept related Bug by design:
-			// 1. resize
-			// 2. orientationchange
-			// 3. resize (optional, if device was fast enough)
-			// 4. orientationchange
-			// 5. resize (if reflow was bad)
-			// 6. resize
+			// TODO: Evaluate when this hack can be removed
+			_webkit_hack();
+
 
 			if (
 				_clock.orientationchange === null
 				|| (
-					_clock.orientationchange !== null
-					&& _clock.resize < _clock.orientationchange
+					   _clock.orientationchange !== null
+					&& _clock.orientationchange > _clock.resize
 				)
 			) {
 
 				_clock.resize = Date.now();
+
 
 				for (var i = 0, l = _instances.length; i < l; i++) {
 
 					(function(instance) {
 						setTimeout(function() {
 							instance.__processReshape(global.innerWidth, global.innerHeight);
-						}, 500);
+						}, 1000);
 					})(_instances[i]);
 
 				}
@@ -192,19 +203,18 @@ lychee.define('Viewport').tags({
 
 
 		if (lychee.debug === true) {
-
 			console.log('lychee.Viewport: Supported methods are ' + methods.join(', '));
-
 		}
 
 	})();
 
 
+
 	var Class = function() {
 
 		this.__orientation = typeof global.orientation === 'number' ? global.orientation : 0;
-		this.__width  = global.innerWidth;
-		this.__height = global.innerHeight;
+		this.__width       = global.innerWidth;
+		this.__height      = global.innerHeight;
 
 		this.__isFullscreen = false;
 
@@ -265,13 +275,19 @@ lychee.define('Viewport').tags({
 		 */
 
 		__processOrientation: function(orientation) {
-			this.__orientation = orientation;
+
+			orientation = typeof orientation === 'number' ? orientation : null;
+
+			if (orientation !== null) {
+				this.__orientation = orientation;
+			}
+
 		},
 
 		__processReshape: function(width, height) {
 
 			if (
-				width === this.__width
+				   width === this.__width
 				&& height === this.__height
 			) {
 				return;
@@ -280,6 +296,7 @@ lychee.define('Viewport').tags({
 
 			this.__width  = width;
 			this.__height = height;
+
 
 
 			//    TOP
@@ -312,6 +329,38 @@ lychee.define('Viewport').tags({
 				}
 
 
+
+			//  BOTTOM
+			//
+			// [X][X][X] <- buttons
+			// |       |
+			// |       |
+			// |       |
+			// |       |
+			// |_______|
+			//
+			//    TOP
+
+			} else if (this.__orientation === 180) {
+
+				if (width > height) {
+					this.trigger('reshape', [
+						'landscape',
+						'landscape',
+						this.__width,
+						this.__height
+					]);
+				} else {
+					this.trigger('reshape', [
+						'portrait',
+						'portrait',
+						this.__width,
+						this.__height
+					]);
+				}
+
+
+
 			//    ____________    B
 			// T |            [x] O
 			// O |            [x] T
@@ -336,6 +385,7 @@ lychee.define('Viewport').tags({
 						this.__height
 					]);
 				}
+
 
 
 			// B    ____________

@@ -195,6 +195,25 @@ lychee.define('lychee.game.Main').requires([
 
 		},
 
+		resetStates: function() {
+
+			var current = this.getState();
+			if (current !== null) {
+				this.resetState();
+			}
+
+
+			for (var id in this.__states) {
+
+				var state = this.__states[id];
+				if (state === current) continue;
+
+				state.reset && state.reset();
+
+			}
+
+		},
+
 		setState: function(id, state) {
 
 			id = typeof id === 'string' ? id : null;

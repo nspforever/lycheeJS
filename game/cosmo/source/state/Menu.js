@@ -167,6 +167,7 @@ lychee.define('game.state.Menu').requires([
 		this.__cache      = { x: 0, y: 0 };
 		this.__locked     = false;
 
+
 		this.reset();
 
 	};
@@ -175,6 +176,9 @@ lychee.define('game.state.Menu').requires([
 	Class.prototype = {
 
 		reset: function() {
+
+			lychee.game.State.prototype.reset.call(this);
+
 
 			var renderer = this.renderer;
 			if (renderer !== null) {

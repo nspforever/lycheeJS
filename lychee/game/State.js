@@ -206,6 +206,16 @@ lychee.define('lychee.game.State').requires([
 
 		reset: function() {
 
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				var env = renderer.getEnvironment();
+
+				this.__layerOffsetX = env.width / 2;
+				this.__layerOffsetY = env.height / 2;
+
+			}
+
 		},
 
 		enter: function() {
@@ -221,14 +231,7 @@ lychee.define('lychee.game.State').requires([
 
 			var renderer = this.renderer;
 			if (renderer !== null) {
-
 				renderer.start();
-
-				var env = renderer.getEnvironment();
-
-				this.__layerOffsetX = env.width / 2;
-				this.__layerOffsetY = env.height / 2;
-
 			}
 
 		},
