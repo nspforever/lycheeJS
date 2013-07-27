@@ -14,7 +14,7 @@ lychee.define('Renderer').tags({
 
 
 	if (
-		typeof global.document !== 'undefined'
+		   typeof global.document !== 'undefined'
 		&& typeof global.document.createElement === 'function'
 		&& typeof global.CanvasRenderingContext2D !== 'undefined'
 	) {
@@ -30,6 +30,32 @@ lychee.define('Renderer').tags({
 	return false;
 
 }).exports(function(lychee, global, attachments) {
+
+	/*
+	 * HELPERS
+	 */
+
+	var _update_environment = function() {
+
+		var env = this.__environment;
+
+
+		env.screen.width  = global.innerWidth;
+		env.screen.height = global.innerHeight;
+
+		env.offset.x = this.__canvas.offsetLeft;
+		env.offset.y = this.__canvas.offsetTop;
+
+		env.width  = this.__width;
+		env.height = this.__height;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(id) {
 
@@ -67,25 +93,8 @@ lychee.define('Renderer').tags({
 
 	};
 
+
 	Class.prototype = {
-
-		__updateEnvironment: function() {
-
-			var env = this.__environment;
-
-
-			env.screen.width  = global.innerWidth;
-			env.screen.height = global.innerHeight;
-
-			env.offset.x = this.__canvas.offsetLeft;
-			env.offset.y = this.__canvas.offsetTop;
-
-			env.width  = this.__width;
-			env.height = this.__height;
-
-		},
-
-
 
 		/*
 		 * STATE AND ENVIRONMENT MANAGEMENT
@@ -115,7 +124,7 @@ lychee.define('Renderer').tags({
 			canvas.style.height = height + 'px';
 
 
-			this.__updateEnvironment();
+			_update_environment.call(this);
 
 		},
 
@@ -166,7 +175,6 @@ lychee.define('Renderer').tags({
 		},
 
 		getEnvironment: function() {
-			this.__updateEnvironment();
 			return this.__environment;
 		},
 
