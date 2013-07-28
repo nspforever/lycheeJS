@@ -2,87 +2,66 @@
 (function(lychee, global) {
 
 	var fs = require('fs');
+
 	var _environment = null;
 
 
-	var _font_id    = 0;
-	var _texture_id = 0;
 
+	/*
+	 * FONT IMPLEMENTATION
+	 */
 
-	var _parse_font_data = function(font, data) {
+	var _parse_font = function(data) {
 
-		if (data !== null) {
-
-			if (data.kerning > data.spacing) {
-				data.kerning = data.spacing;
-			}
-
-
-			for (var property in data) {
-
-				if (property === 'texture') {
-
-					var texture = new Texture(data[property]);
-					texture.load();
-
-					font.texture = texture;
-
-				} else if (
-					property !== 'map'
-					&& font[property] !== undefined
-				) {
-
-					font[property] = data[property];
-
-				}
-
-			}
-
-
-			if (data.map instanceof Array) {
-				_parse_font_map(font, data.map);
-			}
-
-		} else {
-
-			console.warn('FNT file at ' + font.url + ' is invalid.');
-
-			if (font.__onload) {
-				font.__onload();
-			}
-
+		if (
+			   typeof data.kerning === 'number'
+			&& typeof data.spacing === 'number'
+			&& data.kerning > data.spacing
+		) {
+			data.kerning = data.spacing;
 		}
 
-	};
 
-	var _parse_font_map = function(font, map) {
+		if (data.texture !== undefined) {
+			this.texture = new Texture(data.texture);
+			this.texture.load();
+		}
 
-		if (map instanceof Array) {
 
-			var offset = font.spacing;
+		this.baseline   = typeof data.baseline === 'number'    ? data.baseline   : this.baseline;
+		this.charset    = typeof data.charset === 'string'     ? data.charset    : this.charset;
+		this.spacing    = typeof data.spacing === 'number'     ? data.spacing    : this.spacing;
+		this.kerning    = typeof data.kerning === 'number'     ? data.kerning    : this.kerning;
+		this.lineheight = typeof data.lineheight === 'number'  ? data.lineheight : this.lineheight;
 
-			for (var c = 0, cl = font.charset.length; c < cl; c++) {
+
+		if (data.map instanceof Array) {
+
+			var offset = this.spacing;
+
+			for (var c = 0, cl = this.charset.length; c < cl; c++) {
 
 				var chr = {
-					id:     font.charset[c],
-					width:  map[c] + font.spacing * 2,
-					height: font.lineheight,
-					real:   map[c],
-					x:      offset - font.spacing,
+					id:     this.charset[c],
+					width:  data.map[c] + this.spacing * 2,
+					height: this.lineheight,
+					real:   data.map[c],
+					x:      offset - this.spacing,
 					y:      0
 				};
 
 				offset += chr.width;
 
-				font.__buffer[chr.id] = chr;
+
+				this.__buffer[chr.id] = chr;
 
 			}
 
 		}
 
 
-		if (font.__onload) {
-			font.__onload();
+		if (this.onload instanceof Function) {
+			this.onload();
 		}
 
 	};
@@ -90,9 +69,11 @@
 
 	var Font = function(url) {
 
-		this.url      = url;
-		this.__id     = _font_id++;
-		this.__buffer = {};
+		// Hint: default charset from 32 to 126
+
+		this.url        = url;
+		this.onload     = null;
+		this.texture    = null;
 
 		this.baseline   = 0;
 		this.charset    = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
@@ -100,14 +81,19 @@
 		this.kerning    = 0;
 		this.lineheight = 0;
 
+		this.__buffer   = {};
+
 	};
 
-	Object.defineProperty(Font.prototype, 'texture', {
 
-		get: function() {
+	Font.prototype = {
 
-			if (this.__texture != null) {
-				return this.__texture.buffer || null;
+		get: function(character) {
+
+			character = typeof character === 'string' ? character : null;
+
+			if (character !== null) {
+				return this.__buffer[character] || null;
 			}
 
 
@@ -115,118 +101,131 @@
 
 		},
 
-		set: function(texture) {
-
-			if (texture instanceof Texture) {
-				this.__texture = texture;
-			}
-
-		}
-
-	});
-
-	Object.defineProperty(Font.prototype, 'get', {
-
-		value: function(chr) {
-			return this.__buffer[chr] || null;
-		},
-
-		enumerable: true,
-		writable: false,
-		configurable: false
-
-	});
-
-	Object.defineProperty(Font.prototype, 'onload', {
-
-		get: function() {
-			return this.__onload || null;
-		},
-
-		set: function(callback) {
-			this.__onload = callback;
-		}
-
-	});
-
-	Object.defineProperty(Font.prototype, 'load', {
-
-		value: function() {
+		load: function() {
 
 			var that = this;
-
-			var url = this.url;
-
+			var url  = this.url;
 
 			fs.readFile(url, 'utf8', function(err, raw) {
 
+				var data = null;
+
 				if (!err) {
 
-					var data = null;
 					try {
 						data = JSON.parse(raw);
 					} catch(e) {
 					}
 
-					_parse_font_data(that, data);
+					if (data !== null) {
+						_parse_font.call(that, data);
+					}
 
+				}
+
+				if (data === null) {
+
+					if (lychee.debug === true) {
+						console.error('bootstrap.js: Font at ' + url + ' is invalid.');
+					}
+
+				}
+
+				if (that.onload instanceof Function) {
+					that.onload();
 				}
 
 			});
 
-		},
+		}
 
-		writable: false,
-		enumerable: false,
-		configurable: false
+	};
 
-	});
+
+
+	/*
+	 * TEXTURE IMPLEMENTATION
+	 */
+
+	var _texture_id    = 0;
+	var _texture_cache = {};
+
+
+	var _clone_texture = function(origin, clone) {
+
+		clone.id     = origin.id;
+		clone.buffer = origin.buffer;
+		clone.width  = origin.width;
+		clone.height = origin.height;
+
+	};
 
 
 	var Texture = function(url) {
 
-		this.id     = _texture_id++;
-		this.buffer = null;
-		this.url    = url;
-		this.width  = 0;
-		this.height = 0;
+		this.id      = _texture_id++;
+		this.url     = url;
+		this.onload  = null;
+
+		this.buffer  = null;
+		this.width   = 0;
+		this.height  = 0;
+
+
+		if (_texture_cache[this.url] !== undefined) {
+			_clone_texture(_texture_cache[this.url], this);
+		} else {
+			_texture_cache[this.url] = this;
+		}
 
 	};
 
-	Object.defineProperty(Texture.prototype, 'onload', {
 
-		get: function() {
-			return this.__onload || null;
-		},
+	Texture.prototype = {
 
-		set: function(callback) {
-			this.__onload = callback;
-		}
+		load: function() {
 
-	});
+			if (this.buffer !== null) return;
 
-	Object.defineProperty(Texture.prototype, 'load', {
-
-		value: function() {
 
 			var that = this;
+			var url  = this.url;
 
-			fs.readFile(this.url, 'binary', function(err, data) {
-				that.buffer = data;
+			fs.readFile(this.url, 'binary', function(err, raw) {
+
+				var data = null;
+
+				if (!err) {
+
+					that.buffer = raw;
+					that.width  = 0;
+					that.height = 0;
+
+				}
+
+				if (data === null) {
+
+					if (lychee.debug === true) {
+						console.error('bootstrap.js: Font at ' + url + ' is invalid.');
+					}
+
+				}
+
+				if (that.onload instanceof Function) {
+					that.onload();
+				}
+
 			});
 
-		},
+		}
 
-		writable: false,
-		enumerable: false,
-		configurable: false
-
-	});
+	};
 
 
-	global.Font    = Font;
-	global.Texture = Texture;
 
+	/*
+	 * PRELOADER IMPLEMENTATION
+	 */
 
 	lychee.Preloader.prototype._load = function(url, type, _cache) {
 
@@ -333,6 +332,10 @@
 	};
 
 
+
+	/*
+	 * REQUIRED POLYFILLS
+	 */
 
 
 	var _keypress = function(stream) {
@@ -605,6 +608,16 @@
 		}
 
 	};
+
+
+
+	/*
+	 * EXPORTS
+	 */
+
+	global.Font    = Font;
+	global.Texture = Texture;
+
 
 
 	module.exports = function(env) {

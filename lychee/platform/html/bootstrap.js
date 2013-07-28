@@ -205,9 +205,10 @@
 	};
 
 
-	global.Font    = Font;
-	global.Texture = Texture;
 
+	/*
+	 * PRELOADER IMPLEMENTATION
+	 */
 
 	lychee.Preloader.prototype._load = function(url, type, _cache) {
 
@@ -339,6 +340,15 @@
 		}
 
 	};
+
+
+
+	/*
+	 * EXPORTS
+	 */
+
+	global.Font    = Font;
+	global.Texture = Texture;
 
 })(this.lychee, this);
 
