@@ -2,7 +2,7 @@
 (function(lychee, global) {
 
 	/*
-	 * HELPERS
+	 * FONT IMPLEMENTATION
 	 */
 
 	var _parse_font = function(data) {
@@ -61,18 +61,13 @@
 	};
 
 
-
-	/*
-	 * FONT IMPLEMENTATION
-	 */
-
 	var Font = function(url) {
 
 		// Hint: default charset from 32 to 126
 
-		this.url     = url;
-		this.onload  = null;
-		this.texture = null;
+		this.url        = url;
+		this.onload     = null;
+		this.texture    = null;
 
 		this.baseline   = 0;
 		this.charset    = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
@@ -80,7 +75,7 @@
 		this.kerning    = 0;
 		this.lineheight = 0;
 
-		this.__buffer = {};
+		this.__buffer   = {};
 
 	};
 
@@ -148,18 +143,36 @@
 	 * TEXTURE IMPLEMENTATION
 	 */
 
-	var _texture_id = 0;
+	var _texture_id    = 0;
+	var _texture_cache = {};
+
+
+	var _clone_texture = function(origin, clone) {
+
+		clone.id     = origin.id;
+		clone.buffer = origin.buffer;
+		clone.width  = origin.width;
+		clone.height = origin.height;
+
+	};
+
 
 	var Texture = function(url) {
 
 		this.id      = _texture_id++;
 		this.url     = url;
 		this.onload  = null;
-		this.texture = null;
 
-		this.buffer = null;
-		this.width  = 0;
-		this.height = 0;
+		this.buffer  = null;
+		this.width   = 0;
+		this.height  = 0;
+
+
+		if (_texture_cache[this.url] !== undefined) {
+			_clone_texture(_texture_cache[this.url], this);
+		} else {
+			_texture_cache[this.url] = this;
+		}
 
 	};
 
@@ -167,6 +180,9 @@
 	Texture.prototype = {
 
 		load: function() {
+
+			if (this.buffer !== null) return;
+
 
 			var that = this;
 
