@@ -550,39 +550,44 @@ lychee.define('Renderer').tags({
 				y1 -= baseline / 2;
 
 
-				var margin = 0;
+				var margin  = 0;
+				var texture = font.texture;
 
-				for (t = 0, l = text.length; t < l; t++) {
+				if (texture !== null) {
 
-					var chr = font.get(text[t]);
+					for (t = 0, l = text.length; t < l; t++) {
 
-					if (lychee.debug === true) {
+						var chr = font.get(text[t]);
 
-						this.drawBox(
-							x1 + margin,
+						if (lychee.debug === true) {
+
+							this.drawBox(
+								x1 + margin,
+								y1,
+								x1 + margin + chr.real,
+								y1 + chr.height,
+								'#00ff00',
+								false,
+								1
+							);
+
+						}
+
+						this.__ctx.drawImage(
+							texture.buffer,
+							chr.x,
+							chr.y,
+							chr.width,
+							chr.height,
+							x1 + margin - font.spacing,
 							y1,
-							x1 + margin + chr.real,
-							y1 + chr.height,
-							'#00ff00',
-							false,
-							1
+							chr.width,
+							chr.height
 						);
 
+						margin += chr.real + font.kerning;
+
 					}
-
-					this.__ctx.drawImage(
-						font.texture,
-						chr.x,
-						chr.y,
-						chr.width,
-						chr.height,
-						x1 + margin - font.spacing,
-						y1,
-						chr.width,
-						chr.height
-					);
-
-					margin += chr.real + font.kerning;
 
 				}
 
