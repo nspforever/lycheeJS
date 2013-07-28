@@ -62,20 +62,17 @@
 
 
 
-
-
-
 	/*
-	 * DATA TYPES
+	 * FONT IMPLEMENTATION
 	 */
 
 	var Font = function(url) {
 
 		// Hint: default charset from 32 to 126
 
-		this.url      = url;
-		this.onload   = null;
-		this.texture  = null;
+		this.url     = url;
+		this.onload  = null;
+		this.texture = null;
 
 		this.baseline   = 0;
 		this.charset    = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
@@ -147,59 +144,49 @@
 
 
 
-
-
-
-
-
-
+	/*
+	 * TEXTURE IMPLEMENTATION
+	 */
 
 	var _texture_id = 0;
 
-
 	var Texture = function(url) {
 
-		this.id     = _texture_id++;
+		this.id      = _texture_id++;
+		this.url     = url;
+		this.onload  = null;
+		this.texture = null;
+
 		this.buffer = null;
-		this.url    = url;
 		this.width  = 0;
 		this.height = 0;
 
 	};
 
-	Object.defineProperty(Texture.prototype, 'onload', {
 
-		get: function() {
-			return this.__onload || null;
-		},
+	Texture.prototype = {
 
-		set: function(callback) {
-			this.__onload = callback;
-		}
-
-	});
-
-	Object.defineProperty(Texture.prototype, 'load', {
-
-		value: function() {
+		load: function() {
 
 			var that = this;
+
 			var img = new Image();
 			img.onload = function() {
+
+				that.buffer = this;
 				that.width  = this.width;
 				that.height = this.height;
-				that.buffer = this;
-				that.__onload && that.__onload();
+
+				if (that.onload instanceof Function) {
+					that.onload();
+				}
+
 			};
 			img.src = this.url;
 
-		},
+		}
 
-		writable: false,
-		enumerable: false,
-		configurable: false
-
-	});
+	};
 
 
 	global.Font    = Font;
@@ -294,8 +281,8 @@
 			this.__pending[url] = false;
 			_cache[url] = '';
 
-			var link = document.createElement('link');
-			link.rel = 'stylesheet';
+			var link  = document.createElement('link');
+			link.rel  = 'stylesheet';
 			link.href = url;
 
 			document.head.appendChild(link);
