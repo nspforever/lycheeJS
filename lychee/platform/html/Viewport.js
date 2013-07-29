@@ -26,13 +26,13 @@ lychee.define('Viewport').tags({
 
 // TODO: REMOVE THIS CRAP
 var _lognode = document.createElement('ul');
-_lognode.style.cssText = 'position:absolute;top:0;right:0;bottom:0;left:0;text-align:center;z-index:998;';
+_lognode.style.cssText = 'position:absolute;top:0;right:0;left:0;z-index:998;background:rgba(0,0,0,0.1)';
 
-var console = { log: function(message) {
+var _log = function(message) {
 	var li = document.createElement('li');
 	li.innerText = message + '';
 	_lognode.appendChild(li);
-}};
+};
 
 
 
@@ -51,7 +51,7 @@ var console = { log: function(message) {
 
 		_reshaping = true;
 
-console.log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + global.innerHeight);
+_log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + global.innerHeight);
 
 
 		var elements = document.getElementsByClassName('lychee-Renderer-canvas');
