@@ -60,13 +60,7 @@
 		) {
 
 			if (_wrapper.parentNode !== null) {
-
-				_progress.style.width = '100%';
-
-				setTimeout(function() {
-					_wrapper.parentNode.removeChild(_wrapper);
-				}, 500);
-
+				_wrapper.parentNode.removeChild(_wrapper);
 			}
 
 			return;
