@@ -503,6 +503,30 @@ lychee.define('game.state.Menu').requires([
 
 		},
 
+		enter: function(data) {
+
+			this.loop.timeout(1000, function() {
+
+				if (this.game.settings.music === true) {
+					this.game.jukebox.play('music-menu', true);
+				}
+
+			}, this);
+
+			lychee.game.State.prototype.enter.call(this);
+
+		},
+
+		leave: function(data) {
+
+			if (this.game.settings.music === true) {
+				this.game.jukebox.stop('music-menu');
+			}
+
+			lychee.game.State.prototype.leave.call(this);
+
+		},
+
 		update: function(clock, delta) {
 
 			lychee.game.State.prototype.update.call(this, clock, delta);

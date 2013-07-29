@@ -18,7 +18,7 @@ lychee.define('game.Main').requires([
 
 			fullscreen: true,
 
-			music: false,
+			music: true,
 			sound: true,
 
 			input: {

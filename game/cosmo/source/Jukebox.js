@@ -14,7 +14,8 @@ lychee.define('game.Jukebox').includes([
 			'./asset/sound/ship-transformation',
 			'./asset/sound/explosion',
 
-			'./asset/music/space'
+			'./asset/music/menu',
+			'./asset/music/game'
 		];
 
 		var ids = [
@@ -23,7 +24,8 @@ lychee.define('game.Jukebox').includes([
 			'ship-transformation',
 			'explosion',
 
-			'music'
+			'music-menu',
+			'music-game'
 		];
 
 

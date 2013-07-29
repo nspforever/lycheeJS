@@ -115,7 +115,7 @@ lychee.define('game.state.Game').requires([
 
 
 			if (this.game.settings.music === true) {
-				this.game.jukebox.play('music', true);
+				this.game.jukebox.play('music-game', true);
 			}
 
 
@@ -126,7 +126,7 @@ lychee.define('game.state.Game').requires([
 		leave: function() {
 
 			if (this.game.settings.music === true) {
-				this.game.jukebox.stop('music', true);
+				this.game.jukebox.stop('music-game');
 			}
 
 
