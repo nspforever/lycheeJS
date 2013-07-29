@@ -9,8 +9,8 @@ lychee.define('Viewport').tags({
 		   typeof global.addEventListener === 'function'
 		&& typeof global.innerWidth === 'number'
 		&& typeof global.innerHeight === 'number'
-		&& typeof document !== 'undefined'
-		&& typeof document.getElementsByClassName === 'function'
+		&& typeof global.document !== 'undefined'
+		&& typeof global.document.getElementsByClassName === 'function'
 	) {
 		return true;
 	}
@@ -24,37 +24,44 @@ lychee.define('Viewport').tags({
 	 * EVENTS
 	 */
 
-// TODO: REMOVE THIS CRAP
-var _lognode = document.createElement('ul');
-_lognode.style.cssText = 'position:absolute;top:0;right:0;left:0;z-index:998;background:rgba(0,0,0,0.1)';
-
-var _log = function(message) {
-	var li = document.createElement('li');
-	li.innerText = message + '';
-	_lognode.appendChild(li);
-};
-
-
-
-	var _active    = true;
-	var _reshaping = false;
-	var _clock     = {
+	var _clock  = {
 		orientationchange: null,
 		resize:            0
 	};
 
+	var _focusactive   = true;
+	var _reshapeactive = false;
+	var _reshapewidth  = global.innerWidth;
+	var _reshapeheight = global.innerHeight;
 
 	var _reshape_viewport = function() {
 
-		if (_reshaping === true) return;
+		if (
+			_reshapeactive === true
+			|| (
+				   _reshapewidth === global.innerWidth
+				&& _reshapeheight === global.innerHeight
+			)
+		) {
+			 return false;
+		}
 
 
-		_reshaping = true;
-
-_log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + global.innerHeight);
+		_reshapeactive = true;
 
 
-		var elements = document.getElementsByClassName('lychee-Renderer-canvas');
+
+		/*
+		 * ISSUE in Mobile WebKit:
+		 *
+		 * An issue occurs if width of viewport is higher than
+		 * the width of the viewport of future rotation state.
+		 *
+		 * This bugfix prevents the viewport to scale higher
+		 * than 1.0, even if the meta tag is correctly setup.
+		 */
+
+		var elements = global.document.getElementsByClassName('lychee-Renderer-canvas');
 		for (var e = 0, el = elements.length; e < el; e++) {
 
 			var element = elements[e];
@@ -65,13 +72,24 @@ _log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + glob
 		}
 
 
+
+		/*
+		 * ISSUE in Mobile Firefox and Mobile WebKit
+		 *
+		 * The reflow is too slow for an update, so we have
+		 * to lock the heuristic to only be executed once,
+		 * waiting for a second to let the reflow finish.
+		 */
+
 		setTimeout(function() {
 
 			for (var i = 0, l = _instances.length; i < l; i++) {
-				_process_reshape.call(instance, global.innerWidth, global.innerHeight);
+				_process_reshape.call(_instances[i], global.innerWidth, global.innerHeight);
 			}
 
-			_reshaping = false;
+			_reshapewidth  = global.innerWidth;
+			_reshapeheight = global.innerHeight;
+			_reshapeactive = false;
 
 		}, 1000);
 
@@ -111,13 +129,13 @@ _log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + glob
 
 		focus: function() {
 
-			if (_active === false) {
+			if (_focusactive === false) {
 
 				for (var i = 0, l = _instances.length; i < l; i++) {
 					_instances[i].trigger('show', []);
 				}
 
-				_active = true;
+				_focusactive = true;
 
 			}
 
@@ -125,13 +143,13 @@ _log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + glob
 
 		blur: function() {
 
-			if (_active === true) {
+			if (_focusactive === true) {
 
 				for (var i = 0, l = _instances.length; i < l; i++) {
 					_instances[i].trigger('hide', []);
 				}
 
-				_active = false;
+				_focusactive = false;
 
 			}
 
