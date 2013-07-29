@@ -24,14 +24,35 @@ lychee.define('Viewport').tags({
 	 * EVENTS
 	 */
 
-	var _active = true;
-	var _clock = {
+// TODO: REMOVE THIS CRAP
+var _lognode = document.createElement('ul');
+_lognode.style.cssText = 'position:absolute;top:0;right:0;bottom:0;left:0;text-align:center;z-index:998;';
+
+var console = { log: function(message) {
+	var li = document.createElement('li');
+	li.innerText = message + '';
+	_lognode.appendChild(li);
+}};
+
+
+
+	var _active    = true;
+	var _reshaping = false;
+	var _clock     = {
 		orientationchange: null,
 		resize:            0
 	};
 
 
-	var _webkit_hack = function() {
+	var _reshape_viewport = function() {
+
+		if (_reshaping === true) return;
+
+
+		_reshaping = true;
+
+console.log('reshaping: ' + global.orientation + ' - ' + global.innerWidth + 'x' + global.innerHeight);
+
 
 		var elements = document.getElementsByClassName('lychee-Renderer-canvas');
 		for (var e = 0, el = elements.length; e < el; e++) {
@@ -43,6 +64,17 @@ lychee.define('Viewport').tags({
 
 		}
 
+
+		setTimeout(function() {
+
+			for (var i = 0, l = _instances.length; i < l; i++) {
+				_process_reshape.call(instance, global.innerWidth, global.innerHeight);
+			}
+
+			_reshaping = false;
+
+		}, 1000);
+
 	};
 
 
@@ -51,19 +83,16 @@ lychee.define('Viewport').tags({
 
 		orientationchange: function() {
 
-			_clock.orientationchange = Date.now();
-
 			for (var i = 0, l = _instances.length; i < l; i++) {
 				_process_orientation.call(_instances[i], global.orientation);
 			}
 
+			_clock.orientationchange = Date.now();
+			_reshape_viewport();
+
 		},
 
 		resize: function() {
-
-			// TODO: Evaluate when this hack can be removed
-			_webkit_hack();
-
 
 			if (
 				_clock.orientationchange === null
@@ -74,17 +103,7 @@ lychee.define('Viewport').tags({
 			) {
 
 				_clock.resize = Date.now();
-
-
-				for (var i = 0, l = _instances.length; i < l; i++) {
-
-					(function(instance) {
-						setTimeout(function() {
-							_process_reshape.call(instance, global.innerWidth, global.innerHeight);
-						}, 1000);
-					})(_instances[i]);
-
-				}
+				_reshape_viewport();
 
 			}
 
