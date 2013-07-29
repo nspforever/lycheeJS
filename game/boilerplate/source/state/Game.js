@@ -22,6 +22,9 @@ lychee.define('game.state.Game').requires([
 
 		reset: function() {
 
+			lychee.game.State.prototype.reset.call(this);
+
+
 			var renderer = this.renderer;
 			if (renderer !== null) {
 

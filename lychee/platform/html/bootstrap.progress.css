@@ -1,126 +1,57 @@
 
-#bootstrap-progress-bar {
+#lychee-bootstrap-progress {
 	display: block;
-	position: relative;
-	width: 50%;
-	height: 30px;
-	margin: 20% auto;
-	background-color: #111;
-	border-radius: 20px;
-	box-shadow: 0 1px 0 rgba(255,255,255,.03), inset 0 1px 0 rgba(0,0,0,.1);
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 	z-index: 999;
 }
 
-#bootstrap-progress-progress {
-	display: inline-block;
-	margin: 1px;
-	height: 28px;
-	width: 5%;
-
-	border: 1px solid #000;
-	border-bottom-color: #000;
-	background-color: #d3d3d3;
-	background-color: #222;
-	border-radius: 20px;
-
-	-moz-box-sizing: border-box;
-	-ms-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-
-	box-shadow: inset 0 8px 0 rgba(255,255,255,.2);
-	overflow: hidden;
-
-	background-image:
-		-webkit-linear-gradient(
-		-45deg,
-		rgba(255, 22, 22, 1) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(255, 22, 22, 1) 50%,
-		rgba(255, 22, 22, 1) 75%,
-		transparent 75%,
-		transparent
-	);
-	background-image:
-		-moz-linear-gradient(
-		-45deg,
-		rgba(255, 22, 22, 1) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(255, 22, 22, 1) 50%,
-		rgba(255, 22, 22, 1) 75%,
-		transparent 75%,
-		transparent
-	);
-	background-image:
-		-ms-linear-gradient(
-		-45deg,
-		rgba(255, 22, 22, 1) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(255, 22, 22, 1) 50%,
-		rgba(255, 22, 22, 1) 75%,
-		transparent 75%,
-		transparent
-	);
-	background-image:
-		linear-gradient(
-		-45deg,
-		rgba(255, 22, 22, 1) 25%,
-		transparent 25%,
-		transparent 50%,
-		rgba(255, 22, 22, 1) 50%,
-		rgba(255, 22, 22, 1) 75%,
-		transparent 75%,
-		transparent
-	);
-
-	-webkit-background-size: 50px 50px;
-	-moz-background-size: 50px 50px;
-	-ms-background-size: 50px 50px;
-	background-size: 50px 50px;
-
-	-webkit-animation: bootstrapprogressmove 2s linear infinite;
-	-moz-animation: bootstrapprogressmove 2s linear infinite;
-	-ms-animation: bootstrapprogressmove 2s linear infinite;
-	animation: bootstrapprogressmove 2s linear infinite;
-
-}
-
-#bootstrap-progress-message {
-	position: absolute;
+#lychee-bootstrap-progress > div {
 	display: block;
-	width: 100%;
-	height: 1em;
-	bottom: -2em;
+	position: relative;
+	width: 50%;
+	height: 96px;
+	margin: 25% auto;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACeElEQVRYR+1WMWhTQRi+YM0kpZoQoaYhDQUpNA4G6ZJk6GorolMHcSydiq7ZCg6dROgiCuKiUxtxc9BidCkxAYkihbZJXkmhQUVDKTS1nP2O/td7713iS3j2Uei/vLt7d/d9//f//935mMfm8xifnRJwRYG12xO8Vj/DLoX2Gb6w9IdXjvZ2NEmXJ7nUTQ5AmAqujhU2yuxe5XNbjK4IwOPllV8sv7lu43atPybGRi/3CWIgAWtF5GQSeDGS4lbvI71BkxoXz/UKFaAUbGu7oVWhYwUQ++zXvAnMCk4/EwODIjFhrwuGOwQQ//mlothU5zWBw2MYSMBa5ULHCnhOQI2/qgBibjWocCMREcPIBV0euKZAKwKuh4AUSE5fYJlnK9LpKf8ws5L4LwoAcSET528/bUjwd6Ud0VZJWJMQlfPwZ82meMch8IxAdX2Nk8tz0wnR/GLsShXqv/fZm4/fZH9x7JZIQNQ/zGh8714BfmBG+ejcv3N9xJTwAIepBCKDMXY/EJbzdPLjpykEQ48Y/1P0i0X1yp74Pv2RZJOlnNxIJWJicdgBMBkIPI5vim4oepZVnjf/nQNEggiUguPyjsdGqVxWhyvHXsbToo0khOxEgEj0XG2a1tsYeU6A6IEI2rNPUvJuR59ePerrB22cdOHzAXnm40zAjamGgLxfnTkKvY+ACNiaAxSCdq8fFZwOIwLfec+dv4hUMioRJCK8sypAdz15Tl5jHjxH4pHpvMc/WxXolDg2Atb4ow8lUBEgQYaXDg4YkpsynjyneVCglec0x9FRHL3r51SWWPigesVUSmq5key6mjctOuw4IqBb6NbYKQHPFfgL+PikmMrlcKUAAAAASUVORK5CYII=');
+	background-position: 12px 2px;
+	background-size: 48px 48px;
+	background-repeat: no-repeat;
+	border: 1px solid transparent;
+}
+
+#lychee-bootstrap-progress > div > div {
+	display: block;
+	position: relative;
+	height: 28px;
+	margin: 10px 0 10px 72px;
+	padding: 0 4px 0 0;
+	border: 3px solid #8f202f;
+	border-radius: 48px;
+}
+
+#lychee-bootstrap-progress > div > div > div {
+	position: static;
+	width: 10%;
+	height: 24px;
+	border: 2px solid #dd534d;
+	border-radius: 48px;
+	background: #8f202f;
+	-webkit-transition: width 500ms ease-out;
+}
+
+
+#lychee-bootstrap-progress > div > span {
+	display: block;
+	position: static;
+	height: auto;
+	margin: 0px 0px 0px 72px;
+	padding: 8px;
+	font-size: 16px;
 	text-align: center;
-	vertical-align: middle;
-	color: #fff;
-}
-
-#bootstrap-progress-bar.done {
-	display: none;
-}
-
-
-@-webkit-keyframes bootstrapprogressmove{
-	0% {   background-position: 0 0; }
-	100% { background-position: 50px 50px; }
-}
-
-@-moz-keyframes bootstrapprogressmove{
-	0% {   background-position: 0 0; }
-	100% { background-position: 50px 50px; }
-}
-
-@-ms-keyframes bootstrapprogressmove{
-	0% {   background-position: 0 0; }
-	100% { background-position: 50px 50px; }
-}
-
-@keyframes bootstrapprogressmove{
-	0% {   background-position: 0 0; }
-	100% { background-position: 50px 50px; }
+	border-radius: 24px;
+	background: rgba(0,0,0,0.9);
 }
 

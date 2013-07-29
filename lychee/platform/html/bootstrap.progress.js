@@ -1,33 +1,38 @@
 
 (function(lychee, global) {
 
-	var _bar      = null;
-	var _progress = null;
+	var doc = global.document || null;
+
+
 	var _message  = null;
+	var _progress = null;
+	var _wrapper  = null;
 
 	if (
-		typeof global.document !== 'undefined'
-		&& typeof global.document.addEventListener === 'function'
+		   doc !== null
+		&& typeof doc.createElement === 'function'
+		&& typeof doc.addEventListener === 'function'
+		&& typeof doc.querySelector === 'function'
 	) {
 
-		var _bar = global.document.createElement('div');
-		_bar.id = 'bootstrap-progress-bar';
-
-		var _progress = global.document.createElement('div');
-		_progress.id = 'bootstrap-progress-progress';
-
-		var _message = global.document.createElement('div');
-		_message.id = 'bootstrap-progress-message';
-
-		_bar.appendChild(_progress);
-		_bar.appendChild(_message);
+		_wrapper = global.document.createElement('div');
+		_wrapper.id        = 'lychee-bootstrap-progress';
+		_wrapper.innerHTML = '<div><div><div></div></div><span>Loading...</span></div>';
 
 
-		global.document.addEventListener("DOMContentLoaded", function() {
-			global.document.body.appendChild(_bar);
+		doc.addEventListener("DOMContentLoaded", function() {
+
+			doc.body.appendChild(_wrapper);
+
+			_message  = doc.querySelector('#lychee-bootstrap-progress > div > span');
+			_progress = doc.querySelector('#lychee-bootstrap-progress > div > div > div');
+
 		}, false);
 
 	}
+
+
+
 
 	var _count = function(obj) {
 
@@ -41,13 +46,27 @@
 	};
 
 
+
 	lychee.Preloader.prototype._progress = function(url, _cache) {
 
-		// called inside lychee.build()
-		if (url === null && _cache === null) {
 
-			if (_bar.parentNode !== null) {
-				_bar.parentNode.removeChild(_bar);
+		/*
+		 * RESERVED STATE FOR 100%
+		 */
+
+		if (
+			   url === null
+			&& _cache === null
+		) {
+
+			if (_wrapper.parentNode !== null) {
+
+				_progress.style.width = '100%';
+
+				setTimeout(function() {
+					_wrapper.parentNode.removeChild(_wrapper);
+				}, 500);
+
 			}
 
 			return;
@@ -55,16 +74,23 @@
 		}
 
 
-		var ready      = Object.keys(_cache).length;
-		var loading    = _count(this.__pending);
-		var percentage = (ready / (ready + loading) * 100) | 0;
 
 		if (_progress !== null) {
+
+
+			var ready      = Object.keys(_cache).length;
+			var loading    = _count(this.__pending);
+			var percentage = (ready / (ready + loading) * 100) | 0;
+
 			_progress.style.width = percentage + '%';
+
 		}
 
+
 		if (_message !== null) {
-			_message.innerHTML = url + ' (' + loading + ' left)';
+
+			_message.innerHTML = 'Loading: ' + url + ' (' + loading + ' left)';
+
 		}
 
 	};
