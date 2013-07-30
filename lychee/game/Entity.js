@@ -56,23 +56,13 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		this.__clock   = null;
 		this.__states  = _default_states;
 
-		this.__effect  = {
-			start:    null,
-			active:   false,
-			duration: 0,
-			from:     { x: 0, y: 0, z: 0 },
-			clear:    null,
-			callback: null,
-			scope:    null,
-			loop:     false
-		};
 		this.__tween   = {
 			active:       false,
 			type:         Class.TWEEN.linear,
 			start:        null,
 			duration:     0,
-			fromposition: { x: 0, y: 0 },
-			toposition:   { x: 0, y: 0 }
+			fromposition: { x: 0, y: 0, z: 0 },
+			toposition:   { x: 0, y: 0, z: 0 }
 		};
 
 
@@ -93,7 +83,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		// Reuse this cache for performance relevant methods
 		this.__cache = {
-			effect:   { x: 0, y: 0, z: 0 },
 			tween:    { x: 0, y: 0, z: 0 },
 			velocity: { x: 0, y: 0, z: 0 }
 		};
@@ -117,38 +106,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		B:    2,
 		C:    3,
 		D:    4
-	};
-
-
-	Class.EFFECT = {
-
-		wobble: {
-
-			defaults: {
-				x: 0, y: 0, z: 0
-			},
-
-			callback: function(effect, t) {
-
-				var set   = effect.settings;
-				var cache = this.__cache.effect;
-
-				cache.x = effect.from.x + Math.sin(t * 2 * Math.PI) * set.x;
-				cache.y = effect.from.y + Math.sin(t * 2 * Math.PI) * set.y;
-				cache.z = effect.from.z + Math.sin(t * 2 * Math.PI) * set.z;
-
-				return cache;
-
-			},
-
-			clear: function(effect) {
-
-				this.setPosition(effect.from);
-
-			}
-
-		}
-
 	};
 
 
@@ -246,10 +203,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 					this.__tween.start = clock;
 				}
 
-				if (this.__effect.active === true && this.__effect.start === null) {
-					this.__effect.start = clock;
-				}
-
 				this.__clock = clock;
 
 			}
@@ -291,6 +244,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 					var dx = to.x - from.x;
 					var dy = to.y - from.y;
+					var dz = to.z - from.z;
 
 
 					var cache = this.__cache.tween;
@@ -299,6 +253,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 						cache.x = from.x + t * dx;
 						cache.y = from.y + t * dy;
+						cache.z = from.z + t * dz;
 
 					} else if (type === Class.TWEEN.easein) {
 
@@ -306,6 +261,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 						cache.x = from.x + f * dx;
 						cache.y = from.y + f * dy;
+						cache.z = from.z + f * dz;
 
 					} else if (type === Class.TWEEN.easeout) {
 
@@ -313,6 +269,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 						cache.x = from.x + f * dx;
 						cache.y = from.y + f * dy;
+						cache.z = from.z + f * dz;
 
 					} else if (type === Class.TWEEN.bounceeasein) {
 
@@ -331,6 +288,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 						cache.x = from.x + (1 - f) * dx;
 						cache.y = from.y + (1 - f) * dy;
+						cache.z = from.z + (1 - f) * dz;
 
 					} else if (type === Class.TWEEN.bounceeaseout) {
 
@@ -348,6 +306,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 						cache.x = from.x + f * dx;
 						cache.y = from.y + f * dy;
+						cache.z = from.z + f * dz;
 
 					}
 
@@ -394,35 +353,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 
 				this.setPosition(cache);
-
-			}
-
-
-			var effect = this.__effect;
-
-			// 4. Effects
-			if (
-				effect.active === true
-				&& effect.start !== null
-			) {
-
-				t = (this.__clock - effect.start) / effect.duration;
-
-				if (t <= 1) {
-
-					cache = effect.callback.call(effect.scope, effect, t);
-
-					this.setPosition(cache);
-
-				} else {
-
-					if (effect.loop === true) {
-						effect.start = this.__clock;
-					} else {
-						effect.active = false;
-					}
-
-				}
 
 			}
 
@@ -611,10 +541,12 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 				if (settings.position instanceof Object) {
 					tween.toposition.x = typeof settings.position.x === 'number' ? settings.position.x : this.position.x;
 					tween.toposition.y = typeof settings.position.y === 'number' ? settings.position.y : this.position.y;
+					tween.toposition.z = typeof settings.position.z === 'number' ? settings.position.z : this.position.z;
 				}
 
 				tween.fromposition.x = this.position.x;
 				tween.fromposition.y = this.position.y;
+				tween.fromposition.z = this.position.z;
 
 				tween.start  = this.__clock;
 				tween.active = true;
@@ -647,65 +579,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 
 			return false;
-
-		},
-
-		setEffect: function(duration, enumdata, settings, scope, loop) {
-
-			duration = typeof duration === 'number' ? duration : null;
-			settings = settings instanceof Object   ? settings : null;
-			scope    = scope !== undefined          ? scope    : this;
-			loop     = loop === true;
-
-
-			if (
-				   duration !== null
-				&& enumdata instanceof Object
-				&& enumdata.callback instanceof Function
-			) {
-
-				var position = this.position;
-				var effect   = this.__effect;
-
-				effect.start    = this.__clock;
-				effect.active   = true;
-				effect.duration = duration;
-				effect.from.x   = position.x;
-				effect.from.y   = position.y;
-				effect.from.z   = position.z;
-				effect.clear    = enumdata.clear instanceof Function ? enumdata.clear : null;
-				effect.callback = enumdata.callback,
-				effect.scope    = scope;
-				effect.loop     = loop;
-
-
-				if (settings !== null) {
-					effect.settings = settings;
-				} else if (enumdata.defaults instanceof Object) {
-					effect.settings = lychee.extend({}, enumdata.defaults);
-				}
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-		clearEffect: function() {
-
-			if (
-				   this.__effect.active === true
-				&& this.__effect.clear !== null
-			) {
-
-				this.__effect.clear.call(this.__effect.scope, this.__effect);
-
-			}
-
-			this.__effect.active = false;
 
 		}
 
