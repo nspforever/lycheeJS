@@ -92,7 +92,7 @@ lychee.define('game.webserver.mod.File').requires([
 			};
 
 
-			if (mime.type === 'text/html') {
+			if (mime.type.substr(0,4 ) === 'text') {
 				response.header['Content-Type'] = mime.type + '; charset=utf-8';
 			}
 
@@ -114,6 +114,12 @@ lychee.define('game.webserver.mod.File').requires([
 					}
 
 				} else {
+
+					var info = host.fs.info(url);
+					if (info !== null) {
+						response.header['ETag'] = '"' + info.ino + '-' + info.size + '-' + Date.parse(info.mtime) + '"';
+					}
+
 
 					response.body = data;
 					callback(response);

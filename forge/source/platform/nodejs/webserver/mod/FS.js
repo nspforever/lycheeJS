@@ -255,6 +255,31 @@ lychee.define('game.webserver.mod.FS').tags({
 
 		},
 
+		info: function(file) {
+
+			var data = null;
+
+			try {
+				data = fs.statSync(file);
+			} catch(e) {
+			}
+
+
+			if (data !== null) {
+
+				return {
+					ino: data.ino,
+					size: data.size,
+					mtime: data.mtime
+				};
+
+			}
+
+
+			return null;
+
+		},
+
 		filter: function(prefix, suffix, type) {
 
 			prefix = typeof prefix === 'string' ? prefix : null;
