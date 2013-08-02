@@ -1,0 +1,14 @@
+{
+
+	"port": 8080,
+
+	"settings": [{
+		"hosts": [
+			"localhost"
+		],
+		"config": {
+			"root": "%root%"
+		}
+	}]
+
+}

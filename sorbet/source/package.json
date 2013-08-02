@@ -1,0 +1,27 @@
+{
+	"tags": {
+
+	},
+
+	"tree": {
+
+		"data": {
+			"Filesystem": [ "js" ],
+			"Filter":     [ "js" ],
+			"Map":        [ "js" ],
+			"Template":   [ "js" ],
+			"VHost":      [ "js" ]
+		},
+
+		"module": {
+			"Error":      [ "js", "html" ],
+			"File":       [ "js" ],
+			"Filter":     [ "js" ],
+			"Redirect":   [ "js" ],
+			"Welcome":    [ "js", "html" ]
+		},
+
+		"Main": [ "js" ]
+
+	}
+}
