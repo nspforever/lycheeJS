@@ -11,7 +11,11 @@ lychee.define('sorbet.module.Welcome').requires([
 	 * HELPERS
 	 */
 
-	var _generate_internal_projects = function(data) {
+	var _get_projects = function(folder, data) {
+
+		folder = typeof folder === 'string' ? folder : null;
+		data   = data !== undefined         ? data   : null;
+
 
 		var projects = [];
 
@@ -19,7 +23,7 @@ lychee.define('sorbet.module.Welcome').requires([
 		var root = this.root;
 
 		var files = fs.filter(
-			root + '/game',
+			root + folder,
 			'index.html',
 			sorbet.data.Filesystem.TYPE.file
 		);
@@ -42,38 +46,8 @@ lychee.define('sorbet.module.Welcome').requires([
 
 	};
 
-	var _generate_external_projects = function(data) {
 
-		var projects = [];
-
-		var fs   = this.fs;
-		var root = this.root;
-
-		var files = fs.filter(
-			root + '/external',
-			'index.html',
-			sorbet.data.Filesystem.TYPE.file
-		);
-
-
-		for (var f = 0, fl = files.length; f < fl; f++) {
-
-			var url = files[f].substr(root.length);
-			var tmp = url.split('/');
-
-			projects.push({
-				url:   url,
-				title: tmp[tmp.length - 2]
-			});
-
-		}
-
-
-		return projects;
-
-	};
-
-	var _generate_sockets = function(data) {
+	var _get_sockets = function(data) {
 
 		var sockets = [];
 
@@ -111,9 +85,9 @@ lychee.define('sorbet.module.Welcome').requires([
 			try {
 
 				content = _template.render({
-					internal_projects: _generate_internal_projects.call(host, data),
-					external_projects: _generate_external_projects.call(host, data),
-					sockets:           _generate_sockets.call(host, data),
+					internal_projects: _get_projects.call(host, '/game',     data),
+					external_projects: _get_projects.call(host, '/external', data),
+					sockets:           _get_sockets.call(host, data),
 					version:           version
 				});
 

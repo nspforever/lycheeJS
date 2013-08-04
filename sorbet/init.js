@@ -45,12 +45,12 @@ lychee.build(function(lychee, global) {
 	var config  = JSON.parse(fs.readFileSync(profile, 'utf8'));
 
 
-	var server = new sorbet.Main(
+	var main = new sorbet.Main(
 		root,
 		config.settings
 	);
 
-	server.listen(config.port);
+	main.listen(config.port);
 
 }, typeof global !== 'undefined' ? global : this);
 

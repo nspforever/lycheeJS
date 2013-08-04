@@ -18,6 +18,7 @@
 			"File":       [ "js" ],
 			"Filter":     [ "js" ],
 			"Redirect":   [ "js" ],
+			"Server":     [ "js" ],
 			"Welcome":    [ "js", "html" ]
 		},
 

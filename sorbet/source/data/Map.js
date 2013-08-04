@@ -8,6 +8,25 @@ lychee.define('sorbet.data.Map').exports(function(lychee, sorbet, global, attach
 
 	Class.prototype = {
 
+		all: function() {
+
+			var filtered = [];
+
+			for (var id in this.__map) {
+
+				var data = this.__map[id];
+
+				if (filtered.indexOf(data) === -1) {
+					filtered.push(data);
+				}
+
+			}
+
+
+			return filtered;
+
+		},
+
 		get: function(id) {
 
 			id = typeof id === 'string' ? id : null;

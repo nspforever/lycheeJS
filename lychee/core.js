@@ -80,6 +80,7 @@ if (typeof global !== 'undefined') {
 
 		}
 
+
 		return lychee;
 
 	};
@@ -93,6 +94,7 @@ if (typeof global !== 'undefined') {
 		if (settings !== null) {
 
 			for (var tag in settings) {
+
 				if (settings.hasOwnProperty(tag)) {
 
 					var values = null;
@@ -108,39 +110,81 @@ if (typeof global !== 'undefined') {
 					}
 
 				}
+
 			}
 
 		}
+
 
 		return lychee;
 
 	};
 
 
-	lychee.getEnvironment = function(name) {
+	lychee.createEnvironment = function() {
 
-		name = typeof name === 'string' ? name : null;
+		var sandboxenv = {};
 
+		for (var id in _cache.tree) {
 
-		if (name !== null) {
-
-			if (_cache[name] !== undefined) {
-				return _cache[name];
-			} else {
-				return null;
+			if (id.substr(0, 6) === 'lychee') {
+				sandboxenv.tree[id] = _cache.tree[id];
 			}
 
 		}
 
 
-		return _environment;
+		return sandboxenv;
 
+	};
+
+
+	lychee.createSandbox = function() {
+
+		var sandbox = {};
+
+		sandbox.lychee = {};
+
+
+		for (var id in lychee) {
+
+			if (
+				   id.match(/debug|define|extend|generate|rebase|tag|build|createEnvironment|createGlobal|getEnvironment|setEnvironment/)
+				|| id === 'DefinitionBlock'
+				|| id === 'VERSION'
+				|| id === 'Builder'
+				|| id === 'Preloader'
+			) {
+
+				sandbox.lychee[id] = lychee[id];
+
+			}
+
+		}
+
+
+		sandbox.setTimeout = function(callback, timeout) {
+			setTimeout(callback, timeout);
+		};
+
+		sandbox.setInterval = function(callback, interval) {
+			setInterval(callback, interval);
+		};
+
+
+		return sandbox;
+
+	};
+
+
+	lychee.getEnvironment = function() {
+		return _environment;
 	};
 
 	lychee.setEnvironment = function(object) {
 
 		if (
-			object !== null
+			   object !== null
 			&& object instanceof Object
 		) {
 
@@ -158,11 +202,16 @@ if (typeof global !== 'undefined') {
 
 
 			_environment = object;
+
+
 			return true;
 
 		} else {
 
 			_environment = _cache;
+
+
+			return true;
 
 		}
 
@@ -177,11 +226,20 @@ if (typeof global !== 'undefined') {
 	};
 
 
+	var _throw_warning = function(message) {
+
+		if (lychee.debug === true) {
+			console.warn('lychee.DefinitionBlock: Use lychee.define(\'' + this._space + '.' + this._id + '\').' + message + ' instead.');
+		}
+
+	};
+
+
 	lychee.DefinitionBlock = function(space, name) {
 
 		// allows new lychee.DefinitionBlock('Renderer') without a namespace
 		space = typeof name === 'string' ? space : null;
-		name = typeof name === 'string' ? name : space;
+		name  = typeof name === 'string' ? name  : space;
 
 
 		this._space    = space;
@@ -192,6 +250,7 @@ if (typeof global !== 'undefined') {
 		this._exports  = null;
 		this._supports = null;
 
+
 		return this;
 
 	};
@@ -199,29 +258,25 @@ if (typeof global !== 'undefined') {
 
 	lychee.DefinitionBlock.prototype = {
 
-		__throw: function(message) {
-
-			if (lychee.debug === true) {
-				console.warn('lychee.DefinitionBlock: Use lychee.define(\'' + this._space + '.' + this._id + '\').' + message + ' instead.', this);
-			}
-
-		},
-
 		tags: function(tags) {
 
-			if (!tags instanceof Object) {
-				this.__throw('tags({ tag: \'value\' })');
+			if (tags instanceof Object === false) {
+				_throw_warning.call(this, 'tags({ tag: \'value\' })');
 				return this;
 			}
 
+
 			for (var name in tags) {
+
 				if (tags.hasOwnProperty(name)) {
 
 					var value = tags[name];
 					this._tags[name] = value;
 
 				}
+
 			}
+
 
 			return this;
 
@@ -229,22 +284,26 @@ if (typeof global !== 'undefined') {
 
 		supports: function(supports) {
 
-			if (!supports instanceof Function) {
-				this.__throw('supports(function() {})');
+			if (supports instanceof Function === false) {
+				_throw_warning.call(this, 'supports(function() {})');
 				return this;
 			}
 
+
 			this._supports = supports;
 
+
 			return this;
+
 		},
 
 		requires: function(requires) {
 
-			if (!requires instanceof Array) {
-				this.__throw('requires([ \'array\', \'of\', \'requirements\' ])');
+			if (requires instanceof Array === false) {
+				_throw_warning.call(this, 'requires([ \'array\', \'of\', \'requirements\' ])');
 				return this;
 			}
+
 
 			for (var r = 0, l = requires.length; r < l; r++) {
 
@@ -262,22 +321,22 @@ if (typeof global !== 'undefined') {
 
 			}
 
+
 			return this;
 
 		},
 
 		includes: function(includes) {
 
-			if (!includes instanceof Array) {
-				this.__throw('includes([ \'array\', \'of\', \'includes\' ])');
+			if (includes instanceof Array === false) {
+				_throw_warning.call(this, 'includes([ \'array\', \'of\', \'includes\' ])');
 				return this;
 			}
+
 
 			for (var i = 0, l = includes.length; i < l; i++) {
 
 				var id;
-				// TODO: This needs to be more generic
-				// but dunno how atm
 
 				if (includes[i].match(/\./)) {
 					id = includes[i];
@@ -291,16 +350,18 @@ if (typeof global !== 'undefined') {
 
 			}
 
+
 			return this;
 
 		},
 
 		exports: function(exports) {
 
-			if (!exports instanceof Function) {
-				this.__throw('exports(function(lychee, global) { })');
+			if (exports instanceof Function === false) {
+				_throw_warning.call(this, 'exports(function(lychee, ' + (this._space !== 'lychee' ? (this._space + ', ') : '') + 'global, attachments) { })');
 				return this;
 			}
+
 
 			this._exports = exports;
 
@@ -332,23 +393,51 @@ if (typeof global !== 'undefined') {
 	}
 
 	if (console.error === undefined) {
-		console.error = global.console.log;
+
+		console.error = function() {
+
+			var args = [].splice.call(arguments, 0);
+
+			args.reverse();
+			args.push('(E)\t');
+			args.reverse();
+
+			console.log.apply(console, args);
+
+		};
+
 	}
 
 	if (console.warn === undefined) {
-		console.warn = global.console.log;
+
+		console.warn = function() {
+
+			var args = [].splice.call(arguments, 0);
+
+			args.reverse();
+			args.push('(W)\t');
+			args.reverse();
+
+			console.log.apply(console, args);
+
+		};
+
 	}
 
 	if (console.group === undefined) {
+
 		console.group = function(title) {
-			console.log('~ ~ ~ ' + title + '~ ~ ~');
+			console.log('~ ~ ~ ' + title + ' ~ ~ ~');
 		};
+
 	}
 
 	if (console.groupEnd === undefined) {
+
 		console.groupEnd = function() {
 			console.log('~ ~ ~ ~ ~ ~');
 		};
+
 	}
 
 })(typeof global !== 'undefined' ? global : this);

@@ -21,6 +21,9 @@ lychee.define('game.state.Demo').requires([
 
 		reset: function() {
 
+			lychee.game.State.prototype.reset.call(this);
+
+
 			var width  = 0;
 			var height = 0;
 

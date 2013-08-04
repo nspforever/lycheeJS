@@ -6,8 +6,11 @@ lychee.define('sorbet.data.VHost').requires([
 	var _filesystem = sorbet.data.Filesystem;
 
 
-	var Class = function(config) {
+	var _id = 0;
 
+	var Class = function(id, config) {
+
+		this.id   = id || ('vhost-' + _id++);
 		this.root = config.root;
 
 		this.fs = new _filesystem();

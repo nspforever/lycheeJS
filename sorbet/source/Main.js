@@ -4,6 +4,7 @@ lychee.define('sorbet.Main').requires([
 	'sorbet.module.File',
 	'sorbet.module.Filter',
 	'sorbet.module.Redirect',
+	'sorbet.module.Server',
 	'sorbet.module.Welcome',
 	'sorbet.data.Filesystem',
 	'sorbet.data.Map',
@@ -86,15 +87,8 @@ lychee.define('sorbet.Main').requires([
 		this.ports   = [];
 		this.servers = [];
 
-		this.modules = new _map();
 		this.vhosts  = new _map();
-
-
-		this.modules.set('error',    new _module['Error'](this));
-		this.modules.set('file',     new _module['File'](this));
-		this.modules.set('filter',   new _module['Filter'](this));
-		this.modules.set('redirect', new _module['Redirect'](this));
-		this.modules.set('welcome',  new _module['Welcome'](this));
+		this.modules = new _map();
 
 
 		for (var s = 0, sl = settings.length; s < sl; s++) {
@@ -106,12 +100,12 @@ lychee.define('sorbet.Main').requires([
 
 			config.root      = blob.config.root.replace('%root%', this.root);
 			config.redirects = blob.config.redirects || {};
-			config.aliases   = blob.config.aliases || {};
+			config.aliases   = blob.config.aliases   || {};
 
 
 			if (name !== null) {
 
-				var vhost = new _vhost(config);
+				var vhost = new _vhost(name, config);
 
 				this.vhosts.set(name, vhost);
 
@@ -123,6 +117,19 @@ lychee.define('sorbet.Main').requires([
 			}
 
 		}
+
+
+		this.modules.set('error',    new _module['Error'](this));
+		this.modules.set('file',     new _module['File'](this));
+		this.modules.set('filter',   new _module['Filter'](this));
+		this.modules.set('redirect', new _module['Redirect'](this));
+		this.modules.set('welcome',  new _module['Welcome'](this));
+
+
+		var that = this;
+		setTimeout(function() {
+			that.modules.set('server', new _module['Server'](that));
+		}, 1000);
 
 	};
 
@@ -181,8 +188,10 @@ lychee.define('sorbet.Main').requires([
 			var _welcome  = this.modules.get('welcome');
 
 
-			var rawhost = (request.headers.host || '').split(':')[0];
-			var rawport = (request.headers.host || ':80').split(':')[1];
+			var tmp = ('' + request.headers.host).split(':');
+
+			var rawhost = tmp[0] !== undefined ? tmp[0] : '';
+			var rawport = tmp[1] !== undefined ? tmp[1] : '80';
 			var host    = this.vhosts.get(rawhost);
 			var url     = request.url;
 

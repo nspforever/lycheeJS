@@ -20,7 +20,7 @@ lychee.define('game.entity.Track').requires([
 
 	var _parse_track = function(track, data) {
 
-		if (!data instanceof Object) {
+		if (data instanceof Object === false) {
 			return;
 		}
 

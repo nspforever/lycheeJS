@@ -10,44 +10,43 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 
 	Class.MIME = {
 
-		'default': { encoding: 'binary', type: 'application/octet-stream' },
-		'txt':     { encoding: 'utf8',   type: 'text/plain' },
+		'default': { encoding: 'binary', type: 'application/octet-stream'      },
+		'txt':     { encoding: 'utf8',   type: 'text/plain'                    },
 
-		// Images
-		'ico':     { encoding: 'binary', type: 'image/x-icon' },
-		'jpg':     { encoding: 'binary', type: 'image/jpeg' },
-		'png':     { encoding: 'binary', type: 'image/png' },
-		'svg':     { encoding: 'utf8',   type: 'image/svg+xml' },
+		// Media: Images
+		'ico':     { encoding: 'binary', type: 'image/x-icon'                  },
+		'jpg':     { encoding: 'binary', type: 'image/jpeg'                    },
+		'png':     { encoding: 'binary', type: 'image/png'                     },
+		'svg':     { encoding: 'utf8',   type: 'image/svg+xml'                 },
 
-		// Audio + Video
-		'mp3':     { encoding: 'binary', type: 'audio/mp3' },
-		'ogg':     { encoding: 'binary', type: 'application/ogg' },
-		'webm':    { encoding: 'binary', type: 'video/webm' },
+		// Media: Audio
+		'mp3':     { encoding: 'binary', type: 'audio/mp3'                     },
+		'ogg':     { encoding: 'binary', type: 'application/ogg'               },
 
-		// Web: Source
-		'html':    { encoding: 'utf8',   type: 'text/html' },
-		'css':     { encoding: 'utf8',   type: 'text/css' },
-		'js':      { encoding: 'utf8',   type: 'application/javascript' },
-		'json':    { encoding: 'utf8',   type: 'application/json' },
+		// Media: Video
+		'webm':    { encoding: 'binary', type: 'video/webm'                    },
 
-		// Web: Fonts
+		// Source: Web
+		'html':    { encoding: 'utf8',   type: 'text/html'                     },
+		'css':     { encoding: 'utf8',   type: 'text/css'                      },
+		'js':      { encoding: 'utf8',   type: 'application/javascript'        },
+		'json':    { encoding: 'utf8',   type: 'application/json'              },
+
 		'eot':     { encoding: 'utf8',   type: 'application/vnd.ms-fontobject' },
-		'fnt':     { encoding: 'utf8',   type: 'application/json' },
-		'ttf':     { encoding: 'utf8',   type: 'application/x-font-truetype' },
-		'woff':    { encoding: 'utf8',   type: 'application/font-woff' },
+		'fnt':     { encoding: 'utf8',   type: 'application/json'              },
+		'ttf':     { encoding: 'utf8',   type: 'application/x-font-truetype'   },
+		'woff':    { encoding: 'utf8',   type: 'application/font-woff'         },
 
-		// Web: Translations
-		'mo':      { encoding: 'utf8',   type: 'text/x-gettext-catalog' },
-		'po':      { encoding: 'utf8',   type: 'text/x-gettext-translation' },
-		'pot':     { encoding: 'utf8',   type: 'text/x-pot' },
+		// Blob: Translations
+		'mo':      { encoding: 'utf8',   type: 'text/x-gettext-catalog'        },
+		'po':      { encoding: 'utf8',   type: 'text/x-gettext-translation'    },
+		'pot':     { encoding: 'utf8',   type: 'text/x-pot'                    },
 
-
-		// Web: Stuff
-
-		'tar':     { encoding: 'binary', type: 'application/x-tar' },
-		'gz':      { encoding: 'binary', type: 'application/x-gzip' },
-		'tar.gz':  { encoding: 'binary', type: 'application/x-tgz' },
-		'zip':     { encoding: 'binary', type: 'application/zip' }
+		// Stuff
+		'tar':     { encoding: 'binary', type: 'application/x-tar'             },
+		'gz':      { encoding: 'binary', type: 'application/x-gzip'            },
+		'tar.gz':  { encoding: 'binary', type: 'application/x-tgz'             },
+		'zip':     { encoding: 'binary', type: 'application/zip'               }
 
 	};
 
