@@ -395,12 +395,16 @@ lychee.define('sorbet.Main').requires([
 
 					}
 
-					error.execute(404, null, url, callback);
+					_error.process(null, response, {
+						status:   404,
+						host:     rawhost,
+						url:      url,
+						resolved: null
+					});
 
 				}
 
 			}
-
 
 
 			return response;
