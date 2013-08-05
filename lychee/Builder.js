@@ -951,21 +951,26 @@
 
 
 			var candidates = Object.keys(this.__tree);
-
 			if (candidates.length === 1) {
-
 				this.__buildStart = candidates[0];
-
-			} else if (candidates.indexOf('game.Main') !== -1) {
-
-				this.__buildStart = 'game.Main';
-
 			} else {
 
-				console.warn('Could not determine build candidate automatically. (Expecting either 1 candidate or game.Main being loaded already)');
-				console.log(candidates);
-				return;
+				for (var c = 0, cl = candidates.length; c < cl; c++) {
 
+					var candidate = candidates[c];
+					if (candidate.match(/Main/)) {
+						this.__buildStart = candidate;
+						break;
+					}
+
+				}
+
+			}
+
+
+			if (this.__buildStart === null) {
+				console.warn('Could not determine build candidate automatically. (Expecting either 1 candidate or *.Main being loaded already.)');
+				return;
 			}
 
 

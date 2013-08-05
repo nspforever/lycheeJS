@@ -74,7 +74,7 @@ lychee.define('Renderer').tags({
 		};
 
 		this.__cache      = {};
-		this.__state      = null;
+		this.__state      = 0;
 		this.__alpha      = 1;
 		this.__background = null;
 		this.__width      = 0;
@@ -129,20 +129,16 @@ lychee.define('Renderer').tags({
 		},
 
 		start: function() {
-
-			if (this.__state !== 'running') {
-				this.__state = 'running';
-			}
-
+			this.__state = 1;
 		},
 
 		stop: function() {
-			this.__state = 'stopped';
+			this.__state = 0;
 		},
 
 		clear: function() {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			// Some mobile devices have weird issues on rotations with clearRect()
 			// Seems to be if the renderbuffer got bigger after rotation
@@ -160,7 +156,7 @@ lychee.define('Renderer').tags({
 
 		flush: function(command) {
 
-			if (this.__state !== 'running' || typeof command !== 'number') return;
+			if (this.__state !== 1 || typeof command !== 'number') return;
 
 		},
 
@@ -171,7 +167,7 @@ lychee.define('Renderer').tags({
 		 */
 
 		isRunning: function() {
-			return this.__state === 'running';
+			return this.__state === 1;
 		},
 
 		getEnvironment: function() {
@@ -238,7 +234,7 @@ lychee.define('Renderer').tags({
 
 		drawArc: function(x, y, start, end, radius, color, background, lineWidth) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			color      = typeof color === 'string' ? color : '#000000';
 			background = background === true;
@@ -274,7 +270,7 @@ lychee.define('Renderer').tags({
 
 		drawBox: function(x1, y1, x2, y2, color, background, lineWidth) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			color      = typeof color === 'string' ? color : '#000000';
 			background = background === true;
@@ -307,7 +303,7 @@ lychee.define('Renderer').tags({
 
 		drawCircle: function(x, y, radius, color, background, lineWidth) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			color      = typeof color === 'string' ? color : '#000000';
 			background = background === true;
@@ -342,7 +338,7 @@ lychee.define('Renderer').tags({
 
 		drawLine: function(x1, y1, x2, y2, color, lineWidth) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			color     = typeof color === 'string' ? color : '#000000';
 			lineWidth = typeof lineWidth === 'number' ? lineWidth : 1;
@@ -366,7 +362,7 @@ lychee.define('Renderer').tags({
 
 		drawTriangle: function(x1, y1, x2, y2, x3, y3, color, background, lineWidth) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			color = typeof color === 'string' ? color : '#000000';
 			background = background === true;
@@ -399,7 +395,7 @@ lychee.define('Renderer').tags({
 		// points, x1, y1, [ ... x(a), y(a) ... ], [ color, background, lineWidth ]
 		drawPolygon: function(points, x1, y1) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			var l = arguments.length;
 
@@ -464,7 +460,7 @@ lychee.define('Renderer').tags({
 
 		drawSprite: function(x1, y1, texture, map) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			texture = texture instanceof Texture ? texture : null;
 			map     = map instanceof Object      ? map     : null;
@@ -517,7 +513,7 @@ lychee.define('Renderer').tags({
 
 		drawText: function(x1, y1, text, font, center) {
 
-			if (this.__state !== 'running') return;
+			if (this.__state !== 1) return;
 
 			font   = font instanceof Font ? font : null;
 			center = center === true;

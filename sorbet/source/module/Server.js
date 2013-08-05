@@ -40,19 +40,20 @@ if (resolved.match(/dronecontrol/)) continue;
 			tmp.pop(); // Server.js
 			tmp.pop(); // source/
 
-			var projectroot = tmp.join('/');
-			var title       = tmp.pop();
-
+			var projectroot  = tmp.join('/');
+			var resolvedroot = projectroot;
+			var title        = tmp.pop();
 
 			// TODO: Verify that this is correct behaviour for all VHosts
 			projectroot = projectroot.substr(this.main.root.length + 1);
 			projectroot = '../' + projectroot;
 
-
 			projects.push({
-				root:     projectroot,
-				resolved: resolved,
-				title:    title
+				vhost:        vhost,
+				root:         projectroot,
+				resolvedroot: resolvedroot,
+				resolved:     resolved,
+				title:        title
 			});
 
 		}
@@ -68,7 +69,7 @@ if (resolved.match(/dronecontrol/)) continue;
 		var root = project.root;
 
 		if (lychee.debug === true) {
-			console.log('sorbet.module.Sorbet: Building Isolated Server Instance for ' + root);
+			console.log('sorbet.module.Server: Building Isolated Server Instance for ' + root);
 		}
 
 
@@ -105,6 +106,7 @@ if (resolved.match(/dronecontrol/)) continue;
 
 		var that = this;
 		var port = this.getPort();
+		var root = map.project.resolvedroot;
 
 
 		lychee.debug = false;
@@ -115,12 +117,12 @@ if (resolved.match(/dronecontrol/)) continue;
 
 				try {
 
-					var server = new game.Server({
-						port: port
-					});
+					var server = new game.Server();
 
-					that.main.ports.push(port);
-					that.main.servers.push(server);
+					server.listen(port, null);
+
+					that.main.servers.set(root, server);
+					that.main.ports.set(root, port);
 
 				} catch(e) {
 				}
@@ -146,6 +148,7 @@ if (resolved.match(/dronecontrol/)) continue;
 	var Class = function(main) {
 
 		this.main = main;
+		this.type = 'public';
 
 		this.preloader = new lychee.Preloader();
 
@@ -163,7 +166,7 @@ if (resolved.match(/dronecontrol/)) continue;
 			var vhost = vhosts[v];
 
 			if (lychee.debug === true) {
-				console.log('sorbet.module.Sorbet: Booting VHost "' + vhost.id + '"');
+				console.log('sorbet.module.Server: Booting VHost "' + vhost.id + '"');
 			}
 
 
@@ -189,6 +192,40 @@ if (resolved.match(/dronecontrol/)) continue;
 		},
 
 		process: function(host, response, data) {
+
+			var referer = data.referer;
+// TODO: Client side has to attach referer
+referer = '/game/discovery';
+			if (referer !== null) {
+
+				var fs       = host.fs;
+				var root     = host.root;
+
+				var resolved = fs.resolve(root + referer);
+				if (
+					   resolved !== null
+					&& fs.isDirectory(resolved) === true
+					&& fs.isFile(resolved + '/index.html') === true
+				) {
+
+					var server = this.main.servers.get(resolved);
+					var port   = this.main.ports.get(resolved);
+
+					if (server !== null && port !== null) {
+
+//						response.status             = 301;
+//						response.header['Location'] = url;
+						response.content            = data.host + ':' + port;
+
+					}
+
+				}
+
+
+				return true;
+
+			}
+
 
 			return false;
 

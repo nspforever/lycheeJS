@@ -1,26 +1,22 @@
 
 lychee.define('game.Server').requires([
-	'lychee.net.Server',
 	'lychee.net.remote.RoomService'
+]).includes([
+	'lychee.net.Server',
 ]).exports(function(lychee, game, global, attachments) {
 
-	var Class = function(settings) {
+	var Class = function() {
+
+		lychee.net.Server.call(this, JSON.stringify, JSON.parse);
 
 
-		this.__server = new lychee.net.Server(
-			JSON.stringify, JSON.parse
-		);
+		this.bind('connect', function(remote) {
 
-		this.__server.bind('connect', function(remote) {
+			console.log('NEW REMOTE ', remote.id);
 
 			remote.accept();
 
 		}, this);
-
-		this.__server.listen(
-			settings.port || 1337,
-			settings.host || 'localhost'
-		);
 
 	};
 

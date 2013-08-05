@@ -84,8 +84,8 @@ lychee.define('sorbet.Main').requires([
 		this.fs.watch(root);
 
 		this.root    = root;
-		this.ports   = [];
-		this.servers = [];
+		this.ports   = new _map();
+		this.servers = new _map();
 
 		this.vhosts  = new _map();
 		this.modules = new _map();
@@ -156,8 +156,8 @@ lychee.define('sorbet.Main').requires([
 
 				server.listen(port);
 
-				this.ports.push(port);
-				this.servers.push(server);
+				this.servers.set(null, server);
+				this.ports.set(null, port);
 
 				return true;
 
@@ -190,8 +190,9 @@ lychee.define('sorbet.Main').requires([
 
 			var tmp = ('' + request.headers.host).split(':');
 
+			var referer = request.headers.referer || null;
 			var rawhost = tmp[0] !== undefined ? tmp[0] : '';
-			var rawport = tmp[1] !== undefined ? tmp[1] : '80';
+			var rawport = parseInt(tmp[1] !== undefined ? tmp[1] : '80', 10);
 			var host    = this.vhosts.get(rawhost);
 			var url     = request.url;
 
@@ -252,6 +253,31 @@ lychee.define('sorbet.Main').requires([
 							port: rawport,
 							url:  url
 						});
+
+						return response;
+
+					} else if (url.substr(0, 15) === '/sorbet/module/') {
+
+
+						var mid = url.substr(15).toLowerCase();
+						if (mid.length) {
+
+							var module = this.modules.get(mid);
+							if (
+								   module !== null
+								&& module.type === 'public'
+							) {
+
+								module.process(host, response, {
+									referer: referer,
+									host:    rawhost,
+									port:    rawport,
+									url:     url
+								});
+
+							}
+
+						}
 
 						return response;
 
@@ -336,7 +362,7 @@ lychee.define('sorbet.Main').requires([
 
 			} else {
 
-				// 2.1a Sorbet Integration
+				// 2.1a Sorbet Asset Integration
 				if (url.substr(0, 13) === '/sorbet/asset') {
 
 					var resolved = this.fs.resolve(this.root + url);
@@ -357,7 +383,6 @@ lychee.define('sorbet.Main').requires([
 						});
 
 					}
-
 
 				// 2.1b Logging of Attacks
 				} else {

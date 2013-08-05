@@ -6,7 +6,10 @@ lychee.define('sorbet.module.Error').requires([
 	var _template = new sorbet.data.Template(attachments['html']);
 
 
-	var Class = function() {
+	var Class = function(main) {
+
+		this.main = main;
+		this.type = 'private';
 
 	};
 

@@ -4,6 +4,7 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 	var Class = function(main) {
 
 		this.main = main;
+		this.type = 'private';
 
 	};
 

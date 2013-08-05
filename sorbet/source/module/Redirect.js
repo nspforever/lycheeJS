@@ -1,7 +1,10 @@
 
 lychee.define('sorbet.module.Redirect').exports(function(lychee, sorbet, global, attachments) {
 
-	var Class = function() {
+	var Class = function(main) {
+
+		this.main = main;
+		this.type = 'private';
 
 	};
 
