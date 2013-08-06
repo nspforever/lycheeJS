@@ -21,6 +21,14 @@ lychee.define('game.Server').includes([
 
 	Class.prototype = {
 
+		listen: function(port, host) {
+
+			console.log('(Cosmo) game.Server: Listening on ' + host + ':' + port);
+
+			lychee.net.Server.prototype.listen.call(this, port, host);
+
+		}
+
 	};
 
 

@@ -23,6 +23,14 @@ lychee.define('game.Server').requires([
 
 	Class.prototype = {
 
+		listen: function(port, host) {
+
+			console.log('(Discovery) game.Server: Listening on ' + host + ':' + port);
+
+			lychee.net.Server.prototype.listen.call(this, port, host);
+
+		}
+
 	};
 
 

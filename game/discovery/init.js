@@ -28,27 +28,7 @@ lychee.rebase({
 
 lychee.build(function(lychee, global) {
 
- 	var settings = {
-		base: './asset',
-		host: 'localhost',
-		port: 1337
-	};
-
-	if (typeof process !== 'undefined') {
-
-		var os = require('os');
-		settings.host = os.hostname();
-
-		new game.Server(settings);
-
-	} else {
-
-		if (document && document.location && document.location.hostname) {
-			settings.host = document.location.hostname;
-		}
-
-		new game.Main(settings);
-	}
+	new game.Main({});
 
 }, typeof global !== 'undefined' ? global : this);
 

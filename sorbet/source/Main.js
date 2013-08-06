@@ -84,7 +84,6 @@ lychee.define('sorbet.Main').requires([
 		this.fs.watch(root);
 
 		this.root    = root;
-		this.ports   = new _map();
 		this.servers = new _map();
 
 		this.vhosts  = new _map();
@@ -125,12 +124,12 @@ lychee.define('sorbet.Main').requires([
 		this.modules.set('redirect', new _module['Redirect'](this));
 		this.modules.set('welcome',  new _module['Welcome'](this));
 
-/*
+
 		var that = this;
 		setTimeout(function() {
 			that.modules.set('server', new _module['Server'](that));
 		}, 1000);
-*/
+
 	};
 
 
@@ -157,7 +156,6 @@ lychee.define('sorbet.Main').requires([
 				server.listen(port);
 
 				this.servers.set(null, server);
-				this.ports.set(null, port);
 
 				return true;
 

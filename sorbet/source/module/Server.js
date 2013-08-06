@@ -1,7 +1,7 @@
 
 lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, attachments) {
 
-	var _env = lychee.getEnvironment();
+	var child_process = require('child_process');
 
 
 
@@ -22,7 +22,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 		var files = fs.filter(
 			root + folder,
-			'Server.js',
+			'init-server.js',
 			sorbet.data.Filesystem.TYPE.file
 		);
 
@@ -37,8 +37,7 @@ if (resolved.match(/dronecontrol/)) continue;
 
 
 			var tmp = resolved.split('/');
-			tmp.pop(); // Server.js
-			tmp.pop(); // source/
+			tmp.pop();
 
 			var projectroot  = tmp.join('/');
 			var resolvedroot = projectroot;
@@ -66,6 +65,13 @@ if (resolved.match(/dronecontrol/)) continue;
 
 	var _build_project = function(project) {
 
+		var id = project.resolved;
+
+		if (this.main.servers.get(id) !== null) {
+			return false;
+		}
+
+
 		var root = project.root;
 
 		if (lychee.debug === true) {
@@ -73,66 +79,35 @@ if (resolved.match(/dronecontrol/)) continue;
 		}
 
 
-		var env     = lychee.createEnvironment();
-		var sandbox = lychee.createSandbox();
-
-
-		lychee.setEnvironment(env);
-
-
-		lychee.rebase({
-			lychee: _env.bases.lychee,
-			game:   root + '/source'
-		});
-
-		lychee.tag({
-			platform: [ 'nodejs' ]
-		});
-
-
-		this.preloader.load(root + '/source/Server.js', {
-			project: project,
-			env:     env,
-			sandbox: sandbox
-		});
-
-	};
-
-	var _build_server = function(assets, mappings) {
-
-		var url = Object.keys(assets)[0];
-		var map = mappings[url];
-
+		var resolved = project.resolved;
+		var cwd      = project.resolvedroot;
 
 		var that = this;
 		var port = this.getPort();
-		var root = map.project.resolvedroot;
+		var host = 'null';
 
 
-		lychee.debug = false;
-
-		lychee.build(function(lychee, global) {
-
-			with (map.sandbox) {
-
-				try {
-
-					var server = new game.Server();
-
-					server.listen(port, null);
-
-					that.main.servers.set(root, server);
-					that.main.ports.set(root, port);
-
-				} catch(e) {
-				}
-
+		var server = child_process.fork(
+			resolved, [
+				port,
+				host
+			], {
+				cwd: cwd
 			}
+		);
+
+		server.id   = id;
+		server.port = port;
+		server.host = host;
+
+		server.on('exit', function() {
+			that.main.servers.remove(this.id, null);
+		});
+
+		this.main.servers.set(id, server);
 
 
-			lychee.setEnvironment(null);
-
-		}, map.sandbox);
+		return true;
 
 	};
 
@@ -142,22 +117,13 @@ if (resolved.match(/dronecontrol/)) continue;
 	 * IMPLEMENTATION
 	 */
 
-	var _port = 1337;
+	var _port = 8181;
 
 
 	var Class = function(main) {
 
 		this.main = main;
 		this.type = 'public';
-
-		this.preloader = new lychee.Preloader();
-
-		this.preloader.bind('ready', _build_server, this);
-
-		this.preloader.bind('error', function(assets, map) {
-			// TODO: What to do if preloading fails due to file access errors?
-			lychee.setEnvironment(null);
-		}, this);
 
 
 		var vhosts = this.main.vhosts.all();
@@ -168,7 +134,6 @@ if (resolved.match(/dronecontrol/)) continue;
 			if (lychee.debug === true) {
 				console.log('sorbet.module.Server: Booting VHost "' + vhost.id + '"');
 			}
-
 
 			var internal_projects = _get_projects.call(this, vhost, '/game');
 			for (var i = 0, il = internal_projects.length; i < il; i++) {

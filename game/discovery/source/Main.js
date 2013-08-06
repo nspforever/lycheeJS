@@ -28,6 +28,7 @@ lychee.define('game.Main').requires([
 				width:  640,
 				height: 480
 			}
+
 		}, data);
 
 
