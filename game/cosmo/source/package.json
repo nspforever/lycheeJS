@@ -40,7 +40,9 @@
 
 		"DeviceSpecificHacks": [ "js" ],
 		"Jukebox":             [ "js" ],
-		"Main":                [ "js", "css" ]
+		"Main":                [ "js", "css" ],
+		"Client":              [ "js" ],
+		"Server":              [ "js" ]
 
 	}
 }

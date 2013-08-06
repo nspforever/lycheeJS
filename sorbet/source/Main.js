@@ -125,12 +125,12 @@ lychee.define('sorbet.Main').requires([
 		this.modules.set('redirect', new _module['Redirect'](this));
 		this.modules.set('welcome',  new _module['Welcome'](this));
 
-
+/*
 		var that = this;
 		setTimeout(function() {
 			that.modules.set('server', new _module['Server'](that));
 		}, 1000);
-
+*/
 	};
 
 

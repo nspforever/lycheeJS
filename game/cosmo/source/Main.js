@@ -1,5 +1,6 @@
 
 lychee.define('game.Main').requires([
+	'game.Client',
 	'game.Jukebox',
 	'game.entity.ui.Font',
 	'game.logic.Game',
@@ -28,6 +29,9 @@ lychee.define('game.Main').requires([
 				fireSwipe:    false
 			},
 
+			// Is configured by sorbet/module/Server
+			client: null,
+
 			renderer: {
 				id:     'game',
 				width:  800,
@@ -39,7 +43,7 @@ lychee.define('game.Main').requires([
 
 		lychee.game.Main.call(this, settings);
 
-		this.init();
+		this.load();
 
 	};
 
@@ -102,6 +106,34 @@ lychee.define('game.Main').requires([
 
 		},
 
+		load: function() {
+
+			var preloader = new lychee.Preloader();
+
+
+			preloader.bind('ready', function(assets, mappings) {
+
+//				this.settings.port = 1337;
+//				this.settings.host = 'asd';
+
+console.log('READY!', assets);
+
+				this.init();
+
+			}, this);
+
+			preloader.bind('error', function(assets, mappings) {
+
+console.log('ERROR!', assets);
+
+				this.init();
+
+			}, this);
+
+			preloader.load('/sorbet/module/Server');
+
+		},
+
 		init: function() {
 
 			// Remove Preloader Progress Bar
@@ -124,6 +156,11 @@ lychee.define('game.Main').requires([
 			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));
 			this.changeState('menu');
+
+
+			if (this.settings.client !== null) {
+				this.client = new game.Client(this.settings.client, this);
+			}
 
 
 			if (lychee.debug === true) {

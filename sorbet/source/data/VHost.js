@@ -36,10 +36,12 @@ lychee.define('sorbet.data.VHost').requires([
 
 
 		for (var from in config.redirects) {
+
 			var to = config.redirects[from];
 			if (typeof to === 'string') {
 				this.__redirects[from] = to;
 			}
+
 		}
 
 	};

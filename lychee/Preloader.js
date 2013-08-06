@@ -3,11 +3,12 @@
 (function(lychee, global) {
 
 	var _instances = [];
-	var _cache = {};
 
 
 	var _globalIntervalId = null;
 	var _globalInterval   = function() {
+
+		var cache = lychee.getEnvironment().assets;
 
 		var timedOutInstances = 0;
 
@@ -17,12 +18,14 @@
 			var isReady  = true;
 
 			for (var url in instance.__pending) {
+
 				if (
-					instance.__pending[url] === true
-					|| _cache[url] === undefined
+					   instance.__pending[url] === true
+					|| cache[url] === undefined
 				) {
 					isReady = false;
 				}
+
 			}
 
 
@@ -43,7 +46,7 @@
 					if (instance.__fired[url] === undefined) {
 
 						if (instance.__pending[url] === false) {
-							ready[url] = _cache[url] || null;
+							ready[url] = cache[url] || null;
 						} else {
 							errors[url] = null;
 						}
@@ -130,9 +133,9 @@
 
 		bind: function(event, callback, scope) {
 
-			event = typeof event === 'string' ? event : null;
+			event    = typeof event === 'string'    ? event    : null;
 			callback = callback instanceof Function ? callback : null;
-			scope = scope !== undefined ? scope : this;
+			scope    = scope !== undefined          ? scope    : this;
 
 
 			if (event !== null && callback !== null) {
@@ -184,6 +187,8 @@
 
 		load: function(urls, map, extension) {
 
+			var cache = lychee.getEnvironment().assets;
+
 			urls      = urls instanceof Array         ? urls      : (typeof urls === 'string' ? [ urls ] : null);
 			map       = map !== undefined             ? map       : null;
 			extension = typeof extension === 'string' ? extension : null;
@@ -215,16 +220,16 @@
 					// instance already loaded the requested
 					// URL to the shared cache.
 
-					if (_cache[url] != null) {
+					if (cache[url] != null) {
 
 						this.__pending[url] = false;
 
 					} else {
 
 						if (extension !== null) {
-							this._load(url, extension, _cache);
+							this._load(url, extension, cache);
 						} else {
-							this._load(url, tmp[tmp.length - 1], _cache);
+							this._load(url, tmp[tmp.length - 1], cache);
 						}
 
 					}
@@ -245,8 +250,10 @@
 
 		get: function(url) {
 
-			if (_cache[url] !== undefined) {
-				return _cache[url];
+			var cache = lychee.getEnvironment().assets;
+
+			if (cache[url] !== undefined) {
+				return cache[url];
 			}
 
 

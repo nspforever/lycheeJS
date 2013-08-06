@@ -8,13 +8,14 @@ if (typeof global !== 'undefined') {
 
 (function(lychee, global) {
 
-	var _cache = {
-		tree: {},
-		tags: {},
-		bases: { 'lychee': './lychee' }
+	var _default = {
+		assets: {},
+		tree:   {},
+		tags:   {},
+		bases:  { 'lychee': './lychee' }
 	};
 
-	var _environment = _cache;
+	var _environment = _default;
 
 
 	lychee.debug   = false;
@@ -123,12 +124,17 @@ if (typeof global !== 'undefined') {
 
 	lychee.createEnvironment = function() {
 
-		var sandboxenv = {};
+		var sandboxenv = {
+			assets: {},
+			tree:   {},
+			tags:   {},
+			bases:  { 'lychee': './lychee' }
+		};
 
-		for (var id in _cache.tree) {
+		for (var id in _default.tree) {
 
 			if (id.substr(0, 6) === 'lychee') {
-				sandboxenv.tree[id] = _cache.tree[id];
+				sandboxenv.tree[id] = _default.tree[id];
 			}
 
 		}
@@ -188,6 +194,10 @@ if (typeof global !== 'undefined') {
 			&& object instanceof Object
 		) {
 
+			if (object.assets === undefined) {
+				object.assets = {};
+			}
+
 			if (object.tree === undefined) {
 				object.tree = {};
 			}
@@ -203,13 +213,11 @@ if (typeof global !== 'undefined') {
 
 			_environment = object;
 
-
 			return true;
 
 		} else {
 
-			_environment = _cache;
-
+			_environment = _default;
 
 			return true;
 
