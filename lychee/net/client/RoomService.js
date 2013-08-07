@@ -11,6 +11,7 @@ lychee.define('lychee.net.client.RoomService').includes([
 		this.__messages = [];
 
 
+		this.id     = 'RoomService';
 		this.client = client;
 
 
@@ -20,16 +21,6 @@ lychee.define('lychee.net.client.RoomService').includes([
 
 
 	Class.prototype = {
-
-		/*
-		 * SERVICE API
-		 */
-
-		getId: function() {
-			return 'RoomService';
-		},
-
-
 
 		/*
 		 * CUSTOM API
@@ -46,7 +37,7 @@ lychee.define('lychee.net.client.RoomService').includes([
 					userId: userId,
 					roomId: roomId
 				}, {
-					id:     this.getId(),
+					id:     this.id,
 					method: 'enter'
 				});
 
@@ -62,7 +53,7 @@ lychee.define('lychee.net.client.RoomService').includes([
 					userId: this.__userId,
 					roomId: roomId
 				}, {
-					id:     this.getId(),
+					id:     this.id,
 					method: 'leave'
 				});
 
@@ -79,7 +70,7 @@ lychee.define('lychee.net.client.RoomService').includes([
 					roomId:  this.__roomId,
 					message: message
 				}, {
-					id:     this.getId(),
+					id:     this.id,
 					method: 'message'
 				});
 

@@ -1,7 +1,12 @@
 
-lychee.define('game.Server').includes([
+lychee.define('game.Server').requires([
+	'game.net.remote.Multiplayer'
+]).includes([
 	'lychee.net.Server'
 ]).exports(function(lychee, game, global, attachments) {
+
+	var _multiplayer = game.net.remote.Multiplayer;
+
 
 	var Class = function() {
 
@@ -12,6 +17,7 @@ lychee.define('game.Server').includes([
 
 			console.log('(Cosmo) game.Server: New Remote (' + remote.id + ')');
 
+			remote.register('multiplayer', _multiplayer);
 			remote.accept();
 
 		}, this);

@@ -19,6 +19,7 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 
 	var Class = function() {
 
+		this.id     = 'RoomService';
 		this.remote = null;
 
 	};
@@ -48,15 +49,10 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 					}
 				}
 
-
 				this.remote = null;
 
 			}
 
-		},
-
-		getId: function() {
-			return 'RoomService';
 		},
 
 
@@ -94,7 +90,7 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 
 
 					this.remote.send(response, {
-						id:     this.getId(),
+						id:     this.id,
 						method: 'update'
 					});
 
@@ -110,7 +106,7 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 						if (_remotes[r] === this.remote) continue;
 
 						_remotes[r].send(oresponse, {
-							id:     this.getId(),
+							id:     this.id,
 							method: 'update'
 						});
 
@@ -124,7 +120,7 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 					};
 
 					this.remote.send(response, {
-						id:     this.getId(),
+						id:     this.id,
 						method: 'update'
 					});
 
@@ -171,7 +167,7 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 					};
 
 					this.remote.send(response, {
-						id:     this.getId(),
+						id:     this.id,
 						method: 'update'
 					});
 
@@ -221,7 +217,7 @@ lychee.define('lychee.net.remote.RoomService').exports(function(lychee, global) 
 						for (var r = 0, rl = _remotes.length; r < rl; r++) {
 
 							_remotes[r].send(response, {
-								id:     this.getId(),
+								id:     this.id,
 								method: 'update'
 							});
 

@@ -218,6 +218,7 @@ lychee.define('lychee.game.Main').requires([
 
 			id = typeof id === 'string' ? id : null;
 
+
 			if (id !== null) {
 
 				this.__states[id] = state;
@@ -231,14 +232,26 @@ lychee.define('lychee.game.Main').requires([
 
 		},
 
-		getState: function(id) {
+		isState: function(id) {
 
 			id = typeof id === 'string' ? id : null;
 
 			if (id !== null) {
+				return this.__state === this.__states[id];
+			}
 
+
+			return false;
+
+		},
+
+		getState: function(id) {
+
+			id = typeof id === 'string' ? id : null;
+
+
+			if (id !== null) {
 				return this.__states[id] || null;
-
 			}
 
 
@@ -249,6 +262,7 @@ lychee.define('lychee.game.Main').requires([
 		removeState: function(id) {
 
 			id = typeof id === 'string' ? id : null;
+
 
 			if (
 				   id !== null
@@ -269,6 +283,7 @@ lychee.define('lychee.game.Main').requires([
 		changeState: function(id, data) {
 
 			data = data || null;
+
 
 			var oldState = this.__state;
 			var newState = this.__states[id] || null;
@@ -307,7 +322,6 @@ lychee.define('lychee.game.Main').requires([
 			}
 
 		}
-
 
 	};
 

@@ -95,7 +95,7 @@ lychee.define('lychee.net.Remote').tags({
 		for (var s = 0, sl = this.__services.length; s < sl; s++) {
 
 			var service = this.__services[s];
-			if (service.getId() === id) {
+			if (service.id === id) {
 				return service;
 			}
 
@@ -119,7 +119,7 @@ lychee.define('lychee.net.Remote').tags({
 		}
 
 
-		var construct = lychee.net.remote[id];
+		var construct = this.__servicesmap[id] || null;
 		if (typeof construct === 'function') {
 
 			service = new construct();
@@ -137,7 +137,7 @@ lychee.define('lychee.net.Remote').tags({
 
 			// Okay, Client, plugged Service! PONG
 			this.send({}, {
-				id: service.getId(),
+				id: service.id,
 				method: '@plug'
 			});
 
@@ -179,7 +179,7 @@ lychee.define('lychee.net.Remote').tags({
 
 		for (var s = 0, sl = this.__services.length; s < sl; s++) {
 
-			if (this.__services[s].getId() === id) {
+			if (this.__services[s].id === id) {
 				this.__services.splice(s, 1);
 				found = true;
 				sl--;
@@ -224,11 +224,13 @@ lychee.define('lychee.net.Remote').tags({
 		this.version  = _protocol.VERSION;
 		this.waiting  = true;
 
-		this.__server    = server;
-		this.__encoder   = encoder;
-		this.__decoder   = decoder;
-		this.__socket    = socket;
-		this.__services  = [];
+		this.__server   = server;
+		this.__encoder  = encoder;
+		this.__decoder  = decoder;
+		this.__socket   = socket;
+
+		this.__services    = [];
+		this.__servicesmap = {};
 
 
 		lychee.event.Emitter.call(this);
@@ -302,6 +304,28 @@ lychee.define('lychee.net.Remote').tags({
 
 				this.__protocol.close(false, reason);
 				this.waiting = false;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		register: function(id, construct) {
+
+			id        = typeof id === 'string'          ? id        : null;
+			construct = typeof construct === 'function' ? construct : null;
+
+
+			if (
+				   id !== null
+				&& construct !== null
+			) {
+
+				this.__servicesmap[id] = construct;
 
 				return true;
 

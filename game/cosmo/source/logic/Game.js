@@ -81,19 +81,19 @@ lychee.define('game.logic.Game').requires([
 		this.loop     = game.loop;
 		this.renderer = game.renderer;
 
-		this.__clock           = null;
-		this.__fireTimeout     = null;
-		this.__scrollOffset    = 0;
+		this.__clock        = null;
+		this.__fireTimeout  = null;
+		this.__scrollOffset = 0;
 
-		this.__background  = null;
-		this.__level       = null;
-		this.__width       = null;
-		this.__height      = null;
+		this.__background   = null;
+		this.__level        = null;
+		this.__width        = null;
+		this.__height       = null;
 
-		this.__shield    = new _shield();
-		this.__stage     = null;
-		this.__session   = { ship: null, stage: null };
-		this.__isRunning = false;
+		this.__shield       = new _shield();
+		this.__stage        = null;
+		this.__session      = { ship: null, stage: null };
+		this.__isRunning    = false;
 
 		lychee.event.Emitter.call(this);
 
@@ -320,7 +320,7 @@ lychee.define('game.logic.Game').requires([
 		 * PUBLIC API
 		 */
 
-		enter: function(newstage, width, height) {
+		enter: function(stagedata, width, height) {
 
 			if (this.__level !== null) {
 				this.__level.unbind('failure');
@@ -340,7 +340,7 @@ lychee.define('game.logic.Game').requires([
 			var data = {
 				points: null,
 				ship:   null,
-				stage:  newstage
+				stage:  stagedata.stage
 			};
 
 			var oldstage = this.__session.stage;
@@ -356,8 +356,8 @@ lychee.define('game.logic.Game').requires([
 
 			}
 
-			this.__level.reset(data, width, height);
-			this.__stage = newstage;
+			this.__level.reset(stagedata, width, height);
+			this.__stage = stagedata.stage;
 
 
 			this.__background = new _background({

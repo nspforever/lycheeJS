@@ -68,6 +68,7 @@ lychee.define('game.state.Menu').requires([
 	var _show_left  = false;
 	var _show_right = false;
 
+
 	var _navigate_vertical = function(direction) {
 
 		var layer = this.getLayer('ui');
@@ -135,6 +136,8 @@ lychee.define('game.state.Menu').requires([
 					y: posy
 				}
 			});
+
+			root.trigger('tween', []);
 
 			this.loop.timeout(500, function() {
 				this.__locked = false;
@@ -252,8 +255,14 @@ lychee.define('game.state.Menu').requires([
 					});
 
 					entity.bind('touch', function() {
+
 						if (this.__locked === true) return false;
-						this.game.changeState('game');
+
+						this.game.changeState('game', {
+							type:   'singleplayer',
+							player: 1
+						});
+
 					}, this);
 
 					root.addEntity(entity);
@@ -281,12 +290,21 @@ lychee.define('game.state.Menu').requires([
 							if (this.__locked === true) return false;
 
 
-							var layer = this.getLayer('ui').getEntity('root').getEntity('multiplayer-layer');
+							var root  = this.getLayer('ui').getEntity('root');
+							var layer = root.getEntity('multiplayer-layer');
 							if (layer !== null) {
-								layer.resetCode();
+								layer.enter();
 							}
 
+
 							_navigate_vertical.call(this, 1);
+
+
+							if (layer !== null) {
+								root.bind('tween', function() {
+									layer.leave();
+								}, this, true);
+							}
 
 						}, this);
 

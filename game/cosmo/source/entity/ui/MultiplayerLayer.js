@@ -7,22 +7,29 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 	'lychee.ui.Layer'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _texture = attachments["png"];
-	var _config  = attachments["json"];
-
-	var _spriteconfig = {
-		texture: _texture,
-		width:   _config.spritewidth,
-		height:  _config.spriteheight,
-		states:  _config.states,
-		map:     _config.map
-	};
-
-
-
 	/*
 	 * HELPERS
 	 */
+
+	var _get_code = function() {
+
+		var result = null;
+
+
+		var code = this.getEntity('code');
+		if (code !== null) {
+
+			var tmp = parseInt(code.label.split(' ').join(''), 10);
+			if (!isNaN(tmp)) {
+				result = tmp;
+			}
+
+		}
+
+
+		return result;
+
+	};
 
 	var _validate_code = function() {
 
@@ -44,18 +51,6 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 		}
 
 
-		var joingame   = this.getEntity('joingame');
-		var creategame = this.getEntity('creategame');
-
-		if (result === true) {
-			joingame.visible   = true;
-			creategame.visible = true;
-		} else {
-			joingame.visible   = false;
-			creategame.visible = false;
-		}
-
-
 		return result;
 
 	};
@@ -71,8 +66,8 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 		this.game = game;
 
 
-		settings.width  = _config.width;
-		settings.height = _config.height;
+		settings.width  = 512;
+		settings.height = 312;
 
 
 		this.__cursor = 0;
@@ -112,8 +107,8 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			this.setEntity('headline', entity);
 
 			entity = new lychee.ui.Button({
-				label: '_ _ _ _',
-				font: this.game.fonts.normal,
+				label:    '_ _ _ _',
+				font:     this.game.fonts.normal,
 				position: {
 					x:  0,
 					y: -1/2 * height + 64 + 20
@@ -123,8 +118,8 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			this.addEntity(entity);
 
 			entity = new lychee.ui.Button({
-				label: '* * * *',
-				font: this.game.fonts.normal,
+				label:    '* * * *',
+				font:     this.game.fonts.normal,
 				position: {
 					x:  0,
 					y: -1/2 * height + 64 + 16
@@ -144,7 +139,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 				var button = new lychee.ui.Button({
 					label: n + '',
-					font: this.game.fonts.normal,
+					font:  this.game.fonts.normal,
 					position: {
 						x: ox + x * 56,
 						y: oy + y * 48
@@ -165,44 +160,87 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			}
 
 
-			entity = new lychee.ui.Sprite(_spriteconfig);
-			entity.setState('joingame');
-			entity.setPosition({
-				x: -128,
-				y:  156 - 32
-			});
-			entity.bind('touch', function() {
 
-				var result = _validate_code.call(this);
-				if (result === true) {
-					console.log('JOIN GAME');
+			entity = new lychee.ui.Button({
+				label:   '',
+				font:    this.game.fonts.small,
+				visible: false,
+				position: {
+					x: 0,
+					y: 1/2 * height - 32
 				}
-
-			}, this);
-			this.setEntity('joingame', entity);
-
-
-			entity = new lychee.ui.Sprite(_spriteconfig);
-			entity.setState('creategame');
-			entity.setPosition({
-				x: 128,
-				y: 156 - 32
 			});
-			entity.bind('touch', function() {
 
-				var result = _validate_code.call(this);
-				if (result === true) {
-					console.log('CREATE GAME');
-				}
+			this.setEntity('message', entity);
 
-			}, this);
-			this.setEntity('creategame', entity);
+		},
+
+		enter: function() {
+
+			this.resetCode();
+			this.setMessage(null);
+
+
+			var service = this.game.services.multiplayer;
+			if (service !== null) {
+
+				service.bind('verification', function(data) {
+
+console.log('WOOT WOOT', data);
+
+					if (data.code === null) {
+
+						this.resetCode();
+
+						if (typeof data.message === 'string') {
+							this.setMessage(data.message);
+						}
+
+					} else {
+
+						if (typeof data.message === 'string') {
+							this.setMessage(data.message);
+						}
+
+					}
+
+				}, this);
+
+			}
+
+		},
+
+		leave: function() {
+
+			var service = this.game.services.multiplayer;
+			if (service !== null) {
+				service.unbind('verification');
+			}
 
 		},
 
 		resetCode: function() {
 			this.getEntity('code').setLabel('* * * *');
 			_validate_code.call(this);
+		},
+
+		setMessage: function(message) {
+
+			message = typeof message === 'string' ? message : null;
+
+
+			var entity = this.getEntity('message');
+			if (entity !== null) {
+
+				if (message !== null) {
+					entity.setLabel(message);
+					entity.visible = true;
+				} else {
+					entity.visible = false;
+				}
+
+			}
+
 		},
 
 		processNumber: function(entity, id, position, delta) {
@@ -215,12 +253,27 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 				var number = entity.label;
 				tmp[this.__cursor] = number;
 
-				this.__cursor++;
+				code.setLabel(tmp.join(' '));
+				_validate_code.call(this);
+
+			}
+
+			this.__cursor++;
+
+
+			if (this.__cursor === 4) {
+
 				this.__cursor %= 4;
 
-				code.setLabel(tmp.join(' '));
 
-				_validate_code.call(this);
+				var service = this.game.services.multiplayer;
+				if (service !== null) {
+
+					service.enter({
+						code: _get_code.call(this)
+					});
+
+				}
 
 			}
 

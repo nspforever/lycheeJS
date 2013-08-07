@@ -123,7 +123,7 @@ lychee.define('lychee.net.Client').tags({
 		for (var w = 0, wl = this.__services.waiting.length; w < wl; w++) {
 
 			service = this.__services.waiting[w];
-			if (service.getId() === id) {
+			if (service.id === id) {
 				return service;
 			}
 
@@ -132,7 +132,7 @@ lychee.define('lychee.net.Client').tags({
 		for (var a = 0, al = this.__services.active.length; a < al; a++) {
 
 			service = this.__services.active[a];
-			if (service.getId() === id) {
+			if (service.id === id) {
 				return service;
 			}
 
@@ -388,7 +388,7 @@ lychee.define('lychee.net.Client').tags({
 
 				// Please, Remote, plug Service! PING
 				this.send({}, {
-					id: service.getId(),
+					id: service.id,
 					method: '@plug'
 				});
 
@@ -410,7 +410,7 @@ lychee.define('lychee.net.Client').tags({
 
 				// Please, Remote, unplug Service! PING
 				this.send({}, {
-					id: service.getId(),
+					id: service.id,
 					method: '@unplug'
 				});
 

@@ -160,7 +160,12 @@ lychee.define('game.Main').requires([
 			this.fonts.small  = new game.entity.ui.Font('hud');
 
 
-			this.client  = null;
+			this.client   = null;
+			this.services = {
+				multiplayer: null,
+				highscore:   null
+			};
+
 			this.jukebox = new game.Jukebox(this);
 			this.logic   = new game.logic.Game(this);
 
@@ -171,23 +176,6 @@ lychee.define('game.Main').requires([
 			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));
 			this.changeState('menu');
-
-
-			if (lychee.debug === true) {
-
-				if (this.settings.stage !== undefined) {
-					this.changeState('game', this.settings.stage);
-				}
-
-				if (this.settings.points !== undefined) {
-
-					var data = this.logic.__level.getData();
-					data.points = this.settings.points;
-					this.logic.__level.trigger('update', [ data ]);
-
-				}
-
-			}
 
 
 			this.start();

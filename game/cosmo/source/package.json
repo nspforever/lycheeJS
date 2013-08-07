@@ -13,7 +13,7 @@
 				"Title":    [ "js", "png" ],
 
 				"HUDLayer":         [ "js", "json", "png" ],
-				"MultiplayerLayer": [ "js", "json", "png" ],
+				"MultiplayerLayer": [ "js" ],
 				"ResultLayer":      [ "js", "json", "png" ],
 				"SettingsLayer":    [ "js" ]
 			},
@@ -31,11 +31,11 @@
 		"net": {
 
 			"client": {
-				"MultiPlayerService": [ "js" ]
+				"Multiplayer": [ "js" ]
 			},
 
 			"remote": {
-				"MultiPlayerService": [ "js" ]
+				"Multiplayer": [ "js" ]
 			}
 
 		},
