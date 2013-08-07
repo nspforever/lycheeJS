@@ -283,7 +283,6 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 		}
 
-
 	};
 
 

@@ -32,10 +32,6 @@ lychee.define('game.entity.ui.Menu').includes([
 
 	Class.prototype = {
 
-		/*
-		 * CUSTOM API
-		 */
-
 	};
 
 

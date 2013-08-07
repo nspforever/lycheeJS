@@ -5,6 +5,9 @@ lychee.define('game.Client').includes([
 
 	var Class = function(settings, game) {
 
+		this.game = game;
+
+
 		lychee.net.Client.call(this, JSON.stringify, JSON.parse);
 
 
@@ -15,9 +18,7 @@ lychee.define('game.Client').includes([
 		}, this);
 
 		this.bind('disconnect', function(code, reason) {
-
-			console.log('disconnected', code, reason);
-
+			this.game.client = null;
 		}, this);
 
 

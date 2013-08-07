@@ -113,10 +113,19 @@ lychee.define('game.Main').requires([
 
 			preloader.bind('ready', function(assets, mappings) {
 
-//				this.settings.port = 1337;
-//				this.settings.host = 'asd';
+				var url = Object.keys(assets)[0];
+				var settings = assets[url];
+				if (settings !== null) {
 
-console.log('READY!', assets);
+					this.settings.client = {
+						port: settings.port,
+						host: settings.host
+					};
+
+				}
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
 
 				this.init();
 
@@ -124,13 +133,14 @@ console.log('READY!', assets);
 
 			preloader.bind('error', function(assets, mappings) {
 
-console.log('ERROR!', assets);
+				preloader.unbind('ready');
+				preloader.unbind('error');
 
 				this.init();
 
 			}, this);
 
-			preloader.load('/sorbet/module/Server');
+			preloader.load('/sorbet/module/Server', null, 'json');
 
 		},
 
@@ -150,17 +160,17 @@ console.log('ERROR!', assets);
 			this.fonts.small  = new game.entity.ui.Font('hud');
 
 
+			this.client  = null;
 			this.jukebox = new game.Jukebox(this);
 			this.logic   = new game.logic.Game(this);
-
-			this.setState('game', new game.state.Game(this));
-			this.setState('menu', new game.state.Menu(this));
-			this.changeState('menu');
-
 
 			if (this.settings.client !== null) {
 				this.client = new game.Client(this.settings.client, this);
 			}
+
+			this.setState('game', new game.state.Game(this));
+			this.setState('menu', new game.state.Menu(this));
+			this.changeState('menu');
 
 
 			if (lychee.debug === true) {
@@ -168,7 +178,6 @@ console.log('ERROR!', assets);
 				if (this.settings.stage !== undefined) {
 					this.changeState('game', this.settings.stage);
 				}
-
 
 				if (this.settings.points !== undefined) {
 

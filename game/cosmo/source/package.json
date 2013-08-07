@@ -28,6 +28,18 @@
 
 		},
 
+		"net": {
+
+			"client": {
+				"MultiPlayerService": [ "js" ]
+			},
+
+			"remote": {
+				"MultiPlayerService": [ "js" ]
+			}
+
+		},
+
 		"logic": {
 			"Game":  [ "js", "json" ],
 			"Level": [ "js", "json" ]

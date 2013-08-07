@@ -266,6 +266,10 @@ lychee.define('sorbet.Main').requires([
 								&& module.type === 'public'
 							) {
 
+								if (lychee.debug === true) {
+									console.log('sorbet.Main: Processing Module call: "' + mid + ', ' + url + '"');
+								}
+
 								module.process(host, response, {
 									referer: referer,
 									host:    rawhost,

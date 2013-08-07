@@ -272,19 +272,29 @@ lychee.define('game.state.Menu').requires([
 						}
 					});
 
-					entity.bind('touch', function() {
 
-						if (this.__locked === true) return false;
+					var client = this.game.client;
+					if (client !== null) {
+
+						entity.bind('touch', function() {
+
+							if (this.__locked === true) return false;
 
 
-						var layer = this.getLayer('ui').getEntity('root').getEntity('multiplayer-layer');
-						if (layer !== null) {
-							layer.resetCode();
-						}
+							var layer = this.getLayer('ui').getEntity('root').getEntity('multiplayer-layer');
+							if (layer !== null) {
+								layer.resetCode();
+							}
 
-						_navigate_vertical.call(this, 1);
+							_navigate_vertical.call(this, 1);
 
-					}, this);
+						}, this);
+
+					} else {
+
+						entity.setState('multiplayer-disabled');
+
+					}
 
 					root.addEntity(entity);
 

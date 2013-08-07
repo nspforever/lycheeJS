@@ -10,7 +10,7 @@ lychee.define('game.Server').includes([
 
 		this.bind('connect', function(remote) {
 
-			console.log('NEW COSMO REMOTE', remote.id);
+			console.log('(Cosmo) game.Server: New Remote (' + remote.id + ')');
 
 			remote.accept();
 

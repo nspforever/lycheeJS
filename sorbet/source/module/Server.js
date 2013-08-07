@@ -65,7 +65,7 @@ if (resolved.match(/dronecontrol/)) continue;
 
 	var _build_project = function(project) {
 
-		var id = project.resolved;
+		var id = project.resolvedroot;
 
 		if (this.main.servers.get(id) !== null) {
 			return false;
@@ -84,7 +84,7 @@ if (resolved.match(/dronecontrol/)) continue;
 
 		var that = this;
 		var port = this.getPort();
-		var host = 'null';
+		var host = null;
 
 
 		var server = child_process.fork(
@@ -99,6 +99,7 @@ if (resolved.match(/dronecontrol/)) continue;
 		server.id   = id;
 		server.port = port;
 		server.host = host;
+
 
 		server.on('exit', function() {
 			that.main.servers.remove(this.id, null);
@@ -159,28 +160,50 @@ if (resolved.match(/dronecontrol/)) continue;
 		process: function(host, response, data) {
 
 			var referer = data.referer;
-// TODO: Client side has to attach referer
-referer = '/game/discovery';
 			if (referer !== null) {
 
-				var fs       = host.fs;
-				var root     = host.root;
+				var tmp = referer.split(/\//);
+				for (var t = 0, tl = tmp.length; t < tl; t++) {
 
-				var resolved = fs.resolve(root + referer);
+					var str = tmp[t];
+					if (
+						   str === ''
+						|| str === 'http:'
+						|| str === 'https:'
+						|| str.match(/(.*)\:([0-9]{0,5})/)
+						|| str === 'index.html'
+					) {
+						tmp.splice(t, 1);
+						tl--;
+						t--;
+					}
+
+				}
+
+
+				var game = tmp.join('/');
+				var fs   = host.fs;
+				var root = host.root;
+
+				var resolved = fs.resolve(root + '/' + game);
 				if (
 					   resolved !== null
-					&& fs.isDirectory(resolved) === true
+					&& fs.isDirectory(resolved)
 					&& fs.isFile(resolved + '/index.html') === true
 				) {
 
 					var server = this.main.servers.get(resolved);
-					var port   = this.main.ports.get(resolved);
+					if (server !== null) {
 
-					if (server !== null && port !== null) {
+						var settings = {
+							port: server.port,
+							host: server.host !== null ? server.host : data.host
+						};
 
-//						response.status             = 301;
-//						response.header['Location'] = url;
-						response.content            = data.host + ':' + port;
+
+						response.status                 = 200;
+						response.header['Content-Type'] = 'application/json';
+						response.content                = JSON.stringify(settings);
 
 					}
 
