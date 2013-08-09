@@ -68,7 +68,7 @@ lychee.define('lychee.net.Client').tags({
 			} else if (method.charAt(0) === '@') {
 
 				if (method === '@plug') {
-					_plug_service.call(this, data._serviceId, service);
+					_plug_service.call(this,   data._serviceId, service);
 				} else if (method === '@unplug') {
 					_unplug_service.call(this, data._serviceId, service);
 				}
