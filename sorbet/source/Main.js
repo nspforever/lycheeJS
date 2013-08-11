@@ -75,7 +75,7 @@ lychee.define('sorbet.Main').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(root, settings) {
+	var Class = function(root, cfg) {
 
 		root = typeof root === 'string' ? root : '/var/www';
 
@@ -90,10 +90,9 @@ lychee.define('sorbet.Main').requires([
 		this.modules = new _map();
 
 
-		for (var s = 0, sl = settings.length; s < sl; s++) {
+		for (var s = 0, sl = cfg.settings.length; s < sl; s++) {
 
-			var blob = settings[s];
-
+			var blob   = cfg.settings[s];
 			var name   = blob.hosts[0] || null;
 			var config = {};
 
@@ -127,7 +126,11 @@ lychee.define('sorbet.Main').requires([
 
 		var that = this;
 		setTimeout(function() {
-			that.modules.set('server', new _module['Server'](that));
+
+			var module = new _module['Server'](that, cfg.server);
+
+			that.modules.set('server', module);
+
 		}, 1000);
 
 	};

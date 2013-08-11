@@ -118,13 +118,16 @@ if (resolved.match(/dronecontrol/)) continue;
 	 * IMPLEMENTATION
 	 */
 
-	var _port = 8181;
+	var Class = function(main, ports) {
 
+		ports[0] = typeof ports[0] === 'number' ? ports[0] : 8081;
+		ports[1] = typeof ports[1] === 'number' ? ports[1] : 8181;
 
-	var Class = function(main) {
 
 		this.main = main;
 		this.type = 'public';
+
+		this.__port = ports[0];
 
 
 		var vhosts = this.main.vhosts.all();
@@ -154,7 +157,7 @@ if (resolved.match(/dronecontrol/)) continue;
 	Class.prototype = {
 
 		getPort: function() {
-			return _port++;
+			return this.__port++;
 		},
 
 		process: function(host, response, data) {

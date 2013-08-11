@@ -1,6 +1,7 @@
 {
 
-	"port": 80,
+	"port":       80,
+	"server":   [ 8081, 8181 ],
 
 	"settings": [{
 
