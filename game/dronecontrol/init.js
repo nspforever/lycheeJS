@@ -1,6 +1,6 @@
 
 // Set to true to see lychee debug messages
-// lychee.debug = true;
+lychee.debug = true;
 
 
 // Rebase required namespaces for inclusion
@@ -29,14 +29,7 @@ lychee.rebase({
 lychee.build(function(lychee, global) {
 
 	var settings = {
-		base: './asset',
-		host: 'localhost',
-		fullscreen: true
 	};
-
-	if (document && document.location) {
-		settings.host = document.location.hostname;
-	}
 
 	new game.Main(settings);
 

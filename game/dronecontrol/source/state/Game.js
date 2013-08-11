@@ -10,8 +10,9 @@ lychee.define('game.state.Game').requires([
 
 		lychee.game.State.call(this, game);
 
-		this.__client = this.game.client;
+		this.client  = game.client || null;
 
+		this.__droneId  = 'Jordan';
 		this.__entities = {};
 
 		this.reset();
@@ -75,8 +76,8 @@ lychee.define('game.state.Game').requires([
 					value |= 0;
 					value = value / 10;
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'roll',
 						value: value
 					});
@@ -117,8 +118,8 @@ lychee.define('game.state.Game').requires([
 					value |= 0;
 					value = value / 10;
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'pitch',
 						value: value
 					});
@@ -159,8 +160,8 @@ lychee.define('game.state.Game').requires([
 					value |= 0;
 					value = value / 10;
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'yaw',
 						value: value
 					});
@@ -201,8 +202,8 @@ lychee.define('game.state.Game').requires([
 					value |= 0;
 					value = value / 10;
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'heave',
 						value: value
 					});
@@ -229,8 +230,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'takeoff',
 						value: null,
 					});
@@ -251,8 +252,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'animateFlight',
 						type:   'wave',
 						value:  5000
@@ -282,8 +283,8 @@ lychee.define('game.state.Game').requires([
 					entities.heave.setValue(0);
 
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'stop',
 						value: null,
 					});
@@ -304,8 +305,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'land',
 						value: null,
 					});
@@ -331,8 +332,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'animateFlight',
 						type:   'flip-ahead',
 						value:  700
@@ -354,8 +355,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'animateFlight',
 						type:   'flip-behind',
 						value:  700
@@ -377,8 +378,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'animateFlight',
 						type:   'flip-left',
 						value:  700
@@ -400,8 +401,8 @@ lychee.define('game.state.Game').requires([
 
 				entity.bind('touch', function() {
 
-					this.__client.send({
-						droneId: 'Lima',
+					this.client.send({
+						droneId: this.__droneId,
 						method: 'animateFlight',
 						type:   'flip-right',
 						value:  700

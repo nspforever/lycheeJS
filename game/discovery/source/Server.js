@@ -12,8 +12,9 @@ lychee.define('game.Server').requires([
 
 		this.bind('connect', function(remote) {
 
-			console.log('NEW REMOTE ', remote.id);
+			console.log('(Discovery) game.Server: New Remote (' + remote.id + ')');
 
+			remote.register('RoomService', lychee.net.remote.RoomService);
 			remote.accept();
 
 		}, this);

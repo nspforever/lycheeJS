@@ -16,7 +16,9 @@ lychee.define('game.Server').requires([
 
 	var _process_receive = function(data) {
 
-		var drone = this.getDroneById(data.droneId || null);
+		console.log('(Dronecontrol) game.Server: receive ', data);
+
+		var drone = this.getDrone(data.droneId || null);
 		if (drone === null) {
 			return false;
 		}
@@ -34,8 +36,8 @@ lychee.define('game.Server').requires([
 				drone.takeoff();
 			break;
 
-			case 'land': drone.land(); break;
-			case 'stop': drone.stop(); break;
+			case 'land':  drone.land();       break;
+			case 'stop':  drone.stop();       break;
 
 			case 'roll':  drone.roll(value);  break;
 			case 'pitch': drone.pitch(value); break;
