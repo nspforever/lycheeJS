@@ -1,12 +1,35 @@
 
-lychee.define('game.ar.command.PCMD').exports(function(lychee, game, global, attachments) {
+lychee.define('game.ar.command.PCMD').tags({
+	platform: [ 'nodejs' ]
+}).supports(function(lychee, global) {
 
-	var _floatToString = function(sequence) {
+	if (typeof Buffer !== 'undefined') {
+		return true;
+	}
+
+
+	return false;
+
+}).exports(function(lychee, game, global, attachments) {
+
+	/*
+	 * HELPERS
+	 */
+
+	var _float_to_string = function(sequence) {
+
 		var buffer = new Buffer(4);
 		buffer.writeFloatBE(sequence, 0);
+
 		return -~parseInt(buffer.toString('hex'), 16) - 1;
+
 	};
 
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(roll, pitch, yaw, heave) {
 
@@ -41,14 +64,13 @@ lychee.define('game.ar.command.PCMD').exports(function(lychee, game, global, att
 
 			var flag = 0;
 			if (
-				this.roll !== 0
+				   this.roll  !== 0
 				|| this.pitch !== 0
-				|| this.yaw !== 0
+				|| this.yaw   !== 0
 				|| this.heave !== 0
 			) {
 				flag = 1;
 			}
-
 
 
 			/*
@@ -61,10 +83,10 @@ lychee.define('game.ar.command.PCMD').exports(function(lychee, game, global, att
 
 			str += sequence + ',';
 			str += flag     + ',';
-			str += _floatToString(this.roll)   + ',';
-			str += _floatToString(-this.pitch)  + ',';
-			str += _floatToString(this.heave)  + ',';
-			str += _floatToString(this.yaw);
+			str += _float_to_string( this.roll)  + ',';
+			str += _float_to_string(-this.pitch) + ',';
+			str += _float_to_string( this.heave) + ',';
+			str += _float_to_string( this.yaw);
 
 			str += '\r';
 

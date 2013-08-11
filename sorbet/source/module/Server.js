@@ -32,10 +32,6 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 			var resolved = files[f];
 
 
-// TODO: Refactor dronecontrol app
-if (resolved.match(/dronecontrol/)) continue;
-
-
 			var tmp = resolved.split('/');
 			tmp.pop();
 

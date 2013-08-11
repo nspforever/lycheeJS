@@ -49,7 +49,6 @@ lychee.define('game.ar.command.CONFIG').exports(function(lychee, game, global, a
 			}
 
 
-
 			var str = 'AT*CONFIG=';
 
 			str += sequence + ',';

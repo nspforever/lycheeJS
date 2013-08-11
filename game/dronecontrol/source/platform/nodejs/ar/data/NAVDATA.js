@@ -1,6 +1,6 @@
 
 lychee.define('game.ar.data.NAVDATA').tags({
-	platform: 'nodejs'
+	platform: [ 'nodejs' ]
 }).supports(function(lychee, global) {
 
 	if (typeof Buffer !== 'undefined') {
@@ -31,24 +31,18 @@ lychee.define('game.ar.data.NAVDATA').tags({
 		 */
 
 		int16: function() {
-
 			this.__offset += 2;
 			return this.__buffer.readInt16LE(this.__offset - 2);
-
 		},
 
 		uint16: function() {
-
 			this.__offset += 2;
 			return this.__buffer.readUInt16LE(this.__offset - 2);
-
 		},
 
 		int32: function() {
-
 			this.__offset += 4;
 			return this.__buffer.readInt32LE(this.__offset - 4);
-
 		},
 
 		uint32: function() {
@@ -279,7 +273,7 @@ lychee.define('game.ar.data.NAVDATA').tags({
 
 	Module.decode = function(data) {
 
-		var buffer = new _buffer(data);
+		var buffer  = new _buffer(data);
 		var navdata = {
 			valid: false
 		};

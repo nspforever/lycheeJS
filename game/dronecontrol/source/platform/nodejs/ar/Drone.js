@@ -4,54 +4,86 @@ lychee.define('game.ar.Drone').requires([
 	'game.ar.command.PCMD',
 	'game.ar.command.REF',
 	'game.ar.command.Socket',
-	'game.ar.navdata.Socket'
-//	'game.ar.video.Socket'
+	'game.ar.navdata.Socket',
+	'game.ar.video.Socket'
 ]).exports(function(lychee, game, global, attachments) {
-
-	var _id = 0;
 
 	var _config = game.ar.command.CONFIG;
 	var _pcmd   = game.ar.command.PCMD;
 	var _ref    = game.ar.command.REF;
 	var _commandsocket = game.ar.command.Socket;
 	var _navdatasocket = game.ar.navdata.Socket;
+	var _videosocket   = game.ar.video.Socket;
 
 
-	var Class = function(id, data) {
 
-		var settings = lychee.extend({
-			ip:   '192.168.1.1'
-		}, data);
+	/*
+	 * HELPERS
+	 */
+
+	var _process_navdata = function(data) {
+
+		if (data instanceof Object) {
+
+			if (
+				   data.states
+				&& data.states.emergency_landing === 1
+				&& this.__disableEmergency === true
+			) {
+
+				this.__ref.setEmergency(true);
+
+			} else {
+
+				this.__ref.setEmergency(false);
+				this.__disableEmergency = false;
+
+			}
 
 
-		this.id = id || ('drone-' + _id++);
+			this.navdata = data;
+
+		}
+
+	};
+
+	var _process_video = function(data) {
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
+	var Class = function(ip) {
+
+		ip = typeof ip === 'string' ? ip : '192.168.1.1';
+
+
+		this.flying  = false;
+		this.navdata = null;
 
 		this.__ref    = new _ref(false, false);
 		this.__pcmd   = new _pcmd(0, 0, 0, 0);
 		this.__config = new _config();
 
 
-		var ip = settings.ip;
+		this.__sockets = {};
+		this.__sockets.command = new _commandsocket(ip);
+		this.__sockets.navdata = new _navdatasocket(ip);
+		this.__sockets.video   = new _videosocket(ip);
 
-		this.__commandSocket = new _commandsocket(ip);
-		this.__navdataSocket = new _navdatasocket(ip);
-		this.__navdataSocket.bind('receive', this.__processNavdata, this);
+		this.__sockets.navdata.bind('receive', _process_navdata, this);
+		this.__sockets.video.bind('receive',   _process_video,   this);
 
-		//this.__videoSocket   = new _videosocket(
-		// settings.ip, 5555
-		//);
-
-		this.__isFlying         = false;
-		this.__isInEmergency    = false;
-		this.__disableEmergency = false;
-
-		this.__navdata = null;
 
 		this.__state = {};
-		this.__state.roll  = 0;
-		this.__state.pitch = 0;
-		this.__state.yaw   = 0;
-		this.__state.heave = 0;
+		this.__state.roll   = 0;
+		this.__state.pitch  = 0;
+		this.__state.yaw    = 0;
+		this.__state.heave  = 0;
 		this.__state.config = {
 			'general:navdata_demo': [ 'TRUE' ]
 		};
@@ -64,10 +96,8 @@ lychee.define('game.ar.Drone').requires([
 		this.__flightanimation.duration = null;
 		this.__flightanimation.sent     = false;
 
-		this.__clock = null;
 
-
-		settings = null;
+		this.__disableEmergency = false;
 
 	};
 
@@ -106,57 +136,25 @@ lychee.define('game.ar.Drone').requires([
 
 	Class.prototype = {
 
-		/*
-		 * PRIVATE API
-		 */
-
-		__processNavdata: function(data) {
-
-// console.log('processing navdata', data.demo);
-
-			if (data instanceof Object) {
-
-				if (
-					data.states
-					&& data.states.emergency_landing === 1
-					&& this.__disableEmergency === true
-				) {
-					console.log('disabling emergency case');
-					this.__ref.setEmergency(true);
-				} else {
-					this.__ref.setEmergency(false);
-					this.__disableEmergency = false;
-				}
-
-
-				this.__navdata = data;
-
-			}
-
-		},
-
-		isFlying: function() {
-			return this.__isFlying === true;
-		},
-
-		isLanding: function() {
-			return this.__isFlying === false;
-		},
-
 		disableEmergency: function() {
 			this.__disableEmergency = true;
 		},
 
 		update: function(clock, delta) {
 
-			if (this.__commandSocket !== null) {
+			var socket = this.__sockets.command;
+			if (socket != null) {
 
+				var config = this.__config;
+				var ref    = this.__ref;
+				var pcmd   = this.__pcmd;
+
+
+				// 1. CONFIG
 				var state = this.__state;
 				for (var id in state.config) {
-
-					this.__config.set(id, state.config[id]);
-					this.__commandSocket.add(this.__config);
-
+					config.set(id, state.config[id]);
+					socket.add(config);
 				}
 
 				for (var id in state.config) {
@@ -164,24 +162,25 @@ lychee.define('game.ar.Drone').requires([
 				}
 
 
+				// 2. REF
+				socket.add(ref);
 
-				this.__commandSocket.add(this.__ref);
 
-				this.__pcmd.set(
+				// 3. PCMD
+				pcmd.set(
 					state.roll,
 					state.pitch,
 					state.yaw,
 					state.heave
 				);
 
-				this.__commandSocket.add(this.__pcmd);
+				socket.add(pcmd);
 
-				this.__commandSocket.flush();
+
+				// 4. flush()
+				socket.flush();
 
 			}
-
-
-			this.__clock = clock;
 
 		},
 
@@ -192,13 +191,13 @@ lychee.define('game.ar.Drone').requires([
 		 */
 
 		takeoff: function() {
-			this.__isFlying = true;
-			this.__ref.setFlying(this.__isFlying);
+			this.flying = true;
+			this.__ref.setFlying(this.flying);
 		},
 
 		land: function() {
-			this.__isFlying = false;
-			this.__ref.setFlying(this.__isFlying);
+			this.flying = false;
+			this.__ref.setFlying(this.flying);
 		},
 
 		stop: function() {
@@ -285,16 +284,18 @@ lychee.define('game.ar.Drone').requires([
 			var enumval = 0;
 
 			for (var id in Class.FLIGHTANIMATION) {
+
 				if (id === type) {
 					enumval = Class.FLIGHTANIMATION[id];
 					valid   = true;
 					break;
 				}
+
 			}
 
 
 			if (
-				valid === true
+				   valid === true
 				&& duration !== null
 			) {
 				this.__state.config['control:flight_anim'] = [ enumval, duration ];
@@ -309,23 +310,25 @@ lychee.define('game.ar.Drone').requires([
 		animateLEDs: function(type, duration, hertz) {
 
 			duration = typeof duration === 'number' ? duration : null;
-			hertz    = typeof hertz === 'number' ? hertz : 2;
+			hertz    = typeof hertz === 'number'    ? hertz    : 2;
 
 
 			var enumval = 0;
 			var valid   = false;
 
 			for (var id in Class.LEDANIMATION) {
+
 				if (id === type) {
 					enumval = Class.LEDANIMATION[id];
 					valid   = true;
 					break;
 				}
+
 			}
 
 
 			if (
-				valid === true
+				   valid === true
 				&& duration !== null
 			) {
 				this.__state.config['control:leds_anim'] = [ enumval, hertz, (duration / 1000) | 0 ];

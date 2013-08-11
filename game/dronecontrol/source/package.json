@@ -19,16 +19,21 @@
 
 					"command": {
 						"CONFIG": [ "js" ],
-						"PCMD": [ "js" ],
-						"REF": [ "js" ],
+						"PCMD":   [ "js" ],
+						"REF":    [ "js" ],
 						"Socket": [ "js" ]
 					},
 
 					"data": {
-						"NAVDATA": [ "js" ]
+						"NAVDATA": [ "js" ],
+						"VIDEO":   [ "js" ]
 					},
 
 					"navdata": {
+						"Socket": [ "js" ]
+					},
+
+					"video": {
 						"Socket": [ "js" ]
 					},
 
@@ -41,17 +46,17 @@
 		},
 
 		"entity": {
-			"Font": [
-				"js",
-				"normal.fnt"
-			]
+
+			"ui": {
+				"Font": [ "js", "normal.fnt" ]
+			}
+
 		},
 
 		"state": {
 			"Game": [ "js" ]
 		},
 
-		"DeviceSpecificHacks": [ "js" ],
 		"Main": [ "js", "css" ],
 		"Server": [ "js" ]
 

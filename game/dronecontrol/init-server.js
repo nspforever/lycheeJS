@@ -11,8 +11,11 @@ require(path + '/platform/nodejs/bootstrap.js')(__dirname);
 require('./source/Server.js');
 
 
-lychee.debug = true;
+// Set to true to see lychee debug messages
+// lychee.debug = true;
 
+
+// Rebase required namespaces for inclusion
 lychee.rebase({
 	lychee: "../../lychee",
 	game: "./source"
@@ -25,33 +28,23 @@ lychee.tag({
 
 lychee.build(function(lychee, global) {
 
-	var drones = [{
-		id: 'Lima',
-		ip: '192.168.1.1'
-	}, {
-		id: 'Jordan',
-		ip: '192.168.1.2'
-	}, {
-		id: 'Victoria',
-		ip: '192.168.1.3'
-	}];
+	var port = process.argv[2] || '8181';
+	var host = process.argv[3] || 'null';
 
 
-	var arr = [];
+	if (host === 'null') host = null;
 
-	for (var d = 0, dl = drones.length; d < dl; d++) {
+	if (typeof port === 'string') {
+		port = parseInt(port, 10);
+	}
 
-		var drone = new game.ar.Drone(drones[d].id, {
-			ip: drones[d].ip
-		});
+	if (!isNaN(port)) {
 
-		arr.push(drone);
+		var server = new game.Server();
+
+		server.listen(port, host);
 
 	}
 
-
-	new game.Server(arr);
-
 }, typeof global !== 'undefined' ? global : this);
-
 

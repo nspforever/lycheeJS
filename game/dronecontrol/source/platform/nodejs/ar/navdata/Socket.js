@@ -20,27 +20,50 @@ lychee.define('game.ar.navdata.Socket').tags({
 	var _parser = game.ar.data.NAVDATA;
 
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _process_message = function(buffer) {
+
+		var navdata = _parser.decode(buffer);
+
+		if (
+			   navdata instanceof Object
+			&& navdata.valid === true
+		) {
+			this.trigger('receive', [ navdata ]);
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(ip) {
 
-		this.__ip   = typeof ip === 'string' ? ip : '192.168.1.1';
-		this.__port = 5554;
-
+		this.__ip       = typeof ip === 'string' ? ip : '192.168.1.1';
+		this.__port     = 5554;
 		this.__sequence = 0;
 
 
 		var that = this;
 
-		this.__raw = _dgram.createSocket('udp4');
-		this.__raw.bind();
-		this.__raw.on('message', function(buffer) {
-			that.__processMessage(buffer);
+		this.__socket = _dgram.createSocket('udp4');
+		this.__socket.bind();
+		this.__socket.on('message', function(buffer) {
+			_process_message.call(that, buffer);
 		});
 
 
 		// Request Navdata from Drone
 		var buffer = new Buffer([1]);
 
-		this.__raw.send(
+		this.__socket.send(
 			buffer,
 			0,
 			buffer.length,
@@ -56,23 +79,9 @@ lychee.define('game.ar.navdata.Socket').tags({
 
 	Class.prototype = {
 
-		__processMessage: function(buffer) {
-
-			var navdata = _parser.decode(buffer);
-
-			if (
-				navdata instanceof Object
-				&& navdata.valid === true
-			) {
-
-				this.trigger('receive', [ navdata ]);
-
-			}
-
-		},
-
 		close: function() {
-			this.__raw.close();
+			this.__socket.close();
+			return true;
 		}
 
 	};

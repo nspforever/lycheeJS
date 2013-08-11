@@ -1,6 +1,6 @@
 
 lychee.define('game.ar.command.Socket').tags({
-	platform: 'nodejs'
+	platform: [ 'nodejs' ]
 }).supports(function(lychee, global) {
 
 	if (typeof Buffer !== 'undefined') {
@@ -17,12 +17,11 @@ lychee.define('game.ar.command.Socket').tags({
 
 	var Class = function(ip) {
 
-		this.__ip   = typeof ip === 'string' ? ip : '192.168.1.1';
-		this.__port = 5556;
-
-		this.__raw      = _dgram.createSocket('udp4');
+		this.__ip       = typeof ip === 'string' ? ip : '192.168.1.1';
+		this.__port     = 5556;
 		this.__buffer   = [];
 		this.__sequence = 0;
+		this.__socket   = _dgram.createSocket('udp4');
 
 	};
 
@@ -31,6 +30,7 @@ lychee.define('game.ar.command.Socket').tags({
 
 		add: function(command) {
 			this.__buffer.push(command.toString(this.__sequence++));
+			return true;
 		},
 
 		flush: function() {
@@ -39,7 +39,7 @@ lychee.define('game.ar.command.Socket').tags({
 			if (cmdbuffer.length > 0) {
 
 				var commands = cmdbuffer.join('');
-				var buffer = new Buffer(commands);
+				var buffer   = new Buffer(commands);
 
 
 //				if (lychee.debug === true) {
@@ -47,7 +47,7 @@ lychee.define('game.ar.command.Socket').tags({
 //				}
 
 
-				this.__raw.send(
+				this.__socket.send(
 					buffer,
 					0,
 					buffer.length,
@@ -57,12 +57,19 @@ lychee.define('game.ar.command.Socket').tags({
 
 				this.__buffer = [];
 
+
+				return true;
+
 			}
+
+
+			return false;
 
 		},
 
 		close: function() {
 			this.__raw.close();
+			return true;
 		}
 
 	};
