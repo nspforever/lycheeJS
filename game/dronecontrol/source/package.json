@@ -48,7 +48,11 @@
 		"entity": {
 
 			"ui": {
-				"Font": [ "js", "normal.fnt" ]
+				"Font":         [ "js", "normal.fnt" ],
+				"Navdata":      [ "js" ],
+				"SidebarLeft":  [ "js" ],
+				"SidebarRight": [ "js" ],
+				"VideoLayer":   [ "js" ]
 			}
 
 		},
@@ -57,8 +61,9 @@
 			"Game": [ "js" ]
 		},
 
-		"Main": [ "js", "css" ],
-		"Server": [ "js" ]
+		"Controller": [ "js" ],
+		"Main":       [ "js", "css" ],
+		"Server":     [ "js" ]
 
 	}
 }

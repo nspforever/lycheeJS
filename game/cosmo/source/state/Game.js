@@ -36,9 +36,6 @@ lychee.define('game.state.Game').requires([
 			lychee.game.State.prototype.reset.call(this);
 
 
-			var entity = null;
-
-
 			this.removeLayer('ui');
 
 

@@ -1,6 +1,7 @@
 
 lychee.define('game.Main').requires([
 	'lychee.net.Client',
+	'game.Controller',
 	'game.entity.ui.Font',
 	'game.state.Game'
 ]).includes([
@@ -111,6 +112,9 @@ lychee.define('game.Main').requires([
 				this.client = new lychee.net.Client(JSON.stringify, JSON.parse);
 				this.client.listen(this.settings.client.port, this.settings.client.host);
 			}
+
+			this.controller = new game.Controller(this);
+
 
 			this.setState('game', new game.state.Game(this));
 			this.changeState('game');

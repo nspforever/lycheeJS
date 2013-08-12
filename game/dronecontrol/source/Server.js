@@ -18,7 +18,7 @@ lychee.define('game.Server').requires([
 
 		console.log('(Dronecontrol) game.Server: receive ', data);
 
-		var drone = this.getDrone(data.droneId || null);
+		var drone = this.getDrone(data.id || null);
 		if (drone === null) {
 			return false;
 		}
@@ -36,13 +36,15 @@ lychee.define('game.Server').requires([
 				drone.takeoff();
 			break;
 
-			case 'land':  drone.land();       break;
-			case 'stop':  drone.stop();       break;
+			case 'land': drone.land(); break;
+			case 'stop': drone.stop(); break;
 
-			case 'roll':  drone.roll(value);  break;
-			case 'pitch': drone.pitch(value); break;
-			case 'yaw':   drone.yaw(value);   break;
-			case 'heave': drone.heave(value); break;
+			case 'state':
+				drone.roll(value.roll);
+				drone.pitch(value.pitch);
+				drone.yaw(value.yaw);
+				drone.heave(value.heave);
+			break;
 
 			case 'animateFlight': drone.animateFlight(type, value); break;
 			case 'animateLEDs':   drone.animateLEDs(type, value);   break;

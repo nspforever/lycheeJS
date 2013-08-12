@@ -25,9 +25,9 @@
 					"Client": [ "js" ]
 				},
 
-				"Input": [ "js" ],
+				"Input":    [ "js" ],
 				"Renderer": [ "js" ],
-				"Track": [ "js" ],
+				"Track":    [ "js" ],
 				"Viewport": [ "js" ]
 
 			},
@@ -36,13 +36,13 @@
 
 				"net": {
 					"Protocol": [ "js" ],
-					"Remote": [ "js" ],
-					"Server": [ "js" ]
+					"Remote":   [ "js" ],
+					"Server":   [ "js" ]
 				},
 
-				"Input": [ "js" ],
+				"Input":    [ "js" ],
 				"Renderer": [ "js" ],
-				"Track": [ "js" ],
+				"Track":    [ "js" ],
 				"Viewport": [ "js" ]
 
 			},
@@ -53,9 +53,9 @@
 					"Loop": [ "js" ]
 				},
 
-				"Input": [ "js" ],
+				"Input":    [ "js" ],
 				"Renderer": [ "js" ],
-				"Track": [ "js" ],
+				"Track":    [ "js" ],
 				"Viewport": [ "js" ]
 
 			},
@@ -68,32 +68,32 @@
 
 		"data": {
 			"BitON": [ "js" ],
-			"PO": [ "js" ]
+			"PO":    [ "js" ]
 		},
 
 		"event": {
-			"Bus": [ "js" ],
+			"Bus":     [ "js" ],
 			"Emitter": [ "js" ],
 			"Promise": [ "js" ]
 		},
 
 		"game": {
 			"Background": [ "js" ],
-			"Entity": [ "js" ],
-			"Jukebox": [ "js" ],
-			"Layer": [ "js" ],
-			"Loop": [ "js" ],
-			"Main": [ "js" ],
-			"Sprite": [ "js" ],
-			"State": [ "js" ]
+			"Entity":     [ "js" ],
+			"Jukebox":    [ "js" ],
+			"Layer":      [ "js" ],
+			"Loop":       [ "js" ],
+			"Main":       [ "js" ],
+			"Sprite":     [ "js" ],
+			"State":      [ "js" ]
 		},
 
 		"math": {
-			"Matrix4": [ "js" ],
+			"Matrix4":    [ "js" ],
 			"Quaternion": [ "js" ],
-			"Vector2": [ "js" ],
-			"Vector3": [ "js" ],
-			"Vector4": [ "js" ]
+			"Vector2":    [ "js" ],
+			"Vector3":    [ "js" ],
+			"Vector4":    [ "js" ]
 		},
 
 		"net": {
@@ -109,24 +109,25 @@
 		},
 
 		"ui": {
-			"Button": [ "js" ],
+			"Button":    [ "js" ],
 			"Connector": [ "js" ],
-			"Entity": [ "js" ],
-			"Input": [ "js" ],
-			"Layer": [ "js" ],
-			"Select": [ "js" ],
-			"Slider": [ "js" ],
-			"Sprite": [ "js" ],
-			"Textarea": [ "js" ]
+			"Entity":    [ "js" ],
+			"Input":     [ "js" ],
+			"Joystick":  [ "js" ],
+			"Layer":     [ "js" ],
+			"Select":    [ "js" ],
+			"Slider":    [ "js" ],
+			"Sprite":    [ "js" ],
+			"Textarea":  [ "js" ]
 		},
 
 		"verlet": {
-			"AngleConstraint": [ "js" ],
+			"AngleConstraint":    [ "js" ],
 			"DistanceConstraint": [ "js" ],
-			"Particle": [ "js" ],
-			"Tire": [ "js" ],
-			"Vector2": [ "js" ],
-			"World": [ "js" ]
+			"Particle":           [ "js" ],
+			"Tire":               [ "js" ],
+			"Vector2":            [ "js" ],
+			"World":              [ "js" ]
 		}
 
 	}

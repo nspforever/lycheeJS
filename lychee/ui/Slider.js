@@ -3,14 +3,56 @@ lychee.define('lychee.ui.Slider').includes([
 	'lychee.ui.Entity'
 ]).exports(function(lychee, global) {
 
+	/*
+	 * HELPERS
+	 */
+
+	var _refresh_drag = function(x, y) {
+
+		var type   = this.type;
+		var width  = this.width;
+		var height = this.height;
+		var index  = 0;
+
+
+		if (type === Class.TYPE.horizontal) {
+			index = Math.max(0.0, Math.min(1.0,     (x + width  / 2) / width));
+		} else if (type === Class.TYPE.vertical) {
+			index = Math.max(0.0, Math.min(1.0, 1 - (y + height / 2) / height));
+		}
+
+
+		var range = this.__range;
+		var value = index * (range.to - range.from);
+
+		if (range.from < 0) {
+			value += range.from;
+		}
+
+		value = ((value / range.delta) | 0) * range.delta;
+
+
+		var result = this.setValue(value);
+		if (result === true) {
+			this.trigger('change', [ value ]);
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
 
 
-		this.font      = null;
-		this.type      = Class.TYPE.horizontal;
-		this.value     = 0;
+		this.font  = null;
+		this.type  = Class.TYPE.horizontal;
+		this.value = 0;
 
 		this.__drag   = { x: 0, y: 0 };
 		this.__range  = { from: 0, to: 1, delta: 0.001 };
@@ -43,11 +85,11 @@ lychee.define('lychee.ui.Slider').includes([
 		 */
 
 		this.bind('touch', function(id, position, delta) {
-			this.__refresh(position.x, position.y);
+			_refresh_drag.call(this, position.x, position.y);
 		}, this);
 
 		this.bind('swipe', function(id, type, position, delta, swipe) {
-			this.__refresh(position.x, position.y);
+			_refresh_drag.call(this, position.x, position.y);
 		}, this);
 
 		this.bind('focus', function() {
@@ -225,38 +267,6 @@ lychee.define('lychee.ui.Slider').includes([
 		/*
 		 * CUSTOM API
 		 */
-
-		__refresh: function(x, y) {
-
-			var type   = this.type;
-			var width  = this.width;
-			var height = this.height;
-			var index  = 0;
-
-
-			if (type === Class.TYPE.horizontal) {
-				index = Math.max(0.0, Math.min(1.0,     (x + width  / 2) / width));
-			} else if (type === Class.TYPE.vertical) {
-				index = Math.max(0.0, Math.min(1.0, 1 - (y + height / 2) / height));
-			}
-
-
-			var range = this.__range;
-			var value = index * (range.to - range.from);
-
-			if (range.from < 0) {
-				value += range.from;
-			}
-
-			value = ((value / range.delta) | 0) * range.delta;
-
-
-			var result = this.setValue(value);
-			if (result === true) {
-				this.trigger('change', [ value ]);
-			}
-
-		},
 
 		setFont: function(font) {
 
