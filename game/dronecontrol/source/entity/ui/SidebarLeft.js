@@ -86,7 +86,7 @@ lychee.define('game.entity.ui.SidebarLeft').requires([
 					font:  this.game.fonts.normal,
 					position: {
 						x:  0,
-						y: -1/2 * height + 32 + 32 * c
+						y: -1/2 * height + 32 + 40 * c
 					}
 				});
 				entity.bind('#touch', _process_command, this);

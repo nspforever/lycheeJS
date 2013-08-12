@@ -94,10 +94,6 @@ lychee.define('game.Main').requires([
 
 		init: function() {
 
-			// Remove Preloader Progress Bar
-			lychee.Preloader.prototype._progress(null, null);
-
-
 			lychee.game.Main.prototype.init.call(this);
 			this.reset(false);
 

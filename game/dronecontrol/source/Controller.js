@@ -44,6 +44,22 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 
 	Class.prototype = {
 
+		animation: function(method, type, value) {
+
+			var client = this.client;
+			if (client !== null) {
+
+				client.send({
+					id:     this.__id,
+					method: method || 'animateFlight',
+					type:   type,
+					value:  value
+				});
+
+			}
+
+		},
+
 		command: function(command) {
 
 			var client = this.client;

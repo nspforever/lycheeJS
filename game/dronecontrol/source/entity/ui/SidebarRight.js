@@ -6,6 +6,27 @@ lychee.define('game.entity.ui.SidebarRight').requires([
 	'lychee.ui.Layer'
 ]).exports(function(lychee, game, global, attachments) {
 
+	/*
+	 * HELPERS
+	 */
+
+	var _process_flip = function(entity) {
+
+		var animation = entity.label.toLowerCase();
+
+		var controller = this.controller;
+		if (controller !== null) {
+			controller.animation('animateFlight', animation, 700);
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(state, settings) {
 
 		this.state      = state;
@@ -54,17 +75,24 @@ lychee.define('game.entity.ui.SidebarRight').requires([
 			var height = this.height;
 
 
-			entity = new lychee.ui.Button({
-				label: 'Takeoff',
-				font:  this.game.fonts.normal,
-				position: {
-					x:  0,
-					y: -1/2 * height + 32
-				}
-			});
+			var flips = [ 'flip-ahead', 'flip-behind', 'flip-left', 'flip-right' ];
+			for (var f = 0, fl = flips.length; f < fl; f++) {
 
-			this.addEntity(entity);
+				var label = flips[f];
 
+				entity = new lychee.ui.Button({
+					label: label,
+					font:  this.game.fonts.normal,
+					position: {
+						x:  0,
+						y: -1/2 * height + 32 + 40 * f
+					}
+				});
+				entity.bind('#touch', _process_flip, this);
+
+				this.addEntity(entity);
+
+			}
 
 
 			entity = new lychee.ui.Joystick({
