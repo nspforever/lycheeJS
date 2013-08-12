@@ -64,11 +64,11 @@ lychee.define('game.logic.Level').requires([
 		 * STATE API
 		 */
 
-		reset: function(stagedata, width, height) {
+		reset: function(stage, width, height) {
 
 			this.entities = [];
 
-			this.__boundY = ((height      / 80) | 0);
+			this.__boundY = ((height / 80) | 0);
 
 
 			var data = this.__data;
@@ -79,13 +79,13 @@ lychee.define('game.logic.Level').requires([
 			data.missed    = 0;
 
 
-			if (typeof stagedata.points === 'number') {
-				data.points = stagedata.points;
+			if (typeof stage.points === 'number') {
+				data.points = stage.points;
 			}
 
-			if (stagedata.ship instanceof _ship) {
+			if (stage.ship instanceof _ship) {
 
-				this.__ship = stagedata.ship;
+				this.__ship = stage.ship;
 				this.__ship.setHealth(data.health);
 
 				this.entities.push(this.__ship);
@@ -101,7 +101,7 @@ lychee.define('game.logic.Level').requires([
 			}
 
 
-			this.spawnStage(stagedata.stage);
+			this.spawnStage(stage.level);
 
 		},
 

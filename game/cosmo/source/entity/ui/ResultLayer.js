@@ -86,11 +86,11 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(settings, game, gamestate) {
+	var Class = function(settings, game, state) {
 
 		// Required because of Font integration
-		this.game        = game;
-		this.__gamestate = gamestate;
+		this.game   = game;
+		this._state = state;
 
 
 		if (settings === undefined) {
@@ -175,10 +175,12 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			});
 			entity.bind('touch', function() {
 
-				var stglvl = this.__gamestate.stagelevel;
+				var level = this._state.stage.level;
 
-				this.__gamestate.leave();
-				this.__gamestate.enter(stglvl);
+				this._state.leave();
+				this._state.enter({
+					level: level
+				});
 
 			}, this);
 			this.setEntity('restart', entity);
@@ -192,10 +194,12 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			});
 			entity.bind('touch', function() {
 
-				var stglvl = parseInt(this.__gamestate.stagelevel.substr(-1), 10);
+				var level = parseInt(this._state.stage.level.substr(-1), 10);
 
-				this.__gamestate.leave();
-				this.__gamestate.enter('stage' + (stglvl + 1));
+				this._state.leave();
+				this._state.enter({
+					level: 'stage' + (level + 1)
+				});
 
 			}, this);
 			this.setEntity('continue', entity);

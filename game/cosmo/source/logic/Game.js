@@ -278,10 +278,10 @@ lychee.define('game.logic.Game').requires([
 
 			switch(key) {
 
-				case 'left':  case 'a':     this.__controlLeft();  break;
-				case 'down':  case 's':     this.__controlStop();  break;
-				case 'right': case 'd':     this.__controlRight(); break;
-				case 'up':    case 'space': this.__controlFire();  break;
+				case 'left':  case 'a':               this.__controlLeft();  break;
+				case 'down':  case 's':               this.__controlStop();  break;
+				case 'right': case 'd':               this.__controlRight(); break;
+				case 'up':    case 'w': case 'space': this.__controlFire();  break;
 
 			}
 
@@ -320,7 +320,7 @@ lychee.define('game.logic.Game').requires([
 		 * PUBLIC API
 		 */
 
-		enter: function(stagedata, width, height) {
+		enter: function(stage, width, height) {
 
 			if (this.__level !== null) {
 				this.__level.unbind('failure');
@@ -340,9 +340,11 @@ lychee.define('game.logic.Game').requires([
 			var data = {
 				points: null,
 				ship:   null,
-				stage:  stagedata.stage
+				level:  stage.level
 			};
 
+
+			var newstage = data.level;
 			var oldstage = this.__session.stage;
 			if (oldstage !== null) {
 
@@ -356,8 +358,8 @@ lychee.define('game.logic.Game').requires([
 
 			}
 
-			this.__level.reset(stagedata, width, height);
-			this.__stage = stagedata.stage;
+			this.__level.reset(data, width, height);
+			this.__stage = newstage;
 
 
 			this.__background = new _background({

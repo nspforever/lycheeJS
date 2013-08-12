@@ -14,8 +14,9 @@ lychee.define('game.state.Game').requires([
 
 		lychee.game.State.call(this, game);
 
-
-		this.stagelevel = 'stage1';
+		this.stage = {
+			level: 'stage1'
+		};
 
 		this.__result = new _resultlayer({}, game, this);
 		this.__hud    = new _hudlayer({}, game, this);
@@ -69,7 +70,7 @@ lychee.define('game.state.Game').requires([
 
 			if (data === null) data = {};
 
-			data.stage  = typeof data.stage === 'string'  ? data.stage    : 'stage1';
+			data.level  = typeof data.level === 'string'  ? data.level    : 'stage1';
 			data.player = typeof data.player === 'number' ? data.player   : 1;
 			data.type   = data.type === 'multiplayer'     ? 'multiplayer' : 'singeplayer';
 
@@ -102,7 +103,7 @@ lychee.define('game.state.Game').requires([
 				}, this);
 
 
-				this.stage = data.stage;
+				this.stage = data;
 
 				var env = renderer.getEnvironment();
 				logic.enter(this.stage, env.width, env.height);
