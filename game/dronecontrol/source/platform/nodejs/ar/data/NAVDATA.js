@@ -253,6 +253,7 @@ lychee.define('game.ar.data.NAVDATA').tags({
 		data.camera.rotation    = buffer.matrix3();
 		data.camera.translation = buffer.vector3();
 		data.camera.tag         = buffer.uint32();
+		data.camera.type        = buffer.uint32();
 
 		/*
 		 * HD CAMERA
