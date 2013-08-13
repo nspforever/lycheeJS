@@ -41,6 +41,10 @@ lychee.define('game.ar.Drone').requires([
 			}
 
 
+			if (this.navdata === null) {
+				console.log('game.ar.Drone (' + this.ip + '): Navdata Socket online.');
+			}
+
 			this.navdata = data;
 
 		}
@@ -62,6 +66,7 @@ lychee.define('game.ar.Drone').requires([
 		ip = typeof ip === 'string' ? ip : '192.168.1.1';
 
 
+		this.ip      = ip;
 		this.flying  = false;
 		this.navdata = null;
 
@@ -73,10 +78,10 @@ lychee.define('game.ar.Drone').requires([
 		this.__sockets = {};
 		this.__sockets.command = new _commandsocket(ip);
 		this.__sockets.navdata = new _navdatasocket(ip);
-		this.__sockets.video   = new _videosocket(ip);
+//		this.__sockets.video   = new _videosocket(ip);
 
 		this.__sockets.navdata.bind('receive', _process_navdata, this);
-		this.__sockets.video.bind('receive',   _process_video,   this);
+//		this.__sockets.video.bind('receive',   _process_video,   this);
 
 
 		this.__state = {};

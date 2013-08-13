@@ -32,6 +32,7 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 		this.client = game.client || null;
 
 		this.__id    = null;
+		this.__id    = 'Jordan';
 		this.__state = {
 			roll:  0,
 			pitch: 0,

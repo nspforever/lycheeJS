@@ -291,15 +291,15 @@ lychee.define('game.ar.data.NAVDATA').tags({
 
 			while (true) {
 
-				var id     = buffer.uint16();
-				var name   = _ID_MAP[id];
-				var length = buffer.uint16();
+				var id           = buffer.uint16();
+				var name         = _ID_MAP[id];
+				var length       = buffer.uint16();
 				var optionbuffer = new _buffer(buffer.extract(length - 4));
 
 
-console.log(length, id, name);
+//console.log(length, id, name);
 
-				if (id === 65535) {
+				if (name === 'checksum') {
 
 					var expected = 0;
 					for (var d = 0; d < data.length - length; d++) {
@@ -313,18 +313,13 @@ console.log(length, id, name);
 
 					break;
 
-
-				} else if (id === 0) {
+				} else {
 
 					var optiondata = _parse(optionbuffer);
 
 					for (var optionkey in optiondata) {
 						navdata[optionkey] = optiondata[optionkey];
 					}
-
-				} else {
-
-					// console.log('Could not parse #' + id + '(' + name + ')');
 
 				}
 

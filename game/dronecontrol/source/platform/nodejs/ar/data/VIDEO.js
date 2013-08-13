@@ -12,6 +12,9 @@ lychee.define('game.ar.data.VIDEO').tags({
 
 }).exports(function(lychee, game, global, attachments) {
 
+	var stream = require('stream').Stream;
+
+
 	var Module = {};
 
 	Module.encode = function() {};

@@ -16,8 +16,6 @@ lychee.define('game.Server').requires([
 
 	var _process_receive = function(data) {
 
-		console.log('(Dronecontrol) game.Server: receive ', data);
-
 		var drone = this.getDrone(data.id || null);
 		if (drone === null) {
 			return false;
@@ -27,6 +25,9 @@ lychee.define('game.Server').requires([
 		var method = data.method;
 		var type   = data.type || null;
 		var value  = data.value;
+
+
+		console.log('(Dronecontrol) game.Server (' + data.id + '): ' + method + '/' + type + ' - ' + JSON.stringify(value));
 
 
 		switch (method) {

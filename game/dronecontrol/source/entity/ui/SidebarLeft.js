@@ -117,8 +117,8 @@ lychee.define('game.entity.ui.SidebarLeft').requires([
 
 				var controller = this.controller;
 				if (controller !== null) {
-					controller.set('roll',  value.x);
-					controller.set('pitch', value.y);
+					controller.set('roll',   value.x);
+					controller.set('pitch', -value.y);
 				}
 
 			}, this);
