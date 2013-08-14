@@ -1,6 +1,10 @@
 
 lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, attachments) {
 
+	var child_process = require('child_process');
+
+
+
 	/*
 	 * HELPERS
 	 */
@@ -54,6 +58,17 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 
 	};
 
+	var _build_project = function(project) {
+
+		var root = project.root;
+
+		if (lychee.debug === true) {
+			console.log('sorbet.module.Server: Building Isolated Server Instance for ' + root);
+		}
+
+
+	};
+
 
 
 	/*
@@ -66,12 +81,40 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 
 		}, data);
 
-return;
+
+		this.main = main;
+		this.type = 'public';
+
+
+		var vhosts = this.main.vhosts.all();
+		for (var v = 0, vl = vhosts.length; v < vl; v++) {
+
+			var vhost = vhosts[v];
+
+			if (lychee.debug === true) {
+				console.log('sorbet.module.Builder: Booting VHost "' + vhost.id + '"');
+			}
+
+			var internal_projects = _get_projects.call(this, vhost, '/game');
+			for (var i = 0, il = internal_projects.length; i < il; i++) {
+				_build_project.call(this, internal_projects[i]);
+			}
+
+			var external_projects = _get_projects.call(this, vhost, '/external');
+			for (var e = 0, el = external_projects.length; e < el; e++) {
+				_build_project.call(this, external_projects[i]);
+			}
+
+		}
 
 	};
 
 
 	Class.prototype = {
+
+		process: function(host, response, data) {
+
+		}
 
 	};
 
