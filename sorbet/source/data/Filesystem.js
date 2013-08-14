@@ -4,12 +4,20 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 	var fs = require('fs');
 
 
-	var Class = function() {
+	var Class = function(root) {
+
+		root = typeof root === 'string' ? root : null;
+
 
 		this.__roots = [];
 		this.__cache = {};
 		this.__map   = {};
 		this.__rmap  = {};
+
+
+		if (root !== null) {
+			this.watch(root);
+		}
 
 	};
 
@@ -39,7 +47,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 		refresh: function() {
 
 			if (lychee.debug === true) {
-				console.log('sorbet.module.FS: Refreshing tree for ' + this.__roots.join(', '));
+				console.log('sorbet.module.Filesystem: Refreshing tree for ' + this.__roots.join(', '));
 			}
 
 			for (var r = 0, rl = this.__roots.length; r < rl; r++) {
@@ -242,23 +250,30 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		},
 
-		info: function(file) {
+		info: function(path) {
 
-			var data = null;
+			var resolved = this.resolve(path);
+			if (resolved !== null) {
 
-			try {
-				data = fs.statSync(file);
-			} catch(e) {
-			}
+				var raw = null;
+
+				try {
+
+					raw = fs.statSync(path);
+
+				} catch(e) {
+				}
 
 
-			if (data !== null) {
+				if (raw !== null) {
 
-				return {
-					ino: data.ino,
-					size: data.size,
-					mtime: data.mtime
-				};
+					return {
+						ino:   raw.ino,
+						size:  raw.size,
+						mtime: raw.mtime
+					};
+
+				}
 
 			}
 

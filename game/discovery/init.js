@@ -5,7 +5,7 @@ lychee.debug = true;
 
 // Rebase required namespaces for inclusion
 lychee.rebase({
-	lychee: "../../lychee",
+	lychee: "../../lychee/source",
 	game: "./source"
 });
 

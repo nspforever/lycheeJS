@@ -1,7 +1,20 @@
 {
 
-	"port":       80,
-	"server":   [ 8081, 8181 ],
+	"module": {
+
+		"Builder": {
+
+		},
+
+		"Server": {
+
+			"port": [ 8081, 8181 ]
+
+		}
+
+	},
+
+	"port": 80,
 
 	"settings": [{
 

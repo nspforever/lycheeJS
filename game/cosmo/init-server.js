@@ -1,5 +1,5 @@
 
-var path = "../../lychee";
+var path = "../../lychee/source";
 
 require(path + '/core.js');
 require(path + '/Builder.js');
@@ -17,7 +17,7 @@ require('./source/Server.js');
 
 // Rebase required namespaces for inclusion
 lychee.rebase({
-	lychee: "../../lychee",
+	lychee: "../../lychee/source",
 	game: "./source"
 });
 

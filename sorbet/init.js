@@ -1,5 +1,5 @@
 
-var path = "../lychee";
+var path = "../lychee/source";
 
 require(path + '/core.js');
 require(path + '/Builder.js');

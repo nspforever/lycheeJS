@@ -43,15 +43,39 @@ if (typeof global !== 'undefined') {
 	};
 
 
-	lychee.extend = function(obj) {
+	lychee.extendsafe = function(target) {
 
 		for (var a = 1, al = arguments.length; a < al; a++) {
 
-			var obj2 = arguments[a];
-			if (obj2) {
+			var object = arguments[a];
+			if (object) {
 
-				for (var prop in obj2) {
-					obj[prop] = obj2[prop];
+				for (var prop in object) {
+
+					var tvalue = target[prop];
+					var ovalue = object[prop];
+					if (
+						   tvalue instanceof Array
+						&& ovalue instanceof Array
+					) {
+
+						lychee.extendsafe(target[prop], object[prop]);
+
+					} else if (
+						   tvalue instanceof Object
+						&& ovalue instanceof Object
+					) {
+
+						lychee.extendsafe(target[prop], object[prop]);
+
+					} else if (
+						typeof tvalue === typeof ovalue
+					) {
+
+						target[prop] = object[prop];
+
+					}
+
 				}
 
 			}
@@ -59,7 +83,28 @@ if (typeof global !== 'undefined') {
 		}
 
 
-		return obj;
+		return target;
+
+	};
+
+
+	lychee.extend = function(target) {
+
+		for (var a = 1, al = arguments.length; a < al; a++) {
+
+			var object = arguments[a];
+			if (object) {
+
+				for (var prop in object) {
+					target[prop] = object[prop];
+				}
+
+			}
+
+		}
+
+
+		return target;
 
 	};
 

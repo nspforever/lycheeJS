@@ -13,8 +13,7 @@ lychee.define('sorbet.data.VHost').requires([
 		this.id   = id || ('vhost-' + _id++);
 		this.root = config.root;
 
-		this.fs = new _filesystem();
-		this.fs.watch(this.root);
+		this.fs = new _filesystem(this.root);
 
 		this.__redirects = {};
 

@@ -1,5 +1,6 @@
 
 lychee.define('sorbet.Main').requires([
+	'sorbet.module.Builder',
 	'sorbet.module.Error',
 	'sorbet.module.File',
 	'sorbet.module.Filter',
@@ -80,9 +81,12 @@ lychee.define('sorbet.Main').requires([
 		root = typeof root === 'string' ? root : '/var/www';
 
 
-		this.fs = new _filesystem();
-		this.fs.watch(root);
+		if (cfg.module === undefined) {
+			cfg.module = {};
+		}
 
+
+		this.fs      = new _filesystem(root);
 		this.root    = root;
 		this.servers = new _map();
 
@@ -127,11 +131,22 @@ lychee.define('sorbet.Main').requires([
 		var that = this;
 		setTimeout(function() {
 
-			var module = new _module['Server'](that, cfg.server);
+			var settings = cfg.module.Server || undefined;
+			var module   = new _module['Server'](that, settings);
 
 			that.modules.set('server', module);
 
 		}, 1000);
+
+
+		setTimeout(function() {
+
+			var settings = cfg.module.Builder || undefined;
+			var module   = new _module['Builder'](that, settings);
+
+			that.modules.set('builder', module);
+
+		}, 3000);
 
 	};
 

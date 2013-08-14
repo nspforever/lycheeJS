@@ -114,16 +114,17 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(main, ports) {
+	var Class = function(main, data) {
 
-		ports[0] = typeof ports[0] === 'number' ? ports[0] : 8081;
-		ports[1] = typeof ports[1] === 'number' ? ports[1] : 8181;
+		var settings = lychee.extendsafe({
+			port: [ 8081, 8181 ]
+		}, data);
 
 
 		this.main = main;
 		this.type = 'public';
 
-		this.__port = ports[0];
+		this.__port = settings.port[0];
 
 
 		var vhosts = this.main.vhosts.all();
