@@ -11,6 +11,7 @@ if (typeof global !== 'undefined') {
 	var _default = {
 		assets: {},
 		tree:   {},
+		unique: {},
 		tags:   {},
 		bases:  { 'lychee': './lychee' }
 	};
@@ -172,14 +173,25 @@ if (typeof global !== 'undefined') {
 		var sandboxenv = {
 			assets: {},
 			tree:   {},
+			unique: {},
 			tags:   {},
 			bases:  { 'lychee': './lychee' }
 		};
+
 
 		for (var id in _default.tree) {
 
 			if (id.substr(0, 6) === 'lychee') {
 				sandboxenv.tree[id] = _default.tree[id];
+			}
+
+		}
+
+
+		for (var uid in _default.unique) {
+
+			if (uid.substr(0, 6) === 'lychee') {
+				_sandboxenv.unique[uid] = _default.unique[uid];
 			}
 
 		}
@@ -311,6 +323,29 @@ if (typeof global !== 'undefined') {
 
 	lychee.DefinitionBlock.prototype = {
 
+		toUniqueString: function() {
+
+			var uid = this.toString();
+
+			var tags = [];
+			for (var id in this._tags) {
+				tags.push(id + '=' + this._tags[id]);
+			}
+
+
+			if (tags.length > 0) {
+				uid += ';' + tags.join(',');
+			}
+
+
+			return uid;
+
+		},
+
+		toString: function() {
+			return this._space + '.' + this._name;
+		},
+
 		tags: function(tags) {
 
 			if (tags instanceof Object === false) {
@@ -419,11 +454,19 @@ if (typeof global !== 'undefined') {
 			this._exports = exports;
 
 
-			if (
-				(this._supports === null || this._supports.call(global, lychee, global) === true)
-				&& _environment.tree[this._space + '.' + this._name] == null
-			) {
-				_environment.tree[this._space + '.' + this._name] = this;
+			var id = this.toString();
+			if (_environment.tree[id] == null) {
+
+				if (this._supports === null || this._supports.call(global, lychee, global) === true) {
+					_environment.tree[id] = this;
+				}
+
+			}
+
+
+			var uid = this.toUniqueString();
+			if (_environment.unique[uid] == null) {
+				_environment.unique[uid] = this;
 			}
 
 		}
