@@ -22,8 +22,11 @@ lychee.define('game.Main').requires([
 				fireSwipe: true
 			},
 
-			// Is configured by sorbet/module/Server
+			// Is configured by /sorbet/module/Server
 			client: null,
+
+			// Is configured by ./config.json
+			drones: null,
 
 			renderer: {
 				id:     'game',
@@ -55,6 +58,39 @@ lychee.define('game.Main').requires([
 		},
 
 		load: function() {
+
+			var preloader = new lychee.Preloader();
+
+
+			preloader.bind('ready', function(assets, mappings) {
+
+				var url = Object.keys(assets)[0];
+				var settings = assets[url];
+				if (settings !== null) {
+					this.drones = settings.drones;
+				}
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
+
+				this.connect();
+
+			}, this);
+
+			preloader.bind('error', function(assets, mappings) {
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
+
+				this.connect();
+
+			}, this);
+
+			preloader.load('./config.json');
+
+		},
+
+		connect: function() {
 
 			var preloader = new lychee.Preloader();
 
@@ -110,6 +146,15 @@ lychee.define('game.Main').requires([
 			}
 
 			this.controller = new game.Controller(this);
+
+
+			if (this.settings.drones !== null) {
+
+console.log('DRONE SETTINGS!', this.settings.drones);
+
+			}
+
+			this.controller.setIP('192.168.1.1');
 
 
 			this.setState('game', new game.state.Game(this));

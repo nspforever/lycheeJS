@@ -6,6 +6,8 @@ lychee.define('game.ar.Drone').requires([
 	'game.ar.command.Socket',
 	'game.ar.navdata.Socket',
 	'game.ar.video.Socket'
+]).includes([
+	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _config = game.ar.command.CONFIG;
@@ -47,11 +49,17 @@ lychee.define('game.ar.Drone').requires([
 
 			this.navdata = data;
 
+			this.trigger('navdata', [ this.navdata ]);
+
 		}
 
 	};
 
 	var _process_video = function(data) {
+
+		this.video = data;
+
+		this.trigger('video', [ this.video ]);
 
 	};
 
@@ -103,6 +111,9 @@ lychee.define('game.ar.Drone').requires([
 
 
 		this.__disableEmergency = false;
+
+
+		lychee.event.Emitter.call(this);
 
 	};
 

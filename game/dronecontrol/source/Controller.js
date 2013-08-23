@@ -1,5 +1,7 @@
 
-lychee.define('game.Controller').exports(function(lychee, game, global, attachments) {
+lychee.define('game.Controller').includes([
+	'lychee.event.Emitter'
+]).exports(function(lychee, game, global, attachments) {
 
 	/*
 	 * HELPERS
@@ -7,14 +9,38 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 
 	var _refresh_state = function() {
 
+		if (this.ip === null) return;
+
 		var client = this.client;
 		if (client !== null) {
 
 			client.send({
-				id:     this.__id,
+				ip:     this.ip,
 				method: 'state',
 				value:  this.__state
 			});
+
+		}
+
+	};
+
+	var _process_receive = function(data) {
+
+		if (data instanceof Object) {
+
+			if (
+				    this.ip === null
+				|| (this.ip !== null && this.ip === data.ip)
+			) {
+
+				var type = data.type;
+				if (type === 'video') {
+					this.trigger('video',   [ data.data ]);
+				} else if (type === 'navdata') {
+					this.trigger('navdata', [ data.data ]);
+				}
+
+			}
 
 		}
 
@@ -31,14 +57,21 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 		this.game   = game;
 		this.client = game.client || null;
 
-		this.__id    = null;
-		this.__id    = 'Jordan';
+		this.ip     = null;
+
+
 		this.__state = {
 			roll:  0,
 			pitch: 0,
 			yaw:   0,
 			heave: 0
 		};
+
+
+		lychee.event.Emitter.call(this);
+
+
+		this.client.bind('receive', _process_receive, this);
 
 	};
 
@@ -47,11 +80,13 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 
 		animation: function(method, type, value) {
 
+			if (this.ip === null) return;
+
 			var client = this.client;
 			if (client !== null) {
 
 				client.send({
-					id:     this.__id,
+					ip:     this.ip,
 					method: method || 'animateFlight',
 					type:   type,
 					value:  value
@@ -63,11 +98,13 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 
 		command: function(command) {
 
+			if (this.ip === null) return;
+
 			var client = this.client;
 			if (client !== null) {
 
 				client.send({
-					id:     this.__id,
+					ip:     this.ip,
 					method: command,
 					value:  null
 				});
@@ -81,6 +118,14 @@ lychee.define('game.Controller').exports(function(lychee, game, global, attachme
 			this.__state[id] = value;
 
 			_refresh_state.call(this);
+
+		},
+
+		setIP: function(ip) {
+
+			ip = typeof ip === 'string' ? ip : null;
+
+			this.ip = ip;
 
 		}
 

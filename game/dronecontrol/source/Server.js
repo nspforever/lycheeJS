@@ -6,7 +6,7 @@ lychee.define('game.Server').requires([
 	'lychee.net.Server'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _drone = game.ar.Drone;
+	var _drone  = game.ar.Drone;
 
 
 
@@ -54,6 +54,38 @@ lychee.define('game.Server').requires([
 
 	};
 
+	var _process_navdata = function(drone, navdata) {
+
+		var data = {
+			ip:   drone.ip,
+			type: 'navdata',
+			data: navdata
+		};
+
+
+		var remotes = this.remotes;
+		for (var r = 0, rl = remotes.length; r < rl; r++) {
+			remotes[r].send(data);
+		}
+
+	};
+
+	var _process_video = function(drone, videodata) {
+
+		var data = {
+			ip:   drone.ip,
+			type: 'video',
+			data: videodata
+		};
+
+
+		var remotes = this.remotes;
+		for (var r = 0, rl = remotes.length; r < rl; r++) {
+			remotes[r].send(data);
+		}
+
+	};
+
 
 
 	/*
@@ -63,50 +95,17 @@ lychee.define('game.Server').requires([
 	var Class = function(data) {
 
 		var settings = lychee.extend({
-
-			drones: [
-				{ id: 'Lima',     ip: '192.168.1.1' },
-				{ id: 'Jordan',   ip: '192.168.1.2' },
-				{ id: 'Victoria', ip: '192.168.1.3' }
-			]
-
 		}, data);
+
+
+		this.drones = {};
+		this.loop   = null;
 
 
 		lychee.net.Server.call(this, JSON.stringify, JSON.parse);
 
 
-
-		// SETUP
-
-		this.loop = new lychee.game.Loop({
-			render: 0,
-			update: 33
-		});
-
-		this.loop.bind('update', this.update, this);
-
-
-		this.__drones = {};
-
-
-
-		// INITIALIZATION
-
-		this.bind('connect', function(remote) {
-
-			console.log('(Dronecontrol) game.Server: New Remote (' + remote.id + ')');
-
-			remote.bind('receive', _process_receive, this);
-			remote.accept();
-
-		}, this);
-
-
-		var drones = settings.drones;
-		for (var d = 0, dl = drones.length; d < dl; d++) {
-			this.setDrone(drones[d].id, new game.ar.Drone(drones[d].ip));
-		}
+		this.load();
 
 	};
 
@@ -131,11 +130,76 @@ lychee.define('game.Server').requires([
 		 * CUSTOM API
 		 */
 
+		load: function() {
+
+			var preloader = new lychee.Preloader();
+
+			preloader.bind('ready', function(assets, mappings) {
+
+				var url = Object.keys(assets)[0];
+				var settings = assets[url];
+
+				var drones = null;
+				if (settings !== null) {
+					drones = settings.drones;
+				}
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
+
+				this.init(drones);
+
+			}, this);
+
+			preloader.bind('error', function(assets, mappings) {
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
+
+				this.init(null);
+
+			}, this);
+
+			preloader.load('./config.json');
+
+		},
+
+		init: function(drones) {
+
+
+			if (drones instanceof Array) {
+
+				for (var d = 0, dl = drones.length; d < dl; d++) {
+					this.setDrone(drones[d].id, new game.ar.Drone(drones[d].ip));
+				}
+
+			}
+
+
+			this.loop = new lychee.game.Loop({
+				render: 0,
+				update: 33
+			});
+
+			this.loop.bind('update', this.update, this);
+
+
+			this.bind('connect', function(remote) {
+
+				console.log('(Dronecontrol) game.Server: New Remote (' + remote.id + ')');
+
+				remote.bind('receive', _process_receive, this);
+				remote.accept();
+
+			}, this);
+
+		},
+
 		update: function(clock, delta) {
 
-			var drones = this.__drones;
-			for (var did in this.__drones) {
-				this.__drones[did].update(clock, delta);
+			var drones = this.drones;
+			for (var did in this.drones) {
+				this.drones[did].update(clock, delta);
 			}
 
 		},
@@ -147,7 +211,9 @@ lychee.define('game.Server').requires([
 
 			if (id !== null) {
 
-				this.__drones[id] = drone;
+				this.drones[id] = drone;
+				this.drones[id].bind('#navdata', _process_navdata, this);
+				this.drones[id].bind('#video',   _process_video,   this);
 
 				return true;
 
@@ -163,13 +229,13 @@ lychee.define('game.Server').requires([
 			id = typeof id === 'string' ? id : null;
 
 
-			for (var did in this.__drones) {
+			for (var did in this.drones) {
 
 				if (
 					    id === null
 					|| (id === did)
 				) {
-					return this.__drones[did];
+					return this.drones[did];
 				}
 
 			}
