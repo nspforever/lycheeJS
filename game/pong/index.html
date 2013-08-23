@@ -2,16 +2,18 @@
 <html>
 <head>
 	<title>LycheeJS Pong Game (Tutorial)</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 	<!-- required for build process -->
-	<script src="../../lychee/core.js"></script>
-	<script src="../../lychee/Builder.js"></script>
-	<script src="../../lychee/Preloader.js"></script>
-	<script src="../../lychee/platform/html/bootstrap.js"></script>
+	<script src="../../lychee/source/core.js"></script>
+	<script src="../../lychee/source/Builder.js"></script>
+	<script src="../../lychee/source/Preloader.js"></script>
+
+	<!-- platform-specific bootstrapping -->
+	<script src="../../lychee/source/platform/html/bootstrap.js"></script>
 
 	<!-- build start -->
 	<script src="./source/Main.js"></script>
@@ -19,6 +21,6 @@
 
 </head>
 <body>
-	<script src="init.js"></script>
+<script src="init.js"></script>
 </body>
 </html>    

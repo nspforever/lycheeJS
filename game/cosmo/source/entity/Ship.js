@@ -7,7 +7,7 @@ lychee.define('game.entity.Ship').includes([
 		red:   attachments["red.png"],
 		green: attachments["green.png"],
 		blue:  attachments["blue.png"],
-	}
+	};
 	var _texture = attachments["png"];
 	var _config  = attachments["json"];
 

@@ -141,12 +141,12 @@ lychee.define('lychee.net.Server').tags({
 		decoder = decoder instanceof Function ? decoder : function(msg) { return msg; };
 
 
-		this.__encoder = encoder;
-		this.__decoder = decoder;
+		this.remotes = [];
 
+		this.__encoder      = encoder;
+		this.__decoder      = decoder;
 		this.__server       = null;
 		this.__maxFrameSize = 32768;
-		this.__remotes      = [];
 
 
 		lychee.event.Emitter.call(this);
@@ -206,9 +206,9 @@ lychee.define('lychee.net.Server').tags({
 		connect: function(remote) {
 
 			var found = false;
-			for (var r = 0, rl = this.__remotes.length; r < rl; r++) {
+			for (var r = 0, rl = this.remotes.length; r < rl; r++) {
 
-				if (this.__remotes[r] === remote) {
+				if (this.remotes[r] === remote) {
 					found = true;
 					break;
 				}
@@ -222,7 +222,7 @@ lychee.define('lychee.net.Server').tags({
 					console.log('lychee.net.Server: Connected lychee.Remote (' + remote.id + ')');
 				}
 
-				this.__remotes.push(remote);
+				this.remotes.push(remote);
 				this.trigger('connect', [ remote ]);
 
 			}
@@ -232,11 +232,11 @@ lychee.define('lychee.net.Server').tags({
 		disconnect: function(remote) {
 
 			var found = false;
-			for (var r = 0, rl = this.__remotes.length; r < rl; r++) {
+			for (var r = 0, rl = this.remotes.length; r < rl; r++) {
 
-				if (this.__remotes[r] === remote) {
+				if (this.remotes[r] === remote) {
 					found = true;
-					this.__remotes.splice(r, 1);
+					this.remotes.splice(r, 1);
 					rl--;
 				}
 
