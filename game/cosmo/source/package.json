@@ -41,8 +41,9 @@
 		},
 
 		"logic": {
-			"Game":  [ "js", "json" ],
-			"Level": [ "js", "json" ]
+			"Controller": [ "js" ],
+			"Game":       [ "js", "json" ],
+			"Level":      [ "js", "json" ]
 		},
 
 		"state": {

@@ -2,7 +2,6 @@
 lychee.define('game.entity.Ship').requires([
 	'game.entity.Lazer'
 ]).includes([
-	'lychee.event.Emitter',
 	'lychee.game.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
@@ -54,7 +53,6 @@ lychee.define('game.entity.Ship').requires([
 		settings.shape     = lychee.game.Entity.SHAPE.rectangle;
 
 
-		lychee.event.Emitter.call(this);
 		lychee.game.Sprite.call(this, settings);
 
 	};

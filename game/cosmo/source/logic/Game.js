@@ -68,6 +68,74 @@ lychee.define('game.logic.Game').requires([
 
 	};
 
+	var _process_update = function(data, downgrade) {
+
+		downgrade = downgrade === true;
+
+
+		var ship     = this.__level.getShip();
+		var oldstate = ship.state;
+
+		var oldlvl = 0;
+		if (oldstate !== 'default') {
+			oldlvl = parseInt(oldstate.substr(-1), 10);
+		}
+
+		var newlvl = _get_ship_level(data.points, downgrade);
+
+
+		if (
+			   oldlvl !== newlvl
+			&& newlvl !== -1
+		) {
+
+			if (newlvl > oldlvl) {
+				ship.setState('upgrade'   + newlvl);
+				data.health = 100;
+			} else if (newlvl < oldlvl) {
+				ship.setState('downgrade' + oldlvl);
+			}
+
+
+			if (this.game.settings.sound === true) {
+				this.jukebox.play('ship-transformation');
+			}
+
+
+			this.loop.timeout(1000, function() {
+
+				var state = ship.state;
+				if (state.substr(0, 7) === 'upgrade') {
+
+					var lvl = parseInt(state.substr(-1), 10);
+					ship.setState('level' + lvl);
+
+				} else if (state.substr(0, 9) === 'downgrade') {
+
+					var lvl = parseInt(state.substr(-1), 10);
+					if (!isNaN(lvl)) {
+
+						lvl--;
+
+						if (lvl > 0) {
+							ship.setState('level' + lvl);
+						} else {
+							ship.setState('default');
+						}
+
+					}
+
+				}
+
+			}, this);
+
+		}
+
+
+		this.trigger('update', [ data ]);
+
+	};
+
 
 
 	/*
@@ -105,71 +173,6 @@ lychee.define('game.logic.Game').requires([
 		 * PRIVATE API
 		 */
 
-		__processUpdate: function(data, downgrade) {
-
-			var ship     = this.__level.getShip();
-			var oldstate = ship.state;
-
-			var oldlvl = 0;
-			if (oldstate !== 'default') {
-				oldlvl = parseInt(oldstate.substr(-1), 10);
-			}
-
-			var newlvl = _get_ship_level(data.points, downgrade);
-
-
-			if (
-				   oldlvl !== newlvl
-				&& newlvl !== -1
-			) {
-
-				if (newlvl > oldlvl) {
-					ship.setState('upgrade'   + newlvl);
-					data.health = 100;
-				} else if (newlvl < oldlvl) {
-					ship.setState('downgrade' + oldlvl);
-				}
-
-
-				if (this.game.settings.sound === true) {
-					this.jukebox.play('ship-transformation');
-				}
-
-
-				this.loop.timeout(1000, function() {
-
-					var state = ship.state;
-					if (state.substr(0, 7) === 'upgrade') {
-
-						var lvl = parseInt(state.substr(-1), 10);
-						ship.setState('level' + lvl);
-
-					} else if (state.substr(0, 9) === 'downgrade') {
-
-						var lvl = parseInt(state.substr(-1), 10);
-						if (!isNaN(lvl)) {
-
-							lvl--;
-
-							if (lvl > 0) {
-								ship.setState('level' + lvl);
-							} else {
-								ship.setState('default');
-							}
-
-						}
-
-					}
-
-				}, this);
-
-			}
-
-
-			this.trigger('update', [ data ]);
-
-		},
-
 		__processSuccess: function(data) {
 			this.__isRunning = false;
 			this.trigger('success', [ data ]);
@@ -178,26 +181,6 @@ lychee.define('game.logic.Game').requires([
 		__processFailure: function(data) {
 			this.__isRunning = false;
 			this.trigger('failure', [ data ]);
-		},
-
-		__controlFire: function() {
-
-			this.__controlStop();
-
-
-
-			var ship  = this.__level.getShip();
-			var state = ship.state;
-
-			if (
-				   state === 'default'
-				|| state.substr(0, 5) === 'level'
-			) {
-
-				this.__processUpdate(data, true);
-
-			}
-
 		},
 
 
@@ -230,6 +213,9 @@ lychee.define('game.logic.Game').requires([
 					for (var a = 0, al = posarray.length; a < al; a++) {
 						data.points -= 10;
 					}
+
+
+					_process_update.call(this, data, true);
 
 				}
 
@@ -275,12 +261,12 @@ lychee.define('game.logic.Game').requires([
 			this.__level = new game.logic.Level();
 			this.__level.bind('failure', this.__processFailure, this);
 			this.__level.bind('success', this.__processSuccess, this);
-			this.__level.bind('update',  this.__processUpdate,  this);
+			this.__level.bind('update',  _process_update, this);
 
 
 			var data = {
 				points: null,
-				ship:   null,
+				ships:  stage.type === 'multiplayer' ? 2 : 1,
 				level:  stage.level
 			};
 
@@ -293,7 +279,7 @@ lychee.define('game.logic.Game').requires([
 				var newstglvl = parseInt(newstage.substr(-1), 10);
 
 				if (newstglvl > oldstglvl) {
-					data.ship   = this.__session.ship;
+					data.ships  = this.__session.ships;
 					data.points = this.__session.points;
 				}
 
@@ -309,8 +295,7 @@ lychee.define('game.logic.Game').requires([
 			});
 
 
-			var data = this.__level.getData();
-			this.__processUpdate(data, true);
+			_process_update.call(this, this.__level.data, true);
 
 			this.__isRunning = true;
 
@@ -320,7 +305,7 @@ lychee.define('game.logic.Game').requires([
 
 			this.__session.ship   = this.__level.getShip();
 			this.__session.stage  = this.__stage;
-			this.__session.points = this.__level.getData().points;
+			this.__session.points = this.__level.data.points;
 
 		},
 

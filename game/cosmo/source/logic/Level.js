@@ -31,11 +31,37 @@ lychee.define('game.logic.Level').requires([
 	})(_config);
 
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _translate_to_position = function(x, y) {
+
+		var position = this.__cache;
+
+		position.x  = 0;
+		position.y  = 1/2 * this.__boundY * 80;
+
+		position.x += 80 * x;
+		position.y -= 80 * y;
+
+		return position;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
 
 
+		this.enemies  = [];
 		this.entities = [];
 		this.width    = 0;
 
@@ -47,7 +73,6 @@ lychee.define('game.logic.Level').requires([
 		};
 
 		this.__cache = { x: 0, y: 0 };
-		this.__enemies = [];
 		this.__stage   = null;
 		this.__boundY  = 0;
 
@@ -94,7 +119,7 @@ lychee.define('game.logic.Level').requires([
 			} else {
 
 				this.__ship.setState('default');
-				this.__ship.setPosition(this.__translateToPosition(0, 1));
+				this.__ship.setPosition(_translate_to_position.call(this, 0, 1));
 				this.__ship.setHealth(data.health);
 
 				this.entities.push(this.__ship);
@@ -112,24 +137,30 @@ lychee.define('game.logic.Level').requires([
 		 * LOGIC INTEGRATION API
 		 */
 
-		__translateToPosition: function(x, y) {
+		addEntity: function(entity) {
 
-			var position = this.__cache;
+			var found = false;
 
-			position.x  = 0;
-			position.y  = 1/2 * this.__boundY * 80;
+			for (var e = 0, el = this.entities.length; e < el; e++) {
+				if (this.entities[e] === entity) {
+					found = true;
+				}
+			}
 
-			position.x += 80 * x;
-			position.y -= 80 * y;
 
-			return position;
+			if (found === false) {
+
+				this.entities.push(entity);
+
+				if (entity instanceof _enemy) {
+					this.enemies.push(entity);
+				}
+
+			}
 
 		},
 
-		destroy: function(entity, points) {
-
-			points = points === true;
-
+		removeEntity: function(entity) {
 
 			for (var e = 0, el = this.entities.length; e < el; e++) {
 
@@ -143,10 +174,10 @@ lychee.define('game.logic.Level').requires([
 
 			if (entity instanceof _enemy) {
 
-				for (var e = 0, el = this.__enemies.length; e < el; e++) {
+				for (var e = 0, el = this.enemies.length; e < el; e++) {
 
-					if (this.__enemies[e] === entity) {
-						this.__enemies.splice(e, 1);
+					if (this.enemies[e] === entity) {
+						this.enemies.splice(e, 1);
 						el--;
 					}
 
@@ -154,6 +185,14 @@ lychee.define('game.logic.Level').requires([
 
 			}
 
+		},
+
+		destroy: function(entity, points) {
+
+			points = points === true;
+
+
+			this.removeEntity(entity);
 
 
 			if (
@@ -281,7 +320,7 @@ lychee.define('game.logic.Level').requires([
 
 					for (var x = 0, xl = stage[y].length; x < xl; x++) {
 
-						var pos = this.__translateToPosition(offsetX + x, offsetY + y);
+						var pos = _translate_to_position.call(this, offsetX + x, offsetY + y);
 
 						var raw = stage[y][x];
 						if (raw === 1) {
@@ -330,22 +369,10 @@ lychee.define('game.logic.Level').requires([
 				}
 
 
-				this.entities.push(entity);
-
-				if (entity instanceof _enemy) {
-					this.__enemies.push(entity);
-				}
+				this.addEntity(entity);
 
 			}
 
-		},
-
-		getEnemies: function() {
-			return this.__enemies;
-		},
-
-		getShip: function() {
-			return this.__ship;
 		}
 
 	};

@@ -1,5 +1,5 @@
 
-lychee.define('game.Controller').requires([
+lychee.define('game.logic.Controller').requires([
 	'game.entity.Ship'
 ]).exports(function(lychee, game, global, attachments) {
 

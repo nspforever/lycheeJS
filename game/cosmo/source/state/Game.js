@@ -15,6 +15,7 @@ lychee.define('game.state.Game').requires([
 		lychee.game.State.call(this, game);
 
 		this.controller = game.controller || null;
+		this.logic      = game.logic || null;
 
 		this.stage = {
 			level: 'stage1'
@@ -77,10 +78,10 @@ lychee.define('game.state.Game').requires([
 			data.type   = data.type === 'multiplayer'     ? 'multiplayer' : 'singeplayer';
 
 
-			var renderer = this.renderer;
-			var logic    = this.game.logic;
+			var renderer   = this.renderer;
+			var logic      = this.logic;
 			if (
-				renderer !== null
+				   renderer !== null
 				&& logic !== null
 			) {
 
@@ -191,7 +192,19 @@ lychee.define('game.state.Game').requires([
 		},
 
 		processKey: function(key, name, delta) {
-			this.controller.processKey(key);
+
+			var result = this.__result;
+			if (result.visible === true) {
+
+			} else {
+
+				var logic = this.logic;
+				if (logic !== null) {
+					logic.processKey(key);
+				}
+
+			}
+
 		},
 
 		processSwipe: function(id, type, position, delta, swipe) {
@@ -220,7 +233,10 @@ lychee.define('game.state.Game').requires([
 				}
 
 
-				this.controller.touch(position);
+				var logic = this.logic;
+				if (logic !== null) {
+					logic.processTouch(position);
+				}
 
 			}
 
