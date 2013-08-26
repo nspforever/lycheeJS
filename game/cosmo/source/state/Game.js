@@ -14,6 +14,8 @@ lychee.define('game.state.Game').requires([
 
 		lychee.game.State.call(this, game);
 
+		this.controller = game.controller || null;
+
 		this.stage = {
 			level: 'stage1'
 		};
@@ -189,11 +191,7 @@ lychee.define('game.state.Game').requires([
 		},
 
 		processKey: function(key, name, delta) {
-
-			var logic = this.game.logic;
-
-			logic.key(key);
-
+			this.controller.processKey(key);
 		},
 
 		processSwipe: function(id, type, position, delta, swipe) {
@@ -222,10 +220,8 @@ lychee.define('game.state.Game').requires([
 				}
 
 
-				var logic = this.game.logic;
-				if (logic !== null) {
-					logic.touch(position);
-				}
+				this.controller.touch(position);
+
 			}
 
 		},

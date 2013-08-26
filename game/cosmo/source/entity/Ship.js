@@ -1,22 +1,29 @@
 
-lychee.define('game.entity.Ship').includes([
+lychee.define('game.entity.Ship').requires([
+	'game.entity.Lazer'
+]).includes([
+	'lychee.event.Emitter',
 	'lychee.game.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _config   = attachments["json"];
 	var _textures = {
 		red:   attachments["red.png"],
 		green: attachments["green.png"],
 		blue:  attachments["blue.png"],
 	};
-	var _texture = attachments["png"];
-	var _config  = attachments["json"];
+
+	var _lazer = game.entity.Lazer;
 
 
-	var Class = function(settings) {
+	var Class = function(settings, logic) {
 
 		if (settings === undefined) {
 			settings = {};
 		}
+
+
+		this.logic = logic || null;
 
 
 		this.health  = 0;
@@ -24,7 +31,8 @@ lychee.define('game.entity.Ship').includes([
 		this.speedy  = 0;
 		this.weapons = [ 0, 0, 0, 1, 0, 0, 0 ];
 
-		this.__speed = 0;
+		this.__speed   = 0;
+		this.__timeout = 0;
 
 
 		if (
@@ -36,8 +44,9 @@ lychee.define('game.entity.Ship').includes([
 			settings.texture = _textures.red;
 		}
 
-		settings.map     = _config.map;
-		settings.states  = _config.states;
+
+		settings.map       = _config.map;
+		settings.states    = _config.states;
 
 		settings.width     = _config.width;
 		settings.height    = _config.height;
@@ -45,6 +54,7 @@ lychee.define('game.entity.Ship').includes([
 		settings.shape     = lychee.game.Entity.SHAPE.rectangle;
 
 
+		lychee.event.Emitter.call(this);
 		lychee.game.Sprite.call(this, settings);
 
 	};
@@ -55,6 +65,79 @@ lychee.define('game.entity.Ship').includes([
 		/*
 		 * CUSTOM API
 		 */
+
+		left: function() {
+
+			this.velocity.x = -500;
+			this.setSpeedX(-50);
+
+		},
+
+		right: function() {
+
+			this.velocity.x = 500;
+			this.setSpeedX(50);
+
+		},
+
+		stop: function() {
+
+			this.velocity.x = 0;
+			this.setSpeedX(0);
+
+		},
+
+		fire: function() {
+
+			var now = Date.now();
+			if (now < this.__timeout) return false;
+
+
+			this.stop();
+
+			var state = this.state;
+			if (
+				   state === 'default'
+				|| state.substr(0, 5) === 'level'
+			) {
+
+				var logic = this.logic;
+				if (logic !== null) {
+
+
+					var weapons  = this.weapons;
+
+					var cx = this.position.x;
+					var cy = this.position.y;
+
+					var posarray = [];
+
+					if (weapons[0] !== 0) posarray.push({ x: cx +  0, y: cy +  0 });
+					if (weapons[1] !== 0) posarray.push({ x: cx - 30, y: cy - 18 });
+					if (weapons[2] !== 0) posarray.push({ x: cx + 30, y: cy - 18 });
+					if (weapons[3] !== 0) posarray.push({ x: cx - 53, y: cy - 15 });
+					if (weapons[4] !== 0) posarray.push({ x: cx + 53, y: cy - 15 });
+					if (weapons[5] !== 0) posarray.push({ x: cx - 72, y: cy -  6 });
+					if (weapons[6] !== 0) posarray.push({ x: cx + 72, y: cy -  6 });
+
+
+					var velarray = [];
+
+					for (var p = 0, pl = posarray.length; p < pl; p++) {
+						velarray.push({ x: 0, y: -300 });
+					}
+
+
+					logic.spawn(_lazer, posarray, velarray, this);
+
+				}
+
+			}
+
+
+			this.__timeout = now + 200;
+
+		},
 
 		setHealth: function(health) {
 

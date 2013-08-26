@@ -39,13 +39,14 @@ lychee.define('game.logic.Level').requires([
 		this.entities = [];
 		this.width    = 0;
 
-		this.__cache = { x: 0, y: 0 };
-		this.__data  = {
+		this.data  = {
 			health:    0,
 			points:    0,
 			destroyed: 0,
 			missed:    0
 		};
+
+		this.__cache = { x: 0, y: 0 };
 		this.__enemies = [];
 		this.__stage   = null;
 		this.__boundY  = 0;
@@ -71,7 +72,7 @@ lychee.define('game.logic.Level').requires([
 			this.__boundY = ((height / 80) | 0);
 
 
-			var data = this.__data;
+			var data = this.data;
 
 			data.health    = 100;
 			data.points    = 0;
@@ -162,14 +163,14 @@ lychee.define('game.logic.Level').requires([
 
 				if (points === true) {
 
-					this.__data.points += entity.points;
-					this.__data.destroyed++;
+					this.data.points += entity.points;
+					this.data.destroyed++;
 
-					this.trigger('update', [ this.__data ]);
+					this.trigger('update', [ this.data ]);
 
 				} else {
 
-					this.__data.missed++;
+					this.data.missed++;
 
 				}
 
@@ -178,15 +179,15 @@ lychee.define('game.logic.Level').requires([
 
 			if (entity instanceof _ship) {
 
-				this.__data.missed += this.entities.length;
-				this.trigger('failure', [ this.__data ]);
+				this.data.missed += this.entities.length;
+				this.trigger('failure', [ this.data ]);
 
 			} else if (
 				   this.entities.length === 1
 				&& this.entities[0] instanceof _ship
 			) {
 
-				this.trigger('success', [ this.__data ]);
+				this.trigger('success', [ this.data ]);
 
 			}
 
@@ -253,8 +254,8 @@ lychee.define('game.logic.Level').requires([
 				}
 
 
-				this.__data.health = health;
-				this.trigger('update', [ this.__data ]);
+				this.data.health = health;
+				this.trigger('update', [ this.data ]);
 
 			}
 
@@ -339,17 +340,13 @@ lychee.define('game.logic.Level').requires([
 
 		},
 
-		getData: function() {
-			return this.__data;
-		},
-
 		getEnemies: function() {
 			return this.__enemies;
 		},
 
 		getShip: function() {
 			return this.__ship;
-		},
+		}
 
 	};
 

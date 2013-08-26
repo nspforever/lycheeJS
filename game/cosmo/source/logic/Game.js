@@ -82,7 +82,6 @@ lychee.define('game.logic.Game').requires([
 		this.renderer = game.renderer;
 
 		this.__clock        = null;
-		this.__fireTimeout  = null;
 		this.__scrollOffset = 0;
 
 		this.__background   = null;
@@ -181,133 +180,75 @@ lychee.define('game.logic.Game').requires([
 			this.trigger('failure', [ data ]);
 		},
 
-		__controlLeft: function() {
-
-			var ship     = this.__level.getShip();
-			var velocity = ship.velocity;
-
-			velocity.x = -500;
-			ship.setSpeedX(-50);
-
-		},
-
-		__controlStop: function() {
-
-			var ship     = this.__level.getShip();
-			var velocity = ship.velocity;
-
-			velocity.x = 0;
-			ship.setSpeedX(0);
-
-		},
-
-		__controlRight: function() {
-
-			var ship     = this.__level.getShip();
-			var velocity = ship.velocity;
-
-			velocity.x = 500;
-			ship.setSpeedX(50);
-
-		},
-
 		__controlFire: function() {
 
 			this.__controlStop();
 
-			if (this.__clock < this.__fireTimeout) {
-				return;
-			}
 
 
 			var ship  = this.__level.getShip();
 			var state = ship.state;
 
 			if (
-				state === 'default'
+				   state === 'default'
 				|| state.substr(0, 5) === 'level'
 			) {
 
-				var weapons = ship.weapons;
-				var queue   = [];
-				var cx      = ship.position.x;
-				var cy      = ship.position.y;
-
-				if (weapons[0] !== 0) queue.push({ x: cx +  0, y: cy +  0 });
-				if (weapons[1] !== 0) queue.push({ x: cx - 30, y: cy - 18 });
-				if (weapons[2] !== 0) queue.push({ x: cx + 30, y: cy - 18 });
-				if (weapons[3] !== 0) queue.push({ x: cx - 53, y: cy - 15 });
-				if (weapons[4] !== 0) queue.push({ x: cx + 53, y: cy - 15 });
-				if (weapons[5] !== 0) queue.push({ x: cx - 72, y: cy -  6 });
-				if (weapons[6] !== 0) queue.push({ x: cx + 72, y: cy -  6 });
-
-
-				var data = this.__level.getData();
-				for (var q = 0, ql = queue.length; q < ql; q++) {
-
-					var p = queue[q];
-
-					this.__level.spawn(
-						_lazer,
-						p.x,
-						p.y,
-						   0,
-						-300,
-						ship
-					);
-
-					data.points -= 10;
-
-				}
-
-				if (this.game.settings.sound === true) {
-					this.jukebox.play('ship-lazer');
-				}
-
-				this.__fireTimeout = this.__clock + 300;
 				this.__processUpdate(data, true);
 
 			}
 
 		},
 
-		key: function(key) {
-
-			if (this.__isRunning === false) return;
 
 
-			switch(key) {
+		/*
+		 * LOGIC INTERACTION
+		 */
 
-				case 'left':  case 'a':               this.__controlLeft();  break;
-				case 'down':  case 's':               this.__controlStop();  break;
-				case 'right': case 'd':               this.__controlRight(); break;
-				case 'up':    case 'w': case 'space': this.__controlFire();  break;
+		spawn: function(construct, posarray, velarray, owner) {
 
-			}
+			posarray = posarray instanceof Array ? posarray : null;
+			velarray = velarray instanceof Array ? velarray : null;
+			owner    = owner !== undefined       ? owner    : null;
 
-		},
-
-		touch: function(position) {
-
-			if (this.__isRunning === false) return;
-
-
-			var ship = this.__level.getShip();
-			var cx   = ship.position.x;
 
 			if (
-				position.x > cx - ship.width / 2
-				&& position.x < cx + ship.width / 2
+				   posarray !== null
+				&& velarray !== null
+				&& posarray.length === velarray.length
 			) {
 
-				this.__controlFire();
+				if (construct === _lazer) {
 
-			} else {
+					if (this.game.settings.sound === true) {
+						this.jukebox.play('ship-lazer');
+					}
 
-				if (position.x > cx) {
-					this.__controlRight();
-				} else {
-					this.__controlLeft();
+
+					var data = this.__level.data;
+					for (var a = 0, al = posarray.length; a < al; a++) {
+						data.points -= 10;
+					}
+
+				}
+
+
+				for (var a = 0, al = posarray.length; a < al; a++) {
+
+					var pos = posarray[a];
+					var vel = velarray[a];
+
+
+					this.__level.spawn(
+						construct,
+						pos.x,
+						pos.y,
+						vel.x,
+						vel.y,
+						owner
+					);
+
 				}
 
 			}
