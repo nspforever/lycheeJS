@@ -16,6 +16,7 @@ lychee.define('game.entity.Blackhole').includes([
 
 		this.health = Infinity;
 		this.points = 500;
+		this.type   = 'blackhole';
 
 
 		settings.texture = _texture;
@@ -38,8 +39,87 @@ lychee.define('game.entity.Blackhole').includes([
 	Class.prototype = {
 
 		/*
-		 * CUSTOM API
+		 * ENTITY API
 		 */
+
+		update: function(clock, delta, config) {
+
+			lychee.game.Sprite.prototype.update.call(this, clock, delta);
+
+
+			var position = this.position;
+			var velocity = this.velocity;
+
+			position.y += config.scrolly;
+
+
+			var hwidth = this.width / 2;
+			var minx   = -1/2 * config.width;
+			var maxx   =  1/2 * config.width;
+
+			if (position.x < minx + hwidth) {
+				position.x = minx + hwidth;
+				velocity.x = -1 * velocity.x;
+			}
+
+			if (position.x > maxx - hwidth) {
+				position.x = maxx - hwidth;
+				velocity.x = -1 * velocity.x;
+			}
+
+
+			var radius = this.radius;
+
+			var entities = config.entities;
+			for (var e = 0, el = entities.length; e < el; e++) {
+
+				var oentity   = entities[e];
+				var otype     = oentity.type;
+
+
+				if (
+					   otype === 'ship'
+					|| otype === 'lazer'
+				) {
+
+					var oposition = oentity.position;
+					var ovelocity = oentity.velocity;
+
+					var distx   = (position.x - oposition.x);
+					var disty   = (position.y - oposition.y);
+					var gravity = 0;
+
+					var inxrange = distx > -1 * radius && distx < 1 * radius;
+					var inyrange = disty > -2 * radius && disty < 2 * radius;
+
+					if (
+						(
+							   otype === 'ship'
+							&& inxrange === true
+							&& inyrange === true
+						) || (
+							   otype === 'lazer'
+							&& inyrange === true
+						)
+					) {
+
+						gravity = radius * 2 / distx;
+//						gravity = distx / radius;
+						if (gravity > 0) {
+							gravity =  1 - gravity;
+						} else {
+							gravity = -1 - gravity;
+						}
+
+						ovelocity.x += gravity * 80;
+
+					}
+
+				}
+
+			}
+
+		}
 
 	};
 

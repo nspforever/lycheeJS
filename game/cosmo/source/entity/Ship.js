@@ -1,6 +1,7 @@
 
 lychee.define('game.entity.Ship').requires([
-	'game.entity.Lazer'
+	'game.entity.Lazer',
+	'game.entity.Shield'
 ]).includes([
 	'lychee.game.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
@@ -11,8 +12,8 @@ lychee.define('game.entity.Ship').requires([
 		green: attachments["green.png"],
 		blue:  attachments["blue.png"],
 	};
-
-	var _lazer = game.entity.Lazer;
+	var _lazer  = game.entity.Lazer;
+	var _shield = game.entity.Shield;
 
 
 	var Class = function(settings, logic) {
@@ -22,12 +23,14 @@ lychee.define('game.entity.Ship').requires([
 		}
 
 
-		this.logic = logic || null;
+		this.logic  = logic || null;
+		this.shield = new _shield();
 
 
 		this.health  = 0;
 		this.speedx  = 0;
 		this.speedy  = 0;
+		this.type    = 'ship';
 		this.weapons = [ 0, 0, 0, 1, 0, 0, 0 ];
 
 		this.__speed   = 0;
@@ -44,6 +47,9 @@ lychee.define('game.entity.Ship').requires([
 		}
 
 
+		delete settings.color;
+
+
 		settings.map       = _config.map;
 		settings.states    = _config.states;
 
@@ -55,10 +61,61 @@ lychee.define('game.entity.Ship').requires([
 
 		lychee.game.Sprite.call(this, settings);
 
+		settings = null;
+
 	};
 
 
 	Class.prototype = {
+
+		/*
+		 * ENTITY API
+		 */
+
+		update: function(clock, delta, config) {
+
+			lychee.game.Sprite.prototype.update.call(this, clock, delta);
+
+			this.shield.update(clock, delta);
+
+
+			var minx = Math.floor(-1/2 * config.width);
+			var maxx = Math.round( 1/2 * config.width);
+
+
+			var position = this.position;
+			var velocity = this.velocity;
+
+			if (position.x < minx) {
+				this.speedx = 0;
+				position.x  = minx;
+				velocity.x  = 0;
+			}
+
+			if (position.x > maxx) {
+				this.speedx = 0;
+				position.x  = maxx;
+				velocity.x  = 0;
+			}
+
+		},
+
+		render: function(renderer, offsetX, offsetY) {
+
+			lychee.game.Sprite.prototype.render.call(this, renderer, offsetX, offsetY);
+
+
+			var position = this.position;
+
+			this.shield.render(
+				renderer,
+				offsetX + position.x,
+				offsetY + position.y
+			);
+
+		},
+
+
 
 		/*
 		 * CUSTOM API
@@ -126,7 +183,12 @@ lychee.define('game.entity.Ship').requires([
 					}
 
 
-					logic.spawn(_lazer, posarray, velarray, this);
+					logic.spawn(
+						_lazer,
+						posarray,
+						velarray,
+						this.type
+					);
 
 				}
 

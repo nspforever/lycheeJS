@@ -56,30 +56,35 @@ lychee.define('game.logic.Level').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(data) {
+	var Class = function(data, logic) {
 
-		var settings = lychee.extend({}, data);
+		var settings = lychee.extend({
+		}, data);
+
+
+		this.logic = logic || null;
 
 
 		this.enemies  = [];
 		this.entities = [];
+		this.ships    = [];
 		this.width    = 0;
 
-		this.data  = {
+		this.data = {
 			health:    0,
 			points:    0,
 			destroyed: 0,
 			missed:    0
 		};
 
-		this.__cache = { x: 0, y: 0 };
-		this.__stage   = null;
-		this.__boundY  = 0;
-
-		this.__ship = new _ship();
+		this.__cache  = { x: 0, y: 0 };
+		this.__boundY = 0;
 
 
 		lychee.event.Emitter.call(this);
+
+
+		this.reset(settings)
 
 	};
 
@@ -90,11 +95,13 @@ lychee.define('game.logic.Level').requires([
 		 * STATE API
 		 */
 
-		reset: function(stage, width, height) {
+		reset: function(stage) {
 
+			this.enemies  = [];
 			this.entities = [];
+			this.ships    = [];
 
-			this.__boundY = ((height / 80) | 0);
+			this.__boundY = ((stage.height / 80) | 0);
 
 
 			var data = this.data;
@@ -109,20 +116,48 @@ lychee.define('game.logic.Level').requires([
 				data.points = stage.points;
 			}
 
-			if (stage.ship instanceof _ship) {
 
-				this.__ship = stage.ship;
-				this.__ship.setHealth(data.health);
+			var ship;
 
-				this.entities.push(this.__ship);
+			if (typeof stage.ships === 'number') {
+
+				for (var s = 0; s < stage.ships; s++) {
+
+					ship = new _ship({}, this.logic);
+					ship.setState('default');
+					ship.setHealth(data.health);
+					ship.setPosition(_translate_to_position.call(this, 0, 1));
+
+					this.entities.push(ship);
+					this.ships.push(ship);
+
+				}
+
+			} else if (
+				   stage.ships instanceof Array
+				&& stage.ships[0] instanceof _ship
+			) {
+
+				for (var s = 0, sl = stage.ships.length; s < sl; s++) {
+
+					ship = stage.ships[s];
+					ship.setHealth(data.health);
+					ship.setPosition(_translate_to_position.call(this, 0, 1));
+
+					this.entities.push(ship);
+					this.ships.push(ship);
+
+				}
 
 			} else {
 
-				this.__ship.setState('default');
-				this.__ship.setPosition(_translate_to_position.call(this, 0, 1));
-				this.__ship.setHealth(data.health);
+				ship = new _ship({}, this.logic);
+				ship.setState('default');
+				ship.setHealth(data.health);
+				ship.setPosition(_translate_to_position.call(this, 0, 1));
 
-				this.entities.push(this.__ship);
+				this.entities.push(ship);
+				this.ships.push(ship);
 
 			}
 
@@ -307,6 +342,7 @@ lychee.define('game.logic.Level').requires([
 
 			id = typeof id === 'string' ? id : null;
 
+
 			if (id !== null) {
 
 				var stage = _config[id] || null;
@@ -324,11 +360,11 @@ lychee.define('game.logic.Level').requires([
 
 						var raw = stage[y][x];
 						if (raw === 1) {
-							this.spawn(_meteor, pos.x, pos.y);
+							this.spawn(_meteor,    pos.x, pos.y);
 						} else if (raw === 2) {
 							this.spawn(_blackhole, pos.x, pos.y);
 						} else if (raw === 3) {
-							this.spawn(_enemy, pos.x, pos.y);
+							this.spawn(_enemy,     pos.x, pos.y);
 						}
 
 					}
@@ -350,9 +386,10 @@ lychee.define('game.logic.Level').requires([
 			vely      = vely || 0;
 			owner     = owner !== undefined ? owner : null;
 
+
 			if (construct !== null) {
 
-				var entity = new construct();
+				var entity = new construct({}, this.logic);
 
 				entity.setPosition({
 					x: posx,

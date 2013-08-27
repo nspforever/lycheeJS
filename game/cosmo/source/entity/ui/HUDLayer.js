@@ -25,7 +25,6 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	var Class = function(settings, game, gamestate) {
 
-		this.__font = game.fonts.hud;
 
 		if (settings === undefined) {
 			settings = {};
@@ -33,7 +32,10 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 
 		this.texture = _texture;
-		this.__map   = {};
+
+		this.__font           = game.fonts.hud;
+		this.__points         = '00000000';
+		this.__map            = {};
 		this.__map.background = _config.map.background;
 		this.__map.bar        = _config.map.bar;
 

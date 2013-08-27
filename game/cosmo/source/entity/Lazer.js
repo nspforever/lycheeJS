@@ -15,6 +15,7 @@ lychee.define('game.entity.Lazer').includes([
 
 
 		this.owner = null;
+		this.type  = 'lazer';
 
 
 		settings.texture = _texture;
