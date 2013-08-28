@@ -14,8 +14,9 @@ lychee.define('game.entity.Lazer').includes([
 		}
 
 
-		this.owner = null;
-		this.type  = 'lazer';
+		this.owner     = null;
+		this.ownertype = null;
+		this.type      = 'lazer';
 
 
 		settings.texture = _texture;
@@ -42,7 +43,10 @@ lychee.define('game.entity.Lazer').includes([
 		 */
 
 		setOwner: function(owner) {
-			this.owner = owner;
+
+			this.owner     = owner;
+			this.ownertype = owner.type;
+
 		}
 
 	};

@@ -79,6 +79,7 @@
 
 		"game": {
 			"Background": [ "js" ],
+			"Controller": [ "js" ],
 			"Entity":     [ "js" ],
 			"Jukebox":    [ "js" ],
 			"Layer":      [ "js" ],
@@ -99,11 +100,13 @@
 		"net": {
 
 			"client": {
-				"RoomService": [ "js" ]
+				"ControllerService": [ "js" ],
+				"RoomService":       [ "js" ]
 			},
 
 			"remote": {
-				"RoomService": [ "js" ]
+				"ControllerService": [ "js" ],
+				"RoomService":       [ "js" ]
 			}
 
 		},

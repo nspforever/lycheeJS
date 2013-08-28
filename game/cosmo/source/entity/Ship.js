@@ -187,7 +187,7 @@ lychee.define('game.entity.Ship').requires([
 						_lazer,
 						posarray,
 						velarray,
-						this.type
+						this
 					);
 
 				}

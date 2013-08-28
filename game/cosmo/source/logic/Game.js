@@ -25,77 +25,98 @@ lychee.define('game.logic.Game').requires([
 	 * HELPERS
 	 */
 
-	var _get_ship_level = function(points, downgrade) {
+	var _get_level_ship = function(ship) {
 
-		downgrade = downgrade === true;
+		var level = 0;
 
+		var state = ship.state;
+		if (state.substr(0, 5) === 'level') {
 
-		var shiplevel = 0;
+			level = parseInt(state.substr(-1), 10);
 
-		for (var lvlid in _config.upgrade) {
+		} else if (
+			   state.substr(0, 7) === 'upgrade'
+			|| state.substr(0, 9) === 'downgrade'
+		) {
 
-			var lvl = parseInt(lvlid, 10);
-			var min = _config.upgrade[lvl];
-
-			if (points > min) {
-				shiplevel = lvl;
-			}
-
-		}
-
-
-		if (downgrade === true) {
-
-			shiplevel = -1;
-
-
-			for (var lvlid in _config.downgrade) {
-
-				var lvl = parseInt(lvlid, 10);
-				var min = _config.downgrade[lvlid].min;
-				var max = _config.downgrade[lvlid].max;
-
-				if (points > min && points < max) {
-					shiplevel = lvl;
-				}
-
-			}
+			level = -1;
 
 		}
 
 
-		return shiplevel;
+		return isNaN(level) ? 0 : level;
 
 	};
 
-	var _process_update = function(data, downgrade) {
+	var _get_level_points = function(points) {
 
-return;
+		var level = -1;
 
-		downgrade = downgrade === true;
+		for (var levelid in _config.upgrade) {
 
+			var min = _config.upgrade[levelid];
+			if (min < points) {
+				level = parseInt(levelid, 10);
+				console.log('upgrade!', level, points, min);
+			}
 
-		var ship     = this.__level.getShip();
-		var oldstate = ship.state;
-
-		var oldlvl = 0;
-		if (oldstate !== 'default') {
-			oldlvl = parseInt(oldstate.substr(-1), 10);
 		}
 
-		var newlvl = _get_ship_level(data.points, downgrade);
 
+		var levelids = Object.keys(_config.downgrade);
+		for (var l = levelids.length - 1; l >= 0; l--) {
+
+			var levelid = levelids[l];
+
+			var max = _config.downgrade[levelid];
+			if (max > points) {
+				level = parseInt(levelid, 10);
+				console.log('downgrade!', level, points, max);
+			}
+
+		}
+
+
+		return level;
+
+	};
+
+	var _process_update = function(player1, player2) {
+
+		var ship1 = this.__level.ships[0];
+		var ship2 = this.__level.ships[1];
+
+
+		_process_update_player.call(this, player1, ship1);
 
 		if (
-			   oldlvl !== newlvl
-			&& newlvl !== -1
+			   player2 !== undefined
+			&& ship2 !== undefined
+		) {
+			_process_update_player.call(this, player2, ship2);
+		}
+
+
+		this.trigger('update', [ player1, player2 ]);
+
+	};
+
+	var _process_update_player = function(data, ship) {
+
+		var oldlevel = _get_level_ship(ship);
+		var newlevel = _get_level_points(data.points);
+
+		if (
+			   oldlevel !== newlevel
+			&& oldlevel !== -1
+			&& newlevel !== -1
 		) {
 
-			if (newlvl > oldlvl) {
-				ship.setState('upgrade'   + newlvl);
+			if (newlevel > oldlevel) {
+				ship.setState('upgrade' + newlevel);
 				data.health = 100;
-			} else if (newlvl < oldlvl) {
-				ship.setState('downgrade' + oldlvl);
+			} else if (newlevel < oldlevel) {
+				ship.setState('downgrade' + newlevel);
 			}
 
 
@@ -106,35 +127,26 @@ return;
 
 			this.loop.timeout(1000, function() {
 
-				var state = ship.state;
+				var state = this.state;
 				if (state.substr(0, 7) === 'upgrade') {
 
-					var lvl = parseInt(state.substr(-1), 10);
-					ship.setState('level' + lvl);
+					var level = parseInt(state.substr(-1), 10);
+					this.setState('level' + level);
 
 				} else if (state.substr(0, 9) === 'downgrade') {
 
-					var lvl = parseInt(state.substr(-1), 10);
-					if (!isNaN(lvl)) {
-
-						lvl--;
-
-						if (lvl > 0) {
-							ship.setState('level' + lvl);
-						} else {
-							ship.setState('default');
-						}
-
+					var level = parseInt(state.substr(-1), 10) - 1;
+					if (level > 0) {
+						this.setState('level' + level);
+					} else {
+						this.setState('default');
 					}
 
 				}
 
-			}, this);
+			}, ship);
 
 		}
-
-
-		this.trigger('update', [ data ]);
 
 	};
 
@@ -188,6 +200,18 @@ return;
 		/*
 		 * LOGIC INTERACTION
 		 */
+
+		processKey: function(key) {
+
+console.log('processing key!', key);
+
+		},
+
+		processTouch: function(position) {
+
+console.log('processing touch!', position);
+
+		},
 
 		spawn: function(construct, posarray, velarray, owner) {
 
@@ -296,7 +320,7 @@ return;
 			});
 
 
-			_process_update.call(this, this.__level.data, true);
+			_process_update.apply(this, this.__level.data);
 
 			this.__isRunning = true;
 
@@ -377,13 +401,13 @@ return;
 					if (position.x > maxx) position.x = minx;
 
 
-					var owner = entity.owner;
+					var ownertype = entity.ownertype;
 
 					for (var e2 = 0; e2 < entities.length; e2++) {
 
 						var oentity = entities[e2];
 						var otype   = oentity.type;
-						if (owner === otype) continue;
+						if (ownertype === otype) continue;
 
 
 						if (

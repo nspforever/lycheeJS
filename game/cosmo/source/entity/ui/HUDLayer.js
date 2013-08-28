@@ -17,6 +17,53 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 	 * HELPERS
 	 */
 
+	var _get_level = function(points) {
+
+		var currentlvl = 0;
+		for (var lvlid in _gameconfig.upgrade) {
+			if (_gameconfig.upgrade[lvlid] < points) {
+				currentlvl = parseInt(lvlid, 10);
+			}
+		}
+
+		return isNaN(currentlvl) ? 0 : currentlvl;
+
+	};
+
+	var _get_points = function(points) {
+
+		points = points >= 0 ? points : 0;
+
+
+		var pre = '';
+		var str = points + '';
+		if (str.length < 8) {
+
+			for (var l = str.length; l < 8; l++) {
+				pre += '0';
+			}
+
+		}
+
+		return pre + points;
+
+	};
+
+	var _process_update = function(data, index) {
+
+		var level   = this.__map.level;
+		var points  = this.__map.points;
+		var shield  = this.__map.shield;
+		var upgrade = this.__map.upgrade;
+
+		level     =  _get_level(data.points);
+		points    =  _get_points(data.points);
+
+		shield.w  = shield._x  + (shield._w  * (data.health / 100));
+		upgrade.w = upgrade._x + (upgrade._w * (data.points / (_gameconfig.upgrade['' + (level + 1)] || 999999999)));
+
+	};
+
 
 
 	/*
@@ -150,45 +197,15 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		 * CUSTOM API
 		 */
 
-		processUpdate: function(data) {
+		processUpdate: function(player1, player2) {
 
-			var shield = this.__map.shield;
+console.log(player1, player2);
 
-			shield.w = shield._x + (shield._w * (data.health / 100));
+			_process_update.call(this, player1, 0);
 
-
-			var upgrade = this.__map.upgrade;
-
-			var currentlvl = 0;
-			for (var lvlid in _gameconfig.upgrade) {
-
-				if (_gameconfig.upgrade[lvlid] < data.points) {
-					currentlvl = parseInt(lvlid, 10);
-				}
-
+			if (player2 !== undefined) {
+				_process_update.call(this, player2, 1);
 			}
-
-			var nextupgradepoints = _gameconfig.upgrade['' + (currentlvl + 1)] || 999999999;
-
-			upgrade.w = upgrade._x + (upgrade._w * (data.points / nextupgradepoints));
-
-
-			var prefix = '';
-			var points = data.points;
-			if (points < 0) {
-				points = 0;
-			}
-
-			var str = points + '';
-			if (str.length < 8) {
-
-				for (var l = str.length; l < 8; l++) {
-					prefix += '0';
-				}
-
-			}
-
-			this.__points = prefix + points;
 
 		}
 

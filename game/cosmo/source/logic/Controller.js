@@ -43,8 +43,8 @@ lychee.define('game.logic.Controller').requires([
 		var settings = lychee.extend({}, data);
 
 
-		this.game  = game;
-		this.input = game.input || null;
+		this.game   = game;
+		this.client = game.client || null;
 
 		this.mode  = Class.MODE.local;
 		this.ship  = null;

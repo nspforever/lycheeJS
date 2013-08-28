@@ -36,6 +36,15 @@ lychee.define('game.logic.Level').requires([
 	 * HELPERS
 	 */
 
+	var _data = function() {
+
+		this.health    = 100;
+		this.points    = 0;
+		this.destroyed = 0;
+		this.missed    = 0;
+
+	};
+
 	var _translate_to_position = function(x, y) {
 
 		var position = this.__cache;
@@ -65,17 +74,12 @@ lychee.define('game.logic.Level').requires([
 		this.logic = logic || null;
 
 
+		this.data     = [];
 		this.enemies  = [];
 		this.entities = [];
 		this.ships    = [];
 		this.width    = 0;
 
-		this.data = {
-			health:    0,
-			points:    0,
-			destroyed: 0,
-			missed:    0
-		};
 
 		this.__cache  = { x: 0, y: 0 };
 		this.__boundY = 0;
@@ -97,6 +101,7 @@ lychee.define('game.logic.Level').requires([
 
 		reset: function(stage) {
 
+			this.data     = [];
 			this.enemies  = [];
 			this.entities = [];
 			this.ships    = [];
@@ -104,30 +109,21 @@ lychee.define('game.logic.Level').requires([
 			this.__boundY = ((stage.height / 80) | 0);
 
 
-			var data = this.data;
-
-			data.health    = 100;
-			data.points    = 0;
-			data.destroyed = 0;
-			data.missed    = 0;
-
-
-			if (typeof stage.points === 'number') {
-				data.points = stage.points;
-			}
-
-
-			var ship;
+			var ship, data;
 
 			if (typeof stage.ships === 'number') {
 
 				for (var s = 0; s < stage.ships; s++) {
+
+					data = new _data();
+					data.points = typeof stage.points === 'number' ? stage.points : 0;
 
 					ship = new _ship({}, this.logic);
 					ship.setState('default');
 					ship.setHealth(data.health);
 					ship.setPosition(_translate_to_position.call(this, 0, 1));
 
+					this.data.push(data);
 					this.entities.push(ship);
 					this.ships.push(ship);
 
@@ -140,10 +136,14 @@ lychee.define('game.logic.Level').requires([
 
 				for (var s = 0, sl = stage.ships.length; s < sl; s++) {
 
+					data = new _data();
+					data.points = typeof stage.points === 'number' ? stage.points : 0;
+
 					ship = stage.ships[s];
 					ship.setHealth(data.health);
 					ship.setPosition(_translate_to_position.call(this, 0, 1));
 
+					this.data.push(data);
 					this.entities.push(ship);
 					this.ships.push(ship);
 
@@ -151,11 +151,15 @@ lychee.define('game.logic.Level').requires([
 
 			} else {
 
+				data = new _data();
+				data.points = typeof stage.points === 'number' ? stage.points : 0;
+
 				ship = new _ship({}, this.logic);
 				ship.setState('default');
 				ship.setHealth(data.health);
 				ship.setPosition(_translate_to_position.call(this, 0, 1));
 
+				this.data.push(data);
 				this.entities.push(ship);
 				this.ships.push(ship);
 
@@ -222,46 +226,59 @@ lychee.define('game.logic.Level').requires([
 
 		},
 
-		destroy: function(entity, points) {
+		destroy: function(entity, ship) {
 
-			points = points === true;
+			ship = ship instanceof _ship ? ship : null;
 
 
 			this.removeEntity(entity);
 
 
-			if (
-				   entity instanceof _enemy
-				|| entity instanceof _meteor
-			) {
+			if (ship !== null) {
 
-				if (points === true) {
-
-					this.data.points += entity.points;
-					this.data.destroyed++;
-
-					this.trigger('update', [ this.data ]);
-
+				var data  = null;
+				var index = this.ships.indexOf(ship);
+				if (index !== -1) {
+					data = this.data[index];
 				} else {
+					return;
+				}
 
-					this.data.missed++;
+
+				if (
+					   entity instanceof _enemy
+					|| entity instanceof _meteor
+				) {
+
+					if (points === true) {
+
+						data.points += entity.points;
+						data.destroyed++;
+
+						this.trigger('update', this.data);
+
+					} else {
+
+						data.missed++;
+
+					}
 
 				}
 
-			}
 
+				if (entity instanceof _ship) {
 
-			if (entity instanceof _ship) {
+					data.missed += this.entities.length;
+					this.trigger('failure', this.data);
 
-				this.data.missed += this.entities.length;
-				this.trigger('failure', [ this.data ]);
+				} else if (
+					   this.entities.length === 1
+					&& this.entities[0] instanceof _ship
+				) {
 
-			} else if (
-				   this.entities.length === 1
-				&& this.entities[0] instanceof _ship
-			) {
+					this.trigger('success', this.data);
 
-				this.trigger('success', [ this.data ]);
+				}
 
 			}
 
@@ -278,8 +295,8 @@ lychee.define('game.logic.Level').requires([
 				&& passive instanceof _lazer
 			) {
 
-				this.destroy(active,  false);
-				this.destroy(passive, false);
+				this.destroy(active);
+				this.destroy(passive);
 				diff -= 2;
 
 			} else if (
@@ -296,8 +313,8 @@ lychee.define('game.logic.Level').requires([
 
 
 				if (health < 0) {
-					this.destroy(active,  false);
-					this.destroy(passive, true);
+					this.destroy(active);
+					this.destroy(passive, active.owner);
 					diff -= 2;
 				} else {
 					this.destroy(active,  false);
@@ -319,17 +336,23 @@ lychee.define('game.logic.Level').requires([
 
 
 				if (health < 0) {
-					this.destroy(active,  false);
-					this.destroy(passive, false);
+					this.destroy(active);
+					this.destroy(passive, passive);
 					diff -= 2;
 				} else {
-					this.destroy(active,  false);
+					this.destroy(active);
 					diff -= 1;
 				}
 
 
-				this.data.health = health;
-				this.trigger('update', [ this.data ]);
+				var index = this.ships.indexOf(passive);
+				if (index !== -1) {
+
+					var data = this.data[index];
+					data.health = health;
+					this.trigger('update', this.data);
+
+				}
 
 			}
 
@@ -401,7 +424,11 @@ lychee.define('game.logic.Level').requires([
 					y: vely
 				});
 
-				if (owner !== null) {
+
+				if (
+					   owner !== null
+					&& typeof entity.setOwner === 'function'
+				) {
 					entity.setOwner(owner);
 				}
 

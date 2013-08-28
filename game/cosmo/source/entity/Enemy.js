@@ -104,7 +104,7 @@ lychee.define('game.entity.Enemy').requires([
 						_lazer,
 						posarray,
 						velarray,
-						this.type
+						this
 					);
 
 					this.__fireclock = clock + ((2000 + Math.random() * 500) | 0);
