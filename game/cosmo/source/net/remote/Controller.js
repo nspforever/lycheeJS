@@ -1,15 +1,11 @@
 
-lychee.define('game.net.remote.Multiplayer').includes([
+lychee.define('game.net.remote.Controller').includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global, game) {
 
 	var _remotes  = [];
 	var _sessions = {};
 
-
-	/*
-	 * HELPERS
-	 */
 
 	var _session_start = function(session) {
 
@@ -49,14 +45,9 @@ lychee.define('game.net.remote.Multiplayer').includes([
 	};
 
 
-
-	/*
-	 * IMPLEMENTATION
-	 */
-
 	var Class = function() {
 
-		this.id     = 'multiplayer';
+		this.id     = 'controller';
 		this.remote = null;
 
 

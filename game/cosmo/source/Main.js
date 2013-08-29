@@ -158,8 +158,9 @@ lychee.define('game.Main').requires([
 
 			this.client   = null;
 			this.services = {
-				multiplayer: null,
-				highscore:   null
+				controller:  null,
+				highscore:   null,
+				multiplayer: null
 			};
 
 			this.jukebox = new game.Jukebox(this);

@@ -49,19 +49,11 @@ lychee.define('lychee.net.Remote').tags({
 				&& method.charAt(0) !== '@'
 			) {
 
-				if (
-					   typeof service.trigger === 'function'
-					|| typeof service[method] === 'function'
-				) {
+				if (typeof service[method] === 'function') {
 
 					// Remove data frame service header
 					delete data._serviceId;
 					delete data._serviceMethod;
-
-
-					if (typeof service.trigger === 'function') {
-						service.trigger(method, [ data ]);
-					}
 
 					if (typeof service[method] === 'function') {
 						service[method](data);

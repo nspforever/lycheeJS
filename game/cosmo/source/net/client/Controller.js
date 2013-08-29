@@ -1,7 +1,7 @@
 
-lychee.define('lychee.net.client.ControllerService').includes([
+lychee.define('game.net.client.Controller').includes([
 	'lychee.event.Emitter'
-]).exports(function(lychee, global) {
+]).exports(function(lychee, global, game) {
 
 	var Class = function(client) {
 
@@ -30,22 +30,6 @@ lychee.define('lychee.net.client.ControllerService').includes([
 		/*
 		 * CUSTOM API
 		 */
-
-		enter: function(data) {
-
-			if (typeof data.code === 'number') {
-
-				this.client.send({
-					code: data.code,
-					type: data.type || null
-				}, {
-					id:     this.id,
-					method: 'enter'
-				});
-
-			}
-
-		}
 
 	};
 

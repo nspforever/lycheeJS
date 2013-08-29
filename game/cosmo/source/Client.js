@@ -1,5 +1,7 @@
 
 lychee.define('game.Client').requires([
+	'game.net.client.Controller',
+	'game.net.client.Highscore',
 	'game.net.client.Multiplayer'
 ]).includes([
 	'lychee.net.Client'
@@ -7,6 +9,7 @@ lychee.define('game.Client').requires([
 
 	var _highscore   = game.net.client.Highscore;
 	var _multiplayer = game.net.client.Multiplayer;
+	var _controller  = game.net.client.Controller;
 
 
 	var Class = function(settings, game) {
@@ -19,18 +22,25 @@ lychee.define('game.Client').requires([
 
 		this.bind('connect', function() {
 
-//			var hsservice = new _highscore(this);
+			var ctservice = new _controller(this);
+			var hsservice = new _highscore(this);
 			var mpservice = new _multiplayer(this);
 
-//			hsservice.bind('init', function() {
-//				this.game.services.highscore = hsservice;
-//			}, this, true);
+			ctservice.bind('init', function() {
+				this.game.services.controller = ctservice;
+			}, this, true);
+
+			hsservice.bind('init', function() {
+				this.game.services.highscore = hsservice;
+			}, this, true);
 
 			mpservice.bind('init', function() {
 				this.game.services.multiplayer = mpservice;
 			}, this, true);
 
-//			this.plug(hsservice);
+
+			this.plug(ctservice);
+			this.plug(hsservice);
 			this.plug(mpservice);
 
 
@@ -59,6 +69,7 @@ lychee.define('game.Client').requires([
 
 		this.bind('disconnect', function(code, reason) {
 			this.game.client               = null;
+			this.game.services.controller  = null;
 			this.game.services.highscore   = null;
 			this.game.services.multiplayer = null;
 		}, this);
