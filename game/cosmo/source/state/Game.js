@@ -14,15 +14,12 @@ lychee.define('game.state.Game').requires([
 
 		lychee.game.State.call(this, game);
 
-		this.controller = game.controller || null;
-		this.logic      = game.logic || null;
-
-		this.stage = {
-			level: 'stage1'
-		};
+		this.logic = game.logic || null;
+		this.stage = { level: 'stage1' };
 
 		this.__result = new _resultlayer({}, game, this);
 		this.__hud    = new _hudlayer({}, game, this);
+
 
 		this.reset();
 
@@ -81,12 +78,17 @@ lychee.define('game.state.Game').requires([
 			var renderer   = this.renderer;
 			var logic      = this.logic;
 			if (
-				   renderer !== null
+				renderer !== null
 				&& logic !== null
 			) {
 
+				var env = renderer.getEnvironment();
+
+
 				logic.bind('update', function(data) {
+
 					this.__hud.processUpdate(data);
+
 				}, this);
 
 				logic.bind('success', function(data) {
@@ -105,11 +107,14 @@ lychee.define('game.state.Game').requires([
 
 				}, this);
 
+				logic.enter(
+					data,
+					env.width,
+					env.height
+				);
+
 
 				this.stage = data;
-
-				var env = renderer.getEnvironment();
-				logic.enter(this.stage, env.width, env.height);
 
 			}
 
@@ -137,10 +142,11 @@ lychee.define('game.state.Game').requires([
 			var logic = this.game.logic;
 			if (logic !== null) {
 
-				logic.leave();
-				logic.unbind('failure');
 				logic.unbind('update');
 				logic.unbind('success');
+				logic.unbind('failure');
+
+				logic.leave();
 
 			}
 
@@ -231,7 +237,6 @@ lychee.define('game.state.Game').requires([
 					position.y -= env.height / 2;
 
 				}
-
 
 				var logic = this.logic;
 				if (logic !== null) {

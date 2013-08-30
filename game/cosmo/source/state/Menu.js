@@ -603,6 +603,29 @@ lychee.define('game.state.Menu').requires([
 
 			}
 
+		},
+
+		processKey: function(key, name, delta) {
+
+			if (this.__locked === true) return false;
+
+
+			var layer = this.getLayer('ui');
+			var left  = layer.getEntity('left');
+			var top   = layer.getEntity('top');
+			var right = layer.getEntity('right');
+
+
+			switch(key) {
+
+				case 'left':  case 'a': left.visible === true  && _navigate_horizontal.call(this, -1); break;
+				case 'down':  case 's': this.simulateTouch(0, { x: 0, y: 0 }, 0); break;
+				case 'right': case 'd': right.visible === true && _navigate_horizontal.call(this,  1); break;
+				case 'up':    case 'w': top.visible === true   && _navigate_vertical.call(this,   -1); break;
+				case 'space':           this.simulateTouch(0, { x: 0, y: 0 }, 0); break;
+
+			}
+
 		}
 
 	};

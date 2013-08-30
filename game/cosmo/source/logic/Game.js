@@ -2,6 +2,7 @@
 lychee.define('game.logic.Game').requires([
 	'game.entity.Background',
 	'game.entity.Shield',
+	'game.logic.Controller',
 	'game.logic.Level',
 	'lychee.game.Layer'
 ]).includes([
@@ -18,6 +19,9 @@ lychee.define('game.logic.Game').requires([
 	var _meteor     = game.entity.Meteor;
 	var _shield     = game.entity.Shield;
 	var _ship       = game.entity.Ship;
+
+	var _controller = game.logic.Controller;
+	var _level      = game.logic.Level;
 
 
 

@@ -553,6 +553,30 @@ lychee.define('lychee.game.State').requires([
 
 			}
 
+		},
+
+		simulateTouch: function(id, position, delta) {
+
+			id       = typeof id === 'number'     ? id       : 0;
+			position = position instanceof Object ? position : { x: 0, y: 0 };
+			delta    = typeof delta === 'number'  ? delta    : 0;
+
+
+			if (this.renderer !== null) {
+
+				var env = this.renderer.getEnvironment();
+
+				position.x += env.width / 2;
+				position.y += env.height / 2;
+
+				position.x += env.offset.x;
+				position.y += env.offset.y;
+
+			}
+
+
+			this.processTouch(id, position, delta);
+
 		}
 
 	};
