@@ -212,7 +212,7 @@ lychee.define('lychee.net.Remote').tags({
 
 	var _cleanup_services = function() {
 
-		var services = that.__services;
+		var services = this.__services;
 
 		for (var s = 0; s < services.length; s++) {
 
@@ -223,7 +223,7 @@ lychee.define('lychee.net.Remote').tags({
 
 		}
 
-		that.__services = [];
+		this.__services = [];
 
 	};
 

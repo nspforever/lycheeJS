@@ -13,7 +13,7 @@ lychee.define('game.net.client.Multiplayer').includes([
 		lychee.event.Emitter.call(this);
 
 
-		this.bind('update', function(data) {
+		this.bind('session', function(data) {
 
 			if (data.session !== null) {
 				this.session = data.session;

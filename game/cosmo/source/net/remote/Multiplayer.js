@@ -24,6 +24,40 @@ lychee.define('game.net.remote.Multiplayer').includes([
 
 	};
 
+	var _session_leave = function(session) {
+
+		var broadcast = false;
+
+		for (var p = 0, pl = session.players.length; p < pl; p++) {
+
+			if (session.players[p] === this.remote) {
+				session.players.splice(p, 1);
+				broadcast = session.ready === true;
+				session.ready = false;
+				break;
+			}
+
+		}
+
+
+		if (session.players.length > 0) {
+
+			if (session.admin === this.remote) {
+				session.admin = session.players[0];
+			}
+
+			if (broadcast === true) {
+				_session_stop.call(this, session);
+			}
+
+		} else {
+
+			delete _sessions[session.code];
+
+		}
+
+	};
+
 	var _session_full = function(session) {
 
 		this.remote.send({
@@ -58,8 +92,6 @@ lychee.define('game.net.remote.Multiplayer').includes([
 
 	var _session_stop = function(session) {
 
-console.log('> stop session!', session.code);
-
 		var players = session.players;
 		for (var p = 0, pl = players.length; p < pl; p++) {
 
@@ -82,19 +114,11 @@ console.log('> stop session!', session.code);
 	 * IMPLEMENTATION
 	 */
 
-var _interval;
-
 	var Class = function(remote) {
 
 		this.id     = 'multiplayer';
 		this.remote = remote;
 
-
-if (_interval === undefined) {
-_interval = setInterval(function() {
-	console.log('sessions:', _sessions);
-}, 5000);
-}
 
 		lychee.event.Emitter.call(this);
 
@@ -122,39 +146,9 @@ _interval = setInterval(function() {
 				}
 			}
 
+
 			for (var sid in _sessions) {
-
-				var session = _sessions[sid];
-				var stop    = false;
-
-				for (var p = 0, pl = session.players.length; p < pl; p++) {
-
-					if (session.players[p] === this.remote) {
-						session.players.splice(p, 1);
-						stop = session.ready === true;
-						session.ready = false;
-						break;
-					}
-
-				}
-
-
-				if (session.players.length > 0) {
-
-					if (session.admin === this.remote) {
-						session.admin = session.players[0];
-					}
-
-					if (stop === true) {
-						_session_stop.call(this, session);
-					}
-
-				} else {
-
-					delete _sessions[sid];
-
-				}
-
+				_session_leave.call(this, _sessions[sid]);
 			}
 
 		},
@@ -186,11 +180,15 @@ _interval = setInterval(function() {
 
 					_session_wait.call(this, session);
 
+
+				// 2. Join Game
 				} else {
 
-					// 1. Join Game
+
+					// 2.1. Game waiting for others
 					if (session.ready === false) {
 
+						// 2.1a Join
 						var players = session.players;
 						if (players.indexOf(this.remote) === -1) {
 
@@ -201,6 +199,7 @@ _interval = setInterval(function() {
 								_session_start.call(this, session);
 							}
 
+						// 2.1b Already joined
 						} else {
 
 							session.ready = session.players.length === 2;
@@ -214,6 +213,7 @@ _interval = setInterval(function() {
 
 						}
 
+					// 2.2. Game already full
 					} else {
 
 						_session_full.call(this, session);
@@ -228,16 +228,14 @@ _interval = setInterval(function() {
 
 		leave: function(data) {
 
-			var code = data.session;
+			var code = data.code;
 			if (code !== null) {
 
 				var session = _sessions[code] || null;
 
-				// LEAVE GAME
+				// 1. Leave Game
 				if (session !== null) {
-
-console.log('leave session!', session);
-
+					_session_leave.call(this, session);
 				}
 
 			}

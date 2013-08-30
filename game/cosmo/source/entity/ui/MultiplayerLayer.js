@@ -71,7 +71,6 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 
 		this.__cursor  = 0;
-		this.__session = null;
 
 
 		lychee.ui.Layer.call(this, settings);
@@ -197,8 +196,6 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 					} else {
 
-						this.__session = data.code;
-
 						if (typeof data.message === 'string') {
 							this.setMessage(data.message);
 						}
@@ -245,9 +242,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 				service.unbind('start');
 				service.unbind('stop');
 
-				if (this.__session !== null) {
-					service.leave();
-				}
+				service.leave();
 
 			}
 
