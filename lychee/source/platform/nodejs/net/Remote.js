@@ -210,6 +210,23 @@ lychee.define('lychee.net.Remote').tags({
 
 	};
 
+	var _cleanup_services = function() {
+
+		var services = that.__services;
+
+		for (var s = 0; s < services.length; s++) {
+
+			var service = services[s];
+			if (typeof service.unplug === 'function') {
+				service.unplug();
+			}
+
+		}
+
+		that.__services = [];
+
+	};
+
 
 
 	/*
@@ -255,31 +272,23 @@ lychee.define('lychee.net.Remote').tags({
 		});
 
 		this.__socket.on('error', function(err) {
-			that.__protocol.close();
+			that.__protocol.close(true);
+			_cleanup_services.call(that);
 		});
 
 		this.__socket.on('timeout', function(a,b,c) {
-console.log('SOCKET TIMEOUT', a,b,c, that.id);
+			that.__protocol.close(true);
+			_cleanup_services.call(that);
 		});
 
 		this.__socket.on('end', function() {
-
 			that.__protocol.close(true);
+			_cleanup_services.call(that);
+		});
 
-
-			var services = that.__services;
-
-			for (var s = 0; s < services.length; s++) {
-
-				var service = services[s];
-				if (typeof service.unplug === 'function') {
-					service.unplug();
-				}
-
-			}
-
-			that.__services = [];
-
+		this.__socket.on('close', function(err) {
+			that.__protocol.close(true);
+			_cleanup_services.call(that);
 		});
 
 	};
