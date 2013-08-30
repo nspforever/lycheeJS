@@ -136,6 +136,9 @@ lychee.define('lychee.ui.Textarea').includes([
 
 		render: function(renderer, offsetX, offsetY) {
 
+			if (this.visible === false) return;
+
+
 			var buffer = this.__buffer;
 			if (buffer === null) {
 

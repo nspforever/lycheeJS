@@ -19,8 +19,10 @@ lychee.define('game.Main').requires([
 
 			fullscreen: true,
 
-			music: true,
-			sound: true,
+//			music: true,
+//			sound: true,
+			music: false,
+			sound: false,
 
 			input: {
 				fireKey:      true,
@@ -158,7 +160,6 @@ lychee.define('game.Main').requires([
 
 			this.client   = null;
 			this.services = {
-				controller:  null,
 				highscore:   null,
 				multiplayer: null
 			};

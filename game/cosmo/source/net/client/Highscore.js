@@ -1,13 +1,12 @@
 
 lychee.define('game.net.client.Highscore').includes([
 	'lychee.event.Emitter'
-]).exports(function(lychee, global, game) {
+]).exports(function(lychee, game, global, attachments) {
 
 	var Class = function(client) {
 
-		this.id      = 'Highscore';
+		this.id      = 'highscore';
 		this.client  = client;
-		this.session = null;
 
 
 		lychee.event.Emitter.call(this);
@@ -30,10 +29,6 @@ lychee.define('game.net.client.Highscore').includes([
 		/*
 		 * CUSTOM API
 		 */
-
-		triggerupdate: function(data) {
-			this.trigger('update', [ data ]);
-		},
 
 		update: function() {
 

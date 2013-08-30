@@ -335,22 +335,27 @@ lychee.define('game.logic.Level').requires([
 				passive.setHealth(health);
 
 
-				if (health < 0) {
+				if (health >= 0) {
+
+					this.destroy(active);
+					diff -= 1;
+
+
+					var index = this.ships.indexOf(passive);
+					if (index !== -1) {
+
+						var data = this.data[index];
+						data.health = health;
+
+						this.trigger('update', this.data);
+
+					}
+
+				} else {
+
 					this.destroy(active);
 					this.destroy(passive, passive);
 					diff -= 2;
-				} else {
-					this.destroy(active);
-					diff -= 1;
-				}
-
-
-				var index = this.ships.indexOf(passive);
-				if (index !== -1) {
-
-					var data = this.data[index];
-					data.health = health;
-					this.trigger('update', this.data);
 
 				}
 

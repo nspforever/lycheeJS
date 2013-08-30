@@ -3,16 +3,10 @@ lychee.define('game.net.remote.Highscore').includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _config = attachments['json'];
-
-
-	var _remotes = [];
-
-
-	var Class = function() {
+	var Class = function(remote) {
 
 		this.id     = 'highscore';
-		this.remote = null;
+		this.remote = remote;
 
 
 		lychee.event.Emitter.call(this);
@@ -22,29 +16,23 @@ lychee.define('game.net.remote.Highscore').includes([
 
 	Class.prototype = {
 
-		plug: function(remote) {
+		/*
+		 * SERVICE API
+		 */
 
-			this.remote = remote;
-			_remotes.push(remote);
+		plug: function() {
 
 		},
 
 		unplug: function() {
 
-			if (this.remote !== null) {
-
-				for (var r = 0, rl = _remotes.length; r < rl; r++) {
-					if (_remotes[r] === this.remote) {
-						_remotes.splice(r, 1);
-						break;
-					}
-				}
-
-				this.remote = null;
-
-			}
-
 		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
 
 		update: function(data) {
 
@@ -57,9 +45,13 @@ lychee.define('game.net.remote.Highscore').includes([
 				points: 20000
 			});
 
-			this.remote.send(highscore, {
+console.log('SENDING UPDATE!', highscore);
+
+			this.remote.send({
+				highscore: highscore
+			}, {
 				id:     this.id,
-				method: 'triggerupdate'
+				event:  'update'
 			});
 
 		}

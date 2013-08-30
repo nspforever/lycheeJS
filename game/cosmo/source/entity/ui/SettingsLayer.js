@@ -30,7 +30,7 @@ lychee.define('game.entity.ui.SettingsLayer').requires([
 
 
 			this.addEntity(new game.entity.ui.Menu({
-				state: 'blank'
+				state: 'default'
 			}));
 
 

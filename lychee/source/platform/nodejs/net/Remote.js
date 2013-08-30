@@ -41,32 +41,45 @@ lychee.define('lychee.net.Remote').tags({
 		) {
 
 			var service = _get_service_by_id.call(this, data._serviceId);
+			var event   = data._serviceEvent || null;
 			var method  = data._serviceMethod || null;
 
-			if (
-				service !== null
-				&& method !== null
-				&& method.charAt(0) !== '@'
-			) {
+			if (method !== null) {
 
-				if (typeof service[method] === 'function') {
+				if (method.charAt(0) === '@') {
+
+					if (method === '@plug') {
+						_plug_service.call(this, data._serviceId, service);
+					} else if (method === '@unplug') {
+						_unplug_service.call(this, data._serviceId, service);
+					}
+
+				} else if (
+					service !== null
+					&& typeof service[method] === 'function'
+				) {
 
 					// Remove data frame service header
 					delete data._serviceId;
 					delete data._serviceMethod;
 
-					if (typeof service[method] === 'function') {
-						service[method](data);
-					}
+					service[method](data);
 
 				}
 
-			} else if (method.charAt(0) === '@') {
+			} else if (event !== null) {
 
-				if (method === '@plug') {
-					_plug_service.call(this, data._serviceId, service);
-				} else if (method === '@unplug') {
-					_unplug_service.call(this, data._serviceId, service);
+				if (
+					service !== null
+					&& typeof service.trigger === 'function'
+				) {
+
+					// Remove data frame service header
+					delete data._serviceId;
+					delete data._serviceEvent;
+
+					service.trigger(event, [ data ]);
+
 				}
 
 			}
@@ -114,7 +127,7 @@ lychee.define('lychee.net.Remote').tags({
 		var construct = this.__servicesmap[id] || null;
 		if (typeof construct === 'function') {
 
-			service = new construct();
+			service = new construct(this);
 			this.__services.push(service);
 
 
@@ -122,14 +135,15 @@ lychee.define('lychee.net.Remote').tags({
 				console.log('lychee.net.Remote: Plugged in Service (' + id + ')');
 			}
 
+
 			if (typeof service.plug === 'function') {
-				service.plug(this);
+				service.plug();
 			}
 
 
 			// Okay, Client, plugged Service! PONG
 			this.send({}, {
-				id: service.id,
+				id:     service.id,
 				method: '@plug'
 			});
 
@@ -139,14 +153,10 @@ lychee.define('lychee.net.Remote').tags({
 				console.log('lychee.net.Remote: Unplugged Service (' + id + ')');
 			}
 
-			if (typeof service.unplug === 'function') {
-				service.unplug();
-			}
-
 
 			// Nope, Client, unplug invalid Service! PONG
 			this.send({}, {
-				id: id,
+				id:     id,
 				method: '@unplug'
 			});
 
@@ -192,7 +202,7 @@ lychee.define('lychee.net.Remote').tags({
 			}
 
 			this.send({}, {
-				id: id,
+				id:     id,
 				method: '@unplug'
 			});
 
@@ -238,20 +248,6 @@ lychee.define('lychee.net.Remote').tags({
 			that.__socket.destroy();
 			that.__server.disconnect(that);
 
-
-			for (var s = 0, sl = that.__services.length; s < sl; s++) {
-
-				var service = that.__services[s];
-
-				if (typeof service.unplug === 'function') {
-					service.unplug();
-				}
-
-				that.__services.splice(s, 1);
-				sl--;
-
-			}
-
 		});
 
 		this.__socket.on('data', function(data) {
@@ -262,8 +258,28 @@ lychee.define('lychee.net.Remote').tags({
 			that.__protocol.close();
 		});
 
+		this.__socket.on('timeout', function(a,b,c) {
+console.log('SOCKET TIMEOUT', a,b,c, that.id);
+		});
+
 		this.__socket.on('end', function() {
+
 			that.__protocol.close(true);
+
+
+			var services = that.__services;
+
+			for (var s = 0; s < services.length; s++) {
+
+				var service = services[s];
+				if (typeof service.unplug === 'function') {
+					service.unplug();
+				}
+
+			}
+
+			that.__services = [];
+
 		});
 
 	};
@@ -330,17 +346,30 @@ lychee.define('lychee.net.Remote').tags({
 
 		send: function(data, service) {
 
-			if (data instanceof Object) {
+			data    = data instanceof Object    ? data    : null;
+			service = service instanceof Object ? service : null;
 
-				if (service instanceof Object) {
-					data._serviceId     = service.id || null;
-					data._serviceMethod = service.method || null;
-				}
+
+			if (
+				data === null
+				|| this.__protocol.isConnected() === false
+			) {
+				return false;
+			}
+
+
+			if (service !== null) {
+
+				if (typeof service.id     === 'string') data._serviceId     = service.id;
+				if (typeof service.event  === 'string') data._serviceEvent  = service.event;
+				if (typeof service.method === 'string') data._serviceMethod = service.method;
 
 			}
 
 
 			var blob = this.__encoder(data);
+
+
 			this.__protocol.write(blob);
 
 		},

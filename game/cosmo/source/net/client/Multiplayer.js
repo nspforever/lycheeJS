@@ -1,7 +1,7 @@
 
 lychee.define('game.net.client.Multiplayer').includes([
 	'lychee.event.Emitter'
-]).exports(function(lychee, global, game) {
+]).exports(function(lychee, game, global, attachments) {
 
 	var Class = function(client) {
 
@@ -11,6 +11,15 @@ lychee.define('game.net.client.Multiplayer').includes([
 
 
 		lychee.event.Emitter.call(this);
+
+
+		this.bind('update', function(data) {
+
+			if (data.session !== null) {
+				this.session = data.session;
+			}
+
+		}, this);
 
 	};
 
@@ -36,12 +45,29 @@ lychee.define('game.net.client.Multiplayer').includes([
 			if (typeof data.code === 'number') {
 
 				this.client.send({
-					code: data.code,
-					type: data.type || null
+					code: data.code
 				}, {
 					id:     this.id,
 					method: 'enter'
 				});
+
+			}
+
+		},
+
+		leave: function() {
+
+			if (this.session !== null) {
+
+				this.client.send({
+					code: this.session
+				}, {
+					id:     this.id,
+					method: 'leave'
+				});
+
+
+				this.session = null;
 
 			}
 

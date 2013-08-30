@@ -12,6 +12,7 @@
 				"Menu":     [ "js", "json", "png" ],
 				"Title":    [ "js", "png" ],
 
+				"HighscoreLayer":   [ "js" ],
 				"HUDLayer":         [ "js", "json", "png" ],
 				"MultiplayerLayer": [ "js" ],
 				"ResultLayer":      [ "js", "json", "png" ],
@@ -31,10 +32,12 @@
 		"net": {
 
 			"client": {
+				"Highscore":   [ "js" ],
 				"Multiplayer": [ "js" ]
 			},
 
 			"remote": {
+				"Highscore":   [ "js" ],
 				"Multiplayer": [ "js" ]
 			}
 

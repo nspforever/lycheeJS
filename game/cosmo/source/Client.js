@@ -1,6 +1,5 @@
 
 lychee.define('game.Client').requires([
-	'game.net.client.Controller',
 	'game.net.client.Highscore',
 	'game.net.client.Multiplayer'
 ]).includes([
@@ -9,8 +8,42 @@ lychee.define('game.Client').requires([
 
 	var _highscore   = game.net.client.Highscore;
 	var _multiplayer = game.net.client.Multiplayer;
-	var _controller  = game.net.client.Controller;
 
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _init_highscore = function(service) {
+
+		this.game.services.highscore = service;
+
+		var state = this.game.getState('menu');
+		var root  = state.getLayer('ui').getEntity('root');
+		if (root !== null) {
+			root.getEntity('highscore').setState('highscore');
+		}
+
+	};
+
+	var _init_multiplayer = function(service) {
+
+		this.game.services.multiplayer = service;
+
+		var state = this.game.getState('menu');
+		var root  = state.getLayer('ui').getEntity('root');
+		if (root !== null) {
+			root.getEntity('multiplayer').setState('multiplayer');
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(settings, game) {
 
@@ -22,56 +55,35 @@ lychee.define('game.Client').requires([
 
 		this.bind('connect', function() {
 
-			var ctservice = new _controller(this);
-			var hsservice = new _highscore(this);
-			var mpservice = new _multiplayer(this);
+			var highscore   = new _highscore(this);
+			var multiplayer = new _multiplayer(this);
 
-			ctservice.bind('init', function() {
-				this.game.services.controller = ctservice;
-			}, this, true);
+			highscore.bind(  '#init', _init_highscore,   this, true);
+			multiplayer.bind('#init', _init_multiplayer, this, true);
 
-			hsservice.bind('init', function() {
-				this.game.services.highscore = hsservice;
-			}, this, true);
-
-			mpservice.bind('init', function() {
-				this.game.services.multiplayer = mpservice;
-			}, this, true);
-
-
-			this.plug(ctservice);
-			this.plug(hsservice);
-			this.plug(mpservice);
-
-
-			mpservice.bind('start', function(data) {
-
-				if (this.game.isState('menu') === true) {
-
-					this.game.changeState('game', {
-						type:   'multiplayer',
-						player: data.player
-					});
-
-				}
-
-			}, this);
-
-			mpservice.bind('stop', function(data) {
-
-				if (this.game.isState('game') === true) {
-					this.game.changeState('menu');
-				}
-
-			}, this);
+			this.plug(highscore);
+			this.plug(multiplayer);
 
 		}, this);
 
 		this.bind('disconnect', function(code, reason) {
+
 			this.game.client               = null;
-			this.game.services.controller  = null;
 			this.game.services.highscore   = null;
 			this.game.services.multiplayer = null;
+
+
+			var state = this.game.getState('menu');
+			if (state !== null) {
+
+				var root = state.getLayer('ui').getEntity('root');
+				if (root !== null) {
+					root.getEntity('highscore').setState('highscore-disabled');
+					root.getEntity('multiplayer').setState('multiplayer-disabled');
+				}
+
+			}
+
 		}, this);
 
 

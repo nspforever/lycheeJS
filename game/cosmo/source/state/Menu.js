@@ -4,6 +4,7 @@ lychee.define('game.state.Menu').requires([
 	'game.entity.ui.Arrow',
 	'game.entity.ui.Menu',
 	'game.entity.ui.Title',
+	'game.entity.ui.HighscoreLayer',
 	'game.entity.ui.MultiplayerLayer',
 	'game.entity.ui.SettingsLayer',
 	'lychee.ui.Layer'
@@ -147,13 +148,6 @@ lychee.define('game.state.Menu').requires([
 
 	};
 
-	var _load_highscores = function() {
-
-		// TODO: Load Highscores via WebService
-		console.log('Loading Highscores...');
-
-	};
-
 
 
 	/*
@@ -274,7 +268,7 @@ lychee.define('game.state.Menu').requires([
 					 */
 
 					entity = new game.entity.ui.Menu({
-						state: 'multiplayer',
+						state: 'multiplayer-disabled',
 						position: {
 							x: -1/2 * width,
 							y: -1/2 * height
@@ -282,8 +276,7 @@ lychee.define('game.state.Menu').requires([
 					});
 
 
-					var client = this.game.client;
-					if (client !== null) {
+					if (this.game.client !== null) {
 
 						entity.bind('touch', function() {
 
@@ -301,20 +294,23 @@ lychee.define('game.state.Menu').requires([
 
 
 							if (layer !== null) {
+
 								root.bind('tween', function() {
 									layer.leave();
 								}, this, true);
+
 							}
 
 						}, this);
 
-					} else {
 
-						entity.setState('multiplayer-disabled');
+						if (this.game.services.multiplayer !== null) {
+							entity.setState('multiplayer');
+						}
 
 					}
 
-					root.addEntity(entity);
+					root.setEntity('multiplayer', entity);
 
 
 					entity = new game.entity.ui.MultiplayerLayer({
@@ -363,45 +359,50 @@ lychee.define('game.state.Menu').requires([
 					 */
 
 					entity = new game.entity.ui.Menu({
-						state: 'highscores',
+						state: 'highscore-disabled',
 						position: {
 							x:  3/2 * width,
 							y: -1/2 * height
 						}
 					});
 
-					entity.bind('touch', function() {
-						if (this.__locked === true) return false;
-						_navigate_vertical.call(this, 1);
-						_load_highscores.call(this);
-					}, this);
 
-					root.addEntity(entity);
+					if (this.game.client !== null) {
+
+						entity.bind('touch', function() {
+
+							if (this.__locked === true) return false;
 
 
-					var highscores = new lychee.ui.Layer({
-						width: width,
-						height: height,
+							var root  = this.getLayer('ui').getEntity('root');
+							var layer = root.getEntity('highscore-layer');
+							if (layer !== null) {
+								layer.enter();
+							}
+
+
+							_navigate_vertical.call(this, 1);
+
+						}, this);
+
+
+						if (this.game.services.highscore !== null) {
+							entity.setState('highscore');
+						}
+
+					}
+
+					root.setEntity('highscore', entity);
+
+
+					entity = new game.entity.ui.HighscoreLayer({
 						position: {
 							x: 3/2 * width,
 							y: 1/2 * height
 						}
-					});
+					}, this.game);
 
-
-					entity = new lychee.ui.Button({
-						label: 'Loading...',
-						font: this.game.fonts.normal,
-						position: {
-							x: 0,
-							y: 0
-						}
-					});
-
-					highscores.addEntity(entity);
-
-
-					root.addEntity(highscores);
+					root.setEntity('highscore-layer', entity);
 
 
 
@@ -459,7 +460,7 @@ lychee.define('game.state.Menu').requires([
 				} else {
 
 					layer.addEntity(new game.entity.ui.Menu({
-						state: 'blank',
+						state: 'default',
 						position: {
 							x: 0,
 							y: 0

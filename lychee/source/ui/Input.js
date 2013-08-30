@@ -226,6 +226,9 @@ lychee.define('lychee.ui.Input').includes([
 
 		render: function(renderer, offsetX, offsetY) {
 
+			if (this.visible === false) return;
+
+
 			var buffer = this.__buffer;
 			if (buffer === null) {
 

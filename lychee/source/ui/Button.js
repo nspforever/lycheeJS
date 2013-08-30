@@ -55,6 +55,9 @@ lychee.define('lychee.ui.Button').includes([
 
 		render: function(renderer, offsetX, offsetY) {
 
+			if (this.visible === false) return;
+
+
 			var position = this.position;
 
 			var x = position.x + offsetX;

@@ -70,7 +70,8 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 		settings.height = 312;
 
 
-		this.__cursor = 0;
+		this.__cursor  = 0;
+		this.__session = null;
 
 
 		lychee.ui.Layer.call(this, settings);
@@ -91,7 +92,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 
 			this.addEntity(new game.entity.ui.Menu({
-				state: 'blank'
+				state: 'default'
 			}));
 
 
@@ -184,9 +185,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			var service = this.game.services.multiplayer;
 			if (service !== null) {
 
-				service.bind('verification', function(data) {
-
-console.log('WOOT WOOT', data);
+				service.bind('session', function(data) {
 
 					if (data.code === null) {
 
@@ -198,10 +197,33 @@ console.log('WOOT WOOT', data);
 
 					} else {
 
+						this.__session = data.code;
+
 						if (typeof data.message === 'string') {
 							this.setMessage(data.message);
 						}
 
+					}
+
+				}, this);
+
+				service.bind('start', function(data) {
+
+					if (this.game.isState('menu') === true) {
+
+						this.game.changeState('game', {
+							type:   'multiplayer',
+							player: data.player
+						});
+
+					}
+
+				}, this);
+
+				service.bind('stop', function(data) {
+
+					if (this.game.isState('game') === true) {
+						this.game.changeState('menu');
 					}
 
 				}, this);
@@ -212,9 +234,21 @@ console.log('WOOT WOOT', data);
 
 		leave: function() {
 
+			this.resetCode();
+			this.setMessage(null);
+
+
 			var service = this.game.services.multiplayer;
 			if (service !== null) {
+
 				service.unbind('verification');
+				service.unbind('start');
+				service.unbind('stop');
+
+				if (this.__session !== null) {
+					service.leave();
+				}
+
 			}
 
 		},

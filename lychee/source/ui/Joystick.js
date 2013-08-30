@@ -112,6 +112,9 @@ lychee.define('lychee.ui.Joystick').includes([
 
 		render: function(renderer, offsetX, offsetY) {
 
+			if (this.visible === false) return;
+
+
 			var position = this.position;
 
 			var x = position.x + offsetX;
