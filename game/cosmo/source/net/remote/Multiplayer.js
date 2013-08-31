@@ -74,13 +74,20 @@ lychee.define('game.net.remote.Multiplayer').includes([
 	var _session_start = function(session) {
 
 		var players = session.players;
+
+		var playerids = [];
+		for (var p = 0, pl = players.length; p < pl; p++) {
+			playerids.push(players[p].id);
+		}
+
 		for (var p = 0, pl = players.length; p < pl; p++) {
 
-			var player = players[p];
+			var remote = players[p];
 
-			player.send({
+			remote.send({
 				session: session.code,
-				player:  (p + 1)
+				players: playerids,
+				player:  p
 			}, {
 				id:    this.id,
 				event: 'start'

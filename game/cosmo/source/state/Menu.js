@@ -253,8 +253,7 @@ lychee.define('game.state.Menu').requires([
 						if (this.__locked === true) return false;
 
 						this.game.changeState('game', {
-							type:   'singleplayer',
-							player: 1
+							type: 'singleplayer'
 						});
 
 					}, this);

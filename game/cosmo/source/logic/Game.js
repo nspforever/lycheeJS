@@ -167,16 +167,18 @@ lychee.define('game.logic.Game').requires([
 		this.loop     = game.loop;
 		this.renderer = game.renderer;
 
-		this.__scrollOffset = 0;
+		this.controller  = null;
+		this.controllers = [];
+
 
 		this.__background = null;
 		this.__level      = null;
 		this.__width      = null;
 		this.__height     = null;
-
 		this.__stage      = null;
-		this.__session    = { ship: null, stage: null };
+		this.__session    = { ships: [], stage: null };
 		this.__isRunning  = false;
+
 
 		lychee.event.Emitter.call(this);
 
@@ -277,6 +279,13 @@ console.log('processing touch!', position);
 
 		enter: function(stage, width, height) {
 
+			/*
+			 * CLEANUP
+			 */
+
+			this.controller  = null;
+			this.controllers = [];
+
 			if (this.__level !== null) {
 				this.__level.unbind('failure');
 				this.__level.unbind('success');
@@ -286,6 +295,11 @@ console.log('processing touch!', position);
 			this.__width  = width;
 			this.__height = height;
 
+
+
+			/*
+			 * LEVEL SETUP
+			 */
 
 			var data = {
 				points: null,
@@ -318,6 +332,53 @@ console.log('processing touch!', position);
 			this.__stage = newstage;
 
 
+
+			/*
+			 * CONTROLLER SETUP
+			 */
+
+console.log(stage);
+
+			if (stage.type === 'singleplayer') {
+
+				var controller = new _controller({
+					id:   stage.players[0],
+					mode: _controller.MODE.local,
+					ship: this.__level.ships[0] || null
+				}, null);
+
+				this.controllers.push(controller);
+				this.controller = controller;
+
+			} else if (stage.type === 'multiplayer') {
+
+				var service = this.game.services.multiplayer;
+
+				for (var p = 0, pl = stage.players.length; p < pl; p++) {
+
+					var controller = new _controller({
+						id:   stage.players[p],
+						mode: _controller.MODE.online,
+						ship: this.__level.ships[p] || null
+					}, service);
+
+					this.controllers.push(controller);
+
+
+					if (p === stage.player) {
+						this.controller = controller;
+					}
+
+				}
+
+			}
+
+
+
+			/*
+			 * BACKGROUND SETUP
+			 */
+
 			this.__background = new _background({
 				width:  width,
 				height: height
@@ -347,6 +408,8 @@ console.log('processing touch!', position);
     		var ship = level.ships[0];
 			var miny = -1/2 * this.__height;
 			var maxy =  1/2 * this.__height;
+			var minx = -1/2 * this.__width;
+			var maxx =  1/2 * this.__width;
 
 
 			var config = {
@@ -466,10 +529,6 @@ console.log('processing touch!', position);
 				});
 
 			}
-
-
-			this.__scrollOffset += config.scrolly;
-
 
 
 			if (enemyhits !== 0) {

@@ -209,8 +209,9 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 					if (this.game.isState('menu') === true) {
 
 						this.game.changeState('game', {
-							type:   'multiplayer',
-							player: data.player
+							type:    'multiplayer',
+							players: data.players,
+							player:  data.player
 						});
 
 					}

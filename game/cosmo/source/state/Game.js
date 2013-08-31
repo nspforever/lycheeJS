@@ -70,9 +70,10 @@ lychee.define('game.state.Game').requires([
 
 			if (data === null) data = {};
 
-			data.level  = typeof data.level === 'string'  ? data.level    : 'stage1';
-			data.player = typeof data.player === 'number' ? data.player   : 1;
-			data.type   = data.type === 'multiplayer'     ? 'multiplayer' : 'singeplayer';
+			data.type    = data.type === 'multiplayer'     ? 'multiplayer' : 'singleplayer';
+			data.level   = typeof data.level === 'string'  ? data.level    : 'stage1';
+			data.players = data.players instanceof Array   ? data.players  : [ 'local:1337' ];
+			data.player  = typeof data.player === 'number' ? data.player   : 0;
 
 
 			var renderer   = this.renderer;
@@ -205,8 +206,11 @@ lychee.define('game.state.Game').requires([
 			} else {
 
 				var logic = this.logic;
-				if (logic !== null) {
-					logic.processKey(key);
+				if (
+					   logic !== null
+					&& logic.controller !== null
+				) {
+					logic.controller.processKey(key);
 				}
 
 			}
@@ -239,8 +243,11 @@ lychee.define('game.state.Game').requires([
 				}
 
 				var logic = this.logic;
-				if (logic !== null) {
-					logic.processTouch(position);
+				if (
+					   logic !== null
+					&& logic.controller !== null
+				) {
+					logic.controller.processTouch(position);
 				}
 
 			}

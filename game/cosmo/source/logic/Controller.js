@@ -38,13 +38,14 @@ lychee.define('game.logic.Controller').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(data, game) {
+	var Class = function(data, service) {
 
 		var settings = lychee.extend({}, data);
 
 
-		this.game   = game;
-		this.client = game.client || null;
+		this.id      = settings.id || null;
+		this.service = service || null;
+
 
 		this.mode  = Class.MODE.local;
 		this.ship  = null;
@@ -52,6 +53,11 @@ lychee.define('game.logic.Controller').requires([
 
 		this.setMode(settings.mode);
 		this.setShip(settings.ship);
+
+
+		if (this.service !== null) {
+			_bind_service.call(this);
+		}
 
 
 		settings = null;
