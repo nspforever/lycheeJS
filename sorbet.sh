@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# lycheeJS Forge
+# lycheeJS Sorbet
 #
-# Copyright (c) 2012 by Christoph Martens
+# Copyright (c) 2013 by Christoph Martens
 #
 # This project is released under the terms
 # of the MIT License
@@ -15,7 +15,9 @@
 UNAME_P=$(uname -p);
 NODEJS=$(which nodejs);
 NODE=$(which node);
-FORGE_ROOT=$(cd "$(dirname "$0")"; pwd);
+SORBET_ROOT=$(cd "$(dirname "$0")"; pwd);
+SORBET_LOG=$SORBET_ROOT/log.txt;
+SORBET_PID=$SORBET_ROOT/.pid;
 
 
 
@@ -23,7 +25,7 @@ usage() {
 
 cat <<EOF
 
-lycheeJS Forge v0.7
+lycheeJS Sorbet v0.8
 
 This program comes with ABSOLUT NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -39,15 +41,15 @@ Tasks:
 
     help          Shows this help message
     install       Installs a third-party github project into /external
-    start         Starts the WebServer
-    stop          Stops the WebServer
-    restart       Restarts the WebServer
-    status        Checks whether the WebServer is running or not
+    start         Starts the webserver
+    stop          Stops the webserver
+    restart       Restarts the webserver
+    status        Checks whether the webserver is running or not
 
 Options:
 
     start <profile>
-    <profile> is the ID of the profile to use. All profiles are located inside the /forge/profile/ folder.
+    <profile> is the ID of the profile to use. All profiles are located inside the /sorbet/profile/ folder.
 
     install <url> <name>
     <url> is a URL to the zip archive (of the specific branch) on github. The project will be installed to /external/<name>.
@@ -59,7 +61,6 @@ Examples:
     $0 stop
     $0 install https://github.com/martensms/lycheejs.org/archive/master.zip lycheejs.org
     $0 start lycheejs.org
-
 
 EOF
 
@@ -101,10 +102,10 @@ finish() {
 	if [ $1 -eq 1 ]
 	then
 
-		echo -e "\n\nERROR: It seems as lycheeJS Forge had a problem.\n\n";
+		echo -e "\n\nERROR: It seems as lycheeJS Sorbet had a problem.\n\n";
 		echo -e "If this error occurs though following the guidelines,";
 		echo -e "please report an issue at https://github.com/martensms/lycheeJS/issues";
-		echo -e "and attach the ./log file to it. Thanks!";
+		echo -e "and attach the ./log.txt file to it. Thanks!";
 
 	fi;
 
@@ -116,49 +117,45 @@ finish() {
 # install_project "http://url/to/file.zip" "name"
 install_project() {
 
-	echo -e "\n\n~ ~ ~ install_project($1 $2) ~ ~ ~\n" >> $FORGE_ROOT/log;
+	echo -e "\n\n~ ~ ~ install_project($1 $2) ~ ~ ~\n" >> $SORBET_LOG;
 
-	cd $FORGE_ROOT;
-	echo -e "Preparing folder structure:\n" >> $FORGE_ROOT/log;
+	cd $SORBET_ROOT;
+	echo -e "Preparing folder structure:\n" >> $SORBET_LOG;
 
-	if [ ! -d "$FORGE_ROOT/external" ]
+	if [ ! -d "$SORBET_ROOT/external" ]
 	then
-		mkdir "$FORGE_ROOT/external" >> $FORGE_ROOT/log 2>&1;
+		mkdir "$SORBET_ROOT/external" >> $SORBET_LOG 2>&1;
 	fi;
 
-	if [ ! -d "$FORGE_ROOT/external/.temp" ]
+	if [ ! -d "$SORBET_ROOT/external/.temp" ]
 	then
-
-		mkdir "$FORGE_ROOT/external/.temp" >> $FORGE_ROOT/log 2>&1;
+		mkdir "$SORBET_ROOT/external/.temp" >> $SORBET_LOG 2>&1;
 		check_success;
-
 	fi;
 
 
-	if [ -d "$FORGE_ROOT/external/$2" ]
+	if [ -d "$SORBET_ROOT/external/$2" ]
 	then
-
-		echo -e "ERROR: Folder already exists (external/$2)\n" >> $FORGE_ROOT/log;
+		echo -e "ERROR: Folder already exists (external/$2)\n" >> $SORBET_LOG;
 		check_success_step "FAILURE";
-
 	fi;
 
 
-	echo -e "Downloading zip file:\n" >> $FORGE_ROOT/log;
-	wget -O "external/$2.zip" "$1" >> $FORGE_ROOT/log 2>&1;
+	echo -e "Downloading zip file:\n" >> $SORBET_LOG;
+	wget -O "external/$2.zip" "$1" >> $SORBET_LOG 2>&1;
 	check_success "Could not download zip file (wget)";
 
-	echo -e "Extracting zip file:\n" >> $FORGE_ROOT/log;
-	unzip "external/$2.zip" -d "external/.temp" >> $FORGE_ROOT/log 2>&1;
+	echo -e "Extracting zip file:\n" >> $SORBET_LOG;
+	unzip "external/$2.zip" -d "external/.temp" >> $SORBET_LOG 2>&1;
 	check_success "Could not extract zip file (unzip)";
 
-	rm "external/$2.zip" >> $FORGE_ROOT/log 2>&1;
+	rm "external/$2.zip" >> $SORBET_LOG 2>&1;
 	check_success "Could not cleanup zip file";
 
-	mv $FORGE_ROOT/external/.temp/"$2"-* "$FORGE_ROOT/external/$2" >> $FORGE_ROOT/log 2>&1;
+	mv $SORBET_ROOT/external/.temp/"$2"-* "$SORBET_ROOT/external/$2" >> $SORBET_LOG 2>&1;
 	check_success "Could not move extracted files to external/$2";
 
-	rm -rf "$FORGE_ROOT/external/.temp" >> $FORGE_ROOT/log 2>&1;
+	rm -rf "$SORBET_ROOT/external/.temp" >> $SORBET_LOG 2>&1;
 	check_success "Could not cleanup temporary folder";
 
 
@@ -166,21 +163,19 @@ install_project() {
 
 }
 
-start_webserver() {
+start_sorbet() {
 
-	echo -e "\n\n~ ~ ~ start_webserver($1) ~ ~ ~\n" >> $FORGE_ROOT/log;
+	echo -e "\n\n~ ~ ~ start_sorbet($1) ~ ~ ~\n" >> $SORBET_LOG;
 
-	echo -e "Environment: "$(uname -a)"\n" >> $FORGE_ROOT/log;
-
-
-	cd $FORGE_ROOT;
+	echo -e "Environment: "$(uname -a) >> $SORBET_LOG;
 
 
-	if [ -f "$FORGE_ROOT/.pid" ]
+	cd $SORBET_ROOT;
+
+
+	if [ -f "$SORBET_PID" ]
 	then
-
-		echo -e "Forge is already running!";
-
+		echo -e "Sorbet is already running!";
 	else
 
 		nodejs_command="";
@@ -196,23 +191,21 @@ start_webserver() {
 		fi;
 
 
-		echo -e "NodeJS command: $nodejs_command\n" >> $FORGE_ROOT/log;
+		echo -e "nodejs_command: $nodejs_command" >> $SORBET_LOG;
 
 
 		if [ "$nodejs_command" != "" ]
 		then
 
-#			$NODEJS init-nodejs.js >> $FORGE_ROOT/log 2>&1;
+			cd $SORBET_ROOT/sorbet;
 
-			cd $FORGE_ROOT/forge;
+			nohup $nodejs_command init.js $1 >> $SORBET_LOG &
+			sorbet_pid=$!;
 
-			nohup $nodejs_command init-nodejs.js $1 >> $FORGE_ROOT/log &
-			FORGE_PID=$!;
-
-			echo $FORGE_PID > $FORGE_ROOT/.pid;
+			echo $sorbet_pid > $SORBET_PID;
 			check_success;
 
-			echo -e "Process ID is $FORGE_PID\n" >> $FORGE_ROOT/log;
+			echo -e "sorbet_pid: $sorbet_pid.\n" >> $SORBET_LOG;
 		
 		fi;
 
@@ -222,31 +215,32 @@ start_webserver() {
 
 }
 
-stop_webserver() {
+stop_sorbet() {
 
-	echo -e "\n\n~ ~ ~ stop_webserver() ~ ~ ~\n" >> $FORGE_ROOT/log;
+	echo -e "\n\n~ ~ ~ stop_sorbet() ~ ~ ~\n" >> $SORBET_LOG;
 
-	cd $FORGE_ROOT;
+	cd $SORBET_ROOT;
 
 
-	if [ -f "$FORGE_ROOT/.pid" ]
+	if [ -f "$SORBET_PID" ]
 	then
 
-		FORGE_PID=$(cat $FORGE_ROOT/.pid);
+		sorbet_pid=$(cat $SORBET_PID);
 
-		echo -e "Process ID is $FORGE_PID\n" >> $FORGE_ROOT/log;
+		echo -e "Process ID is $sorbet_pid.\n" >> $SORBET_LOG;
 
-		if [ "$FORGE_PID" != "" ]
+		if [ "$sorbet_pid" != "" ]
 		then
 
-			if ps -p $FORGE_PID > /dev/null
+			if ps -p $sorbet_pid > /dev/null
 			then
-				kill $FORGE_PID > /dev/null 2>&1;
+				pkill -P $sorbet_pid > /dev/null 2>&1;
+				kill $sorbet_pid > /dev/null 2>&1;
 			fi;
 
 		fi;
 
-		rm "$FORGE_ROOT/.pid" >> $FORGE_ROOT/log 2>&1;
+		rm "$SORBET_PID" >> $SORBET_LOG 2>&1;
 		check_success "Could not cleanup PID file";
 
 	fi;
@@ -267,7 +261,7 @@ case "$1" in
 
 	install)
 
-		echo -e "\nInstalling external github project...";
+		echo -e "\nInstalling external github project ...";
 		install_project "$2" "$3";
 
 		exit;
@@ -275,34 +269,31 @@ case "$1" in
 
 	start)
 
-		echo -e "\nStarting WebServer...";
+		echo -e "\nStarting Sorbet ...";
 
 		profile="$2";
 
-		if [ ! -f "$FORGE_ROOT/forge/profile/$profile.json" ]
+		if [ ! -f "$SORBET_ROOT/sorbet/profile/$profile.json" ]
 		then
-
 			echo -e "\tInvalid <profile>, falling back to 'default'.";
-
 			profile="default";
-
 		fi;
 
 
-		start_webserver $profile;
+		start_sorbet $profile;
 
 		exit;
 		;;
 
 	status)
 
-		if [ -f "$FORGE_ROOT/.pid" ]
+		if [ -f "$SORBET_PID" ]
 		then
 
-			FORGE_PID=$(cat $FORGE_ROOT/.pid);
-			FORGE_STATUS=$(ps -e | grep $FORGE_PID | grep -v grep);
+			sorbet_pid=$(cat $SORBET_PID);
+			sorbet_status=$(ps -e | grep $sorbet_pid | grep -v grep);
 
-			if [ "$FORGE_STATUS" != "" ]
+			if [ "$sorbet_status" != "" ]
 			then
 				echo -e "Running";
 				exit 0;
@@ -318,22 +309,20 @@ case "$1" in
 
 		fi;
 
-# ps -e | grep 4022 | grep -v grep
-
 		exit;
 		;;
 
 	stop)
 
-		echo -e "\nStopping WebServer...";
-		stop_webserver;
+		echo -e "\nStopping Sorbet ...";
+		stop_sorbet;
 
 		exit;
 		;;
 
 	restart)
 
-		echo -e "\nRestarting WebServer...";
+		echo -e "\nRestarting Sorbet ...";
 
 		profile="$2";
 		if [ "$profile" == "" ]
@@ -342,8 +331,8 @@ case "$1" in
 		fi;
 
 
-		stop_webserver;
-		start_webserver $profile;
+		stop_sorbet;
+		start_sorbet $profile;
 
 		exit;
 		;;

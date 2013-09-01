@@ -52,5 +52,10 @@ lychee.build(function(lychee, global) {
 
 	main.listen(config.port);
 
+
+	process.on('exit', function() {
+		main.terminate();
+	});
+
 }, typeof global !== 'undefined' ? global : this);
 

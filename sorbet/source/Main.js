@@ -16,6 +16,7 @@ lychee.define('sorbet.Main').requires([
 	var zlib = require('zlib');
 
 
+
 	var _filesystem = sorbet.data.Filesystem;
 	var _map        = sorbet.data.Map;
 	var _module     = sorbet.module;
@@ -428,6 +429,24 @@ lychee.define('sorbet.Main').requires([
 
 
 			return response;
+
+		},
+
+		terminate: function() {
+
+			var servers = this.servers;
+
+			for (var s = 0, sl = servers.length; s < sl; s++) {
+
+				var server = servers[s];
+
+				if (lychee.debug === true) {
+					console.log('sorbet.Main: Terminating ' + server.id + ' (' + server.pid + ')');
+				}
+
+				server.exit(0);
+
+			}
 
 		}
 
