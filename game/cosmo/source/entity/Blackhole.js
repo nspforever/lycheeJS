@@ -89,7 +89,7 @@ lychee.define('game.entity.Blackhole').includes([
 					var disty   = (position.y - oposition.y);
 					var gravity = 0;
 
-					var inxrange = distx > -1 * radius && distx < 1 * radius;
+					var inxrange = distx > -2 * radius && distx < 2 * radius;
 					var inyrange = disty > -2 * radius && disty < 2 * radius;
 
 					if (
@@ -99,19 +99,18 @@ lychee.define('game.entity.Blackhole').includes([
 							&& inyrange === true
 						) || (
 							   otype === 'lazer'
+							&& inxrange === true
 							&& inyrange === true
 						)
 					) {
 
-						gravity = radius * 2 / distx;
-//						gravity = distx / radius;
-						if (gravity > 0) {
-							gravity =  1 - gravity;
-						} else {
-							gravity = -1 - gravity;
-						}
+						var dx = distx / (2 * radius);
 
-						ovelocity.x += gravity * 80;
+						gravity = Math.pow(dx, 2);
+
+						if (distx < 0) gravity = -1 * gravity;
+
+						ovelocity.x += gravity * 160;
 
 					}
 

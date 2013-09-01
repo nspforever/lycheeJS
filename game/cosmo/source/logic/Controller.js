@@ -38,26 +38,18 @@ lychee.define('game.logic.Controller').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(data, service) {
+	var Class = function(id, data) {
 
 		var settings = lychee.extend({}, data);
 
 
-		this.id      = settings.id || null;
-		this.service = service || null;
-
+		this.id = id || null;
 
 		this.mode  = Class.MODE.local;
 		this.ship  = null;
 
-
 		this.setMode(settings.mode);
 		this.setShip(settings.ship);
-
-
-		if (this.service !== null) {
-			_bind_service.call(this);
-		}
 
 
 		settings = null;
@@ -72,6 +64,18 @@ lychee.define('game.logic.Controller').requires([
 
 
 	Class.prototype = {
+
+		/*
+		 * SERVICE INTEGRATION
+		 */
+
+		control: function(data) {
+
+			console.log('control()', this.id, data);
+
+		},
+
+
 
 		/*
 		 * LOGIC INTEGRATION
@@ -130,6 +134,12 @@ lychee.define('game.logic.Controller').requires([
 			}
 
 		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
 
 		setMode: function(mode) {
 

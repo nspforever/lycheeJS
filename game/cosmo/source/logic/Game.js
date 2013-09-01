@@ -56,26 +56,19 @@ lychee.define('game.logic.Game').requires([
 
 		var level = -1;
 
-		for (var levelid in _config.upgrade) {
+		for (var levelid in _config.level) {
 
-			var min = _config.upgrade[levelid];
-			if (min < points) {
-				level = parseInt(levelid, 10);
-				console.log('upgrade!', level, points, min);
-			}
+			var current = parseInt(levelid, 10);
+			var next    = current + 1;
 
-		}
+			var currentmin = _config.level[current];
+			var nextmin    = _config.level[next] || Infinity;
 
-
-		var levelids = Object.keys(_config.downgrade);
-		for (var l = levelids.length - 1; l >= 0; l--) {
-
-			var levelid = levelids[l];
-
-			var max = _config.downgrade[levelid];
-			if (max > points) {
-				level = parseInt(levelid, 10);
-				console.log('downgrade!', level, points, max);
+			if (
+				   points > currentmin
+				&& points < nextmin
+			) {
+				level = current;
 			}
 
 		}
@@ -119,8 +112,8 @@ lychee.define('game.logic.Game').requires([
 			if (newlevel > oldlevel) {
 				ship.setState('upgrade' + newlevel);
 				data.health = 100;
-			} else if (newlevel < oldlevel) {
-				ship.setState('downgrade' + newlevel);
+//			} else if (newlevel < oldlevel) {
+//				ship.setState('downgrade' + newlevel);
 			}
 
 
@@ -137,15 +130,15 @@ lychee.define('game.logic.Game').requires([
 					var level = parseInt(state.substr(-1), 10);
 					this.setState('level' + level);
 
-				} else if (state.substr(0, 9) === 'downgrade') {
-
-					var level = parseInt(state.substr(-1), 10) - 1;
-					if (level > 0) {
-						this.setState('level' + level);
-					} else {
-						this.setState('default');
-					}
-
+//				} else if (state.substr(0, 9) === 'downgrade') {
+//
+//					var level = parseInt(state.substr(-1), 10) - 1;
+//					if (level > 0) {
+//						this.setState('level' + level);
+//					} else {
+//						this.setState('default');
+//					}
+//
 				}
 
 			}, ship);
@@ -207,23 +200,11 @@ lychee.define('game.logic.Game').requires([
 		 * LOGIC INTERACTION
 		 */
 
-		processKey: function(key) {
-
-console.log('processing key!', key);
-
-		},
-
-		processTouch: function(position) {
-
-console.log('processing touch!', position);
-
-		},
-
 		spawn: function(construct, posarray, velarray, owner) {
 
 			posarray = posarray instanceof Array ? posarray : null;
 			velarray = velarray instanceof Array ? velarray : null;
-			owner    = typeof owner === 'string' ? owner    : null;
+			owner    = owner !== undefined       ? owner    : null;
 
 
 			if (
@@ -238,14 +219,19 @@ console.log('processing touch!', position);
 						this.jukebox.play('ship-lazer');
 					}
 
+					var data  = null;
+					var index = this.__level.ships.indexOf(owner);
+					if (index !== -1) {
 
-					var data = this.__level.data;
-					for (var a = 0, al = posarray.length; a < al; a++) {
-						data.points -= 10;
+						data = this.__level.data[index];
+
+						for (var a = 0, al = posarray.length; a < al; a++) {
+							data.points -= 10;
+						}
+
+						_process_update.apply(this, this.__level.data);
+
 					}
-
-
-					_process_update.call(this, data, true);
 
 				}
 
@@ -282,6 +268,15 @@ console.log('processing touch!', position);
 			/*
 			 * CLEANUP
 			 */
+
+			var service = this.game.services.multiplayer;
+			if (service !== null) {
+
+				for (var c = 0, cl = this.controllers.length; c < cl; c++) {
+					service.unbind('control', this.controllers[c].control, this.controllers[c]);
+				}
+
+			}
 
 			this.controller  = null;
 			this.controllers = [];
@@ -337,36 +332,48 @@ console.log('processing touch!', position);
 			 * CONTROLLER SETUP
 			 */
 
-console.log(stage);
-
 			if (stage.type === 'singleplayer') {
 
-				var controller = new _controller({
-					id:   stage.players[0],
+				var controller = new _controller(stage.players[0], {
 					mode: _controller.MODE.local,
 					ship: this.__level.ships[0] || null
-				}, null);
+				});
 
 				this.controllers.push(controller);
 				this.controller = controller;
 
 			} else if (stage.type === 'multiplayer') {
 
-				var service = this.game.services.multiplayer;
-
 				for (var p = 0, pl = stage.players.length; p < pl; p++) {
 
-					var controller = new _controller({
-						id:   stage.players[p],
+					var controller = new _controller(stage.players[p], {
 						mode: _controller.MODE.online,
 						ship: this.__level.ships[p] || null
-					}, service);
+					});
 
 					this.controllers.push(controller);
 
 
 					if (p === stage.player) {
 						this.controller = controller;
+					}
+
+				}
+
+
+				var service = this.game.services.multiplayer;
+				if (service !== null) {
+
+					for (var c = 0, cl = this.controllers.length; c < cl; c++) {
+
+						var controller = this.controllers[c];
+
+						service.bind(
+							'control-' + controller.id,
+							controller.control,
+							controller
+						);
+
 					}
 
 				}

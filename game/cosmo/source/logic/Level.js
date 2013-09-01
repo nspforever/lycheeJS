@@ -250,7 +250,7 @@ lychee.define('game.logic.Level').requires([
 					|| entity instanceof _meteor
 				) {
 
-					if (points === true) {
+					if (ship !== null) {
 
 						data.points += entity.points;
 						data.destroyed++;
@@ -317,7 +317,7 @@ lychee.define('game.logic.Level').requires([
 					this.destroy(passive, active.owner);
 					diff -= 2;
 				} else {
-					this.destroy(active,  false);
+					this.destroy(active);
 					diff -= 1;
 				}
 

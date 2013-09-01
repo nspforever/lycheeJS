@@ -19,14 +19,29 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	var _get_level = function(points) {
 
-		var currentlvl = 0;
-		for (var lvlid in _gameconfig.upgrade) {
-			if (_gameconfig.upgrade[lvlid] < points) {
-				currentlvl = parseInt(lvlid, 10);
+		var level = 0;
+
+		for (var levelid in _config.level) {
+
+			var current = parseInt(levelid, 10);
+			var next    = current + 1;
+
+			var currentmin = _config.level[current];
+			var nextmin    = _config.level[next] || Infinity;
+
+console.log(points, typeof points);
+
+			if (
+				   points > currentmin
+				&& points < nextmin
+			) {
+				level = current;
 			}
+
 		}
 
-		return isNaN(currentlvl) ? 0 : currentlvl;
+
+		return level;
 
 	};
 
@@ -59,8 +74,13 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		level     =  _get_level(data.points);
 		points    =  _get_points(data.points);
 
+console.log(level, data.points);
+
 		shield.w  = shield._x  + (shield._w  * (data.health / 100));
-		upgrade.w = upgrade._x + (upgrade._w * (data.points / (_gameconfig.upgrade['' + (level + 1)] || 999999999)));
+		upgrade.w = upgrade._x + (upgrade._w * (data.points / (_gameconfig.level['' + (level + 1)] || 999999999)));
+
+		this.__map.level  = '' + level;
+		this.__map.points = '' + points;
 
 	};
 
@@ -81,10 +101,11 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		this.texture = _texture;
 
 		this.__font           = game.fonts.hud;
-		this.__points         = '00000000';
 		this.__map            = {};
 		this.__map.background = _config.map.background;
 		this.__map.bar        = _config.map.bar;
+		this.__map.level      = '0';
+		this.__map.points     = '00000000';
 
 		var shield = _config.map.shield;
 		this.__map.shield = {
@@ -181,9 +202,16 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 
 				renderer.drawText(
+					x1,
+					y1 + 92,
+					map.level,
+					this.__font
+				);
+
+				renderer.drawText(
 					x1 + 34,
 					y1 + 92,
-					this.__points,
+					map.points,
 					this.__font
 				);
 
@@ -198,8 +226,6 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		 */
 
 		processUpdate: function(player1, player2) {
-
-console.log(player1, player2);
 
 			_process_update.call(this, player1, 0);
 
