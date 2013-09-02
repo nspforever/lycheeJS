@@ -8,6 +8,7 @@
 		"data": {
 			"Filesystem": [ "js" ],
 			"Map":        [ "js" ],
+			"Profile":    [ "js" ],
 			"Template":   [ "js" ],
 			"VHost":      [ "js" ]
 		},
