@@ -1,6 +1,8 @@
 
 lychee.define('game.logic.Controller').requires([
 	'game.entity.Ship'
+]).includes([
+	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _ship = game.entity.Ship;
@@ -52,6 +54,8 @@ lychee.define('game.logic.Controller').requires([
 		this.setShip(settings.ship);
 
 
+		lychee.event.Emitter.call(this);
+
 		settings = null;
 
 	};
@@ -59,7 +63,7 @@ lychee.define('game.logic.Controller').requires([
 
 	Class.MODE = {
 		local:  0,
-		remote: 1
+		online: 1
 	};
 
 
@@ -71,7 +75,25 @@ lychee.define('game.logic.Controller').requires([
 
 		control: function(data) {
 
-			console.log('control()', this.id, data);
+			data.id     = typeof data.id === 'string'     ? data.id     : null;
+			data.method = typeof data.method === 'string' ? data.method : null;
+			data.args   = data.args instanceof Array      ? data.args   : null;
+
+
+			if (
+				   data.id !== null
+				&& data.id === this.id
+				&& data.method !== null
+				&& data.args !== null
+			) {
+
+				var method = data.method;
+				var args   = data.args;
+				if (typeof this[method] === 'function') {
+					this[method].apply(this, args);
+				}
+
+			}
 
 		},
 
@@ -82,9 +104,6 @@ lychee.define('game.logic.Controller').requires([
 		 */
 
 		processKey: function(key) {
-
-			if (this.mode !== Class.MODE.local) return;
-
 
 			var ship = this.ship;
 			if (ship !== null) {
@@ -98,6 +117,19 @@ lychee.define('game.logic.Controller').requires([
 					case 'space':           ship.fire();  break;
 
 				}
+
+			}
+
+
+			if (this.mode === Class.MODE.online) {
+
+				var data = {
+					id:     this.id,
+					method: 'processKey',
+					args:   [ key ]
+				};
+
+				this.trigger('control', [ data ]);
 
 			}
 

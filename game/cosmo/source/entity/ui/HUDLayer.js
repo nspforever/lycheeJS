@@ -29,8 +29,6 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 			var currentmin = _config.level[current];
 			var nextmin    = _config.level[next] || Infinity;
 
-console.log(points, typeof points);
-
 			if (
 				   points > currentmin
 				&& points < nextmin
@@ -73,8 +71,6 @@ console.log(points, typeof points);
 
 		level     =  _get_level(data.points);
 		points    =  _get_points(data.points);
-
-console.log(level, data.points);
 
 		shield.w  = shield._x  + (shield._w  * (data.health / 100));
 		upgrade.w = upgrade._x + (upgrade._w * (data.points / (_gameconfig.level['' + (level + 1)] || 999999999)));

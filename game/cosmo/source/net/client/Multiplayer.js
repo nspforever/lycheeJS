@@ -71,6 +71,28 @@ lychee.define('game.net.client.Multiplayer').includes([
 
 			}
 
+		},
+
+		control: function(data) {
+
+console.log('CONTROLLING!', data);
+
+			if (
+				   this.session !== null
+				&& typeof data.id === 'string'
+				&& typeof data.method === 'string'
+				&& data.args instanceof Array
+			) {
+
+				data.session = this.session;
+
+				this.client.send(data, {
+					id:     this.id,
+					method: 'control'
+				});
+
+			}
+
 		}
 
 	};

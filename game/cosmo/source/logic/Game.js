@@ -273,7 +273,8 @@ lychee.define('game.logic.Game').requires([
 			if (service !== null) {
 
 				for (var c = 0, cl = this.controllers.length; c < cl; c++) {
-					service.unbind('control', this.controllers[c].control, this.controllers[c]);
+					var controller = this.controllers[c];
+					service.unbind('control-' + controller.id, controller.control, controller);
 				}
 
 			}
@@ -373,6 +374,8 @@ lychee.define('game.logic.Game').requires([
 							controller.control,
 							controller
 						);
+
+						controller.bind('control', service.control, service);
 
 					}
 

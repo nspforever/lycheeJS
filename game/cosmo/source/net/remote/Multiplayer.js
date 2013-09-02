@@ -97,6 +97,49 @@ lychee.define('game.net.remote.Multiplayer').includes([
 
 	};
 
+	var _session_control = function(session, data) {
+
+		var broadcast = false;
+
+		var players = session.players;
+		for (var p = 0, pl = players.length; p < pl; p++) {
+
+			var remote = players[p];
+			if (remote.id === data.id) {
+				broadcast = true;
+			}
+
+		}
+
+
+		if (broadcast === true) {
+
+			var packet = {
+				id:     data.id     || null,
+				method: data.method || null,
+				args:   data.args   || null
+			};
+
+console.log('BROADCASTING PACKET!', packet, session.code);
+
+			for (var p = 0, pl = players.length; p < pl; p++) {
+
+				var remote = players[p];
+				if (remote.id !== data.id) {
+
+					remote.send(packet, {
+						id:    this.id,
+						event: 'control-' + data.id
+					});
+
+				}
+
+			}
+
+		}
+
+	};
+
 	var _session_stop = function(session) {
 
 		var players = session.players;
@@ -226,6 +269,27 @@ lychee.define('game.net.remote.Multiplayer').includes([
 						_session_full.call(this, session);
 
 					}
+
+				}
+
+			}
+
+		},
+
+		control: function(data) {
+
+			var code = data.code;
+			if (code !== null) {
+
+				var session = _sessions[code] || null;
+
+				// 2. Broadcast Control Action
+				if (
+					   session !== null
+					&& session.ready === true
+				) {
+
+					_session_control.call(this, session, data);
 
 				}
 
