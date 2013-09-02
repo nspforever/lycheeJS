@@ -85,6 +85,13 @@ lychee.define('game.net.remote.Multiplayer').includes([
 			var remote = players[p];
 
 			remote.send({
+				session: session.code
+			}, {
+				id:    this.id,
+				event: 'session'
+			});
+
+			remote.send({
 				session: session.code,
 				players: playerids,
 				player:  p
@@ -118,14 +125,9 @@ lychee.define('game.net.remote.Multiplayer').includes([
 				id: data.id || null
 			};
 
-			if (data.key !== null)      packet.key      = data.key;
-			if (data.position !== null) packet.position = data.position;
-			if (data.touch !== null)    packet.touch    = data.touch;
-
-
-
-console.log('BROADCASTING!', packet, session.code);
-
+			if (data.key !== undefined)    packet.key    = data.key;
+			if (data.update !== undefined) packet.update = data.update;
+			if (data.touch !== undefined)  packet.touch  = data.touch;
 
 
 			for (var p = 0, pl = players.length; p < pl; p++) {

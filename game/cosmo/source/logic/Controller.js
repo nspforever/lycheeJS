@@ -73,17 +73,50 @@ lychee.define('game.logic.Controller').requires([
 		 * SERVICE INTEGRATION
 		 */
 
+		sync: function() {
+
+			var ship = this.ship;
+			if (ship !== null) {
+
+				var position = ship.position;
+
+				position.x |= 0;
+				position.y |= 0;
+
+
+				var velocity = ship.velocity;
+
+				velocity.x |= 0;
+				velocity.y |= 0;
+
+
+				var data = {
+					id: this.id,
+					update: {
+						px: position.x,
+						py: position.y,
+						vx: velocity.x,
+						vy: velocity.y
+					}
+				};
+
+				this.trigger('control', [ data ]);
+
+			}
+
+		},
+
 		control: function(data) {
 
 			if (data.id === this.id) {
 
-				var position = data.position || null;
-				var touch    = data.touch    || null;
-				var key      = data.key      || null;
+				var key    = data.key    || null;
+				var update = data.update || null;
+				var touch  = data.touch  || null;
 
-				if (position !== null) this.processPosition(position, true);
-				if (key !== null)      this.processKey(key, true);
-				if (touch !== null)    this.processTouch(touch, true);
+				if (key !== null)    this.processKey(key, true);
+				if (update !== null) this.processUpdate(update, true);
+				if (touch !== null)  this.processTouch(touch, true);
 
 			}
 
@@ -135,7 +168,7 @@ lychee.define('game.logic.Controller').requires([
 
 		},
 
-		processPosition: function(position, silent) {
+		processUpdate: function(update, silent) {
 
 			silent = silent === true;
 
@@ -143,8 +176,11 @@ lychee.define('game.logic.Controller').requires([
 			var ship = this.ship;
 			if (ship !== null) {
 
-				ship.position.x = position.x;
-				ship.position.y = position.y;
+				ship.position.x = update.px;
+				ship.position.y = update.py;
+
+				ship.velocity.x = update.vx;
+				ship.velocity.y = update.vy;
 
 			}
 

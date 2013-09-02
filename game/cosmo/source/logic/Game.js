@@ -164,13 +164,14 @@ lychee.define('game.logic.Game').requires([
 		this.controllers = [];
 
 
-		this.__background = null;
-		this.__level      = null;
-		this.__width      = null;
-		this.__height     = null;
-		this.__stage      = null;
-		this.__session    = { ships: [], stage: null };
-		this.__isRunning  = false;
+		this.__background  = null;
+		this.__level       = null;
+		this.__width       = null;
+		this.__height      = null;
+		this.__stage       = null;
+		this.__session     = { ships: [], stage: null };
+		this.__synctimeout = 0;
+		this.__isRunning   = false;
 
 
 		lychee.event.Emitter.call(this);
@@ -565,6 +566,16 @@ lychee.define('game.logic.Game').requires([
 
 				if (this.game.settings.sound === true) {
 					this.jukebox.play('ship-shield');
+				}
+
+			}
+
+
+			var controllers = this.controllers;
+			if (controllers.length > 1) {
+
+				for (var c = 0, cl = controllers.length; c < cl; c++) {
+					controllers[c].sync();
 				}
 
 			}
