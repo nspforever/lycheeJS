@@ -1,13 +1,9 @@
 {
 
 	"database": {
-
 		"Server": {
-
 			"port": [ 8081, 8181 ]
-
 		}
-
 	},
 
 	"port": 80,
