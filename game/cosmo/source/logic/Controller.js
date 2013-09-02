@@ -75,23 +75,15 @@ lychee.define('game.logic.Controller').requires([
 
 		control: function(data) {
 
-			data.id     = typeof data.id === 'string'     ? data.id     : null;
-			data.method = typeof data.method === 'string' ? data.method : null;
-			data.args   = data.args instanceof Array      ? data.args   : null;
+			if (data.id === this.id) {
 
+				var position = data.position || null;
+				var touch    = data.touch    || null;
+				var key      = data.key      || null;
 
-			if (
-				   data.id !== null
-				&& data.id === this.id
-				&& data.method !== null
-				&& data.args !== null
-			) {
-
-				var method = data.method;
-				var args   = data.args;
-				if (typeof this[method] === 'function') {
-					this[method].apply(this, args);
-				}
+				if (position !== null) this.processPosition(position, true);
+				if (key !== null)      this.processKey(key, true);
+				if (touch !== null)    this.processTouch(touch, true);
 
 			}
 
@@ -103,30 +95,38 @@ lychee.define('game.logic.Controller').requires([
 		 * LOGIC INTEGRATION
 		 */
 
-		processKey: function(key) {
+		processKey: function(key, silent) {
+
+			silent = silent === true;
+
+
+			var processed = false;
 
 			var ship = this.ship;
 			if (ship !== null) {
 
 				switch(key) {
 
-					case 'left':  case 'a': ship.left();  break;
-					case 'down':  case 's': ship.stop();  break;
-					case 'right': case 'd': ship.right(); break;
-					case 'up':    case 'w': ship.fire();  break;
-					case 'space':           ship.fire();  break;
+					case 'left':  case 'a': ship.left();  processed = true; break;
+					case 'down':  case 's': ship.stop();  processed = true; break;
+					case 'right': case 'd': ship.right(); processed = true; break;
+					case 'up':    case 'w': ship.fire();  processed = true; break;
+					case 'space':           ship.fire();  processed = true; break;
 
 				}
 
 			}
 
 
-			if (this.mode === Class.MODE.online) {
+			if (
+				   silent === false
+				&& processed === true
+				&& this.mode === Class.MODE.online
+			) {
 
 				var data = {
-					id:     this.id,
-					method: 'processKey',
-					args:   [ key ]
+					id:  this.id,
+					key: key
 				};
 
 				this.trigger('control', [ data ]);
@@ -135,10 +135,27 @@ lychee.define('game.logic.Controller').requires([
 
 		},
 
-		processTouch: function(position) {
+		processPosition: function(position, silent) {
 
-			if (this.mode !== Class.MODE.local) return;
+			silent = silent === true;
 
+
+			var ship = this.ship;
+			if (ship !== null) {
+
+				ship.position.x = position.x;
+				ship.position.y = position.y;
+
+			}
+
+		},
+
+		processTouch: function(position, silent) {
+
+			silent = silent === true;
+
+
+			var processed = false;
 
 			var ship = this.ship;
 			if (ship !== null) {
@@ -162,6 +179,24 @@ lychee.define('game.logic.Controller').requires([
 					}
 
 				}
+
+				processed = true;
+
+			}
+
+
+			if (
+				   silent === false
+				&& processed === true
+				&& this.mode === Class.MODE.online
+			) {
+
+				var data = {
+					id:    this.id,
+					touch: { x: position.x, y: position.y }
+				};
+
+				this.trigger('control', [ data ]);
 
 			}
 

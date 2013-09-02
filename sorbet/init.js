@@ -47,7 +47,8 @@ lychee.build(function(lychee, global) {
 
 	var main = new sorbet.Main(
 		root,
-		config
+		profile,
+		config.settings
 	);
 
 	main.listen(config.port);

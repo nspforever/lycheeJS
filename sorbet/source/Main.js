@@ -1,13 +1,14 @@
 
 lychee.define('sorbet.Main').requires([
+	'sorbet.module.Blacklist',
 	'sorbet.module.Builder',
 	'sorbet.module.Error',
 	'sorbet.module.File',
-	'sorbet.module.Filter',
 	'sorbet.module.Redirect',
 	'sorbet.module.Server',
 	'sorbet.module.Welcome',
 	'sorbet.data.Filesystem',
+	'sorbet.data.Profile',
 	'sorbet.data.Map',
 	'sorbet.data.VHost'
 ]).exports(function(lychee, sorbet, global, attachments) {
@@ -17,6 +18,7 @@ lychee.define('sorbet.Main').requires([
 
 
 
+	var _database   = sorbet.data.Profile;
 	var _filesystem = sorbet.data.Filesystem;
 	var _map        = sorbet.data.Map;
 	var _module     = sorbet.module;
@@ -77,16 +79,12 @@ lychee.define('sorbet.Main').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(root, cfg) {
+	var Class = function(root, profile, settings) {
 
 		root = typeof root === 'string' ? root : '/var/www';
 
 
-		if (cfg.module === undefined) {
-			cfg.module = {};
-		}
-
-
+		this.db      = new _database(profile);
 		this.fs      = new _filesystem(root);
 		this.root    = root;
 		this.servers = new _map();
@@ -95,26 +93,30 @@ lychee.define('sorbet.Main').requires([
 		this.modules = new _map();
 
 
-		for (var s = 0, sl = cfg.settings.length; s < sl; s++) {
+		if (settings instanceof Array) {
 
-			var blob   = cfg.settings[s];
-			var name   = blob.hosts[0] || null;
-			var config = {};
+			for (var s = 0, sl = settings.length; s < sl; s++) {
 
-			config.root      = blob.config.root.replace('%root%', this.root);
-			config.redirects = blob.config.redirects || {};
-			config.aliases   = blob.config.aliases   || {};
+				var blob   = settings[s];
+				var name   = blob.hosts[0] || null;
+				var config = {};
+
+				config.root      = blob.config.root.replace('%root%', this.root);
+				config.redirects = blob.config.redirects || {};
+				config.aliases   = blob.config.aliases   || {};
 
 
-			if (name !== null) {
+				if (name !== null) {
 
-				var vhost = new _vhost(name, config);
+					var vhost = new _vhost(name, config);
 
-				this.vhosts.set(name, vhost);
+					this.vhosts.set(name, vhost);
 
-				for (var h = 1, hl = blob.hosts.length; h < hl; h++) {
-					var alias = blob.hosts[h];
-					this.vhosts.alias(name, alias);
+					for (var h = 1, hl = blob.hosts.length; h < hl; h++) {
+						var alias = blob.hosts[h];
+						this.vhosts.alias(name, alias);
+					}
+
 				}
 
 			}
@@ -122,32 +124,16 @@ lychee.define('sorbet.Main').requires([
 		}
 
 
-		this.modules.set('error',    new _module['Error'](this));
-		this.modules.set('file',     new _module['File'](this));
-		this.modules.set('filter',   new _module['Filter'](this));
-		this.modules.set('redirect', new _module['Redirect'](this));
-		this.modules.set('welcome',  new _module['Welcome'](this));
+		this.modules.set('blacklist', new _module['Blacklist'](this));
+		this.modules.set('error',     new _module['Error'](this));
+		this.modules.set('file',      new _module['File'](this));
+		this.modules.set('redirect',  new _module['Redirect'](this));
+		this.modules.set('welcome',   new _module['Welcome'](this));
 
 
 		var that = this;
-		setTimeout(function() {
-
-			var settings = cfg.module.Server || undefined;
-			var module   = new _module['Server'](that, settings);
-
-			that.modules.set('server', module);
-
-		}, 1000);
-
-
-		setTimeout(function() {
-
-			var settings = cfg.module.Builder || undefined;
-			var module   = new _module['Builder'](that, settings);
-
-			that.modules.set('builder', module);
-
-		}, 3000);
+		setTimeout(function() { that.modules.set('server',  new _module['Server'](that));  }, 1000);
+		setTimeout(function() { that.modules.set('builder', new _module['Builder'](that)); }, 3000);
 
 	};
 
@@ -198,15 +184,16 @@ lychee.define('sorbet.Main').requires([
 			};
 
 
-			var _error    = this.modules.get('error');
-			var _file     = this.modules.get('file');
-			var _filter   = this.modules.get('filter');
-			var _redirect = this.modules.get('redirect');
-			var _welcome  = this.modules.get('welcome');
+			var _blacklist = this.modules.get('blacklist');
+			var _error     = this.modules.get('error');
+			var _file      = this.modules.get('file');
+			var _redirect  = this.modules.get('redirect');
+			var _welcome   = this.modules.get('welcome');
 
 
 			var tmp = ('' + request.headers.host).split(':');
 
+			var remote  = request.connection.remoteAddress;
 			var referer = request.headers.referer || null;
 			var rawhost = tmp[0] !== undefined ? tmp[0] : '';
 			var rawport = parseInt(tmp[1] !== undefined ? tmp[1] : '80', 10);
@@ -216,10 +203,10 @@ lychee.define('sorbet.Main').requires([
 
 
 			/*
-			 * 0. Filter and Blacklist of known Intruders
+			 * 0. Blacklist of known Intruders
 			 */
 
-			if (_filter.process(host, response, request) === true) {
+			if (_blacklist.process(host, response, request) === true) {
 
 				_error.process(host, response, {
 					status:   403,
@@ -386,7 +373,10 @@ lychee.define('sorbet.Main').requires([
 				// 2.1a Sorbet Asset Integration
 				if (url.substr(0, 13) === '/sorbet/asset') {
 
-					var resolved = this.fs.resolve(this.root + url);
+					host = { fs: this.fs };
+
+
+					var resolved = host.fs.resolve(this.root + url);
 					if (resolved !== null) {
 
 						_file.process(host, response, {
@@ -408,13 +398,14 @@ lychee.define('sorbet.Main').requires([
 				// 2.1b Logging of Attacks
 				} else {
 
-					if (lychee.debug === true) {
-
-						console.error('sorbet.Main: Illegal Request for "'   + rawhost + ' , ' + url            + '"');
-						console.error('sorbet.Main: Remote Address is "'     + request.connection.remoteAddress + '"');
-						console.error('sorbet.Main: User Agent is "'         + request.headers['user-agent']    + '"');
-
-					}
+					_blacklist.log({
+						host:      rawhost,
+						port:      rawport,
+						referer:   referer,
+						remote:    remote,
+						useragent: request.headers['user-agent'],
+						url:       url
+					});
 
 					_error.process(null, response, {
 						status:   404,

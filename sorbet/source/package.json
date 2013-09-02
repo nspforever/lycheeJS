@@ -7,17 +7,16 @@
 
 		"data": {
 			"Filesystem": [ "js" ],
-			"Filter":     [ "js" ],
 			"Map":        [ "js" ],
 			"Template":   [ "js" ],
 			"VHost":      [ "js" ]
 		},
 
 		"module": {
+			"Blacklist":  [ "js" ],
 			"Builder":    [ "js" ],
 			"Error":      [ "js", "html" ],
 			"File":       [ "js" ],
-			"Filter":     [ "js" ],
 			"Redirect":   [ "js" ],
 			"Server":     [ "js" ],
 			"Welcome":    [ "js", "html" ]

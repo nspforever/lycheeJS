@@ -335,21 +335,33 @@ lychee.define('game.logic.Game').requires([
 
 			if (stage.type === 'singleplayer') {
 
+
+				var ship = this.__level.ships[0];
+
+				ship.setColor('red');
+
 				var controller = new _controller(stage.players[0], {
 					mode: _controller.MODE.local,
-					ship: this.__level.ships[0] || null
+					ship: ship
 				});
 
 				this.controllers.push(controller);
 				this.controller = controller;
 
+
 			} else if (stage.type === 'multiplayer') {
+
+				var colors = [ 'red', 'blue', 'green' ];
 
 				for (var p = 0, pl = stage.players.length; p < pl; p++) {
 
+					var ship = this.__level.ships[p];
+
+					ship.setColor(colors[p % 3]);
+
 					var controller = new _controller(stage.players[p], {
 						mode: _controller.MODE.online,
-						ship: this.__level.ships[p] || null
+						ship: ship
 					});
 
 					this.controllers.push(controller);

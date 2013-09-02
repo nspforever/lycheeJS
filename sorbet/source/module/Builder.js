@@ -9,6 +9,20 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 	 * HELPERS
 	 */
 
+	var _init_database = function() {
+
+		var database = this.main.db.get('Builder');
+		if (database === null) {
+
+			this.main.db.set('Builder', this.defaults);
+			database = this.main.db.get('Builder');
+
+		}
+
+		this.database = database;
+
+	};
+
 	var _get_projects = function(vhost, folder, data) {
 
 		folder = typeof folder === 'string' ? folder : null;
@@ -128,15 +142,15 @@ console.log('BUILD VARIANTS', builds);
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(main, data) {
+	var Class = function(main) {
 
-		var settings = lychee.extendsafe({
+		this.main     = main;
+		this.type     = 'public';
+		this.database = null;
 
-		}, data);
 
+		_init_database.call(this);
 
-		this.main    = main;
-		this.type    = 'public';
 
 		this.preloader = new lychee.Preloader();
 		this.preloader.bind('ready', _prepare_project, this);
@@ -176,6 +190,10 @@ console.log('BUILD VARIANTS', builds);
 
 
 	Class.prototype = {
+
+		defaults: {
+
+		},
 
 		process: function(host, response, data) {
 

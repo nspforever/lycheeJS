@@ -36,7 +36,7 @@ h1#logo a {
 	width: 384px;
 	height: 64px;
 	margin: 0 auto;
-	background: url('../png/logo.png') no-repeat;
+	background: url('../logo.png') no-repeat;
 	font-size: 1px;
 	color: transparent;
 }

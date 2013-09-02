@@ -9,6 +9,20 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 	 * HELPERS
 	 */
 
+	var _init_database = function() {
+
+		var database = this.main.db.get('Server');
+		if (database === null) {
+
+			this.main.db.set('Server', this.defaults);
+			database = this.main.db.get('Server');
+
+		}
+
+		this.database = database;
+
+	};
+
 	var _get_projects = function(vhost, folder, data) {
 
 		folder = typeof folder === 'string' ? folder : null;
@@ -114,17 +128,17 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(main, data) {
+	var Class = function(main) {
 
-		var settings = lychee.extendsafe({
-			port: [ 8081, 8181 ]
-		}, data);
+		this.main     = main;
+		this.type     = 'public';
+		this.database = null;
 
 
-		this.main = main;
-		this.type = 'public';
+		_init_database.call(this);
 
-		this.__port = settings.port[0];
+
+		this.__port = this.database.port[0];
 
 
 		var vhosts = this.main.vhosts.all();
@@ -152,6 +166,10 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 
 	Class.prototype = {
+
+		defaults: {
+			port: [ 8081, 8181 ]
+		},
 
 		getPort: function() {
 			return this.__port++;

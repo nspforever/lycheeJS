@@ -37,21 +37,9 @@ lychee.define('game.entity.Ship').requires([
 		this.__timeout = 0;
 
 
-		if (
-			typeof settings.color === 'string'
-			&& _textures[settings.color] !== undefined
-		) {
-			settings.texture = _textures[settings.color];
-		} else {
-			settings.texture = _textures.red;
-		}
-
-
-		delete settings.color;
-
-
 		settings.map       = _config.map;
 		settings.states    = _config.states;
+		settings.texture   = _textures.red;
 
 		settings.width     = _config.width;
 		settings.height    = _config.height;
@@ -60,6 +48,9 @@ lychee.define('game.entity.Ship').requires([
 
 
 		lychee.game.Sprite.call(this, settings);
+
+		this.setColor(settings.color);
+		this.setHealth(settings.health);
 
 		settings = null;
 
@@ -196,6 +187,24 @@ lychee.define('game.entity.Ship').requires([
 
 
 			this.__timeout = now + 200;
+
+		},
+
+		setColor: function(color) {
+
+			color = typeof color === 'string' ? color : null;
+
+			if (
+				color !== null
+				&& _textures[color] !== undefined
+			) {
+
+				return this.setTexture(_textures[color]);
+
+			}
+
+
+			return false;
 
 		},
 
