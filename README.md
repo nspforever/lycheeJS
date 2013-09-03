@@ -1,5 +1,5 @@
 
-# lycheeJS (v0.7)
+# lycheeJS (v0.8)
 
 lycheeJS is a JavaScript Game library that offers a
 complete solution for prototyping and deployment
@@ -21,11 +21,19 @@ and extract its contents to **/var/www/lycheeJS**.
 
 ```bash
 cd /var/www/lycheeJS;
-./forge.sh start
+./sorbet.sh start
+```
+
+- If your OS has no support for the **nohup** or **pkill** command, you can still start
+sorbet manually. Note that the third parameter is the profile name (without .json):
+
+```bash
+cd /var/www/lycheeJS/sorbet;
+nodejs init.js default
 ```
 
 - Open your Web Browser, navigate to **http://localhost:8080** or try out the examples
-at [forge.lycheeJS.org](http://forge.lycheeJS.org) and have fun :)
+at [sorbet.lycheejs.org](http://sorbet.lycheejs.org) and have fun :)
 
 Those games show you how to develop real cross-platform games and the best practices
 in high-performant JavaScript code.
@@ -35,24 +43,13 @@ in high-performant JavaScript code.
 
 # Documentation
 
-The documentation is online available at [http://lycheejs.org/docs](http://lycheejs.org/docs)
+The documentation is available online at [http://lycheejs.org/docs](http://lycheejs.org/docs)
 or in the [lycheejs.org github repository](https://github.com/martensms/lycheejs.org)
 
 
 # License
 
 The lycheeJS framework is licensed under MIT License.
-
-
-### lycheeJS-ADK (App Development Kit)
-
-The [lycheeJS ADK](http://github.com/martensms/lycheeJS-adk)
-is the underlying framework to deliver platforms natively.
-
-The ADK allows you to cross-compile to different platforms
-natively using a custom V8 based JIT runtime with OpenGL
-bindings as the target environment. The equivalent environment
-integration is the platform/v8gl inside the lycheeJS Game library.
 
 
 ### Other (yet unsupported) JavaScript environments
