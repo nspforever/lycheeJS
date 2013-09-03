@@ -4,7 +4,8 @@ lychee.define('game.Main').requires([
 	'game.state.Font',
 	'game.state.Test',
 	'game.Builder',
-	'game.DeviceSpecificHacks'
+	'game.DeviceSpecificHacks',
+	'game.Project'
 ]).includes([
 	'lychee.game.Main'
 ]).exports(function(lychee, game, global, attachments) {

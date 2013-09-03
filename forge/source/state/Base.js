@@ -1,5 +1,6 @@
 
 lychee.define('game.state.Base').requires([
+	'lychee.game.State',
 	'game.entity.ui.Sidebar'
 ]).exports(function(lychee, game, global) {
 
@@ -11,6 +12,9 @@ lychee.define('game.state.Base').requires([
 	Module.reset = function() {
 
 		var tile = 32;
+
+
+		lychee.game.State.prototype.reset.call(this);
 
 
 		var renderer = this.renderer;

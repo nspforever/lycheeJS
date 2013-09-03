@@ -1,33 +1,9 @@
 {
 	"tags": {
 
-		"platform": {
-
-			"nodejs": "platform/nodejs"
-
-		}
-
 	},
 
 	"tree": {
-
-		"platform": {
-
-			"nodejs": {
-
-				"webserver": {
-
-					"mod": {
-						"FS": [ "js" ]
-					}
-
-				},
-
-				"WebServer": [ "js" ]
-
-			}
-
-		},
 
 		"entity": {
 
@@ -57,23 +33,11 @@
 			"Test": [ "js" ]
 		},
 
-		"webserver": {
-
-			"mod": {
-				"Error": [ "js", "html" ],
-				"File": [ "js" ],
-				"Redirect": [ "js" ],
-				"Welcome": [ "js", "html" ]
-			},
-
-			"Template": [ "js" ]
-
-		},
-
 		"Builder": [ "js" ],
 		"DeviceSpecificHacks": [ "js" ],
 		"Main": [ "js", "css" ],
-		"MainServer": [ "js" ]
+		"MainServer": [ "js" ],
+		"Project": [ "js" ]
 
 	}
 }
