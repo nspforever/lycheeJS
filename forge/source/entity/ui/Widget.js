@@ -10,18 +10,20 @@ lychee.define('game.entity.ui.Widget').includes([
 		}
 
 
-		this.margin   = 10;
-		this.overflow = true;
+		this.sidebar = null;
 
-		this.__offsetX = 0;
-		this.__offsetY = 0;
+		this.margin = 24;
+		this.reflow = {
+			x: true,
+			y: true
+		};
 
 
 		this.setMargin(settings.margin);
-		this.setOverflow(settings.overflow);
+		this.setReflow(settings.reflow);
 
 		delete settings.margin;
-		delete settings.overflow;
+		delete settings.reflow;
 
 
 		lychee.ui.Layer.call(this, settings);
@@ -40,7 +42,10 @@ lychee.define('game.entity.ui.Widget').includes([
 		 * GAME UI API
 		 */
 
-		relayout: function() {
+		relayout: function(shiftposition) {
+
+			shiftposition = shiftposition === true;
+
 
 			var margin = this.margin;
 
@@ -58,23 +63,17 @@ lychee.define('game.entity.ui.Widget').includes([
 
 			}
 
+			height += margin;
+
 
 			// 2. Reflow the calculated width/height if required
-			if (this.overflow === true) {
-				width  = Math.max(width,  this.width);
-				height = Math.max(height, this.height);
-			} else {
-				width  = this.width;
-				height = this.height;
-			}
+			if (this.reflow.x === false) width  = this.width;
+			if (this.reflow.y === false) height = this.height;
 
 
 			// 3. Reset the offsets and positions
-			this.__offsetX = 0;
-			this.__offsetY = -1/2 * height + margin;
-
-			var posx = this.__offsetX;
-			var posy = this.__offsetY;
+			var posx = 0;
+			var posy = -1/2 * height + margin;
 
 
 			// 4. Relayout the entities
@@ -94,14 +93,35 @@ lychee.define('game.entity.ui.Widget').includes([
 
 			}
 
-			this.__offsetX = posx;
-			this.__offsetY = posy;
 
+			// 6. Relayout this widget (if reflow is wanted)
+			if (this.reflow.x === true) {
 
-			// 5. Relayout this widget (if overflow is wanted)
-			if (this.overflow === true) {
-				this.width  = width;
+				if (shiftposition === true) {
+					this.position.x += (width - this.width) / 2;
+				}
+
+				this.width = width;
+
+			}
+
+			if (this.reflow.y === true) {
+
+				if (shiftposition === true) {
+					this.position.y += (height - this.height) / 2;
+				}
+
 				this.height = height;
+
+			}
+
+
+			// 7. Relayout the Sidebar (if given)
+			if (
+				   shiftposition === true
+				&& this.sidebar !== null
+			) {
+				this.sidebar.relayout();
 			}
 
 		},
@@ -130,16 +150,12 @@ lychee.define('game.entity.ui.Widget').includes([
 
 		},
 
-		setOverflow: function(overflow) {
+		setReflow: function(reflow) {
 
-			if (
-				(
-					   overflow === true
-					|| overflow === false
-				) && this.overflow !== overflow
-			) {
+			if (reflow instanceof Object) {
 
-				this.overflow = overflow;
+				this.reflow.x = typeof reflow.x === 'boolean' ? reflow.x : this.reflow.x;
+				this.reflow.y = typeof reflow.y === 'boolean' ? reflow.y : this.reflow.y;
 
 				return true;
 

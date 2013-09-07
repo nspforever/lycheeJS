@@ -23,18 +23,15 @@ lychee.define('lychee.ui.Select').includes([
 
 
 		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
-		settings.width  = typeof settings.width === 'number' ? settings.width : 240;
-		settings.height = 48;
+		settings.width  = typeof settings.width === 'number' ? settings.width : 140;
+		settings.height = 28;
 
 
 		lychee.ui.Entity.call(this, settings);
 
 
-		if (
-			this.options.length > 0
-			&& this.value === ''
-		) {
-			this.setValue(this.options[0]);
+		if (this.value === '') {
+			this.setValue(this.options[0] || null);
 		}
 
 
@@ -53,15 +50,20 @@ lychee.define('lychee.ui.Select').includes([
 			// 2. Select option from dropdown menu
 			} else {
 
-				var hheight = this.options.length * 48 / 2;
-				var index   = ((position.y + hheight) / 48) | 0;
+				var index = ((position.y + this.height / 2) / 28) | 0;
+				if (index > 0) {
 
-				var value   = this.options[index] || null;
-				if (value !== null && this.value !== value) {
+					var value = this.options[index - 1] || null;
+					if (
+						   value !== null
+						&& value !== this.value
+					) {
 
-					var result = this.setValue(this.options[index] || null);
-					if (result === true) {
-						this.trigger('change', [ this.value ]);
+						var result = this.setValue(value);
+						if (result === true) {
+							this.trigger('change', [ this.value ]);
+						}
+
 					}
 
 				}
@@ -107,143 +109,94 @@ lychee.define('lychee.ui.Select').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#ff1b1b' : '#aa1b1b';
+			var color = this.state === 'active' ? '#0099cc' : '#575757';
 
 
+			var font    = this.font;
 			var hwidth  = this.width / 2;
 			var hheight = this.height / 2;
-
-
-			// TODO: Evaluate better method for preventing
-			// entities in the background of being visible
-
-			renderer.drawBox(
-				x - hwidth,
-				y - hheight,
-				x + hwidth,
-				y + hheight,
-				'#000000',
-				true
-			);
-
-
-			renderer.drawArc(
-				x - hwidth + 24,
-				y - hheight + 24,
-				0.5,
-				0.75,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
-				x - hwidth + 24,
-				y - hheight,
-				x + hwidth - 24,
-				y - hheight,
-				color,
-				2
-			);
-
-			renderer.drawArc(
-				x + hwidth - 24,
-				y - hheight + 24,
-				0.75,
-				1,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
-				x + hwidth,
-				y - hheight + 24,
-				x + hwidth,
-				y + hheight - 24,
-				color,
-				2
-			);
-
-			renderer.drawArc(
-				x + hwidth - 24,
-				y + hheight - 24,
-				0,
-				0.25,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
-				x - hwidth + 24,
-				y + hheight,
-				x + hwidth - 24,
-				y + hheight,
-				color,
-				2
-			);
-
-			renderer.drawArc(
-				x - hwidth + 24,
-				y + hheight - 24,
-				0.25,
-				0.5,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
-				x - hwidth,
-				y - hheight + 24,
-				x - hwidth,
-				y + hheight - 24,
-				color,
-				2
-			);
 
 
 			var state = this.state;
 			if (state === 'active') {
 
-				var font = this.font;
+				renderer.drawBox(
+					x - hwidth,
+					y - hheight,
+					x + hwidth,
+					y + hheight,
+					color,
+					false,
+					2
+				);
+
+
+				var lhh  = 28 / 2;
+				var cury = y - hheight + lhh;
+
+				renderer.drawLine(
+					x - hwidth,
+					cury + lhh,
+					x + hwidth,
+					cury + lhh,
+					color,
+					2
+				);
+
+				renderer.drawTriangle(
+					x + hwidth - 14,
+					cury + lhh,
+					x + hwidth,
+					cury + lhh - 14,
+					x + hwidth,
+					cury + lhh,
+					color,
+					true
+				);
+
 				if (font !== null) {
 
-					var offsety  = 48;
-					var currenty = y - hheight + offsety / 2;
+					var text = this.value;
 
-					for (var o = 0, ol = this.options.length; o < ol; o++) {
+					renderer.drawText(
+						x,
+						cury,
+						text,
+						font,
+						true
+					);
 
-						var text = this.options[o];
+					var options = this.options;
+					for (var o = 0, ol = options.length; o < ol; o++) {
+
+						cury += lhh * 2;
+
+						var text = options[o];
+
+						if (text === this.value) {
+
+							renderer.setAlpha(0.7);
+
+							renderer.drawBox(
+								x - hwidth,
+								cury - lhh,
+								x + hwidth,
+								cury + lhh,
+								'#33b5e5',
+								true
+							);
+
+							renderer.setAlpha(1.0);
+
+						}
 
 						renderer.drawText(
 							x,
-							currenty,
+							cury,
 							text,
 							font,
 							true
 						);
-
-						if (o > 0) {
-
-							renderer.drawLine(
-								x - hwidth,
-								currenty - 24,
-								x + hwidth,
-								currenty - 24,
-								color,
-								2
-							);
-
-						}
-
-
-						currenty += offsety;
 
 					}
 
@@ -251,17 +204,37 @@ lychee.define('lychee.ui.Select').includes([
 
 			} else {
 
-				var font = this.font;
+				renderer.drawLine(
+					x - hwidth,
+					y + hheight,
+					x + hwidth,
+					y + hheight,
+					color,
+					2
+				);
+
+				renderer.drawTriangle(
+					x + hwidth - 14,
+					y + hheight,
+					x + hwidth,
+					y + hheight - 14,
+					x + hwidth,
+					y + hheight,
+					color,
+					true
+				);
+
+
 				if (font !== null) {
 
 					var text = this.value;
 
 					renderer.drawText(
-						x - hwidth + 24,
-						y - hheight,
+						x,
+						y,
 						text,
 						font,
-						false
+						true
 					);
 
 				}
@@ -283,13 +256,16 @@ lychee.define('lychee.ui.Select').includes([
 
 				if (id === 'default') {
 
-					this.height = 48;
+					this.position.y -= (this.height - 28) / 2;
+					this.height      = 28;
 
 				} else if (id === 'active') {
 
-					var o = this.options.length;
+					// active value on top, then options
+					var ol = 1 + this.options.length;
 
-					this.height = Math.max(48, o * 48);
+					this.height      = Math.max(28, ol * 28);
+					this.position.y += (this.height - 28) / 2;
 
 				}
 

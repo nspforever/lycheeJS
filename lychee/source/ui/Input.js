@@ -34,8 +34,8 @@ lychee.define('lychee.ui.Input').includes([
 
 
 		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
-		settings.width  = typeof settings.width === 'number' ? settings.width : 240;
-		settings.height = 48;
+		settings.width  = typeof settings.width === 'number' ? settings.width : 140;
+		settings.height = 24;
 
 
 		lychee.ui.Entity.call(this, settings);
@@ -211,7 +211,7 @@ lychee.define('lychee.ui.Input').includes([
 
 			var settings = data['arguments'][0];
 
-			if (this.width !== 240) settings.width = this.width;
+			if (this.width !== 140) settings.width = this.width;
 
 			if (this.font !== null)            settings.font  = this.font.serialize();
 			if (this.max !== Infinity)         settings.max   = this.max;
@@ -233,7 +233,7 @@ lychee.define('lychee.ui.Input').includes([
 			if (buffer === null) {
 
 				buffer = renderer.createBuffer(
-					this.width - 48,
+					this.width - 24,
 					this.height
 				);
 
@@ -301,55 +301,41 @@ lychee.define('lychee.ui.Input').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#ff1b1b' : '#aa1b1b';
+			var color = this.state === 'active' ? '#0099cc' : '#575757';
 
 
 			var hwidth  = this.width / 2;
 			var hheight = this.height / 2;
 
-
 			renderer.drawLine(
-				x - hwidth + 24,
-				y - hheight,
-				x + hwidth - 24,
-				y - hheight,
-				color,
-				2
-			);
-
-			renderer.drawLine(
-				x - hwidth + 24,
-				y + hheight,
-				x + hwidth - 24,
+				x - hwidth,
+				y + hheight - 7,
+				x - hwidth,
 				y + hheight,
 				color,
 				2
 			);
 
-			renderer.drawArc(
-				x - hwidth + 24,
-				y,
-				0.25,
-				0.75,
-				24,
+			renderer.drawLine(
+				x - hwidth,
+				y + hheight,
+				x + hwidth,
+				y + hheight,
 				color,
-				false,
 				2
 			);
 
-			renderer.drawArc(
-				x + hwidth - 24,
-				y,
-				-0.25,
-				0.25,
-				24,
+			renderer.drawLine(
+				x + hwidth,
+				y + hheight - 7,
+				x + hwidth,
+				y + hheight,
 				color,
-				false,
 				2
 			);
 
 
-			var x1 = x - hwidth + 24;
+			var x1 = x - hwidth + 12;
 			var y1 = y - hheight;
 
 			renderer.drawBuffer(

@@ -88,35 +88,56 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 		render: function(renderer, offsetX, offsetY) {
 
-			offsetX += this.position.x;
-			offsetY += this.position.y;
+			var position = this.position;
+
+			var x = position.x + offsetX;
+			var y = position.y + offsetY;
 
 
 			var hwidth  = this.width / 2;
 			var hheight = this.height / 2;
 
 			renderer.drawBox(
-				offsetX - hwidth,
-				offsetY - hheight,
-				offsetX + hwidth,
-				offsetY + hheight,
-				'#222222',
+				x - hwidth,
+				y - hheight,
+				x + hwidth,
+				y + hheight,
+				'#282828',
 				true
 			);
 
 
 			for (var e = 0, el = this.entities.length; e < el; e++) {
 
-				var widget    = this.entities[e];
-				var widgetpos = widget.position;
-				var entities  = widget.entities;
+				var widget   = this.entities[e];
+				var entities = widget.entities;
+
+				var whw = widget.width / 2;
+				var whh = widget.height / 2;
+				var wpx = x + widget.position.x;
+				var wpy = y + widget.position.y;
+
+
+				if (lychee.debug === true) {
+
+					renderer.drawBox(
+						wpx - whw,
+						wpy - whh,
+						wpx + whw,
+						wpy + whh,
+						'#ff00ff',
+						false,
+						1
+					);
+
+				}
 
 				for (var e2 = 0, e2l = entities.length; e2 < e2l; e2++) {
 
 					entities[e2].render(
 						renderer,
-						widgetpos.x + offsetX,
-						widgetpos.y + offsetY
+						wpx,
+						wpy
 					);
 
 				}
@@ -138,6 +159,8 @@ lychee.define('game.entity.ui.Sidebar').requires([
 				var result = lychee.ui.Layer.prototype.addEntity.call(this, entity);
 				if (result === true) {
 
+					entity.sidebar = this;
+
 					this.relayout();
 					return true;
 
@@ -154,6 +177,8 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 			var result = lychee.ui.Layer.prototype.removeEntity.call(this, entity);
 			if (result === true) {
+
+				entity.sidebar = null;
 
 				this.relayout();
 				return true;

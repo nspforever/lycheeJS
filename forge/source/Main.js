@@ -66,9 +66,7 @@ lychee.define('game.Main').requires([
 
 
 			this.fonts = {};
-			this.fonts.headline = new game.entity.Font('headline');
-			this.fonts.normal   = new game.entity.Font('normal');
-			this.fonts.small    = new game.entity.Font('small');
+			this.fonts.normal = new game.entity.Font('normal');
 
 			this.builder = new game.Builder(this);
 			this.project = new game.Project(this, this.settings.project);

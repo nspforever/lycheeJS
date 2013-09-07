@@ -16,6 +16,60 @@ lychee.define('game.state.Font').requires([
 	var _widget  = game.entity.ui.Widget;
 
 
+	/*
+	 * HELPERS
+	 */
+
+	var _create_widget = function(property, label, entity) {
+
+		property = typeof property === 'string' ? property : null;
+
+
+		if (property !== null) {
+
+			var margin = 12;
+
+			var widget = new _widget({
+				width:  this.width,
+				margin: margin,
+				reflow: {
+					x: false,
+					y: true
+				}
+			});
+
+
+			if (label !== null) {
+
+				label.width = this.width - margin * 4;
+				widget.addEntity(label);
+
+			}
+
+			if (entity !== null) {
+
+				entity.width = this.width - margin * 4;
+				widget.addEntity(entity);
+
+				entity.bind('touch', function() {
+					this.relayout(true);
+				}, widget);
+
+			}
+
+
+			this.addEntity(widget);
+
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(game) {
 
 		lychee.game.State.call(this, game);
@@ -37,11 +91,15 @@ lychee.define('game.state.Font').requires([
 			_base.reset.call(this);
 
 
-			this.__createSettingsWidget(
+			var settings = this.getLayer('ui').getEntity('settings');
+
+
+			_create_widget.call(
+				settings,
 				'family',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
-					label: 'Family'
+					label: 'Font Family'
 				}),
 				new lychee.ui.Input({
 					font:  this.game.fonts.normal,
@@ -50,11 +108,12 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			this.__createSettingsWidget(
+			_create_widget.call(
+				settings,
 				'style',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
-					label: 'Style'
+					label: 'Font Style'
 				}),
 				new lychee.ui.Select({
 					font:    this.game.fonts.normal,
@@ -63,14 +122,15 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			this.__createSettingsWidget(
+			_create_widget.call(
+				settings,
 				'size',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
-					label: 'Size'
+					label: 'Font Size'
 				}),
 				new lychee.ui.Slider({
-					type: lychee.ui.Slider.TYPE.horizontal,
+					type:  lychee.ui.Slider.TYPE.horizontal,
 					range: {
 						from:  1,
 						to:    64,
@@ -80,14 +140,15 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			this.__createSettingsWidget(
+			_create_widget.call(
+				settings,
 				'spacing',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Spacing'
 				}),
 				new lychee.ui.Slider({
-					type: lychee.ui.Slider.TYPE.horizontal,
+					type:  lychee.ui.Slider.TYPE.horizontal,
 					range: {
 						from:  1,
 						to:    64,
@@ -97,24 +158,26 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			this.__createSettingsWidget(
+			_create_widget.call(
+				settings,
 				'outline',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Outline'
 				}),
 				new lychee.ui.Slider({
-					type: lychee.ui.Slider.TYPE.horizontal,
+					type:  lychee.ui.Slider.TYPE.horizontal,
 					range: {
-						from:  1,
-						to:    32,
+						from:  0,
+						to:    16,
 						delta: 1
 					},
-					value: 2
+					value: 1
 				})
 			);
 
-			this.__createSettingsWidget(
+			_create_widget.call(
+				settings,
 				'color',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
@@ -127,7 +190,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-	   		this.__createSettingsWidget(
+			_create_widget.call(
+				settings,
 				'outlinecolor',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
@@ -144,60 +208,13 @@ lychee.define('game.state.Font').requires([
 
 		enter: function(data) {
 
-
 			lychee.game.State.prototype.enter.call(this);
 
 		},
 
 		leave: function() {
 
-
 			lychee.game.State.prototype.leave.call(this);
-
-		},
-
-
-
-		/*
-		 * CUSTOM API
-		 */
-
-		__createSettingsWidget: function(property, label, entity) {
-
-			property = typeof property === 'string'      ? property : null;
-			label    = label instanceof lychee.ui.Button ? label    : null;
-			entity   = entity !== undefined              ? entity   : null;
-
-
-			if (
-				   property !== null
-				&& label !== null
-				&& entity !== null
-			) {
-
-				var tile = 32;
-				var settings = this.getLayer('ui').getEntity('settings');
-
-
-				var widget = new _widget({
-					margin: tile / 4
-				});
-
-
-				if (label !== null) {
-					if (label.width === 0) label.width = settings.width;
-					widget.addEntity(label);
-				}
-
-				if (entity !== null) {
-					if (entity.width === 0)   entity.width = settings.width;
-					widget.addEntity(entity);
-				}
-
-
-				settings.addEntity(widget);
-
-			}
 
 		}
 

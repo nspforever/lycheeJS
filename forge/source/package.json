@@ -8,19 +8,16 @@
 		"entity": {
 
 			"ui": {
-				"Sidebar": [ "js" ],
-
 				"Navigation": [ "js" ],
 				"Properties": [ "js" ],
 				"Sandbox": [ "js" ],
+				"Sidebar": [ "js" ],
 				"Widget": [ "js" ]
 			},
 
 			"Font": [
 				"js",
-				"headline.fnt",
-				"normal.fnt",
-				"small.fnt"
+				"normal.fnt"
 			]
 
 		},
@@ -36,7 +33,6 @@
 		"Builder": [ "js" ],
 		"DeviceSpecificHacks": [ "js" ],
 		"Main": [ "js", "css" ],
-		"MainServer": [ "js" ],
 		"Project": [ "js" ]
 
 	}

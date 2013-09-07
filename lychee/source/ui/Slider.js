@@ -56,8 +56,8 @@ lychee.define('lychee.ui.Slider').includes([
 
 		this.__drag   = { x: 0, y: 0 };
 		this.__range  = { from: 0, to: 1, delta: 0.001 };
-		this.__width  = typeof settings.width === 'number'  ? settings.width  : 240;
-		this.__height = typeof settings.height === 'number' ? settings.height : 240;
+		this.__width  = typeof settings.width === 'number'  ? settings.width  : 140;
+		this.__height = typeof settings.height === 'number' ? settings.height : 140;
 
 
 		this.setFont(settings.font);
@@ -126,9 +126,11 @@ lychee.define('lychee.ui.Slider').includes([
 			var settings = data['arguments'][0];
 
 
-			if (this.font !== null)                  settings.font  = this.font.serialize();
-			if (this.type !== Class.TYPE.horizontal) settings.type  = this.type;
-			if (this.value !== 0)                    settings.value = this.value;
+			if (this.font !== null)                  settings.font   = this.font.serialize();
+			if (this.type !== Class.TYPE.horizontal) settings.type   = this.type;
+			if (this.value !== 0)                    settings.value  = this.value;
+			if (this.__width !== 140)                settings.width  = this.__width;
+			if (this.__height !== 140)               settings.height = this.__height;
 
 			if (
 				   this.__range.from !== 0
@@ -159,7 +161,8 @@ lychee.define('lychee.ui.Slider').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#ff1b1b' : '#aa1b1b';
+			var color = this.state === 'active' ? '#33b5e5' : '#0099cc';
+			var alpha = this.state === 'active' ? 0.7       : 0.3;
 
 
 			var type    = this.type;
@@ -171,84 +174,40 @@ lychee.define('lychee.ui.Slider').includes([
 			if (type === Class.TYPE.horizontal) {
 
 				renderer.drawLine(
-					x - hwidth + 24,
-					y - hheight,
-					x + hwidth - 24,
-					y - hheight,
+					x - hwidth,
+					y,
+					x + drag.x,
+					y,
 					color,
 					2
 				);
 
 				renderer.drawLine(
-					x - hwidth + 24,
-					y + hheight,
-					x + hwidth - 24,
-					y + hheight,
-					color,
-					2
-				);
-
-				renderer.drawArc(
-					x - hwidth + 24,
+					x + drag.x,
 					y,
-					0.25,
-					0.75,
-					24,
-					color,
-					false,
-					2
-				);
-
-				renderer.drawArc(
-					x + hwidth - 24,
+					x + hwidth,
 					y,
-					-0.25,
-					0.25,
-					24,
-					color,
-					false,
+					'#575757',
 					2
 				);
 
 			} else if (type === Class.TYPE.vertical) {
 
 				renderer.drawLine(
-					x - hwidth,
-					y - hheight + 24,
-					x - hwidth,
-					y + hheight - 24,
+					x,
+					y + hheight,
+					x,
+					y + drag.y,
 					color,
 					2
 				);
 
 				renderer.drawLine(
-					x + hwidth,
-					y - hheight + 24,
-					x + hwidth,
-					y + hheight - 24,
-					color,
-					2
-				);
-
-				renderer.drawArc(
 					x,
-					y - hheight + 24,
-					-0.5,
-					0,
-					24,
-					color,
-					false,
-					2
-				);
-
-				renderer.drawArc(
+					y + drag.y,
 					x,
-					y + hheight - 24,
-					0,
-					0.5,
-					24,
-					color,
-					false,
+					y - hheight,
+					'#575757',
 					2
 				);
 
@@ -258,10 +217,22 @@ lychee.define('lychee.ui.Slider').includes([
 			renderer.drawCircle(
 				x + drag.x,
 				y + drag.y,
-				22,
+				4,
 				color,
 				true
 			);
+
+			renderer.setAlpha(alpha);
+
+			renderer.drawCircle(
+				x + drag.x,
+				y + drag.y,
+				14,
+				color,
+				true
+			);
+
+			renderer.setAlpha(1.0);
 
 		},
 
@@ -327,9 +298,9 @@ lychee.define('lychee.ui.Slider').includes([
 
 				if (type === Class.TYPE.horizontal) {
 					this.width  = this.__width;
-					this.height = 48;
+					this.height = 28;
 				} else if (type === Class.TYPE.vertical) {
-					this.width  = 48;
+					this.width  = 28;
 					this.height = this.__height;
 				}
 
@@ -359,13 +330,11 @@ lychee.define('lychee.ui.Slider').includes([
 
 				if (type === Class.TYPE.horizontal) {
 
-					width -= 48;
 					this.__drag.x = width * index - (width / 2);
 					this.__drag.y = 0;
 
 				} else if (type === Class.TYPE.vertical) {
 
-					height -= 48;
 					this.__drag.x = 0;
 					this.__drag.y = height * (1 - index) - (height / 2);
 
