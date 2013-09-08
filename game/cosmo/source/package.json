@@ -54,11 +54,11 @@
 			"Menu": [ "js" ]
 		},
 
-		"DeviceSpecificHacks": [ "js" ],
-		"Jukebox":             [ "js" ],
-		"Main":                [ "js", "css" ],
-		"Client":              [ "js" ],
-		"Server":              [ "js" ]
+		"Client":     [ "js" ],
+		"Controller": [ "js" ],
+		"Jukebox":    [ "js" ],
+		"Main":       [ "js", "css" ],
+		"Server":     [ "js" ]
 
 	}
 }

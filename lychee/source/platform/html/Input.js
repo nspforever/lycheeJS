@@ -240,7 +240,8 @@ lychee.define('Input').tags({
 		}
 
 
-		var key, name;
+		var key  = null;
+		var name = null;
 
 		// 3a. Check for special characters (that can be shifted)
 		if (Class.SPECIALMAP[code] !== undefined) {
@@ -252,26 +253,32 @@ lychee.define('Input').tags({
 
 			if (ctrl  === true) name += 'ctrl-';
 			if (alt   === true) name += 'alt-';
-			// Ignore shift, as shift key is emulated
-			// if (shift === true) name += 'shift-';
+			if (shift === true) name += 'shift-';
 
-			name += key.toLowerCase();
+			name += tmp[0];
+
 
 		// 3b. Check for normal characters
-		} else {
+		} else if (Class.KEYMAP[code] !== undefined) {
 
 			key  = Class.KEYMAP[code];
 			name = '';
 
 			if (ctrl  === true && key !== 'ctrl')  name += 'ctrl-';
 			if (alt   === true && key !== 'alt')   name += 'alt-';
-			if (shift === true && key !== 'shift') {
+			if (shift === true && key !== 'shift') name += 'shift-';
 
-				name += 'shift-';
+			if (
+				   shift === true
+				&& key !== 'ctrl'
+				&& key !== 'alt'
+				&& key !== 'shift'
+			) {
 
-				// WTF is this shit?
-				// t > T, but 0 > ! is special character
-				key = String.fromCharCode(code);
+				var tmp = String.fromCharCode(code);
+				if (tmp !== '') {
+					key = tmp;
+				}
 
 			}
 
@@ -282,9 +289,15 @@ lychee.define('Input').tags({
 
 		var handled = false;
 
-		// allow bind('key') and bind('ctrl-a');
-		handled = this.trigger('key', [ key, name, delta ]) || handled;
-		handled = this.trigger(name, [ delta ]) || handled;
+		if (key !== null) {
+
+			// bind('key') and bind('ctrl-a');
+			// bind('!')   and bind('shift-1');
+
+			handled = this.trigger('key', [ key, name, delta ]) || handled;
+			handled = this.trigger(name, [ delta ])             || handled;
+
+		}
 
 
 		this.__clock.key = Date.now();

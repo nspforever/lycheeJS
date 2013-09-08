@@ -17,6 +17,10 @@ lychee.define('Viewport').tags({
 
 }).exports(function(lychee, global) {
 
+	/*
+	 * EVENTS
+	 */
+
 	var _instances = [];
 
 	var _listeners = {
@@ -24,7 +28,7 @@ lychee.define('Viewport').tags({
 		resize: function() {
 
 			for (var i = 0, l = _instances.length; i < l; i++) {
-				_instances[i].__processReshape(process.stdout.columns, process.stdout.rows);
+				_process_reshape.call(_instances[i], process.stdout.columns, process.stdout.rows);
 			}
 
 		}
@@ -32,27 +36,61 @@ lychee.define('Viewport').tags({
 	};
 
 
+
+	/*
+	 * FEATURE DETECTION
+	 */
+
 	(function() {
 
-		var resize = true; // No way to detect that
-		if (resize) {
-			process.stdout.on('resize', _listeners.resize);
-		}
+		process.stdout.on('resize', _listeners.resize);
 
 
 		if (lychee.debug === true) {
-
-			var methods = [];
-			if (resize) methods.push('resize');
-
-			if (methods.length === 0) methods.push('NONE');
-
-			console.log('lychee.Viewport: Supported methods are ' + methods.join(', '));
-
+			console.log('lychee.Viewport: Supported methods are resize');
 		}
 
 	})();
 
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _process_reshape = function(width, height) {
+
+		this.__width  = width;
+		this.__height = height;
+
+
+		if (width > height) {
+
+			this.trigger('reshape', [
+				'landscape',
+				'landscape',
+				this.__width,
+				this.__height
+			]);
+
+		} else {
+
+			this.trigger('reshape', [
+				'portrait',
+				'portrait',
+				this.__width,
+				this.__height
+			]);
+
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function() {
 
@@ -71,35 +109,16 @@ lychee.define('Viewport').tags({
 	Class.prototype = {
 
 		/*
-		 * PRIVATE API
+		 * PUBLIC API
 		 */
 
-		__processReshape: function(width, height) {
+		enterFullscreen: function() {
+			// TODO: Evaluate if Fullscreen can be implemented in a TTY
+			return false;
+		},
 
-			this.__width  = width;
-			this.__height = height;
-
-
-			if (width > height) {
-
-				this.trigger('reshape', [
-					'landscape',
-					'landscape',
-					this.__width,
-					this.__height
-				]);
-
-			} else {
-
-				this.trigger('reshape', [
-					'portrait',
-					'portrait',
-					this.__width,
-					this.__height
-				]);
-
-			}
-
+		leaveFullscreen: function() {
+			return true;
 		}
 
 	};

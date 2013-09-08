@@ -5,8 +5,7 @@ lychee.define('game.Main').requires([
 	'game.entity.ui.Font',
 	'game.logic.Game',
 	'game.state.Game',
-	'game.state.Menu',
-	'game.DeviceSpecificHacks'
+	'game.state.Menu'
 ]).includes([
 	'lychee.game.Main'
 ]).exports(function(lychee, game, global, attachments) {
@@ -15,8 +14,6 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
-			title: 'Cosmo',
-
 			fullscreen: true,
 
 //			music: true,
@@ -24,15 +21,15 @@ lychee.define('game.Main').requires([
 			music: false,
 			sound: false,
 
+			// Is configured by sorbet/module/Server
+			client: null,
+
 			input: {
 				fireKey:      true,
 				fireModifier: false,
 				fireTouch:    true,
 				fireSwipe:    false
 			},
-
-			// Is configured by sorbet/module/Server
-			client: null,
 
 			renderer: {
 				id:     'game',
@@ -90,8 +87,6 @@ lychee.define('game.Main').requires([
 		},
 
 		reset: function(state) {
-
-			game.DeviceSpecificHacks.call(this);
 
 			// This will initially reset the viewport
 			// based on the DeviceSpecificHacks

@@ -1,6 +1,6 @@
 
 // Set to true to see lychee debug messages
-// lychee.debug = true;
+lychee.debug = true;
 
 
 lychee.rebase({
@@ -17,6 +17,7 @@ lychee.tag({
 lychee.build(function(lychee, global) {
 
 	var settings = {
+		state: 'font'
 	};
 
 

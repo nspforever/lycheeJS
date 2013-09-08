@@ -41,10 +41,12 @@
 
 		"state": {
 			"Base":  [ "js" ],
-			"Font":  [ "js" ]
+			"Font":  [ "js" ],
+			"Scene": [ "js" ]
 		},
 
 		"Builder":    [ "js" ],
+		"Client":     [ "js" ],
 		"Controller": [ "js" ],
 		"Main":       [ "js", "css" ],
 		"Server":     [ "js" ]

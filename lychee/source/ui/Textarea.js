@@ -75,6 +75,7 @@ lychee.define('lychee.ui.Textarea').includes([
 					character = '\t';
 				}
 
+
 				var ll = this.__lines.length;
 
 				if (character.length === 1) {
@@ -173,6 +174,7 @@ lychee.define('lychee.ui.Textarea').includes([
 
 					for (var t = 0, tl = text.length; t < tl; t++) {
 						var chr = font.get(text[t]);
+						if (chr === null) console.log(t, tl, text[t], text);
 						linewidth += chr.real + kerning;
 					}
 

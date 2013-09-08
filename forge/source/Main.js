@@ -1,7 +1,9 @@
 
 lychee.define('game.Main').requires([
+	'game.Client',
 	'game.entity.Font',
 	'game.state.Font',
+	'game.state.Scene',
 //	'game.Builder',
 	'game.Controller'
 ]).includes([
@@ -14,26 +16,31 @@ lychee.define('game.Main').requires([
 
 			fullscreen: true,
 
+			// Is configured by sorbet/module/Server
+			client: null,
+
 			input: {
 				fireKey:   true,
 				fireTouch: true,
 				fireSwipe: true
 			},
 
+			project: {
+				path: '/game/boilerplate'
+			},
+
 			renderer: {
 				id: 'forge'
 			},
 
-			project: {
-				path: '/game/boilerplate'
-			}
+			state: 'scene'
 
 		}, data);
 
 
 		lychee.game.Main.call(this, settings);
 
-		this.init();
+		this.load();
 
 	};
 
@@ -51,6 +58,44 @@ lychee.define('game.Main').requires([
 
 		},
 
+		load: function() {
+
+			var preloader = new lychee.Preloader();
+
+
+			preloader.bind('ready', function(assets, mappings) {
+
+				var url = Object.keys(assets)[0];
+				var settings = assets[url];
+				if (settings !== null) {
+
+					this.settings.client = {
+						port: settings.port,
+						host: settings.host
+					};
+
+				}
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
+
+				this.init();
+
+			}, this);
+
+			preloader.bind('error', function(assets, mappings) {
+
+				preloader.unbind('ready');
+				preloader.unbind('error');
+
+				this.init();
+
+			}, this);
+
+			preloader.load('/sorbet/module/Server', null, 'json');
+
+		},
+
 		init: function(project) {
 
 			// Remove Preloader Progress Bar
@@ -64,25 +109,22 @@ lychee.define('game.Main').requires([
 			this.fonts = {};
 			this.fonts.normal = new game.entity.Font('normal');
 
+
+			this.client   = null;
+			this.services = {
+				project: null
+			};
+
 //			this.builder    = new game.Builder(this);
 			this.controller = new game.Controller(this);
 
-			this.setState('font', new game.state.Font(this));
-
-
-			if (typeof this.settings.state === 'string') {
-
-				if (this.getState(this.settings.state) !== null) {
-					this.changeState(this.settings.state);
-				}
-
+			if (this.settings.client !== null) {
+				this.client = new game.Client(this.settings.client, this);
 			}
 
-
-			if (this.getState() === null) {
-				this.changeState('test');
-//				this.changeState('scene', '/game/boilerplate');
-			}
+			this.setState('font',  new game.state.Font(this));
+			this.setState('scene', new game.state.Scene(this));
+			this.changeState(this.settings.state);
 
 
 			this.start();

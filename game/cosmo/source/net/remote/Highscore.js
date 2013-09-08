@@ -36,6 +36,8 @@ lychee.define('game.net.remote.Highscore').includes([
 
 		update: function(data) {
 
+			// TODO: Implement Highscores via Database
+
 			var highscore = [];
 
 			highscore.push({
@@ -45,7 +47,6 @@ lychee.define('game.net.remote.Highscore').includes([
 				points: 20000
 			});
 
-console.log('SENDING UPDATE!', highscore);
 
 			this.remote.send({
 				highscore: highscore

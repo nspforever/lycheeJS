@@ -18,6 +18,10 @@ lychee.define('Input').tags({
 
 }).exports(function(lychee, global) {
 
+	/*
+	 * EVENTS
+	 */
+
 	var _instances = [];
 
 	var _listeners = {
@@ -26,16 +30,18 @@ lychee.define('Input').tags({
 
 			// This is apparently a hack to have a TTY conform behaviour
 			if (key && key.ctrl && key.name === 'c') {
+
 				process.exit();
+
 			} else if (
-				key.sequence !== undefined
+				   key.sequence !== undefined
 				|| key.name !== undefined
 			) {
 
 				var k = key.name !== undefined ? key.name : key.sequence;
 
 				for (var i = 0, l = _instances.length; i < l; i++) {
-					_instances[i].__processKey(k, key.ctrl, key.meta, key.shift);
+					_process_key.call(_instances[i], k, key.ctrl, key.meta, key.shift);
 				}
 
 			} else if (lychee.debug === true) {
@@ -47,37 +53,84 @@ lychee.define('Input').tags({
 	};
 
 
+
+	/*
+	 * FEATURE DETECTION
+	 */
+
 	(function() {
 
-		var keyboard = true;
-		if (keyboard === true) {
-			process.stdin.on('keypress', _listeners.keyboard).resume();
-		}
-
+		process.stdin.on('keypress', _listeners.keyboard).resume();
 		process.stdin.setRawMode(true);
 		process.stdin.resume();
 
 
-		// NodeJS has no theoretical support for both Touch and Mouse
-		var touch = false;
-		var mouse = false;
-
-
 		if (lychee.debug === true) {
-
-			var methods = [];
-			if (keyboard) methods.push('Keyboard');
-			if (touch)    methods.push('Touch');
-			if (mouse)    methods.push('Mouse');
-
-			if (methods.length === 0) methods.push("NONE");
-
-			console.log('lychee.Input: Supported input methods are ' + methods.join(', '));
-
+			console.log('lychee.Input: Supported input methods are Keyboard');
 		}
 
 	})();
 
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _process_key = function(key, ctrl, alt, shift) {
+
+		if (this.__fireKey === false) return;
+
+
+		// 2. Only fire after the enforced delay
+		var delta = Date.now() - this.__clock.key;
+		if (delta < this.__delay) {
+			return;
+		}
+
+
+		// 3. Check for current key being a modifier
+		/*
+		 * TODO: Modifier support is missing, I have
+		 * no idea how to work around the TTY behaviour.
+		 *
+		 */
+		if (
+			this.__fireModifier === false
+			&& (key === 'ctrl' || key === 'meta' || key === 'shift')
+		) {
+			return;
+		}
+
+
+		var name = '';
+
+		if (ctrl  === true) name += 'ctrl-';
+		if (alt   === true) name += 'alt-';
+		if (shift === true) name += 'shift-';
+
+		name += key.toLowerCase();
+
+
+		if (lychee.debug === true) {
+			console.log('lychee.Input:', key, name, delta);
+		}
+
+
+		// allow bind('key') and bind('ctrl-a');
+		this.trigger('key', [ key, name, delta ]);
+		this.trigger(name, [ delta ]);
+
+
+		this.__clock.key = Date.now();
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(data) {
 
@@ -115,67 +168,12 @@ lychee.define('Input').tags({
 
 		reset: function() {
 
-			this.__clock      = null; // GC hint
-			this.__clock      = {
+			this.__clock = null; // GC hint
+			this.__clock = {
 				key:   Date.now(),
 				touch: Date.now(),
 				swipe: Date.now()
 			};
-
-		},
-
-
-
-		/*
-		 * PRIVATE API
-		 */
-
-		__processKey: function(key, ctrl, alt, shift) {
-
-			if (this.__fireKey === false) return;
-
-
-			// 2. Only fire after the enforced delay
-			var delta = Date.now() - this.__clock.key;
-			if (delta < this.__delay) {
-				return;
-			}
-
-
-			// 3. Check for current key being a modifier
-			/*
-			 * TODO: Modifier support is missing, I have
-			 * no idea how to work around the TTY behaviour.
-			 *
-			 */
-			if (
-				this.__fireModifier === false
-				&& (key === 'ctrl' || key === 'meta' || key === 'shift')
-			) {
-				return;
-			}
-
-
-			var name = '';
-
-			if (ctrl)   name += 'ctrl-';
-			if (alt)    name += 'alt-';
-			if (shift)  name += 'shift-';
-
-			name += key.toLowerCase();
-
-
-			if (lychee.debug === true) {
-				console.log('lychee.Input:', key, name, delta);
-			}
-
-
-			// allow bind('key') and bind('ctrl-a');
-			this.trigger('key', [ key, name, delta ]);
-			this.trigger(name, [ delta ]);
-
-
-			this.__clock.key = Date.now();
 
 		}
 

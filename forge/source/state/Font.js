@@ -1,72 +1,12 @@
 
 lychee.define('game.state.Font').requires([
-	'lychee.ui.Button',
-	'lychee.ui.Input',
-	'lychee.ui.Slider',
-	'game.state.Base',
-	'game.entity.ui.Sidebar',
-	'game.entity.ui.Widget'
+	'game.state.Base'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global) {
 
 	var _base = game.state.Base;
 
-	var _sidebar = game.entity.ui.Sidebar;
-	var _widget  = game.entity.ui.Widget;
-
-
-	/*
-	 * HELPERS
-	 */
-
-	var _create_widget = function(property, label, entity) {
-
-		property = typeof property === 'string' ? property : null;
-
-
-		if (property !== null) {
-
-			var widget = new _widget({
-				width:  this.width - this.margin * 4,
-				margin: this.margin,
-				reflow: {
-					x: false,
-					y: true
-				}
-			});
-
-
-			if (label !== null) {
-
-				label.width = widget.width - widget.margin * 2;
-				widget.addEntity(label);
-
-			}
-
-			if (entity !== null) {
-
-				entity.width = widget.width - widget.margin * 2;
-				widget.addEntity(entity);
-
-				entity.bind('touch', function() {
-					this.relayout(true);
-				}, widget);
-
-			}
-
-
-			this.addEntity(widget);
-
-		}
-
-	};
-
-
-
-	/*
-	 * IMPLEMENTATION
-	 */
 
 	var Class = function(game) {
 
@@ -81,6 +21,17 @@ lychee.define('game.state.Font').requires([
 	Class.prototype = {
 
 		/*
+		 * MODULE INCLUSION
+		 */
+
+		createWidget: function() {
+			var args = [].slice.call(arguments, 0);
+			return _base.createWidget.apply(this, args);
+		},
+
+
+
+		/*
 		 * STATE API
 		 */
 
@@ -89,12 +40,8 @@ lychee.define('game.state.Font').requires([
 			_base.reset.call(this);
 
 
-			var settings = this.getLayer('ui').getEntity('settings');
-
-
-			_create_widget.call(
-				settings,
-				'family',
+			this.createWidget(
+				'settings', 'family',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Font Family'
@@ -106,9 +53,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			_create_widget.call(
-				settings,
-				'style',
+			this.createWidget(
+				'settings', 'style',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Font Style'
@@ -120,8 +66,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			_create_widget.call(
-				settings,
+			this.createWidget(
+				'settings', 'size',
 				'size',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
@@ -138,9 +84,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			_create_widget.call(
-				settings,
-				'spacing',
+			this.createWidget(
+				'settings', 'spacing',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Spacing'
@@ -156,9 +101,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			_create_widget.call(
-				settings,
-				'outline',
+			this.createWidget(
+				'settings', 'outline',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Outline'
@@ -174,9 +118,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			_create_widget.call(
-				settings,
-				'color',
+			this.createWidget(
+				'settings', 'color',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Color'
@@ -188,9 +131,8 @@ lychee.define('game.state.Font').requires([
 				})
 			);
 
-			_create_widget.call(
-				settings,
-				'outlinecolor',
+			this.createWidget(
+				'settings', 'outlinecolor',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Outline Color'
