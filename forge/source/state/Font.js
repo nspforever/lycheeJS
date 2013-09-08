@@ -68,7 +68,6 @@ lychee.define('game.state.Font').requires([
 
 			this.createWidget(
 				'settings', 'size',
-				'size',
 				new lychee.ui.Button({
 					font:  this.game.fonts.normal,
 					label: 'Font Size'
