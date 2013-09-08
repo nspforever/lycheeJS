@@ -210,7 +210,10 @@ lychee.define('Input').tags({
 
 
 		// 1. Validate key event
-		if (Class.KEYMAP[code] === undefined) {
+		if (
+			   Class.KEYMAP[code] === undefined
+			&& Class.SPECIALMAP[code] === undefined
+		) {
 			return false;
 		}
 
@@ -237,23 +240,44 @@ lychee.define('Input').tags({
 		}
 
 
-		var key  = Class.KEYMAP[code];
-		var name = '';
+		var key, name;
 
-		if (ctrl  === true && key !== 'ctrl')  name += 'ctrl-';
-		if (alt   === true && key !== 'alt')   name += 'alt-';
-		if (shift === true && key !== 'shift') {
+		// 3a. Check for special characters (that can be shifted)
+		if (Class.SPECIALMAP[code] !== undefined) {
 
-			name += 'shift-';
+			var tmp = Class.SPECIALMAP[code];
 
-			// WTF is this shit?
-			// t > T, but 0 > ! doesn't work.
-			key = String.fromCharCode(code);
+			key  = shift === true ? tmp[1] : tmp[0];
+			name = '';
+
+			if (ctrl  === true) name += 'ctrl-';
+			if (alt   === true) name += 'alt-';
+			// Ignore shift, as shift key is emulated
+			// if (shift === true) name += 'shift-';
+
+			name += key.toLowerCase();
+
+		// 3b. Check for normal characters
+		} else {
+
+			key  = Class.KEYMAP[code];
+			name = '';
+
+			if (ctrl  === true && key !== 'ctrl')  name += 'ctrl-';
+			if (alt   === true && key !== 'alt')   name += 'alt-';
+			if (shift === true && key !== 'shift') {
+
+				name += 'shift-';
+
+				// WTF is this shit?
+				// t > T, but 0 > ! is special character
+				key = String.fromCharCode(code);
+
+			}
+
+			name += key.toLowerCase();
 
 		}
-
-
-		name += key.toLowerCase();
 
 
 		var handled = false;
