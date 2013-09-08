@@ -3,27 +3,15 @@
 // lychee.debug = true;
 
 
-// Rebase required namespaces for inclusion
 lychee.rebase({
 	lychee: "../../lychee/source",
-	game: "./source"
+	game:   "./source"
 });
 
 
-// Tags are required to determine which libraries to load
-(function(lychee, global) {
-
-	var platform = [ 'webgl', 'html', 'nodejs' ];
-
-	if (global.navigator && global.navigator.appName === 'V8GL') {
-		platform = [ 'v8gl' ];
-	}
-
-	lychee.tag({
-		platform: platform
-	});
-
-})(lychee, typeof global !== 'undefined' ? global : this);
+lychee.tag({
+	platform: [ 'webgl', 'html' ]
+});
 
 
 lychee.build(function(lychee, global) {
@@ -32,7 +20,7 @@ lychee.build(function(lychee, global) {
 		instances:  2,
 		fullscreen: false,
 		width:      global.innerWidth,
-		height:     (global.innerHeight / 2) - (2 * 2)
+		height:    (global.innerHeight / 2) - (2 * 2)
 	};
 
 

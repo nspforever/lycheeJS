@@ -6,14 +6,14 @@ lychee.debug = true;
 // Rebase required namespaces for inclusion
 lychee.rebase({
 	lychee: "../../lychee/source",
-	game: "./source"
+	game:   "./source"
 });
 
 
 // Tags are required to determine which libraries to load
 (function(lychee, global) {
 
-	var platform = [ 'webgl', 'html', 'nodejs' ];
+	var platform = [ 'webgl', 'html' ];
 
 	if (global.navigator && global.navigator.appName === 'V8GL') {
 		platform = [ 'v8gl' ];
@@ -33,6 +33,7 @@ lychee.build(function(lychee, global) {
 		music: true,
 		sound: true
 	};
+
 
 	new game.Main(settings);
 

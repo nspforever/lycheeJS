@@ -150,6 +150,9 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 				console.log('sorbet.module.Server: Booting VHost "' + vhost.id + '"');
 			}
 
+			var forge_project = _get_projects.call(this, vhost, '/forge')[0];
+			_build_project.call(this, forge_project);
+
 			var internal_projects = _get_projects.call(this, vhost, '/game');
 			for (var i = 0, il = internal_projects.length; i < il; i++) {
 				_build_project.call(this, internal_projects[i]);

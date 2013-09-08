@@ -2,10 +2,8 @@
 lychee.define('game.Main').requires([
 	'game.entity.Font',
 	'game.state.Font',
-	'game.state.Test',
-	'game.Builder',
-	'game.DeviceSpecificHacks',
-	'game.Project'
+//	'game.Builder',
+	'game.Controller'
 ]).includes([
 	'lychee.game.Main'
 ]).exports(function(lychee, game, global, attachments) {
@@ -44,8 +42,6 @@ lychee.define('game.Main').requires([
 
 		reset: function(state) {
 
-			game.DeviceSpecificHacks.call(this);
-
 			this.reshape();
 
 
@@ -68,13 +64,10 @@ lychee.define('game.Main').requires([
 			this.fonts = {};
 			this.fonts.normal = new game.entity.Font('normal');
 
-			this.builder = new game.Builder(this);
-			this.project = new game.Project(this, this.settings.project);
+//			this.builder    = new game.Builder(this);
+			this.controller = new game.Controller(this);
 
 			this.setState('font', new game.state.Font(this));
-			this.setState('test', new game.state.Test(this));
-
-			// this.setState('scene', new game.state.Scene(this));
 
 
 			if (typeof this.settings.state === 'string') {

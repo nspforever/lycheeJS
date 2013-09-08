@@ -11,14 +11,12 @@ require(path + '/platform/nodejs/bootstrap.js')(__dirname);
 require('./source/Server.js');
 
 
-// Set to true to see lychee debug messages
 // lychee.debug = true;
 
 
-// Rebase required namespaces for inclusion
 lychee.rebase({
 	lychee: "../../lychee/source",
-	game: "./source"
+	game:   "./source"
 });
 
 lychee.tag({

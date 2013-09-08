@@ -5,14 +5,19 @@
 
 	"tree": {
 
+		"data": {
+			"Font":    [ "js" ],
+			"Project": [ "js" ]
+		},
+
 		"entity": {
 
 			"ui": {
 				"Navigation": [ "js" ],
 				"Properties": [ "js" ],
-				"Sandbox": [ "js" ],
-				"Sidebar": [ "js" ],
-				"Widget": [ "js" ]
+				"Sandbox":    [ "js" ],
+				"Sidebar":    [ "js" ],
+				"Widget":     [ "js" ]
 			},
 
 			"Font": [
@@ -22,18 +27,27 @@
 
 		},
 
+		"net": {
 
-		"state": {
-			"Base": [ "js" ],
-			"Font": [ "js" ],
-			"Scene": [ "js" ],
-			"Test": [ "js" ]
+			"client": {
+				"Project": [ "js" ]
+			},
+
+			"remote": {
+				"Project": [ "js" ]
+			}
+
 		},
 
-		"Builder": [ "js" ],
-		"DeviceSpecificHacks": [ "js" ],
-		"Main": [ "js", "css" ],
-		"Project": [ "js" ]
+		"state": {
+			"Base":  [ "js" ],
+			"Font":  [ "js" ]
+		},
+
+		"Builder":    [ "js" ],
+		"Controller": [ "js" ],
+		"Main":       [ "js", "css" ],
+		"Server":     [ "js" ]
 
 	}
 }

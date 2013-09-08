@@ -1,5 +1,5 @@
 
-var path = "../../lychee/source";
+var path = "../lychee/source";
 
 require(path + '/core.js');
 require(path + '/Builder.js');
@@ -11,14 +11,15 @@ require(path + '/platform/nodejs/bootstrap.js')(__dirname);
 require('./source/Server.js');
 
 
+// Set to true to see lychee debug messages
 // lychee.debug = true;
 
 
+// Rebase required namespaces for inclusion
 lychee.rebase({
-	lychee: "../../lychee/source",
+	lychee: "../lychee/source",
 	game:   "./source"
 });
-
 
 lychee.tag({
 	platform: [ 'nodejs' ]

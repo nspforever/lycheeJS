@@ -6,7 +6,7 @@
 // Rebase required namespaces for inclusion
 lychee.rebase({
 	lychee: "../../lychee/source",
-	game: "./source"
+	game:   "./source"
 });
 
 
@@ -33,6 +33,7 @@ lychee.build(function(lychee, global) {
 		music: true,
 		sound: true
 	};
+
 
 	new game.Main(settings);
 
