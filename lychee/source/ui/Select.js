@@ -96,7 +96,21 @@ lychee.define('lychee.ui.Select').includes([
 		 */
 
 		serialize: function() {
-			// TODO: Serialization
+
+			var data = lychee.ui.Entity.prototype.serialize.call(this);
+			data['constructor'] = 'lyche.ui.Select';
+
+			var settings = data['arguments'][0];
+
+
+			if (this.font !== null)        settings.font    = this.font.serialize();
+			if (this.options.length !== 0) settings.options = [].slice.call(this.options, 0);
+			if (this.value !== '')         settings.value   = this.value;
+			if (this.width !== 140)        settings.width   = this.width;
+
+
+			return data;
+
 		},
 
 		render: function(renderer, offsetX, offsetY) {
@@ -327,7 +341,7 @@ lychee.define('lychee.ui.Select').includes([
 
 
 			if (
-				value !== null
+				   value !== null
 				&& this.options.indexOf(value) !== -1
 			) {
 
