@@ -14,7 +14,7 @@ lychee.define('lychee.game.State').requires([
 	 * HELPERS
 	 */
 
-	var _isEntityAtPosition = function(entity, targetX, targetY) {
+	var _is_entity_at_position = function(entity, targetX, targetY) {
 
 		var result = false;
 
@@ -60,7 +60,7 @@ lychee.define('lychee.game.State').requires([
 
 	};
 
-	var _processSwipeRecursive = function(search, entity, offset, offsetX, offsetY) {
+	var _processSwipe_recursive = function(search, entity, offset, offsetX, offsetY) {
 
 		if (offsetX === undefined || offsetY === undefined) {
 
@@ -87,7 +87,7 @@ lychee.define('lychee.game.State').requires([
 
 				var position = entities[e].position;
 
-				var result = _processSwipeRecursive.call(
+				var result = _processSwipe_recursive.call(
 					this,
 					search,
 					entities[e],
@@ -109,12 +109,12 @@ lychee.define('lychee.game.State').requires([
 
 	};
 
-	var _processTouchRecursive = function(entity, originX, originY, args) {
+	var _processTouch_recursive = function(entity, originX, originY, args) {
 
 		var triggered = null;
 
 
-		if (_isEntityAtPosition(entity, originX, originY) === true) {
+		if (_is_entity_at_position(entity, originX, originY) === true) {
 
 			var position = entity.position;
 
@@ -123,7 +123,7 @@ lychee.define('lychee.game.State').requires([
 				var entities = entity.entities;
 				for (var e = entities.length - 1; e >= 0; e--) {
 
-					var result = _processTouchRecursive.call(
+					var result = _processTouch_recursive.call(
 						this,
 						entities[e],
 						originX - position.x,
@@ -421,7 +421,7 @@ lychee.define('lychee.game.State').requires([
 
 				if (type === 'start') {
 
-					_processSwipeRecursive.call(
+					_processSwipe_recursive.call(
 						this,
 						entity,
 						layer,
@@ -500,7 +500,7 @@ lychee.define('lychee.game.State').requires([
 
 				for (var e = entities.length - 1; e >= 0; e--) {
 
-					var triggered = _processTouchRecursive.call(
+					var triggered = _processTouch_recursive.call(
 						this,
 						entities[e],
 						position.x,

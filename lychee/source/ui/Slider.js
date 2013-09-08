@@ -7,6 +7,27 @@ lychee.define('lychee.ui.Slider').includes([
 	 * HELPERS
 	 */
 
+	var _validate_enum = function(enumobject, value) {
+
+		if (typeof value !== 'number') return false;
+
+
+		var found = false;
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				found = true;
+				break;
+			}
+
+		}
+
+
+		return found;
+
+	};
+
 	var _refresh_drag = function(x, y) {
 
 		var type   = this.type;
@@ -279,22 +300,7 @@ lychee.define('lychee.ui.Slider').includes([
 
 		setType: function(type) {
 
-			if (typeof type !== 'number') return false;
-
-
-			var found = false;
-
-			for (var id in Class.TYPE) {
-
-				if (type === Class.TYPE[id]) {
-					found = true;
-					break;
-				}
-
-			}
-
-
-			if (found === true) {
+			if (_validate_enum(Class.TYPE, type) === true) {
 
 				if (type === Class.TYPE.horizontal) {
 					this.width  = this.__width;
@@ -306,10 +312,13 @@ lychee.define('lychee.ui.Slider').includes([
 
 				this.type = type;
 
+
+				return true;
+
 			}
 
 
-			return found;
+			return false;
 
 		},
 

@@ -284,27 +284,16 @@ lychee.define('lychee.ui.Entity').includes([
 
 		setShape: function(shape) {
 
-			if (typeof shape !== 'number') return false;
+			if (_validate_enum(Class.SHAPE, shape) === true) {
 
-
-			var found = false;
-
-			for (var id in Class.SHAPE) {
-
-				if (shape === Class.SHAPE[id]) {
-					found = true;
-					break;
-				}
-
-			}
-
-
-			if (found === true) {
 				this.shape = shape;
+
+				return true;
+
 			}
 
 
-			return found;
+			return false;
 
 		},
 

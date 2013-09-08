@@ -8,6 +8,10 @@ lychee.define('lychee.game.Main').requires([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
 
+	/*
+	 * HELPERS
+	 */
+
 	var _toString = Object.prototype.toString;
 	var _extend_recursive = function(obj) {
 
@@ -36,6 +40,11 @@ lychee.define('lychee.game.Main').requires([
 
 	};
 
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(settings) {
 
