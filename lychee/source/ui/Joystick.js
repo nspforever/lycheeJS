@@ -36,8 +36,8 @@ lychee.define('lychee.ui.Joystick').includes([
 		var settings = lychee.extend({}, data);
 
 
-		this.width  = typeof settings.width  === 'number' ? settings.width  : 240;
-		this.height = typeof settings.height === 'number' ? settings.height : 240;
+		this.width  = typeof settings.width  === 'number' ? settings.width  : 140;
+		this.height = typeof settings.height === 'number' ? settings.height : 140;
 		this.value  = { x: 0, y: 0 };
 
 		this.__drag = { x: 0, y: 0 };
@@ -120,7 +120,8 @@ lychee.define('lychee.ui.Joystick').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#ff1b1b' : '#aa1b1b';
+			var color = this.state === 'active' ? '#0099cc' : '#575757';
+			var alpha = this.state === 'active' ? 0.7       : 0.3;
 
 
 			var drag    = this.__drag;
@@ -138,13 +139,126 @@ lychee.define('lychee.ui.Joystick').includes([
 				2
 			);
 
-			renderer.drawCircle(
-				x + drag.x,
-				y + drag.y,
-				22,
+			renderer.drawLine(
+				x - hwidth,
+				y - hheight,
+				x + hwidth,
+				y + hheight,
+				'#575757',
+				1
+			);
+
+			renderer.drawLine(
+				x,
+				y - hheight,
+				x,
+				y + hheight,
+				'#575757',
+				2
+			);
+
+			renderer.drawLine(
+				x + hwidth,
+				y - hheight,
+				x - hwidth,
+				y + hheight,
+				'#575757',
+				1
+			);
+
+			renderer.drawLine(
+				x - hwidth,
+				y,
+				x + hwidth,
+				y,
+				'#575757',
+				2
+			);
+
+
+			renderer.drawTriangle(
+				x - hwidth,
+				y - hheight + 14,
+				x - hwidth,
+				y - hheight,
+				x - hwidth + 14,
+				y - hheight,
 				color,
 				true
 			);
+
+			renderer.drawTriangle(
+				x + hwidth - 14,
+				y - hheight,
+				x + hwidth,
+				y - hheight,
+				x + hwidth,
+				y - hheight + 14,
+				color,
+				true
+			);
+
+			renderer.drawTriangle(
+				x + hwidth,
+				y + hheight - 14,
+				x + hwidth,
+				y + hheight,
+				x + hwidth - 14,
+				y + hheight,
+				color,
+				true
+			);
+
+			renderer.drawTriangle(
+				x - hwidth + 14,
+				y + hheight,
+				x - hwidth,
+				y + hheight,
+				x - hwidth,
+				y + hheight - 14,
+				color,
+				true
+			);
+
+
+			renderer.drawLine(
+				x,
+				y,
+				x + drag.x,
+				y,
+				color,
+				2
+			);
+
+			renderer.drawLine(
+				x,
+				y,
+				x,
+				y + drag.y,
+				color,
+				2
+			);
+
+
+			renderer.drawCircle(
+				x + drag.x,
+				y + drag.y,
+				4,
+				color,
+				true
+			);
+
+			renderer.setAlpha(alpha);
+
+			renderer.drawCircle(
+				x + drag.x,
+				y + drag.y,
+				14,
+				color,
+				true
+			);
+
+			renderer.setAlpha(1.0);
 
 		},
 

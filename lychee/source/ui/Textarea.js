@@ -265,11 +265,11 @@ lychee.define('lychee.ui.Textarea').includes([
 			);
 
 			renderer.drawTriangle(
-				x + hwidth - 14,
-				y + hheight,
 				x + hwidth,
 				y + hheight - 14,
 				x + hwidth,
+				y + hheight,
+				x + hwidth - 14,
 				y + hheight,
 				color,
 				true
