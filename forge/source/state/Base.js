@@ -11,7 +11,7 @@ lychee.define('game.state.Base').requires([
 
 	Module.reset = function() {
 
-		var tile = 32;
+		var tile = 24;
 
 
 		lychee.game.State.prototype.reset.call(this);
@@ -31,13 +31,13 @@ lychee.define('game.state.Base').requires([
 			var layer = new lychee.game.Layer();
 
 
-			var swidth  = Math.min((((width * 0.25) / tile) | 0) * tile, 8 * tile);
+			var swidth  = 10 * tile;
 			var sheight = height;
 
 			var entitiesbar = new _sidebar({
 				width:  swidth,
 				height: sheight,
-				margin: tile / 4,
+				margin: tile / 2,
 				position: {
 					x: -1/2 * width + swidth / 2,
 					y: 0
@@ -50,7 +50,7 @@ lychee.define('game.state.Base').requires([
 			var settingsbar = new _sidebar({
 				width:  swidth,
 				height: sheight,
-				margin: tile / 4,
+				margin: tile / 2,
 				position: {
 					x: 1/2 * width - swidth / 2,
 					y: 0

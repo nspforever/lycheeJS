@@ -26,8 +26,8 @@ lychee.define('lychee.ui.Textarea').includes([
 
 
 		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
-		settings.width  = typeof settings.width  === 'number' ? settings.width  : 240;
-		settings.height = typeof settings.height === 'number' ? settings.height : 144;
+		settings.width  = typeof settings.width  === 'number' ? settings.width  : 140;
+		settings.height = typeof settings.height === 'number' ? settings.height : 140;
 
 
 		lychee.ui.Entity.call(this, settings);
@@ -143,8 +143,8 @@ lychee.define('lychee.ui.Textarea').includes([
 			if (buffer === null) {
 
 				buffer = renderer.createBuffer(
-					this.width - 48,
-					this.height - 48
+					this.width  - 28,
+					this.height - 28
 				);
 
 				this.__buffer = buffer;
@@ -176,7 +176,8 @@ lychee.define('lychee.ui.Textarea').includes([
 						linewidth += chr.real + kerning;
 					}
 
-					textwidth = linewidth;
+					var drag  = font.get('_');
+					textwidth = linewidth + drag.real;
 
 
 					var offsetx = 0;
@@ -202,6 +203,23 @@ lychee.define('lychee.ui.Textarea').includes([
 
 					}
 
+
+					if (this.state === 'active') {
+
+						var dragx = offsetx + textwidth - drag.real;
+						var dragy = offsety + lineheight * l - lineheight;
+
+						renderer.drawBox(
+							dragx,
+							dragy,
+							dragx + drag.real,
+							dragy + lineheight,
+							'#33b5e5',
+							true
+						);
+
+					}
+
 				}
 
 
@@ -218,102 +236,72 @@ lychee.define('lychee.ui.Textarea').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#ff1b1b' : '#aa1b1b';
+			var color = this.state === 'active' ? '#0099cc' : '#575757';
 
 
 			var hwidth  = this.width / 2;
 			var hheight = this.height / 2;
 
 
-			renderer.drawArc(
-				x - hwidth + 24,
-				y - hheight + 24,
-				0.5,
-				0.75,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
-				x - hwidth + 24,
+			renderer.drawBox(
+				x - hwidth,
 				y - hheight,
-				x + hwidth - 24,
-				y - hheight,
-				color,
-				2
-			);
-
-			renderer.drawArc(
-				x + hwidth - 24,
-				y - hheight + 24,
-				0.75,
-				1,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
 				x + hwidth,
-				y - hheight + 24,
-				x + hwidth,
-				y + hheight - 24,
-				color,
-				2
-			);
-
-			renderer.drawArc(
-				x + hwidth - 24,
-				y + hheight - 24,
-				0,
-				0.25,
-				24,
-				color,
-				false,
-				2
-			);
-
-			renderer.drawLine(
-				x - hwidth + 24,
-				y + hheight,
-				x + hwidth - 24,
 				y + hheight,
 				color,
-				2
-			);
-
-			renderer.drawArc(
-				x - hwidth + 24,
-				y + hheight - 24,
-				0.25,
-				0.5,
-				24,
-				color,
 				false,
 				2
 			);
 
-			renderer.drawLine(
+			renderer.drawTriangle(
 				x - hwidth,
-				y - hheight + 24,
+				y - hheight + 14,
 				x - hwidth,
-				y + hheight - 24,
+				y - hheight,
+				x - hwidth + 14,
+				y - hheight,
 				color,
-				2
+				true
+			);
+
+			renderer.drawTriangle(
+				x + hwidth - 14,
+				y + hheight,
+				x + hwidth,
+				y + hheight - 14,
+				x + hwidth,
+				y + hheight,
+				color,
+				true
 			);
 
 
-			var x1 = x - hwidth + 24;
-			var y1 = y - hheight + 24;
+			var x1 = x - hwidth  + 14;
+			var y1 = y - hheight + 14;
 
 			renderer.drawBuffer(
 				x1,
 				y1,
 				this.__buffer
 			);
+
+		},
+
+
+
+		/*
+		 * CUSTOM ENTITY API
+		 */
+
+		setState: function(id) {
+
+			var result = lychee.ui.Entity.prototype.setState.call(this, id);
+			if (result === true) {
+				this.__isDirty = true;
+			}
+
+
+			return result;
 
 		},
 

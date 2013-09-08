@@ -27,11 +27,9 @@ lychee.define('game.state.Font').requires([
 
 		if (property !== null) {
 
-			var margin = 12;
-
 			var widget = new _widget({
-				width:  this.width,
-				margin: margin,
+				width:  this.width - this.margin * 4,
+				margin: this.margin,
 				reflow: {
 					x: false,
 					y: true
@@ -41,14 +39,14 @@ lychee.define('game.state.Font').requires([
 
 			if (label !== null) {
 
-				label.width = this.width - margin * 4;
+				label.width = widget.width - widget.margin * 2;
 				widget.addEntity(label);
 
 			}
 
 			if (entity !== null) {
 
-				entity.width = this.width - margin * 4;
+				entity.width = widget.width - widget.margin * 2;
 				widget.addEntity(entity);
 
 				entity.bind('touch', function() {
@@ -203,6 +201,16 @@ lychee.define('game.state.Font').requires([
 					value: '#000000'
 				})
 			);
+
+
+var test = new lychee.ui.Textarea({
+	font: this.game.fonts.normal,
+	value: 'This is just a test\nfor typing\nstuff...',
+	width:  140 * 3,
+	height: 140
+});
+
+this.getLayer('ui').addEntity(test);
 
 		},
 

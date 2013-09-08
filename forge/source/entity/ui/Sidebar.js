@@ -15,10 +15,7 @@ lychee.define('game.entity.ui.Sidebar').requires([
 		}
 
 
-		this.margin = 10;
-
-		this.__offsetX = 0;
-		this.__offsetY = 0;
+		this.margin = 20;
 
 
 		this.setMargin(settings.margin);
@@ -27,6 +24,31 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 
 		lychee.ui.Layer.call(this, settings);
+
+
+
+		/*
+		 * INITIALIZATION
+		 */
+
+		this.bind('touch', function() {}, this);
+
+		this.bind('swipe', function(id, type, position, delta, swipe) {
+
+			var offset = 0;
+
+			var lastentity = this.entities[this.entities.length - 1];
+			var overflow   = (this.height / 2) - (lastentity.position.y + lastentity.height / 2);
+			if (overflow < 0) {
+
+				if (swipe.y > 0) offset = Math.min(0, swipe.y);
+				if (swipe.y < 0) offset = Math.max(overflow, swipe.y);
+
+				this.offset.y = offset;
+
+			}
+
+		}, this);
 
 
 		this.relayout()
@@ -51,11 +73,8 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 
 			// 3. Reset the offsets and positions
-			this.__offsetX = 0;
-			this.__offsetY = -1/2 * height + margin;
-
-			var posx = this.__offsetX;
-			var posy = this.__offsetY;
+			var posx = 0;
+			var posy = -1/2 * height + margin;
 
 
 			// 4. Relayout the entities
@@ -74,9 +93,6 @@ lychee.define('game.entity.ui.Sidebar').requires([
 				posy += margin;
 
 			}
-
-			this.__offsetX = posx;
-			this.__offsetY = posy;
 
 		},
 
@@ -107,6 +123,8 @@ lychee.define('game.entity.ui.Sidebar').requires([
 			);
 
 
+			var offset = this.offset;
+
 			for (var e = 0, el = this.entities.length; e < el; e++) {
 
 				var widget   = this.entities[e];
@@ -114,8 +132,8 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 				var whw = widget.width / 2;
 				var whh = widget.height / 2;
-				var wpx = x + widget.position.x;
-				var wpy = y + widget.position.y;
+				var wpx = x + widget.position.x - this.margin + offset.x;
+				var wpy = y + widget.position.y + offset.y;
 
 
 				if (lychee.debug === true) {
