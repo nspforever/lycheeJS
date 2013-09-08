@@ -120,8 +120,9 @@ lychee.define('lychee.ui.Joystick').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#0099cc' : '#575757';
-			var alpha = this.state === 'active' ? 0.7       : 0.3;
+			var color  = this.state === 'active' ? '#33b5e5' : '#0099cc';
+			var color2 = this.state === 'active' ? '#0099cc' : '#575757';
+			var alpha  = this.state === 'active' ? 0.7       : 0.3;
 
 
 			var drag    = this.__drag;
@@ -134,7 +135,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				y - hheight,
 				x + hwidth,
 				y + hheight,
-				color,
+				color2,
 				false,
 				2
 			);
@@ -183,7 +184,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				y - hheight,
 				x - hwidth + 14,
 				y - hheight,
-				color,
+				'#0099cc',
 				true
 			);
 
@@ -194,7 +195,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				y - hheight,
 				x + hwidth,
 				y - hheight + 14,
-				color,
+				'#0099cc',
 				true
 			);
 
@@ -205,7 +206,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				y + hheight,
 				x + hwidth - 14,
 				y + hheight,
-				color,
+				'#0099cc',
 				true
 			);
 
@@ -216,7 +217,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				y + hheight,
 				x - hwidth,
 				y + hheight - 14,
-				color,
+				'#0099cc',
 				true
 			);
 
