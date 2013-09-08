@@ -172,7 +172,7 @@ lychee.define('lychee.ui.Input').includes([
 
 					return;
 
-				} else if (key === 'return') {
+				} else if (key === 'enter') {
 
 					this.trigger('blur', []);
 

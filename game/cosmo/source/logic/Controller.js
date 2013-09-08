@@ -140,11 +140,11 @@ lychee.define('game.logic.Controller').requires([
 
 				switch(key) {
 
-					case 'left':  case 'a': ship.left();  processed = true; break;
-					case 'down':  case 's': ship.stop();  processed = true; break;
-					case 'right': case 'd': ship.right(); processed = true; break;
-					case 'up':    case 'w': ship.fire();  processed = true; break;
-					case 'space':           ship.fire();  processed = true; break;
+					case 'arrow-left':  case 'a': ship.left();  processed = true; break;
+					case 'arrow-down':  case 's': ship.stop();  processed = true; break;
+					case 'arrow-right': case 'd': ship.right(); processed = true; break;
+					case 'arrow-up':    case 'w': ship.fire();  processed = true; break;
+					case 'space':                 ship.fire();  processed = true; break;
 
 				}
 

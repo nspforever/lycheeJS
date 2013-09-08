@@ -617,11 +617,11 @@ lychee.define('game.state.Menu').requires([
 
 			switch(key) {
 
-				case 'left':  case 'a': left.visible === true  && _navigate_horizontal.call(this, -1); break;
-				case 'down':  case 's': this.simulateTouch(0, { x: 0, y: 0 }, 0); break;
-				case 'right': case 'd': right.visible === true && _navigate_horizontal.call(this,  1); break;
-				case 'up':    case 'w': top.visible === true   && _navigate_vertical.call(this,   -1); break;
-				case 'space':           this.simulateTouch(0, { x: 0, y: 0 }, 0); break;
+				case 'arrow-left':  case 'a': left.visible === true  && _navigate_horizontal.call(this, -1); break;
+				case 'arrow-down':  case 's': this.simulateTouch(0, { x: 0, y: 0 }, 0);                      break;
+				case 'arrow-right': case 'd': right.visible === true && _navigate_horizontal.call(this,  1); break;
+				case 'arrow-up':    case 'w': top.visible === true   && _navigate_vertical.call(this,   -1); break;
+				case 'space':                 this.simulateTouch(0, { x: 0, y: 0 }, 0);                      break;
 
 			}
 

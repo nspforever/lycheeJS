@@ -60,7 +60,7 @@ lychee.define('lychee.ui.Textarea').includes([
 			var line      = this.__lines[this.__lines.length - 1];
 			var character = key;
 
-			if (key === 'return') {
+			if (key === 'enter') {
 
 				this.__lines.push('');
 				this.__isDirty = true;
