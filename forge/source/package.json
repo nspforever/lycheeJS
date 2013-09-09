@@ -1,12 +1,29 @@
 {
 	"tags": {
 
+		"platform": {
+
+			"html": "platform/html"
+
+		}
+
 	},
 
 	"tree": {
 
+		"platform": {
+
+			"html": {
+
+				"data": {
+					"Font": [ "js" ]
+				}
+
+			}
+
+		},
+
 		"data": {
-			"Font":    [ "js" ],
 			"Project": [ "js" ]
 		},
 
