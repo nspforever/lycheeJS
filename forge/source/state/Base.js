@@ -4,6 +4,7 @@ lychee.define('game.state.Base').requires([
 	'lychee.ui.Input',
 	'lychee.ui.Select',
 	'lychee.ui.Slider',
+	'lychee.ui.Sprite',
 	'lychee.ui.Textarea',
 	'lychee.game.State',
 	'game.entity.ui.Sidebar',
@@ -100,6 +101,7 @@ lychee.define('game.state.Base').requires([
 
 			entity.width = widget.width - widget.margin * 2;
 			widget.addEntity(entity);
+
 
 			entity.bind('touch', function() {
 				this.relayout(true);

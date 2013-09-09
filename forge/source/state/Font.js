@@ -1,16 +1,52 @@
 
 lychee.define('game.state.Font').requires([
+	'game.data.Font',
 	'game.state.Base'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global) {
 
 	var _base = game.state.Base;
+	var _font = game.data.Font;
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _bind_entity = function(property, entity) {
+
+		entity.bind('change', function(value) {
+			this.generator.settings[property] = value;
+			this.generator.generate();
+		}, this);
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(game) {
 
 		lychee.game.State.call(this, game);
+
+		this.preview = new lychee.ui.Sprite({
+			position: {
+				x: 0, y: 0
+			}
+		});
+
+		this.generator = new _font(this);
+		this.generator.bind('ready', function(data) {
+
+			this.preview.width  = data.texture.width;
+			this.preview.height = data.texture.height;
+			this.preview.setTexture(data.texture);
+
+		}, this);
 
 
 		this.reset();
@@ -25,8 +61,13 @@ lychee.define('game.state.Font').requires([
 		 */
 
 		createWidget: function() {
+
 			var args = [].slice.call(arguments, 0);
-			return _base.createWidget.apply(this, args);
+
+			_bind_entity.call(this, args[1], args[3]);
+
+			_base.createWidget.apply(this, args);
+
 		},
 
 
@@ -40,6 +81,9 @@ lychee.define('game.state.Font').requires([
 			_base.reset.call(this);
 
 
+			var settings = this.generator.settings;
+
+
 			this.createWidget(
 				'settings', 'family',
 				new lychee.ui.Button({
@@ -49,7 +93,7 @@ lychee.define('game.state.Font').requires([
 				new lychee.ui.Input({
 					font:  this.game.fonts.normal,
 					type:  lychee.ui.Input.TYPE.text,
-					value: 'Ubuntu Mono'
+					value: settings.family
 				})
 			);
 
@@ -62,7 +106,7 @@ lychee.define('game.state.Font').requires([
 				new lychee.ui.Select({
 					font:    this.game.fonts.normal,
 					options: [ 'normal', 'bold', 'italic' ],
-					value:   'normal'
+					value:   settings.style
 				})
 			);
 
@@ -79,7 +123,7 @@ lychee.define('game.state.Font').requires([
 						to:    64,
 						delta: 1
 					},
-					value: 32
+					value: settings.size
 				})
 			);
 
@@ -96,7 +140,7 @@ lychee.define('game.state.Font').requires([
 						to:    64,
 						delta: 1
 					},
-					value: 8
+					value: settings.spacing
 				})
 			);
 
@@ -113,7 +157,7 @@ lychee.define('game.state.Font').requires([
 						to:    16,
 						delta: 1
 					},
-					value: 1
+					value: settings.outline
 				})
 			);
 
@@ -126,7 +170,7 @@ lychee.define('game.state.Font').requires([
 				new lychee.ui.Input({
 					font:  this.game.fonts.normal,
 					type:  lychee.ui.Input.TYPE.color,
-					value: '#ffffff'
+					value: settings.color
 				})
 			);
 
@@ -139,23 +183,18 @@ lychee.define('game.state.Font').requires([
 				new lychee.ui.Input({
 					font:  this.game.fonts.normal,
 					type:  lychee.ui.Input.TYPE.color,
-					value: '#000000'
+					value: settings.outlinecolor
 				})
 			);
 
 
-var test = new lychee.ui.Textarea({
-	font: this.game.fonts.normal,
-	value: 'This is just a test\nfor typing\nstuff...',
-	width:  140 * 3,
-	height: 140
-});
-
-this.getLayer('ui').addEntity(test);
+			this.getLayer('ui').addEntity(this.preview);
 
 		},
 
 		enter: function(data) {
+
+			this.generator.generate();
 
 			lychee.game.State.prototype.enter.call(this);
 
