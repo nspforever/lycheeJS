@@ -30,17 +30,16 @@
 		"entity": {
 
 			"ui": {
-				"Navigation": [ "js" ],
-				"Properties": [ "js" ],
-				"Sandbox":    [ "js" ],
-				"Sidebar":    [ "js" ],
-				"Widget":     [ "js" ]
+				"Sandbox": [ "js" ],
+				"Sidebar": [ "js" ],
+				"Widget":  [ "js" ]
 			},
 
 			"Font": [
 				"js",
 				"normal.fnt"
-			]
+			],
+			"Project": [ "js", "json" ]
 
 		},
 

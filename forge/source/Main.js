@@ -2,6 +2,7 @@
 lychee.define('game.Main').requires([
 	'game.Client',
 	'game.entity.Font',
+	'game.entity.Project',
 	'game.state.Font',
 	'game.state.Scene',
 //	'game.Builder',
@@ -98,34 +99,32 @@ lychee.define('game.Main').requires([
 
 		init: function(project) {
 
-			// Remove Preloader Progress Bar
-			lychee.Preloader.prototype._progress(null, null);
-
-
 			lychee.game.Main.prototype.init.call(this);
 			this.reset(false);
 
 
+			var env = this.renderer.getEnvironment();
+
+
 			this.fonts = {};
 			this.fonts.normal = new game.entity.Font('normal');
-
 
 			this.client   = null;
 			this.services = {
 				project: null
 			};
 
-//			this.builder    = new game.Builder(this);
-			this.controller = new game.Controller(this);
-
 			if (this.settings.client !== null) {
 				this.client = new game.Client(this.settings.client, this);
 			}
 
+//			this.builder    = new game.Builder(this);
+			this.controller = new game.Controller(this);
+			this.project    = new game.entity.Project(this);
+
 			this.setState('font',  new game.state.Font(this));
 			this.setState('scene', new game.state.Scene(this));
 			this.changeState(this.settings.state);
-
 
 			this.start();
 

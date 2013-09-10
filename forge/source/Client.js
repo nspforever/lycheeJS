@@ -17,6 +17,12 @@ lychee.define('game.Client').requires([
 
 		this.game.services.project = service;
 
+
+		var entity = this.game.project;
+		if (entity !== null) {
+			service.bind('update', entity.processUpdate, entity);
+		}
+
 	};
 
 

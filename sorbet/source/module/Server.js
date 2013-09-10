@@ -100,7 +100,8 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		var server = child_process.fork(
 			resolved, [
 				port,
-				host
+				host,
+				this.main.root
 			], {
 				cwd: cwd
 			}
@@ -109,7 +110,6 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		server.id   = id;
 		server.port = port;
 		server.host = host;
-
 
 		server.on('exit', function() {
 			that.main.servers.remove(this.id, null);

@@ -114,10 +114,15 @@ lychee.define('lychee.net.Server').tags({
 			socket.setKeepAlive(true, 0);
 			socket.removeAllListeners('timeout');
 
-			this.connect(new lychee.net.Remote(
-				this, socket, this.__maxFrameSize,
-				this.__encoder, this.__decoder
-			));
+
+			var remote = new lychee.net.Remote(
+				this,
+				socket,
+				this.__encoder,
+				this.__decoder
+			);
+
+			this.connect(remote);
 
 
 			return true;
@@ -146,7 +151,6 @@ lychee.define('lychee.net.Server').tags({
 		this.__encoder      = encoder;
 		this.__decoder      = decoder;
 		this.__server       = null;
-		this.__maxFrameSize = 32768;
 
 
 		lychee.event.Emitter.call(this);

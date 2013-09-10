@@ -233,20 +233,19 @@ lychee.define('lychee.net.Remote').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(server, socket, maxFrameSize, encoder, decoder) {
+	var Class = function(server, socket, encoder, decoder) {
 
 		encoder = encoder instanceof Function ? encoder : function(blob) { return blob; };
 		decoder = decoder instanceof Function ? decoder : function(blob) { return blob; };
 
 
-		this.id       = socket.remoteAddress + ':' + socket.remotePort;
-		this.version  = _protocol.VERSION;
-		this.waiting  = true;
+		this.id      = socket.remoteAddress + ':' + socket.remotePort;
+		this.version = _protocol.VERSION;
+		this.waiting = true;
+		this.server  = server;
 
-		this.__server   = server;
-		this.__encoder  = encoder;
-		this.__decoder  = decoder;
-		this.__socket   = socket;
+		this.__encoder = encoder;
+		this.__decoder = decoder;
 
 		this.__services    = [];
 		this.__servicesmap = {};
@@ -259,34 +258,34 @@ lychee.define('lychee.net.Remote').tags({
 
 		var that = this;
 
-		this.__protocol = new _protocol(socket, maxFrameSize, function(closedByRemote) {
+		this.__protocol = new _protocol(socket, function(closedByRemote) {
 
-			that.__socket.end();
-			that.__socket.destroy();
-			that.__server.disconnect(that);
+			socket.end();
+			socket.destroy();
+			server.disconnect(that);
 
 		});
 
-		this.__socket.on('data', function(data) {
+		socket.on('data', function(data) {
 			that.__protocol.read(data, _receive_handler, that);
 		});
 
-		this.__socket.on('error', function(err) {
+		socket.on('error', function(err) {
 			that.__protocol.close(true);
 			_cleanup_services.call(that);
 		});
 
-		this.__socket.on('timeout', function(a,b,c) {
+		socket.on('timeout', function(a,b,c) {
 			that.__protocol.close(true);
 			_cleanup_services.call(that);
 		});
 
-		this.__socket.on('end', function() {
+		socket.on('end', function() {
 			that.__protocol.close(true);
 			_cleanup_services.call(that);
 		});
 
-		this.__socket.on('close', function(err) {
+		socket.on('close', function(err) {
 			that.__protocol.close(true);
 			_cleanup_services.call(that);
 		});
@@ -360,7 +359,7 @@ lychee.define('lychee.net.Remote').tags({
 
 
 			if (
-				data === null
+				   data === null
 				|| this.__protocol.isConnected() === false
 			) {
 				return false;

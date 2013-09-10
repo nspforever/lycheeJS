@@ -8,7 +8,12 @@ lychee.define('game.Server').requires([
 	var _project = game.net.remote.Project;
 
 
-	var Class = function() {
+	var Class = function(config) {
+
+		this.config = lychee.extend({
+			root: null
+		}, config);
+
 
 		lychee.net.Server.call(this, JSON.stringify, JSON.parse);
 

@@ -121,10 +121,10 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 				var builds = _get_build_variants(data.tree);
 
 
-console.log('----------------------');
-console.log(id);
-console.log('----------------------');
-console.log('BUILD VARIANTS', builds);
+//console.log('----------------------');
+//console.log(id);
+//console.log('----------------------');
+//console.log('BUILD VARIANTS', builds);
 
 
 				this.__done[id] = true;

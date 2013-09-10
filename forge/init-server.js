@@ -40,11 +40,17 @@ lychee.build(function(lychee, global) {
 
 	if (!isNaN(port)) {
 
-		var server = new game.Server();
+		var server = new game.Server({
+			root: process.argv[4] || null
+		});
 
 		server.listen(port, host);
 
 	}
+
+process.on('message', function(data) {
+	console.log('CONFIG IS HERE!', data);
+});
 
 }, typeof global !== 'undefined' ? global : this);
 

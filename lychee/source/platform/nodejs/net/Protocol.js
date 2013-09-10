@@ -17,10 +17,9 @@ lychee.define('lychee.net.Protocol').tags({
 
 }).exports(function(lychee, global) {
 
-	var Class = function(socket, maxFrameSize, closeCallback) {
+	var Class = function(socket, closeCallback) {
 
 		this.__socket          = socket;
-		this.__maxFrameSize    = maxFrameSize;
 		this.__closeCallback   = closeCallback;
 
 		this.__buffer  = new Buffer(0);
@@ -83,7 +82,7 @@ lychee.define('lychee.net.Protocol').tags({
 
 			if (this.__isClosed === true) {
 				return;
-			} else if (data.length > this.__maxFrameSize) {
+			} else if (data.length > 32768) {
 				this.__closeCode = Class.STATUS.message_too_big;
 				return this.close(false);
 			}
