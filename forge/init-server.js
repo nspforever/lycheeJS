@@ -18,6 +18,7 @@ require('./source/Server.js');
 // Rebase required namespaces for inclusion
 lychee.rebase({
 	lychee: "../lychee/source",
+	sorbet: "../sorbet/source",
 	game:   "./source"
 });
 
@@ -40,9 +41,7 @@ lychee.build(function(lychee, global) {
 
 	if (!isNaN(port)) {
 
-		var server = new game.Server({
-			root: process.argv[4] || null
-		});
+		var server = new game.Server(process.argv[4] || null);
 
 		server.listen(port, host);
 

@@ -1,18 +1,22 @@
 
 lychee.define('game.Server').requires([
-	'game.net.remote.Project'
+	'game.net.remote.Project',
+	'sorbet.data.Filesystem'
 ]).includes([
 	'lychee.net.Server'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _project = game.net.remote.Project;
+	var _filesystem = sorbet.data.Filesystem;
+	var _project    = game.net.remote.Project;
 
 
-	var Class = function(config) {
+	var Class = function(root) {
 
-		this.config = lychee.extend({
-			root: null
-		}, config);
+		root = typeof root === 'string' ? root : '/var/www';
+
+
+		this.fs   = new _filesystem(root);
+		this.root = root;
 
 
 		lychee.net.Server.call(this, JSON.stringify, JSON.parse);
