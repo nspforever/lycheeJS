@@ -7,10 +7,12 @@ lychee.define('game.state.Base').requires([
 	'lychee.ui.Sprite',
 	'lychee.ui.Textarea',
 	'lychee.game.State',
+	'game.entity.ui.Scene',
 	'game.entity.ui.Sidebar',
 	'game.entity.ui.Widget'
 ]).exports(function(lychee, game, global) {
 
+	var _scene   = game.entity.ui.Scene;
 	var _sidebar = game.entity.ui.Sidebar;
 	var _widget  = game.entity.ui.Widget;
 
@@ -39,36 +41,51 @@ lychee.define('game.state.Base').requires([
 
 			var layer   = new lychee.game.Layer();
 			var swidth  = 10 * tile;
-			var sheight = height;
 
+
+			var project = this.game.project;
+
+			var scene = new _scene({
+				width:  width  - 2 * swidth     - tile,
+				height: height - project.height - tile,
+				position: {
+					x: 0,
+					y: project.height / 2
+				}
+			});
 
 			var entities = new _sidebar({
 				width:  swidth,
-				height: sheight,
+				height: height - project.height,
 				margin: tile / 2,
 				position: {
 					x: -1/2 * width + swidth / 2,
-					y:  0
+					y:  project.height / 2
 				},
 				scrollable: true
 			});
-
-			layer.setEntity('entities', entities);
-
 
 			var settings = new _sidebar({
 				width:  swidth,
-				height: sheight,
+				height: height - project.height,
 				margin: tile / 2,
 				position: {
 					x: 1/2 * width - swidth / 2,
-					y: 0
+					y: project.height / 2
 				},
 				scrollable: true
 			});
 
-			layer.setEntity('settings', settings);
 
+			project.setPosition({
+				y: -1/2 * height + project.height / 2
+			});
+
+
+			layer.setEntity('scene',    scene);
+			layer.setEntity('entities', entities);
+			layer.setEntity('settings', settings);
+			layer.setEntity('project',  project);
 
 			this.setLayer('ui', layer);
 
