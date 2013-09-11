@@ -112,35 +112,10 @@ lychee.define('lychee.game.State').requires([
 	var _processTouch_recursive = function(entity, originX, originY, args) {
 
 		var triggered = null;
+		var position  = entity.position;
 
 
 		if (_is_entity_at_position(entity, originX, originY) === true) {
-
-			var position = entity.position;
-
-			if (entity.entities !== undefined) {
-
-				var entities = entity.entities;
-				for (var e = entities.length - 1; e >= 0; e--) {
-
-					var result = _processTouch_recursive.call(
-						this,
-						entities[e],
-						originX - position.x,
-						originY - position.y,
-						args
-					);
-
-
-					if (result !== null) {
-						triggered = result;
-						break;
-					}
-
-				}
-
-			}
-
 
 			if (typeof entity.trigger === 'function') {
 
@@ -150,6 +125,30 @@ lychee.define('lychee.game.State').requires([
 				var result = entity.trigger('touch', args);
 				if (result === true && triggered === null) {
 					triggered = entity;
+				}
+
+			}
+
+		}
+
+
+		if (entity.entities !== undefined) {
+
+			var entities = entity.entities;
+			for (var e = entities.length - 1; e >= 0; e--) {
+
+				var result = _processTouch_recursive.call(
+					this,
+					entities[e],
+					originX - position.x,
+					originY - position.y,
+					args
+				);
+
+
+				if (result !== null) {
+					triggered = result;
+					break;
 				}
 
 			}

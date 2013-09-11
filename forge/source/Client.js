@@ -15,8 +15,6 @@ lychee.define('game.Client').requires([
 
 	var _init_project = function(service) {
 
-console.log('INIT PROJECT!', service);
-
 		this.game.services.project = service;
 
 
