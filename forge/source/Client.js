@@ -15,12 +15,14 @@ lychee.define('game.Client').requires([
 
 	var _init_project = function(service) {
 
+console.log('INIT PROJECT!', service);
+
 		this.game.services.project = service;
 
 
-		var entity = this.game.project;
+		var entity = this.game.project || null;
 		if (entity !== null) {
-			service.bind('update', entity.processUpdate, entity);
+			entity.init(service);
 		}
 
 	};

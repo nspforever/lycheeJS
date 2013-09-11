@@ -1,5 +1,5 @@
 
-lychee.define('game.entity.Project').requires([
+lychee.define('game.entity.ui.Project').requires([
 	'lychee.ui.Button',
 	'lychee.ui.Input'
 ]).includes([
@@ -15,6 +15,42 @@ lychee.define('game.entity.Project').requires([
 	 */
 
 	var _process_update = function(data) {
+
+		var filtered = [];
+		var options  = [];
+
+		var projects = data.projects || null;
+		if (projects !== null) {
+
+			for (var p = 0, pl = projects.length; p < pl; p++) {
+
+				var project = projects[p];
+
+				filtered.push(project);
+				options.push(project.title);
+
+			}
+
+		}
+
+
+		this.__projects = filtered;
+		this.__options  = options;
+
+
+		var entity = this.getEntity('select');
+		if (entity !== null) {
+
+			entity.setOptions(this.__options);
+
+
+			var value = entity.value;
+			if (this.__options.indexOf(value) === -1) {
+				entity.setValue(this.__options[0]);
+			}
+
+		}
+
 	};
 
 
@@ -32,7 +68,8 @@ lychee.define('game.entity.Project').requires([
 
 		this.game = game;
 
-		this.__projects = _default_projects;
+		this.__options  = [];
+		this.__projects = [];
 
 
 		var renderer = this.game.renderer || null;
@@ -52,6 +89,8 @@ lychee.define('game.entity.Project').requires([
 
 
 		this.reset();
+
+		_process_update.call(this, _default_projects);
 
 	};
 
@@ -76,7 +115,7 @@ lychee.define('game.entity.Project').requires([
 				label: 'Project:',
 				font:  this.game.fonts.normal,
 				position: {
-					x: -1/2 * width + 64,
+					x: -1/2 * width + 96,
 					y:  0
 				}
 			});
@@ -86,8 +125,13 @@ lychee.define('game.entity.Project').requires([
 
 			entity = new lychee.ui.Select({
 				font:    this.game.fonts.normal,
-				options: [ '/game/boilerplate' ],
-				value:   '/game/boilerplate'
+				options: [ 'no project found' ],
+				value:   'no project found',
+				width:   256,
+				position: {
+					x: -1/2 * width + 96 + 256,
+					y: 0
+				}
 			});
 
 			entity.bind('change', function(value) {
@@ -99,7 +143,7 @@ lychee.define('game.entity.Project').requires([
 
 			}, this);
 
-			this.addEntity(entity);
+			this.setEntity('select', entity);
 
 		},
 
@@ -109,7 +153,9 @@ lychee.define('game.entity.Project').requires([
 		 * SERVICE INTEGRATION API
 		 */
 
-		processUpdate: function(data) {
+		init: function(service) {
+
+console.log('BINDING TO SERVICE', service);
 
 console.log('UPDATING PROJECT INDEX', data);
 

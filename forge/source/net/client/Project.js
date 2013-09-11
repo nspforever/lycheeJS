@@ -20,11 +20,31 @@ lychee.define('game.net.client.Project').includes([
 		 * SERVICE API
 		 */
 
+		init: function() {
+			this.trigger('init', []);
+		},
+
 		plug: function() {
 
 		},
 
 		unplug: function() {
+
+		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
+
+		update: function() {
+
+			this.client.send({
+			}, {
+				id:     this.id,
+				method: 'update'
+			});
 
 		}
 

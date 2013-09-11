@@ -1,0 +1,9 @@
+{
+	"projects": [{
+		"title":        "boilerplate",
+		"root":         "../game/boilerplate",
+    	"resolvedroot": "/home/christoph/Web/game/boilerplate",
+		"file":         "../game/boilerplate/source/package.json",
+		"resolvedfile": "/home/christoph/Web/game/boilerplate/source/package.json"
+	}]
+}

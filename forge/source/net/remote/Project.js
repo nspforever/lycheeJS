@@ -28,10 +28,10 @@ lychee.define('game.net.remote.Project').includes([
 
 			for (var f = 0, fl = files.length; f < fl; f++) {
 
-				var resolved = files[f];
+				var resolvedfile = files[f];
 
 
-				var tmp = resolved.split('/');
+				var tmp = resolvedfile.split('/');
 				tmp.pop();
 				tmp.pop();
 
@@ -42,10 +42,14 @@ lychee.define('game.net.remote.Project').includes([
 				projectroot = projectroot.substr(root.length + 1);
 				projectroot = '../' + projectroot;
 
+
+				var file = projectroot + '/' + resolvedfile.substr(resolvedroot.length + 1);
+
 				projects.push({
 					root:         projectroot,
 					resolvedroot: resolvedroot,
-					resolved:     resolved,
+					file:         file,
+					resolvedfile: resolvedfile,
 					title:        title
 				});
 
@@ -61,11 +65,31 @@ lychee.define('game.net.remote.Project').includes([
 
 	var _update = function() {
 
-		var projects = _get_projects.call(this, this.remote.server, '/game');
+		var filtered = [];
+		var p, pl, projects;
 
-console.log(projects);
+		projects = _get_projects.call(this, this.remote.server, '/game');
+		for (p = 0, pl = projects.length; p < pl; p++) {
+			filtered.push(projects[p]);
+		}
 
-		for (var p = 0, pl = projects.length; p < pl; p++) {
+		projects = _get_projects.call(this, this.remote.server, '/external');
+		for (p = 0, pl = projects.length; p < pl; p++) {
+			filtered.push(projects[p]);
+		}
+
+
+console.log(filtered);
+
+		if (filtered.length > 0) {
+
+			this.remote.send({
+				projects: filtered
+			}, {
+				id:    this.id,
+				event: 'update'
+			});
+
 		}
 
 	};
@@ -95,11 +119,21 @@ console.log(projects);
 
 		plug: function() {
 
-			_update.call(this);
-
 		},
 
 		unplug: function() {
+
+		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
+
+		update: function() {
+
+			_update.call(this);
 
 		}
 
