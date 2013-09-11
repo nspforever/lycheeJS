@@ -20,9 +20,13 @@ lychee.define('game.entity.ui.Scene').includes([
 
 		this.bind('touch', function(id, position, delta) {
 
+console.log('touch!', position);
+
 		}, this);
 
 		this.bind('swipe', function(id, type, position, delta, swipe) {
+
+console.log('swipe!', position, swipe);
 
 		}, this);
 
@@ -33,6 +37,50 @@ lychee.define('game.entity.ui.Scene').includes([
 
 
 	Class.prototype = {
+
+		/*
+		 * GAME UI API
+		 */
+
+		relayout: function() {
+
+			var width  = 0;
+			var height = 0;
+			var offset = 0;
+
+			for (var e = 0, el = this.entities.length; e < el; e++) {
+
+				var entity = this.entities[e];
+
+// TODO: Reposition entities in a meaningful way. Hard to determine though.
+
+/*
+				entity.setPosition({
+					y: offset + entity.height / 2
+				});
+*/
+
+				width  = Math.max(width,  entity.width);
+				height = Math.max(height, height + entity.height);
+
+				offset += entity.height;
+
+			}
+
+
+			if (width > this.width) {
+				this.width = width;
+			}
+
+			if (height > this.height) {
+				this.height = height;
+			}
+
+console.log('SCENE relayout()', width, height);
+
+		},
+
+
 
 		/*
 		 * ENTITY API
@@ -57,6 +105,36 @@ lychee.define('game.entity.ui.Scene').includes([
 				'#481818',
 				true
 			);
+
+		},
+
+		addEntity: function(entity) {
+
+			var result = lychee.ui.Layer.prototype.addEntity.call(this, entity);
+			if (result === true) {
+
+				this.relayout();
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		removeEntity: function(entity) {
+
+			var result = lychee.ui.Layer.prototype.removeEntity.call(this, entity);
+			if (result === true) {
+
+				this.relayout();
+				return true;
+
+			}
+
+
+			return false;
 
 		}
 

@@ -31,20 +31,34 @@ lychee.define('game.state.Font').requires([
 
 	var Class = function(game) {
 
+		this.scene = game.scene || null;
+
+
 		lychee.game.State.call(this, game);
 
-		this.preview = new lychee.ui.Sprite({
-			position: {
-				x: 0, y: 0
-			}
-		});
 
 		this.generator = new _font(this);
 		this.generator.bind('ready', function(data) {
 
-			this.preview.width  = data.texture.width;
-			this.preview.height = data.texture.height;
-			this.preview.setTexture(data.texture);
+			var scene = this.scene;
+			if (scene !== null) {
+
+				scene.reset();
+
+				var preview = new lychee.ui.Sprite({
+					width:    data.texture.width,
+					height:   data.texture.height,
+					texture:  data.texture,
+					position: {
+						x: 0,
+						y: 0
+					}
+				});
+
+
+				scene.addEntity(preview);
+
+			}
 
 		}, this);
 
