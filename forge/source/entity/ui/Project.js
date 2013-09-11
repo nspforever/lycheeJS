@@ -155,9 +155,12 @@ lychee.define('game.entity.ui.Project').requires([
 
 		init: function(service) {
 
-console.log('BINDING TO SERVICE', service);
+			service.bind('update', function(data) {
+				_process_update.call(this, data);
+			}, this);
 
-console.log('UPDATING PROJECT INDEX', data);
+
+			service.update();
 
 		}
 
