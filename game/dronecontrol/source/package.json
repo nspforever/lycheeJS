@@ -25,6 +25,7 @@
 					},
 
 					"data": {
+						"Buffer":  [ "js" ],
 						"NAVDATA": [ "js" ],
 						"VIDEO":   [ "js" ]
 					},
@@ -48,12 +49,14 @@
 		"entity": {
 
 			"ui": {
-				"Font":         [ "js", "normal.fnt" ],
+				"Menu":         [ "js" ],
 				"Navdata":      [ "js" ],
 				"SidebarLeft":  [ "js" ],
 				"SidebarRight": [ "js" ],
-				"VideoLayer":   [ "js" ]
-			}
+				"Video":        [ "js" ]
+			},
+
+			"Font": [ "js", "normal.fnt" ]
 
 		},
 

@@ -1,6 +1,6 @@
 
 lychee.define('game.ar.video.Socket').tags({
-	platform: [ 'nodejs' ]
+	platform: 'nodejs'
 }).requires([
 //	'game.ar.data.VIDEO'
 ]).includes([
@@ -16,7 +16,8 @@ lychee.define('game.ar.video.Socket').tags({
 
 }).exports(function(lychee, game, global, attachments) {
 
-	var net = require('net');
+	var net     = require('net');
+	var _parser = game.ar.data.VIDEO;
 
 
 
@@ -26,7 +27,10 @@ lychee.define('game.ar.video.Socket').tags({
 
 	var _process_data = function(buffer) {
 
-console.log('processing raw video stream', buffer);
+		var videodata = _parser.decode(buffer);
+		if (videodata instanceof Object) {
+			this.trigger('receive', [ videodata ]);
+		}
 
 	};
 
@@ -38,16 +42,15 @@ console.log('processing raw video stream', buffer);
 
 	var Class = function(ip) {
 
-		this.__ip       = typeof ip === 'string' ? ip : '192.168.1.1';
-		this.__port     = 5555;
-		this.__sequence = 0;
+		this.__ip   = typeof ip === 'string' ? ip : '192.168.1.1';
+		this.__port = 5555;
 
 
 		var that = this;
 
 		this.__socket = new net.Socket();
-		this.__socket.setTimeout(1000);
 		this.__socket.connect(this.__port, this.__ip);
+		this.__socket.setTimeout(1000);
 		this.__socket.on('data', function(buffer) {
 			_process_data.call(that, buffer);
 		});

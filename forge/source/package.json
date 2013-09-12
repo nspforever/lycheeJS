@@ -37,10 +37,7 @@
 				"Widget":  [ "js" ]
 			},
 
-			"Font": [
-				"js",
-				"normal.fnt"
-			]
+			"Font": [ "js", "normal.fnt" ]
 
 		},
 

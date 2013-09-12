@@ -1,6 +1,6 @@
 
 lychee.define('game.ar.command.PCMD').tags({
-	platform: [ 'nodejs' ]
+	platform: 'nodejs'
 }).supports(function(lychee, global) {
 
 	if (typeof Buffer !== 'undefined') {

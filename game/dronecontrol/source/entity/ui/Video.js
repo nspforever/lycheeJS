@@ -1,5 +1,5 @@
 
-lychee.define('game.entity.ui.VideoLayer').requires([
+lychee.define('game.entity.ui.Video').requires([
 
 ]).includes([
 	'lychee.ui.Layer'

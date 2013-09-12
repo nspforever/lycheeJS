@@ -56,7 +56,6 @@ lychee.define('game.Controller').includes([
 
 		this.game   = game;
 		this.client = game.client || null;
-
 		this.ip     = null;
 
 

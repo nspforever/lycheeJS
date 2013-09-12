@@ -1,6 +1,6 @@
 
 lychee.define('game.ar.data.VIDEO').tags({
-	platform: [ 'nodejs' ]
+	platform: 'nodejs'
 }).supports(function(lychee, global) {
 
 	if (typeof Buffer !== 'undefined') {
@@ -12,7 +12,7 @@ lychee.define('game.ar.data.VIDEO').tags({
 
 }).exports(function(lychee, game, global, attachments) {
 
-	var stream = require('stream').Stream;
+	var _buffer = game.ar.data.Buffer;
 
 
 	var Module = {};
@@ -20,6 +20,12 @@ lychee.define('game.ar.data.VIDEO').tags({
 	Module.encode = function() {};
 
 	Module.decode = function(data) {
+
+		var buffer = new _buffer(data);
+
+
+console.log('DECODING VIDEO', data);
+
 
 		var videodata = null;
 

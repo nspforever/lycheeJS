@@ -2,7 +2,7 @@
 lychee.define('game.Main').requires([
 	'lychee.net.Client',
 	'game.Controller',
-	'game.entity.ui.Font',
+	'game.entity.Font',
 	'game.state.Game'
 ]).includes([
 	'lychee.game.Main'
@@ -67,7 +67,7 @@ lychee.define('game.Main').requires([
 				var url = Object.keys(assets)[0];
 				var settings = assets[url];
 				if (settings !== null) {
-					this.drones = settings.drones;
+					this.settings.drones = settings.drones;
 				}
 
 				preloader.unbind('ready');
@@ -135,7 +135,7 @@ lychee.define('game.Main').requires([
 
 
 			this.fonts = {};
-			this.fonts.normal = new game.entity.ui.Font('normal');
+			this.fonts.normal = new game.entity.Font('normal');
 
 
 			this.client = null;
@@ -146,16 +146,7 @@ lychee.define('game.Main').requires([
 			}
 
 			this.controller = new game.Controller(this);
-
-
-			if (this.settings.drones !== null) {
-
-console.log('DRONE SETTINGS!', this.settings.drones);
-
-			}
-
 			this.controller.setIP('192.168.1.1');
-
 
 			this.setState('game', new game.state.Game(this));
 			this.changeState('game');

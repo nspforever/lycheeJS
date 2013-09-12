@@ -86,10 +86,10 @@ lychee.define('game.ar.Drone').requires([
 		this.__sockets = {};
 		this.__sockets.command = new _commandsocket(ip);
 		this.__sockets.navdata = new _navdatasocket(ip);
-//		this.__sockets.video   = new _videosocket(ip);
+		this.__sockets.video   = new _videosocket(ip);
 
 		this.__sockets.navdata.bind('receive', _process_navdata, this);
-//		this.__sockets.video.bind('receive',   _process_video,   this);
+		this.__sockets.video.bind('receive',   _process_video,   this);
 
 
 		this.__state = {};

@@ -1,6 +1,6 @@
 
 lychee.define('game.ar.navdata.Socket').tags({
-	platform: [ 'nodejs' ]
+	platform: 'nodejs'
 }).requires([
 	'game.ar.data.NAVDATA'
 ]).includes([

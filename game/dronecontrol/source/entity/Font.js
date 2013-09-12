@@ -1,5 +1,5 @@
 
-lychee.define('game.entity.ui.Font').exports(function(lychee, game, global, attachments) {
+lychee.define('game.entity.Font').exports(function(lychee, game, global, attachments) {
 
 	var _fonts = {};
 

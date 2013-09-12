@@ -27,6 +27,11 @@ lychee.define('game.Main').requires([
 				fireSwipe: true
 			},
 
+			loop: {
+				render: 30,
+				update: 30
+			},
+
 			project: {
 				path: '/game/boilerplate'
 			},
