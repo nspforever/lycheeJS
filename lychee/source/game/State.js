@@ -166,10 +166,16 @@ lychee.define('lychee.game.State').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(game) {
+	var Class = function(game, data) {
+
+		var settings = lychee.extend({
+			layers: {}
+		}, data);
+
 
 		this.game     = game;
 		this.input    = game.input    || null;
+		this.jukebox  = game.jukebox  || null;
 		this.loop     = game.loop     || null;
 		this.renderer = game.renderer || null;
 
@@ -178,10 +184,10 @@ lychee.define('lychee.game.State').requires([
 		this.__layerOffsetX  = 0;
 		this.__layerOffsetY  = 0;
 		this.__focusEntity   = null;
+
 		this.__touchEntities = [];
 		this.__touchLayers   = [];
 		this.__touchOffsets  = [];
-
 
 		for (var i = 0; i < 10; i++) {
 			this.__touchEntities.push(null);
@@ -189,6 +195,11 @@ lychee.define('lychee.game.State').requires([
 			this.__touchOffsets.push({
 				x: 0, y: 0
 			});
+		}
+
+
+		for (var id in settings.layers) {
+			this.setLayer(id, lychee.deserialize(settings.layers[id]));
 		}
 
 
@@ -202,6 +213,25 @@ lychee.define('lychee.game.State').requires([
 		/*
 		 * STATE API
 		 */
+
+		serialize: function() {
+
+			var settings = {};
+
+
+			settings.layers = {};
+
+			for (var id in this.__layers) {
+				settings.layers[id] = this.__layers[id].serialize();
+			}
+
+
+			return {
+				'constructor': 'lychee.game.State',
+				'arguments':   [ '#main', settings ]
+			};
+
+		},
 
 		reset: function() {
 

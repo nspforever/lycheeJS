@@ -40,7 +40,7 @@ lychee.define('lychee.ui.Button').includes([
 		serialize: function() {
 
 			var data = lychee.ui.Entity.prototype.serialize.call(this);
-			data['constructor'] = 'lyche.ui.Button';
+			data['constructor'] = 'lychee.ui.Button';
 
 			var settings = data['arguments'][0];
 

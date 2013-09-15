@@ -35,6 +35,20 @@ lychee.define('Renderer').tags({
 	 * HELPERS
 	 */
 
+	var _is_color = function(color) {
+
+		if (
+			   typeof color === 'string'
+			&& color.match(/(#[AaBbCcDdEeFf0-9]{6})/)
+		) {
+			return true;
+		}
+
+
+		return false;
+
+	};
+
 	var _update_environment = function() {
 
 		var env = this.__environment;
@@ -178,15 +192,21 @@ lychee.define('Renderer').tags({
 
 			alpha = typeof alpha === 'number' ? alpha : null;
 
-			if (alpha !== null && alpha >= 0 && alpha <= 1) {
+			if (
+				   alpha !== null
+				&& alpha >= 0
+				&& alpha <= 1
+			) {
+
 				this.__ctx.globalAlpha = alpha;
+
 			}
 
 		},
 
 		setBackground: function(color) {
 
-			color = typeof color === 'string' ? color : '#000000';
+			color = _is_color(color) === true ? color : '#000000';
 
 			this.__background = color;
 			this.__canvas.style.backgroundColor = color;
@@ -236,7 +256,7 @@ lychee.define('Renderer').tags({
 
 			if (this.__state !== 1) return;
 
-			color      = typeof color === 'string' ? color : '#000000';
+			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
@@ -272,7 +292,7 @@ lychee.define('Renderer').tags({
 
 			if (this.__state !== 1) return;
 
-			color      = typeof color === 'string' ? color : '#000000';
+			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
@@ -305,7 +325,7 @@ lychee.define('Renderer').tags({
 
 			if (this.__state !== 1) return;
 
-			color      = typeof color === 'string' ? color : '#000000';
+			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
@@ -340,7 +360,7 @@ lychee.define('Renderer').tags({
 
 			if (this.__state !== 1) return;
 
-			color     = typeof color === 'string' ? color : '#000000';
+			color     = _is_color(color) === true ? color : '#000000';
 			lineWidth = typeof lineWidth === 'number' ? lineWidth : 1;
 
 
@@ -364,9 +384,9 @@ lychee.define('Renderer').tags({
 
 			if (this.__state !== 1) return;
 
-			color = typeof color === 'string' ? color : '#000000';
+			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
-			lineWidth = typeof lineWidth === 'number' ? lineWidth : 1;
+			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
 
 			var ctx = this.__ctx;
@@ -403,10 +423,8 @@ lychee.define('Renderer').tags({
 
 				var optargs = l - (points * 2) - 1;
 
-				var color      = '#000000';
-				var background = false;
-				var lineWidth  = 1;
 
+				var color, background, lineWidth;
 
 				if (optargs === 3) {
 
@@ -424,6 +442,11 @@ lychee.define('Renderer').tags({
 					color      = arguments[l - 1];
 
 				}
+
+
+				color      = _is_color(color) === true ? color : '#000000';
+				background = background === true;
+				lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
 
 				var ctx = this.__ctx;
@@ -448,7 +471,7 @@ lychee.define('Renderer').tags({
 					ctx.strokeStyle = color;
 					ctx.stroke();
 				} else {
-					ctx.fillStyle = color;
+					ctx.fillStyle   = color;
 					ctx.fill();
 				}
 

@@ -1,10 +1,14 @@
 
 lychee.define('game.state.Game').requires([
-	'game.entity.Circle',
-	'game.entity.Text'
+	'game.entity.Button',
+	'game.entity.Circle'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
+
+	var _button = game.entity.Button;
+	var _circle = game.entity.Circle;
+
 
 	var Class = function(game) {
 
@@ -38,17 +42,17 @@ lychee.define('game.state.Game').requires([
 				var layer = new lychee.game.Layer();
 
 
-				layer.addEntity(new game.entity.Text({
-					text: 'Game State active',
-					font:  this.game.fonts.headline,
+				layer.addEntity(new _button({
+					font:   this.game.fonts.headline,
+					label: 'Game State active',
 					position: {
 						x: 0, y: -50
 					}
 				}));
 
-				layer.addEntity(new game.entity.Text({
-					text: 'Touch the circle to make Noise',
+				layer.addEntity(new _button({
 					font:  this.game.fonts.small,
+					label: 'Touch the circle to make Noise',
 					position: {
 						x: 0, y: 0
 					}
@@ -64,7 +68,7 @@ lychee.define('game.state.Game').requires([
 				 *
 				 */
 
-				var circle = new game.entity.Circle({
+				var circle = new _circle({
 					radius: 50,
 					position: {
 						x: 0,
@@ -86,9 +90,9 @@ lychee.define('game.state.Game').requires([
 				layer.addEntity(circle);
 
 
-				var exit = new game.entity.Text({
-					text: 'Exit to Menu',
+				var exit = new _button({
 					font:  this.game.fonts.small,
+					label: 'Exit to Menu',
 					position: {
 						x: 0,
 						y: height / 2 - 42
