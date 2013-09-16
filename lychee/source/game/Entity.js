@@ -134,6 +134,10 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		 * ENTITY API
 		 */
 
+		// No Recursion of other instances contained,
+		// so there's no deserialize() method!
+		// deserialize: function() {},
+
 		serialize: function() {
 
 			var settings = {};

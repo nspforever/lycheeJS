@@ -698,7 +698,7 @@
 
 		// 3. Extend the Class, Module or Callback
 		var includes = definitionblock._includes;
-		if (includes.length && data != null) {
+		if (includes.length > 0 && data != null) {
 
 			// 3.1 Collect its own and already
 			// inherited methods

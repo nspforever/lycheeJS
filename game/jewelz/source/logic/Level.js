@@ -14,6 +14,54 @@ lychee.define('game.logic.Level').requires([
 	var _jewel = game.entity.Jewel;
 
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _key_enum = function(enumobject, value) {
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				return id;
+			}
+
+		}
+
+
+		return null;
+
+	};
+
+
+	var _validate_enum = function(enumobject, value) {
+
+		if (typeof value !== 'number') return false;
+
+
+		var found = false;
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				found = true;
+				break;
+			}
+
+		}
+
+
+		return found;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
@@ -45,12 +93,12 @@ lychee.define('game.logic.Level').requires([
 
 	Class.MODE = {};
 
-	(function(enumobj) {
+	(function(enumobject) {
 
 		var i = 0;
 
 		for (var id in _data) {
-			enumobj[id] = i++;
+			enumobject[id] = i++;
 		}
 
 	})(Class.MODE);
@@ -536,28 +584,18 @@ lychee.define('game.logic.Level').requires([
 
 		setMode: function(mode) {
 
-			if (typeof mode !== 'number') return false;
+			if (_validate_enum(Class.MODE, mode) === true) {
 
+				var id = _key_enum(Class.MODE, mode);
 
-			var found = false;
-
-			var id;
-			for (id in Class.MODE) {
-
-				if (mode === Class.MODE[id]) {
-					found = true;
-					break;
-				}
-
-			}
-
-
-			if (found === true) {
 				this.__data = _data[id];
+
+				return true;
+
 			}
 
 
-			return found;
+			return false;
 
 		}
 

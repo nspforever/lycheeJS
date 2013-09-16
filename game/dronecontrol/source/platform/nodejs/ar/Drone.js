@@ -23,6 +23,27 @@ lychee.define('game.ar.Drone').requires([
 	 * HELPERS
 	 */
 
+	var _validate_enum = function(enumobject, value) {
+
+		if (typeof value !== 'number') return false;
+
+
+		var found = false;
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				found = true;
+				break;
+			}
+
+		}
+
+
+		return found;
+
+	};
+
 	var _process_navdata = function(data) {
 
 		if (data instanceof Object) {
@@ -291,31 +312,22 @@ lychee.define('game.ar.Drone').requires([
 
 		},
 
-		animateFlight: function(type, duration) {
+		animateFlight: function(animation, duration) {
 
 			duration = typeof duration === 'number' ? duration : null;
 
 
-			var valid   = false;
-			var enumval = 0;
-
-			for (var id in Class.FLIGHTANIMATION) {
-
-				if (id === type) {
-					enumval = Class.FLIGHTANIMATION[id];
-					valid   = true;
-					break;
-				}
-
-			}
-
-
 			if (
-				   valid === true
+				   _validate_enum(Class.FLIGHTANIMATION, animation) === true
 				&& duration !== null
 			) {
-				this.__state.config['control:flight_anim'] = [ enumval, duration ];
+
+				var value = Class.FLIGHTANIMATION[animation];
+
+				this.__state.config['control:flight_anim'] = [ value, duration ];
+
 				return true;
+
 			}
 
 
@@ -323,32 +335,23 @@ lychee.define('game.ar.Drone').requires([
 
 		},
 
-		animateLEDs: function(type, duration, hertz) {
+		animateLEDs: function(animation, duration, hertz) {
 
 			duration = typeof duration === 'number' ? duration : null;
 			hertz    = typeof hertz === 'number'    ? hertz    : 2;
 
 
-			var enumval = 0;
-			var valid   = false;
-
-			for (var id in Class.LEDANIMATION) {
-
-				if (id === type) {
-					enumval = Class.LEDANIMATION[id];
-					valid   = true;
-					break;
-				}
-
-			}
-
-
 			if (
-				   valid === true
+				   _validate_enum(Class.LEDANIMATION, animation) === true
 				&& duration !== null
 			) {
-				this.__state.config['control:leds_anim'] = [ enumval, hertz, (duration / 1000) | 0 ];
+
+				var value = Class.LEDANIMATION[animation];
+
+				this.__state.config['control:leds_anim'] = [ value, hertz, (duration / 1000) | 0 ];
+
 				return true;
+
 			}
 
 

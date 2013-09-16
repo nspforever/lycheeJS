@@ -37,6 +37,35 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 
 		},
 
+		deserialize: function(settings) {
+
+			this.setVisible(settings.visible);
+
+
+			var entities = [];
+			for (var e = 0, el = settings.entities.length; e < el; e++) {
+				var blob = settings.entities[e];
+				entities.push(lychee.deserialize(blob));
+			}
+
+			var map = [];
+			for (var id in settings.map) {
+				var index = settings.map[id];
+				map[index] = id;
+			}
+
+			for (var e = 0, el = entities.length; e < el; e++) {
+
+				if (typeof map[e] === 'number') {
+					this.setEntity(map[e], entities[e]);
+				} else {
+					this.addEntity(entities[e]);
+				}
+
+			}
+
+		},
+
 		serialize: function() {
 
 			var settings = {};

@@ -1,34 +1,36 @@
 
-lychee.define('game.entity.Font').exports(function(lychee, game, global, attachments) {
+lychee.define('game.entity.Font').includes([
+	'lychee.ui.Font'
+]).exports(function(lychee, game, global, attachments) {
 
-	var _fonts = {};
+	var Class = function(name) {
 
-	for (var file in attachments) {
-
-		var tmp = file.split('.');
-		var id  = tmp[0];
-		var ext = tmp[1];
-
-		if (ext === 'fnt') {
-			_fonts[id] = attachments[file];
-		}
-
-	}
+		name = typeof name === 'string' ? name : null;
 
 
-	var Callback = function(id) {
-
-		if (_fonts[id] !== undefined) {
-			return _fonts[id];
-		}
+		lychee.ui.Font.call(this, attachments);
 
 
-		return null;
+		return this.deserialize(name);
 
 	};
 
 
-	return Callback;
+	Class.prototype = {
+
+		serialize: function(name) {
+
+			return {
+				'constructor': 'game.entity.Font',
+				'arguments':   [ name ]
+			}
+
+		}
+
+	};
+
+
+	return Class;
 
 });
 
