@@ -20,7 +20,7 @@ lychee.define('game.entity.Enemy').requires([
 		this.logic = logic || null;
 
 
-		this.health  = (200 + Math.random() * 200) | 0;
+		this.health  = 300;
 		this.points  = this.health;
 		this.speedx  = 0;
 		this.speedy  = 0;
@@ -53,6 +53,32 @@ lychee.define('game.entity.Enemy').requires([
 		/*
 		 * ENTITY API
 		 */
+
+		deserialize: function(blob) {
+
+			this.setHealth(blob.health);
+			this.setSpeedX(blob.speedx);
+			this.setSpeedY(blob.speedy);
+
+		},
+
+		serialize: function() {
+
+			var data = lychee.game.Sprite.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.Enemy';
+
+			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
+
+
+			if (this.health !== 200) blob.health = this.health;
+			if (this.speedx !== 0)   blob.speedx = this.speedx;
+			if (this.speedy !== 0)   blob.speedy = this.speedy;
+
+
+			return data;
+
+		},
 
 		update: function(clock, delta, config) {
 

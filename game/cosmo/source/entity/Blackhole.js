@@ -42,6 +42,16 @@ lychee.define('game.entity.Blackhole').includes([
 		 * ENTITY API
 		 */
 
+		serialize: function() {
+
+			var data = lychee.game.Sprite.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.Blackhole';
+
+
+			return data;
+
+		},
+
 		update: function(clock, delta, config) {
 
 			lychee.game.Sprite.prototype.update.call(this, clock, delta);

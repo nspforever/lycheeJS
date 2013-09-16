@@ -42,6 +42,26 @@ lychee.define('game.entity.Lazer').includes([
 		 * CUSTOM API
 		 */
 
+		deserialize: function(blob) {
+
+		},
+
+		serialize: function() {
+
+			var data = lychee.game.Sprite.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.Lazer';
+
+			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
+
+
+			// TODO: blob integration
+
+
+			return data;
+
+		},
+
 		setOwner: function(owner) {
 
 			this.owner     = owner;

@@ -14,7 +14,7 @@ lychee.define('game.entity.Meteor').includes([
 		}
 
 
-		this.health = (100 + Math.random() * 100) | 0;
+		this.health = 200;
 		this.points = this.health;
 		this.type   = 'meteor';
 
@@ -23,7 +23,7 @@ lychee.define('game.entity.Meteor').includes([
 		settings.map     = _config.map;
 		settings.state   = Math.random() > 0.5 ? 'rotation-right' : 'rotation-left';
 		settings.states  = {
-			'default': _config.states['default'],
+			'default':        _config.states['default'],
 			'rotation-right': {
 				animation: true,
 				duration:  (2000 + Math.random() * 4000) | 0,
@@ -53,6 +53,28 @@ lychee.define('game.entity.Meteor').includes([
 		/*
 		 * ENTITY API
 		 */
+
+		deserialize: function(blob) {
+
+			this.setHealth(blob.health);
+
+		},
+
+		serialize: function() {
+
+			var data = lychee.game.Sprite.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.Meteor';
+
+			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
+
+
+			if (this.health !== 200) blob.health = this.health;
+
+
+			return data;
+
+		},
 
 		update: function(clock, delta, config) {
 
@@ -93,16 +115,6 @@ lychee.define('game.entity.Meteor').includes([
 
 			if (value !== null) {
 				this.health = value;
-			}
-
-		},
-
-		setPoints: function(value) {
-
-			value = typeof value === 'number' ? value : null;
-
-			if (value !== null) {
-				this.points = value;
 			}
 
 		}

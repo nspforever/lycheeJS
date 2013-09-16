@@ -27,6 +27,7 @@ lychee.define('game.entity.Ship').requires([
 		this.shield = new _shield();
 
 
+		this.color   = 'red';
 		this.health  = 0;
 		this.speedx  = 0;
 		this.speedy  = 0;
@@ -39,7 +40,7 @@ lychee.define('game.entity.Ship').requires([
 
 		settings.map       = _config.map;
 		settings.states    = _config.states;
-		settings.texture   = _textures.red;
+		settings.texture   = _textures[color];
 
 		settings.width     = _config.width;
 		settings.height    = _config.height;
@@ -62,6 +63,35 @@ lychee.define('game.entity.Ship').requires([
 		/*
 		 * ENTITY API
 		 */
+
+		deserialize: function(blob) {
+
+			this.setHealth(blob.health);
+			this.setSpeedX(blob.speedx);
+			this.setSpeedY(blob.speedy);
+
+		},
+
+		serialize: function() {
+
+			var data = lychee.game.Sprite.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.Ship';
+
+			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
+
+
+			if (this.color !== 'red') settings.color = this.color;
+
+
+			if (this.health !== 200) blob.health = this.health;
+			if (this.speedx !== 0)   blob.speedx = this.speedx;
+			if (this.speedy !== 0)   blob.speedy = this.speedy;
+
+
+			return data;
+
+		},
 
 		update: function(clock, delta, config) {
 
@@ -196,10 +226,17 @@ lychee.define('game.entity.Ship').requires([
 
 			if (
 				color !== null
-				&& _textures[color] !== undefined
+				&& _textures[color] instanceof Texture
 			) {
 
-				return this.setTexture(_textures[color]);
+
+				if (this.setTexture(_textures[color]) === true) {
+
+					this.color = color;
+
+					return true;
+
+				}
 
 			}
 
