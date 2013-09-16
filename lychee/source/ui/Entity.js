@@ -154,7 +154,8 @@ lychee.define('lychee.ui.Entity').includes([
 
 			return {
 				'constructor': 'lychee.ui.Entity',
-				'arguments':   [ settings ]
+				'arguments':   [ settings ],
+				'blob':        null
 			};
 
 		},

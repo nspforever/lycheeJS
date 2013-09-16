@@ -67,7 +67,8 @@ lychee.define('lychee.ui.Font').exports(function(lychee, global, attachments) {
 
 			return {
 				'constructor': 'lychee.ui.Font',
-				'arguments':   [ name ]
+				'arguments':   [],
+				'blob':        name
 			};
 
 		}

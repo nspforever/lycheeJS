@@ -22,8 +22,9 @@ lychee.define('game.entity.Font').includes([
 
 			return {
 				'constructor': 'game.entity.Font',
-				'arguments':   [ name ]
-			}
+				'arguments':   [ name ],
+				'blob':        null
+			};
 
 		}
 

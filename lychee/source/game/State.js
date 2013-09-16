@@ -166,14 +166,9 @@ lychee.define('lychee.game.State').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(game, data) {
+	var Class = function(game) {
 
-		var settings = lychee.extend({
-			layers: {}
-		}, data);
-
-
-		this.game     = game;
+		this.game     = game          || null;
 		this.input    = game.input    || null;
 		this.jukebox  = game.jukebox  || null;
 		this.loop     = game.loop     || null;
@@ -198,11 +193,6 @@ lychee.define('lychee.game.State').requires([
 		}
 
 
-		for (var id in settings.layers) {
-			this.setLayer(id, lychee.deserialize(settings.layers[id]));
-		}
-
-
 		lychee.event.Emitter.call(this);
 
 	};
@@ -214,21 +204,36 @@ lychee.define('lychee.game.State').requires([
 		 * STATE API
 		 */
 
+		deserialize: function(blob) {
+
+			for (var id in blob.layers) {
+				this.setLayer(id, lychee.deserialize(blob.layers[id]));
+			}
+
+		},
+
 		serialize: function() {
 
-			var settings = {};
+			var blob = {};
 
 
-			settings.layers = {};
+			blob.layers = {};
 
 			for (var id in this.__layers) {
-				settings.layers[id] = this.__layers[id].serialize();
+				blob.layers[id] = this.__layers[id].serialize();
+			}
+
+
+			var game = null;
+			if (this.game !== null) {
+				game = '#lychee.game.Main';
 			}
 
 
 			return {
 				'constructor': 'lychee.game.State',
-				'arguments':   [ '#main', settings ]
+				'arguments':   [ game ],
+				'blob':        blob
 			};
 
 		},

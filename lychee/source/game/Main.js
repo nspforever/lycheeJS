@@ -43,12 +43,47 @@ lychee.define('lychee.game.Main').requires([
 
 
 	/*
+	 * DEFAULT SETTINGS
+	 * and SERIALIZATION CACHE
+	 */
+
+	var _defaults = {
+
+		fullscreen: false,
+		music:      true,
+		sound:      true,
+
+		input: {
+			delay:        0,
+			fireKey:      false,
+			fireModifier: false,
+			fireTouch:    true,
+			fireSwipe:    false
+		},
+
+		loop: {
+			render: 60,
+			update: 60
+		},
+
+		renderer: {
+			width:      1024,
+			height:     768,
+			id:         'game',
+			background: '#222222'
+		}
+
+	};
+
+
+
+	/*
 	 * IMPLEMENTATION
 	 */
 
 	var Class = function(settings) {
 
-		this.settings = _extend_recursive({}, this.defaults, settings);
+		this.settings = _extend_recursive({}, _defaults, settings);
 		this.defaults = _extend_recursive({}, this.settings);
 
 		this.input    = null;
@@ -67,31 +102,43 @@ lychee.define('lychee.game.Main').requires([
 
 	Class.prototype = {
 
-		defaults: {
+		deserialize: function(blob) {
 
-			fullscreen: false,
-			music:      true,
-			sound:      true,
+			for (var id in blob.states) {
 
-			input: {
-				delay:        0,
-				fireKey:      false,
-				fireModifier: false,
-				fireTouch:    true,
-				fireSwipe:    false
-			},
+				var stateblob = blob.states[id];
 
-			loop: {
-				render: 60,
-				update: 60
-			},
+				for (var a = 0, al = stateblob.arguments.length; a < al; a++) {
+					if (stateblob.arguments[a] === '#lychee.game.Main') {
+						stateblob.arguments[a] = this;
+					}
+				}
 
-			renderer: {
-				width:      1024,
-				height:     768,
-				id:         'game',
-				background: '#222222'
+				this.setState(id, lychee.deserialize(stateblob));
+
 			}
+
+		},
+
+		serialize: function() {
+
+			// TODO: Diff algorithm for settings
+			var settings = this.settings;
+			var blob     = {};
+
+			blob.states = {};
+
+			for (var id in this.__states) {
+				blob.states[id] = this.__states[id].serialize();
+			}
+
+
+			return {
+// TODO: Evaluate if constructor and arguments are necessary
+//				'constructor': 'lychee.game.Main'
+//				'arguments':   [ settings ]
+				'blob':        blob
+			};
 
 		},
 

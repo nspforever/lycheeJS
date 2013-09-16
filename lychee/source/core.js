@@ -19,8 +19,42 @@ if (typeof global !== 'undefined') {
 	var _environment = _default;
 
 
+
+	/*
+	 * HELPERS
+	 */
+
+	var _resolve_constructor = function(identifier, scope) {
+
+		var pointer = scope;
+
+		var ns = identifier.split('.');
+		for (var n = 0, l = ns.length; n < l; n++) {
+
+			var name = ns[n];
+
+			if (pointer[name] !== undefined) {
+				pointer = pointer[name];
+			} else {
+				pointer = null;
+				break;
+			}
+
+		}
+
+
+		return pointer;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	lychee.debug   = false;
-	lychee.VERSION = 0.7;
+	lychee.VERSION = 0.8;
 
 
 	lychee.define = function(name) {
@@ -282,6 +316,83 @@ if (typeof global !== 'undefined') {
 
 
 		return false;
+
+	};
+
+
+	lychee.serialize = function(object) {
+
+		object = object !== undefined ? object : null;
+
+
+		if (object !== null) {
+
+			if (typeof object.serialize === 'function') {
+				return object.serialize();
+			} else {
+				return JSON.parse(JSON.stringify(object));
+			}
+
+		}
+
+
+		return null;
+
+	};
+
+
+	lychee.deserialize = function(data) {
+
+		if (data instanceof Object) {
+
+			if (
+				typeof data.constructor === 'string'
+				&& data.arguments instanceof Array
+			) {
+
+				var construct = _resolve_constructor(data.constructor, global);
+				if (typeof construct === 'function') {
+
+					var bindargs = [].splice.call(data.arguments, 0);
+					bindargs.reverse();
+					bindargs.push(construct);
+					bindargs.reverse();
+
+
+					var instance = new (
+						construct.bind.apply(
+							construct,
+							bindargs
+						)
+					)();
+
+
+					var blob = data.blob || null;
+					if (
+						   blob !== null
+						&& typeof instance.deserialize === 'function'
+					) {
+
+						instance.deserialize(blob);
+
+					}
+
+
+					return instance;
+
+				}
+
+			}
+
+		}
+
+
+		if (data === undefined) {
+			data = null;
+		}
+
+
+		return data;
 
 	};
 

@@ -48,20 +48,20 @@ lychee.define('lychee.ui.Layer').includes([
 
 		},
 
-		deserialize: function(settings) {
-
-			this.setVisible(settings.visible);
-
+		deserialize: function(blob) {
 
 			var entities = [];
-			for (var e = 0, el = settings.entities.length; e < el; e++) {
-				var blob = settings.entities[e];
-				entities.push(lychee.deserialize(blob));
+			for (var e = 0, el = blob.entities.length; e < el; e++) {
+
+				var entity = lychee.deserialize(blob.entities[e]);
+
+				entities.push(entity);
+
 			}
 
 			var map = [];
-			for (var id in settings.map) {
-				var index = settings.map[id];
+			for (var id in blob.map) {
+				var index  = blob.map[id];
 				map[index] = id;
 			}
 
@@ -79,7 +79,11 @@ lychee.define('lychee.ui.Layer').includes([
 
 		serialize: function() {
 
-			var settings = {};
+			var data = lychee.ui.Entity.prototype.serialize.call(this);
+			data['constructor'] = 'lychee.ui.Layer';
+
+			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
 
 
 			if (this.visible !== true) settings.visible = this.visible;
@@ -99,21 +103,18 @@ lychee.define('lychee.ui.Layer').includes([
 			}
 
 
-			var mapentities = [];
+			var entities = [];
 
 			if (this.entities.length > 0) {
 
-				settings.entities = [];
+				blob.entities = [];
 
 				for (var e = 0, el = this.entities.length; e < el; e++) {
 
 					var entity = this.entities[e];
-					if (typeof entity.serialize === 'function') {
-						settings.entities.push(entity.serialize());
-						mapentities.push(entity);
-					} else {
-						settings.entities.push(null);
-					}
+
+					blob.entities.push(lychee.serialize(entity));
+					entities.push(entity);
 
 				}
 
@@ -122,13 +123,13 @@ lychee.define('lychee.ui.Layer').includes([
 
 			if (Object.keys(this.__map).length > 0) {
 
-				settings.map = {};
+				blob.map = {};
 
 				for (var id in this.__map) {
 
-					var index = mapentities.indexOf(this.__map[id]);
+					var index = entities.indexOf(this.__map[id]);
 					if (index !== -1) {
-						settings.map[id] = index;
+						blob.map[id] = index;
 					}
 
 				}
@@ -136,10 +137,7 @@ lychee.define('lychee.ui.Layer').includes([
 			}
 
 
-			return {
-				'constructor': 'lychee.ui.Layer',
-				'arguments':   [ settings ]
-			};
+			return data;
 
 		},
 
