@@ -10,11 +10,6 @@ lychee.define('game.entity.Circle').includes([
 
 		lychee.ui.Entity.call(this, settings);
 
-
-		//this.bind('swipe', function(id, type, position, delta, swipe) {
-		//	console.log(type, position.x, position.y);
-		//}, this);
-
 	};
 
 
@@ -23,6 +18,16 @@ lychee.define('game.entity.Circle').includes([
 		/*
 		 * ENTITY API
 		 */
+
+		serialize: function() {
+
+			var data = lychee.ui.Entity.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.Circle';
+
+
+			return data;
+
+		},
 
 		render: function(renderer, offsetX, offsetY) {
 
@@ -38,12 +43,6 @@ lychee.define('game.entity.Circle').includes([
 			);
 
 		}
-
-
-
-		/*
-		 * CUSTOM API
-		 */
 
 	};
 

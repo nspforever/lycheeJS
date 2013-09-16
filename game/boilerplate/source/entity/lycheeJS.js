@@ -30,6 +30,16 @@ lychee.define('game.entity.lycheeJS').includes([
 
 	Class.prototype = {
 
+		serialize: function() {
+
+			var data = lychee.game.Sprite.prototype.serialize.call(this);
+			data['constructor'] = 'game.entity.lycheeJS';
+
+
+			return data;
+
+		}
+
 	};
 
 

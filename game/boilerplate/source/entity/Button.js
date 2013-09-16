@@ -32,7 +32,7 @@ lychee.define('game.entity.Button').includes([
 		serialize: function() {
 
 			var data = lychee.ui.Button.prototype.serialize.call(this);
-			data['constructor'] = 'game.entity.Text';
+			data['constructor'] = 'game.entity.Button';
 
 			var settings = data['arguments'][0];
 
