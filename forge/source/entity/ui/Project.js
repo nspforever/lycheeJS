@@ -1,7 +1,7 @@
 
 lychee.define('game.entity.ui.Project').requires([
 	'lychee.ui.Button',
-	'lychee.ui.Input'
+	'lychee.ui.Select'
 ]).includes([
 	'lychee.ui.Layer'
 ]).exports(function(lychee, game, global, attachments) {
@@ -53,6 +53,28 @@ lychee.define('game.entity.ui.Project').requires([
 
 	};
 
+	var _process_change = function(value) {
+
+		var found = null;
+
+		var projects = this.__projects;
+		for (var p = 0, pl = projects.length; p < pl; p++) {
+
+			var project = projects[p];
+			if (project.title === value) {
+				found = project;
+				break;
+			}
+
+		}
+
+
+		if (found !== null) {
+			this.trigger('change', [ found ]);
+		}
+
+	};
+
 
 
 	/*
@@ -77,7 +99,7 @@ lychee.define('game.entity.ui.Project').requires([
 
 			var env = renderer.getEnvironment();
 
-			settings.width  = env.width;
+			settings.width  = env.width / 2;
 			settings.height = 64;
 
 		}
@@ -134,14 +156,7 @@ lychee.define('game.entity.ui.Project').requires([
 				}
 			});
 
-			entity.bind('change', function(value) {
-
-				var project = this.__projects[value] || null;
-				if (project !== null) {
-					this.trigger('change', [ project ]);
-				}
-
-			}, this);
+			entity.bind('change', _process_change, this);
 
 			this.setEntity('select', entity);
 

@@ -139,6 +139,15 @@ lychee.define('lychee.ui.Select').includes([
 					y - hheight,
 					x + hwidth,
 					y + hheight,
+					'#282828',
+					true
+				);
+
+				renderer.drawBox(
+					x - hwidth,
+					y - hheight,
+					x + hwidth,
+					y + hheight,
 					color,
 					false,
 					2

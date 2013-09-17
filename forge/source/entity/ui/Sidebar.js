@@ -37,14 +37,18 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 			var offset = 0;
 
-			var lastentity = this.entities[this.entities.length - 1];
-			var overflow   = (this.height / 2) - (lastentity.position.y + lastentity.height / 2);
-			if (overflow < 0) {
+			var lastentity = this.entities[this.entities.length - 1] || null;
+			if (lastentity !== null) {
 
-				if (swipe.y > 0) offset = Math.min(0, swipe.y);
-				if (swipe.y < 0) offset = Math.max(overflow, swipe.y);
+				var overflow = (this.height / 2) - (lastentity.position.y + lastentity.height / 2);
+				if (overflow < 0) {
 
-				this.offset.y = offset;
+					if (swipe.y > 0) offset = Math.min(0, swipe.y);
+					if (swipe.y < 0) offset = Math.max(overflow, swipe.y);
+
+					this.offset.y = offset;
+
+				}
 
 			}
 

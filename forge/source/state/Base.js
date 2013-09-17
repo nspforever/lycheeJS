@@ -36,18 +36,23 @@ lychee.define('game.state.Base').requires([
 			var height = env.height;
 
 
-			this.removeLayer('ui');
+			this.removeLayer('layer-1');
+			this.removeLayer('layer-2');
+			this.removeLayer('layer-3');
 
 
-			var layer   = new lychee.game.Layer();
+			var layer1  = new lychee.game.Layer();
+			var layer2  = new lychee.game.Layer();
+			var layer3  = new lychee.game.Layer();
 			var swidth  = 10 * tile;
 
 
+			var menu    = this.game.menu;
 			var project = this.game.project;
 
 			var scene = new _scene({
-				width:  width  - 2 * swidth     - tile,
-				height: height - project.height - tile,
+				width:  width  - 2 * swidth     - 4,
+				height: height - project.height - 4,
 				position: {
 					x: 0,
 					y: project.height / 2
@@ -76,18 +81,29 @@ lychee.define('game.state.Base').requires([
 				scrollable: true
 			});
 
+			menu.setPosition({
+				x:  1/2 * width  - menu.width  / 2,
+				y: -1/2 * height + menu.height / 2
+			});
 
 			project.setPosition({
+				x: -1/2 * width  + project.width  / 2,
 				y: -1/2 * height + project.height / 2
 			});
 
 
-			layer.setEntity('scene',    scene);
-			layer.setEntity('entities', entities);
-			layer.setEntity('settings', settings);
-			layer.setEntity('project',  project);
+			layer1.setEntity('scene',    scene);
 
-			this.setLayer('ui', layer);
+			layer2.setEntity('entities', entities);
+			layer2.setEntity('settings', settings);
+
+			layer3.setEntity('project',  project);
+			layer3.setEntity('menu',     menu);
+
+
+			this.setLayer('game', layer1);
+			this.setLayer('ui',   layer2);
+			this.setLayer('xxx',  layer3);
 
 		}
 

@@ -2,6 +2,7 @@
 lychee.define('game.Main').requires([
 	'game.Client',
 	'game.entity.Font',
+	'game.entity.ui.Menu',
 	'game.entity.ui.Project',
 	'game.entity.ui.Scene',
 	'game.state.Font',
@@ -126,8 +127,24 @@ lychee.define('game.Main').requires([
 
 //			this.builder    = new game.Builder(this);
 			this.controller = new game.Controller(this);
+			this.menu       = new game.entity.ui.Menu(this);
 			this.project    = new game.entity.ui.Project(this);
 			this.scene      = new game.entity.ui.Scene(this);
+
+			this.menu.bind('change', function(stateid) {
+				var state = this.getState(stateid);
+				if (state !== null) {
+					this.changeState(stateid);
+				}
+
+			}, this);
+
+			this.project.bind('change', function(project) {
+
+				this.controller.setProject(project);
+
+			}, this);
+
 
 			this.setState('font',  new game.state.Font(this));
 			this.setState('scene', new game.state.Scene(this));

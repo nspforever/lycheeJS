@@ -102,6 +102,16 @@ console.log('SCENE relayout()', width, height);
 				y - hheight,
 				x + hwidth,
 				y + hheight,
+				'#ffffff',
+				false,
+				2
+			);
+
+			renderer.drawBox(
+				x - hwidth,
+				y - hheight,
+				x + hwidth,
+				y + hheight,
 				'#481818',
 				true
 			);
