@@ -50,7 +50,7 @@ lychee.define('game.net.remote.Project').includes([
 					resolvedroot: resolvedroot,
 					file:         file,
 					resolvedfile: resolvedfile,
-					title:        title
+					title:        title.charAt(0).toUpperCase() + title.substr(1)
 				});
 
 			}
@@ -78,8 +78,6 @@ lychee.define('game.net.remote.Project').includes([
 			filtered.push(projects[p]);
 		}
 
-
-console.log(filtered);
 
 		if (filtered.length > 0) {
 

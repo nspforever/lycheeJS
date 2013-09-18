@@ -59,7 +59,6 @@ lychee.define('game.entity.ui.Sidebar').requires([
 
 		settings = null;
 
-
 	};
 
 

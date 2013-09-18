@@ -10,19 +10,23 @@ lychee.define('lychee.ui.Layer').includes([
 
 		this.entities = [];
 		this.offset   = { x: 0, y: 0, z: 0 };
+		this.overflow = true;
 		this.visible  = true;
 
-		this.__map = {};
+		this.__buffer = null;
+		this.__map    = {};
 
 
 		this.setEntities(settings.entities);
 		this.setMap(settings.map);
 		this.setOffset(settings.offset);
+		this.setOverflow(settings.overflow);
 		this.setVisible(settings.visible);
 
 		delete settings.entities;
 		delete settings.map;
 		delete settings.offset;
+		delete settings.overflow;
 		delete settings.visible;
 
 
@@ -158,6 +162,19 @@ lychee.define('lychee.ui.Layer').includes([
 			if (this.visible === false) return;
 
 
+			var buffer = this.__buffer;
+			if (buffer === null) {
+
+				buffer = renderer.createBuffer(
+					this.width,
+					this.height
+				);
+
+				this.__buffer = buffer;
+
+			}
+
+
 			var position = this.position;
 
 			var ox = position.x + offsetX;
@@ -182,6 +199,18 @@ lychee.define('lychee.ui.Layer').includes([
 			}
 
 
+			var overflow = this.overflow;
+			if (overflow === false) {
+
+				ox = this.width / 2;
+				oy = this.height / 2;
+
+				renderer.clearBuffer(buffer);
+				renderer.setBuffer(buffer);
+
+			}
+
+
 			var entities = this.entities;
 			for (var e = 0, el = entities.length; e < el; e++) {
 
@@ -189,6 +218,19 @@ lychee.define('lychee.ui.Layer').includes([
 					entities[e],
 					ox,
 					oy
+				);
+
+			}
+
+
+			if (overflow === false) {
+
+				renderer.setBuffer(null);
+
+				renderer.drawBuffer(
+					position.x + offsetX - hwidth,
+					position.y + offsetY - hheight,
+					buffer
 				);
 
 			}
@@ -392,6 +434,21 @@ lychee.define('lychee.ui.Layer').includes([
 				this.offset.x = typeof offset.x === 'number' ? offset.x : this.offset.x;
 				this.offset.y = typeof offset.y === 'number' ? offset.y : this.offset.y;
 				this.offset.z = typeof offset.z === 'number' ? offset.z : this.offset.z;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setOverflow: function(overflow) {
+
+			if (overflow === true || overflow === false) {
+
+				this.overflow = overflow;
 
 				return true;
 

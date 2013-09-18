@@ -9,11 +9,13 @@ lychee.define('game.state.Base').requires([
 	'lychee.game.State',
 	'game.entity.ui.Scene',
 	'game.entity.ui.Sidebar',
+	'game.entity.ui.Toolbar',
 	'game.entity.ui.Widget'
 ]).exports(function(lychee, game, global) {
 
 	var _scene   = game.entity.ui.Scene;
 	var _sidebar = game.entity.ui.Sidebar;
+	var _toolbar = game.entity.ui.Toolbar;
 	var _widget  = game.entity.ui.Widget;
 
 
@@ -51,11 +53,20 @@ lychee.define('game.state.Base').requires([
 			var project = this.game.project;
 
 			var scene = new _scene({
-				width:  width  - 2 * swidth     - 4,
-				height: height - project.height - 4,
+				width:  width  - 2 * swidth,
+				height: height - project.height,
 				position: {
 					x: 0,
 					y: project.height / 2
+				}
+			});
+
+			var toolbar = new _toolbar({
+				width:  256,
+				height: tile * 3,
+				position: {
+					x: -1/2 * scene.width  + 128,
+					y:  1/2 * scene.height - tile * 3/2 + project.height / 2
 				}
 			});
 
@@ -93,6 +104,7 @@ lychee.define('game.state.Base').requires([
 
 
 			layer1.setEntity('scene',    scene);
+			layer1.setEntity('toolbar',  toolbar);
 
 			layer2.setEntity('entities', entities);
 			layer2.setEntity('settings', settings);
