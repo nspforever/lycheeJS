@@ -40,7 +40,7 @@ lychee.define('game.entity.Ship').requires([
 
 		settings.map       = _config.map;
 		settings.states    = _config.states;
-		settings.texture   = _textures[color];
+		settings.texture   = _textures[this.color];
 
 		settings.width     = _config.width;
 		settings.height    = _config.height;

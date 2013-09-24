@@ -9,15 +9,19 @@ lychee.define('game.entity.ui.Toolbar').requires([
 	var _widget = game.entity.ui.Widget;
 
 
-	var Class = function(settings) {
+	var Class = function(game, settings) {
 
 		if (settings === undefined) {
 			settings = {};
 		}
 
 
+		this.game = game;
+
+
 		lychee.ui.Layer.call(this, settings);
 
+		settings = null;
 
 
 		/*
@@ -28,8 +32,6 @@ lychee.define('game.entity.ui.Toolbar').requires([
 
 
 		this.reset();
-
-		settings = null;
 
 	};
 
@@ -42,11 +44,30 @@ lychee.define('game.entity.ui.Toolbar').requires([
 
 		reset: function() {
 
-			var tool = new lychee.ui.Select({
-			})
+			lychee.ui.Layer.prototype.reset.call(this);
 
-			this.addEntity()
 
+			var entity = null;
+			var width  = this.width;
+			var height = this.height;
+
+console.log('TOOLBAR WIDTH', width);
+
+
+			entity = new lychee.ui.Switch({
+				font:    this.game.fonts.normal,
+				options: [ 'Camera', 'Cursor', 'Grid' ],
+				value:   'Camera',
+				width:   3 * 128,
+				type:    lychee.ui.Switch.TYPE.horizontal
+			});
+
+			entity.bind('change', function(value) {
+				var tool = value.toLowerCase();
+				this.trigger('change', [ tool ]);
+			}, this);
+
+			this.addEntity(entity);
 
 		},
 

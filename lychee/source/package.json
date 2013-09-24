@@ -119,6 +119,7 @@
 			"Select":    [ "js" ],
 			"Slider":    [ "js" ],
 			"Sprite":    [ "js" ],
+			"Switch":    [ "js" ],
 			"Textarea":  [ "js" ]
 		},
 

@@ -71,7 +71,6 @@ lychee.define('lychee.ui.Slider').includes([
 		var settings = lychee.extend({}, data);
 
 
-		this.font  = null;
 		this.type  = Class.TYPE.horizontal;
 		this.value = 0;
 
@@ -81,12 +80,10 @@ lychee.define('lychee.ui.Slider').includes([
 		this.__height = typeof settings.height === 'number' ? settings.height : 140;
 
 
-		this.setFont(settings.font);
 		this.setRange(settings.range);
 		this.setType(settings.type);
 		this.setValue(settings.value);
 
-		delete settings.font;
 		delete settings.range;
 		delete settings.type;
 		delete settings.value;
@@ -147,7 +144,6 @@ lychee.define('lychee.ui.Slider').includes([
 			var settings = data['arguments'][0];
 
 
-			if (this.font !== null)                  settings.font   = this.font.serialize();
 			if (this.type !== Class.TYPE.horizontal) settings.type   = this.type;
 			if (this.value !== 0)                    settings.value  = this.value;
 			if (this.__width !== 140)                settings.width  = this.__width;
@@ -183,7 +179,7 @@ lychee.define('lychee.ui.Slider').includes([
 			var y = position.y + offsetY;
 
 			var color = this.state === 'active' ? '#33b5e5' : '#0099cc';
-			var alpha = this.state === 'active' ? 0.7       : 0.3;
+			var alpha = this.state === 'active' ? 0.6       : 0.3;
 
 
 			var type    = this.type;
@@ -262,24 +258,6 @@ lychee.define('lychee.ui.Slider').includes([
 		/*
 		 * CUSTOM API
 		 */
-
-		setFont: function(font) {
-
-			font = font instanceof Font ? font : null;
-
-
-			if (font !== null) {
-
-				this.font = font;
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
 
 		setRange: function(range) {
 

@@ -122,7 +122,7 @@ lychee.define('lychee.ui.Joystick').includes([
 
 			var color  = this.state === 'active' ? '#33b5e5' : '#0099cc';
 			var color2 = this.state === 'active' ? '#0099cc' : '#575757';
-			var alpha  = this.state === 'active' ? 0.7       : 0.3;
+			var alpha  = this.state === 'active' ? 0.6       : 0.3;
 
 
 			var drag    = this.__drag;

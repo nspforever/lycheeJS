@@ -48,13 +48,14 @@ lychee.define('lychee.ui.Button').includes([
 			var data = lychee.ui.Entity.prototype.serialize.call(this);
 			data['constructor'] = 'lychee.ui.Button';
 
+
 			var settings = data['arguments'][0];
 			var blob     = data['blob'] = (data['blob'] || {});
 
 			if (this.label !== null) settings.label = this.label;
 
 
-			if (this.font !== null)  blob.font  = this.font.serialize();
+			if (this.font !== null) blob.font = this.font.serialize();
 
 
 			return data;

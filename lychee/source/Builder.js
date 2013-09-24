@@ -250,6 +250,8 @@
 
 						namespaceId = classId.substr(0, classId.indexOf('*') - 1);
 
+console.log(namespaceId, candidates);
+
 						var overallRequired = 0;
 						for (var c = 0, l = candidates.length; c < l; c++) {
 							overallRequired += candidates[c].attachments.length + 1;
@@ -383,12 +385,14 @@
 
 							if (all[a].substr(0, folder.length) === folder) {
 
-								// 1.1. Namespace
-								// e.g. /tag/value/namespace/Class
+								// 1.1. Namespace Includes
+								// e.g. /tag/value/namespace/*
 								if (path.indexOf('*') > 0) {
 
 									var namespace = path.substr(0, path.indexOf('*') - 1);
 									if (all[a].substr(folder.length + 1, namespace.length) === namespace) {
+
+console.log('>>>', namespace);
 
 										id = namespace + '.' + all[a].substr(folder.length + namespace.length + 2).split('/').join('.');
 
@@ -424,13 +428,34 @@
 
 
 				// 2. No Tag-based search
-				id = classId;
 
 				for (var a = 0, al = all.length; a < al; a++) {
 
-					// 2.1 direct includes
-					// e.g. lychee/Example.js > lychee.Example
-					if (all[a] === path) {
+					// 2.1. Namespace Includes
+					// e.g. /namespace/*
+					if (path.indexOf('*') > 0) {
+
+						var namespace = path.substr(0, path.indexOf('*') - 1);
+						if (all[a].substr(0, namespace.length) === namespace) {
+
+							id = all[a].split('/').join('.');
+
+console.log('NAMESPACE!', id);
+
+							if (filtered[id] === undefined) {
+								filtered[id] = [ all[a] ];
+							} else {
+								filtered[id].push(all[a]);
+							}
+
+						}
+
+
+					// 2.2 Simple Includes
+					// e.g. /lychee/Class
+					} else if (all[a] === path) {
+
+						id = classId;
 
 						if (filtered[id] === undefined) {
 							filtered[id] = [ all[a] ];
@@ -440,70 +465,16 @@
 
 						break;
 
-					// 2.2. subfolder includes
-					// e.g. lychee/parser/ASTScope.js > lychee.ASTScope
-					} else if (filtered[id] === undefined && all[a].substr(-1 * path.length) === path) {
-
-						// 2.2.1 validate folder against other tags
-						var isInvalid = false;
-						for (var tag in this.__tags) {
-
-							for (var otherValue in config.tags[tag]) {
-
-								for (var v = 0, l = this.__tags[tag].length; v < l; v++) {
-
-									var value = this.__tags[tag][v];
-									if (value !== otherValue) {
-
-										var folder = config.tags[tag][otherValue];
-										if (all[a].substr(0, folder.length) === folder) {
-											isInvalid = true;
-											break;
-										}
-
-									}
-
-								}
-
-								if (isInvalid === true) break;
-
-							}
-
-							if (isInvalid === true) break;
-
-						}
-
-
-						// 2.2.2 If the folder is validated, check if it was already set
-						if (isInvalid === false) {
-
-							if (filtered[id] === undefined) {
-								filtered[id] = [ all[a] ];
-							} else if (filtered[id] !== undefined) {
-
-								var alreadyInFiltered = false;
-
-								for (var f = 0, fl = filtered[id].length; f < fl; f++) {
-									if (filtered[id][f] === all[a]) {
-										alreadyInFiltered = true;
-										break;
-									}
-								}
-
-								if (alreadyInFiltered === false) {
-									filtered[id].push(all[a]);
-								}
-
-							}
-
-						}
-
 					}
 
 				}
 
 			}
 
+
+// TODO: Refactor candidates stuff,
+// doesn't work for namespaces due to
+// nodes[n] having no id. Damn it!
 
 			if (Object.keys(filtered).length > 0) {
 

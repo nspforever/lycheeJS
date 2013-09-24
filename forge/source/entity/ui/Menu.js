@@ -76,7 +76,7 @@ lychee.define('game.entity.ui.Menu').requires([
 				this.trigger('change', [ state ]);
 			}, this);
 
-			this.setEntity('select', entity);
+			this.addEntity(entity);
 
 		}
 

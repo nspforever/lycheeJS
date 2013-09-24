@@ -31,16 +31,13 @@ lychee.define('game.state.Font').requires([
 
 	var Class = function(game) {
 
-		this.scene = game.scene || null;
-
-
 		lychee.game.State.call(this, game);
 
 
 		this.generator = new _font(this);
 		this.generator.bind('ready', function(data) {
 
-			var scene = this.scene;
+			var scene = _base.getEntity.call(this, 'scene');
 			if (scene !== null) {
 
 				scene.reset();
@@ -200,9 +197,6 @@ lychee.define('game.state.Font').requires([
 					value: settings.outlinecolor
 				})
 			);
-
-
-			this.getLayer('ui').addEntity(this.preview);
 
 		},
 

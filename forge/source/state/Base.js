@@ -61,12 +61,12 @@ lychee.define('game.state.Base').requires([
 				}
 			});
 
-			var toolbar = new _toolbar({
-				width:  256,
+			var toolbar = new _toolbar(this.game, {
+				width:  scene.width,
 				height: tile * 3,
 				position: {
-					x: -1/2 * scene.width  + 128,
-					y:  1/2 * scene.height - tile * 3/2 + project.height / 2
+					x: 0,
+					y: 1/2 * scene.height - tile * 3/2 + project.height / 2
 				}
 			});
 
@@ -121,6 +121,22 @@ lychee.define('game.state.Base').requires([
 
 	};
 
+
+	Module.getEntity = function(id) {
+
+		for (var layerId in this.__layers) {
+
+			var entity = this.__layers[layerId].getEntity(id);
+			if (entity !== null) {
+				return entity;
+			}
+
+		}
+
+
+		return null;
+
+	};
 
 	Module.createWidget = function(target, property, label, entity) {
 
