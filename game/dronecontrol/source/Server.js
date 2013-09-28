@@ -16,10 +16,11 @@ lychee.define('game.Server').requires([
 
 	var _process_receive = function(data) {
 
-		var drone = this.getDrone(data.id || null);
+		var drone = this.getDrone(data.ip || null);
 		if (drone === null) {
 			return false;
 		}
+
 
 
 		var method = data.method;
@@ -27,7 +28,7 @@ lychee.define('game.Server').requires([
 		var value  = data.value;
 
 
-		console.log('(Dronecontrol) game.Server (' + data.id + '): ' + method + '/' + type + ' - ' + JSON.stringify(value));
+		console.log('(Dronecontrol) game.Server (' + data.ip + '): ' + method + '/' + type + ' - ' + JSON.stringify(value));
 
 
 		switch (method) {
@@ -166,11 +167,10 @@ lychee.define('game.Server').requires([
 
 		init: function(drones) {
 
-
 			if (drones instanceof Array) {
 
 				for (var d = 0, dl = drones.length; d < dl; d++) {
-					this.setDrone(drones[d].id, new game.ar.Drone(drones[d].ip));
+					this.setDrone(drones[d].ip, new game.ar.Drone(drones[d].ip));
 				}
 
 			}

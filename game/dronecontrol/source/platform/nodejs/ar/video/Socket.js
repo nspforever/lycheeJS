@@ -2,7 +2,7 @@
 lychee.define('game.ar.video.Socket').tags({
 	platform: 'nodejs'
 }).requires([
-//	'game.ar.data.VIDEO'
+	'game.ar.data.VIDEO'
 ]).includes([
 	'lychee.event.Emitter'
 ]).supports(function(lychee, global) {

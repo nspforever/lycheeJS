@@ -1,7 +1,9 @@
 
 lychee.define('game.ar.data.NAVDATA').tags({
 	platform: 'nodejs'
-}).supports(function(lychee, global) {
+}).requires([
+	'game.ar.data.Buffer'
+]).supports(function(lychee, global) {
 
 	if (typeof Buffer !== 'undefined') {
 		return true;
