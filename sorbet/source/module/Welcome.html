@@ -13,38 +13,51 @@
 <body>
 	<h1 id="logo"><a href="http://lycheeJS.org">lycheeJS</a></h1>
 	<div id="wrapper">
-		<div>
-			<div class="wrapper-left">
-				<h2>lycheeJS Projects</h1>
-				<ul class="ui-list">
-				<%script% for(var i = 0, il = internal_projects.length; i < il; i++) { %>
-					<li><a href="<%=internal_projects[i].url%>"><%=internal_projects[i].title%></a></li>
-				<%script% } %>
-				</ul>
-			</div>
-			<div class="wrapper-right">
-				<h2>lycheeJS Forge</h1>
-				<ul class="ui-list">
-					<li><a href="/forge/index.html#state=font">Font Exporter</a></li>
-				</ul>
-			</div>
+		<div class="wrapper-left">
+			<h2>lycheeJS Projects</h2>
+			<ul class="ui-list">
+			<%script% for(var i = 0, il = internal_projects.length; i < il; i++) { %>
+				<li><a href="<%=internal_projects[i].url%>"><%=internal_projects[i].title%></a></li>
+			<%script% } %>
+			</ul>
+
+			<br>
+			<br>
+
+			<h2>External Projects</h2>
+			<ul class="ui-list">
+			<%script% for(var e = 0, el = external_projects.length; e < el; e++) { %>
+				<li><a href="<%=external_projects[e].url%>"><%=external_projects[e].title%></a></li>
+			<%script% } %>
+			</ul>
 		</div>
-		<div>
-			<div class="wrapper-left">
-				<h2>External Projects</h1>
-				<ul class="ui-list">
-				<%script% for(var e = 0, el = external_projects.length; e < el; e++) { %>
-					<li><a href="<%=external_projects[e].url%>"><%=external_projects[e].title%></a></li>
-				<%script% } %>
-				</ul>
-			</div>
-			<div class="wrapper-right">
-				<h2>Server Status</h2>
-				<ul class="ui-list">
-				<%script% for(var s = 0, sl = sockets.length; s < sl; s++) { %>
-					<li><a class="ui-text" href="<%=sockets[s].url%>"><%=sockets[s].port%>&nbsp;-&nbsp;(<%=sockets[s].services%>)</a></li>
-				<%script% } %>
-				</ul>
+		<div class="wrapper-right">
+			<h2>lycheeJS Sorbet</h2>
+			<ul class="ui-list">
+				<li><a href="/forge/index.html">Forge Editor</a></li>
+				<li><a href="/admin/index.html">Admin Panel</a></li>
+			</ul>
+
+			<br>
+			<br>
+
+			<div>
+				<div class="wrapper-left">
+					<h3>Servers</h3>
+					<ul>
+					<%script% for(var s = 0, sl = servers.length; s < sl; s++) { %>
+						<li><a href="<%=servers[s].url%>"><%=servers[s].title%>&nbsp;(<%=servers[s].port%>)</a></li>
+					<%script% } %>
+					</ul>
+				</div>
+				<div class="wrapper-right">
+					<h3>VHosts</h3>
+					<ul>
+					<%script% for(var v = 0, vl = vhosts.length; v < vl; v++) { %>
+						<li><a href="<%=vhosts[v].url%>"><%=vhosts[v].title%>&nbsp;(<%=vhosts[v].root%>)</a></li>
+					<%script% } %>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>

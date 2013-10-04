@@ -76,7 +76,6 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 	var _build_project = function(project) {
 
 		var id = project.resolvedroot;
-
 		if (this.main.servers.get(id) !== null) {
 			return false;
 		}
@@ -141,7 +140,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		this.__port = this.database.port[0];
 
 
-		var vhosts = this.main.vhosts.all();
+		var vhosts = this.main.vhosts.values();
 		for (var v = 0, vl = vhosts.length; v < vl; v++) {
 
 			var vhost = vhosts[v];
@@ -150,8 +149,10 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 				console.log('sorbet.module.Server: Booting VHost "' + vhost.id + '"');
 			}
 
-			var forge_project = _get_projects.call(this, vhost, '/forge')[0];
-			_build_project.call(this, forge_project);
+			var forge_project = _get_projects.call(this, vhost, '/forge')[0] || null;
+			if (forge_project !== null) {
+				_build_project.call(this, forge_project);
+			}
 
 			var internal_projects = _get_projects.call(this, vhost, '/game');
 			for (var i = 0, il = internal_projects.length; i < il; i++) {

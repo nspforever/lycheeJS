@@ -168,7 +168,7 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 		}
 
 
-		var vhosts = this.main.vhosts.all();
+		var vhosts = this.main.vhosts.values();
 		for (var v = 0, vl = vhosts.length; v < vl; v++) {
 
 			var vhost = vhosts[v];

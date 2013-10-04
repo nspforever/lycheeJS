@@ -17,10 +17,9 @@ lychee.define('sorbet.module.Welcome').requires([
 		data   = data !== undefined         ? data   : null;
 
 
-		var projects = [];
-
-		var fs   = this.fs;
-		var root = this.root;
+		var fs     = this.fs;
+		var root   = this.root;
+		var output = [];
 
 		var files = fs.filter(
 			root + folder,
@@ -34,7 +33,7 @@ lychee.define('sorbet.module.Welcome').requires([
 			var url = files[f].substr(root.length);
 			var tmp = url.split('/');
 
-			projects.push({
+			output.push({
 				url:   url,
 				title: tmp[tmp.length - 2]
 			});
@@ -42,25 +41,80 @@ lychee.define('sorbet.module.Welcome').requires([
 		}
 
 
-		return projects;
+		return output;
 
 	};
 
 
-	var _get_sockets = function(data) {
+	var _get_servers = function(main, data) {
 
-		var sockets = [];
+		var servers = main.servers.values();
+		var output  = [];
 
 
-		sockets.push({
-			url:  'http://' + data.host + ':' + data.port,
-			host: data.host,
-			port: data.port,
-			services: 'WebService'
+		for (var s = 0, sl = servers.length; s < sl; s++) {
+
+			var server = servers[s];
+
+			var tmp   = server.id.split('/');
+			var port  = server.port;
+			var title = tmp[tmp.length - 1];
+
+
+			output.push({
+				title: title,
+				url:   'ws://' + data.host + ':' + port,
+				type:  'ws',
+				host:  null,
+				port:  port
+			});
+
+		}
+
+
+		output.push({
+			title: 'sorbet',
+			url:   'http://' + data.host + ':' + data.port,
+			type:  'http',
+			host:  data.host,
+			port:  data.port
 		});
 
 
-		return sockets;
+		output.sort(function(a,b) {
+			return a.port > b.port;
+		});
+
+
+		return output;
+
+	};
+
+	var _get_vhosts = function(main, data) {
+
+		var vhosts = main.vhosts.ids();
+		var output = [];
+
+
+		for (var v = 0, vl = vhosts.length; v < vl; v++) {
+
+			var hostname = vhosts[v];
+			var vhost    = main.vhosts.get(hostname);
+
+
+			var root = vhost.root.substr(main.root.length) || '/';
+
+
+			output.push({
+				title: hostname,
+				url:   'http://' + hostname + ':' + data.port,
+				root:  root
+			});
+
+		}
+
+
+		return output;
 
 	};
 
@@ -70,7 +124,10 @@ lychee.define('sorbet.module.Welcome').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function() {
+	var Class = function(main) {
+
+		this.main = main;
+		this.type = 'public';
 
 	};
 
@@ -80,14 +137,17 @@ lychee.define('sorbet.module.Welcome').requires([
 		process: function(host, response, data) {
 
 			var content = '';
+			var main    = this.main;
 			var version = sorbet.Main.VERSION;
+
 
 			try {
 
 				content = _template.render({
 					internal_projects: _get_projects.call(host, '/game',     data),
 					external_projects: _get_projects.call(host, '/external', data),
-					sockets:           _get_sockets.call(host, data),
+					servers:           _get_servers(main, data),
+					vhosts:            _get_vhosts(main, data),
 					version:           version
 				});
 
@@ -102,7 +162,7 @@ lychee.define('sorbet.module.Welcome').requires([
 					_error.process(host, response, {
 						status:   500,
 						host:     data.host || null,
-						url:      url,
+						url:      data.url,
 						resolved: null
 					});
 

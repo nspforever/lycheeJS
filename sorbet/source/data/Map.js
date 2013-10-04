@@ -8,7 +8,7 @@ lychee.define('sorbet.data.Map').exports(function(lychee, sorbet, global, attach
 
 	Class.prototype = {
 
-		all: function() {
+		values: function() {
 
 			var filtered = [];
 
@@ -20,6 +20,19 @@ lychee.define('sorbet.data.Map').exports(function(lychee, sorbet, global, attach
 					filtered.push(data);
 				}
 
+			}
+
+
+			return filtered;
+
+		},
+
+		ids: function() {
+
+			var filtered = [];
+
+			for (var id in this.__map) {
+				filtered.push(id);
 			}
 
 

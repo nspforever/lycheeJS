@@ -70,6 +70,16 @@ h2 {
 	border-bottom: 4px solid #444444;
 }
 
+h3 {
+	margin: 0 8px 0 8px;
+	padding: 0 0 8px 0;
+	font-family: exobold;
+	font-size: 1em;
+	font-weight: normal;
+	text-align: center;
+	border-bottom: 4px solid #444444;
+}
+
 a {
 	color: #8f202f;
 	-moz-transition: all 250ms ease-out;
@@ -119,7 +129,8 @@ a:active {
 	display: inline-block;
 	width: 192px;
 	height: 48px;
-	margin: 8px;
+	margin: 8px 0;
+	padding: 0 8px;
 }
 
 .ui-list li a {
@@ -127,18 +138,10 @@ a:active {
 	width: 192px;
 	height: 48px;
 	line-height: 48px;
-	font-family: exobold;
 	text-align: center;
-	text-decoration: none;
-	text-transform: capitalize;
 	vertical-align: middle;
 	border: 3px solid #8f202f;
 	border-radius: 24px;
-}
-
-.ui-list li a.ui-text {
-	width: auto;
-	padding: 0 24px;
 }
 
 .ui-list li a:focus,
@@ -146,5 +149,20 @@ a:active {
 .ui-list li a:active {
 	color: #ffffff;
 	border: 3px solid #ffffff;
+}
+
+ul li a {
+	width: auto;
+	font-size: 1em;
+	font-family: exobold;
+	text-decoration: none;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+ul li a:focus,
+ul li a:hover,
+ul li a:active {
+	color: #ffffff;
 }
 
