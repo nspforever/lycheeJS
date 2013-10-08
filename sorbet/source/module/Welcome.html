@@ -59,6 +59,26 @@
 					</ul>
 				</div>
 			</div>
+			<div>
+				<h3>Blacklist</h3>
+				<ul class="ui-log">
+				<%script% for(var b = 0, bl = blacklist.length; b < bl; b++) { %>
+					<li>
+						(<%=blacklist[b].log%>) <%=blacklist[b].host%> <%=blacklist[b].url%>
+						&nbsp;<a class="ui-button" href="/sorbet/module/Blacklist/remove?host=<%=blacklist[b].host%>&url=<%=blacklist[b].url%>">X</a>
+
+						<ul>
+						<%script% for(var r = 0, rl = blacklist[b].remotes.length; r < rl; r++) { %>
+							<li>
+								<%=blacklist[b].remotes[r]%>
+								&nbsp;<a class="ui-button" href="/sorbet/module/Blacklist/remove?host=<%=blacklist[b].host%>&url=<%=blacklist[b].url%>&remote=<%=blacklist[b].remotes[r]%>">X</a>
+							</li>
+						<%script% } %>
+						</ul>
+					</li>
+				<%script% } %>
+				</ul>
+			</div>
 		</div>
 	</div>
 	<small id="version"><%=version%></small>

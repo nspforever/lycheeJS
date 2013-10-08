@@ -3,6 +3,8 @@ lychee.define('sorbet.module.Welcome').requires([
 	'sorbet.data.Template'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var fs = require('fs');
+
 	var _template = new sorbet.data.Template(attachments['html']);
 
 
@@ -114,6 +116,48 @@ lychee.define('sorbet.module.Welcome').requires([
 		}
 
 
+		output.sort(function(a, b) {
+			return a.title < b.title;
+		});
+
+
+		return output;
+
+	};
+
+	var _get_blacklist = function(main, data) {
+
+		var output = [];
+
+		var database = main.db.get('Blacklist');
+		if (database !== null) {
+
+			for (var host in database) {
+
+				for (var url in database[host]) {
+
+					var entry = database[host][url];
+
+					output.push({
+						host:       host,
+						url:        url,
+						log:        entry.log || 0,
+						remotes:    entry.remotes,
+						useragents: entry.useragents
+					});
+
+				}
+
+			}
+
+		}
+
+
+		output.sort(function(a, b) {
+			return a.log < b.log;
+		});
+
+
 		return output;
 
 	};
@@ -148,6 +192,7 @@ lychee.define('sorbet.module.Welcome').requires([
 					external_projects: _get_projects.call(host, '/external', data),
 					servers:           _get_servers(main, data),
 					vhosts:            _get_vhosts(main, data),
+					blacklist:         _get_blacklist(main, data),
 					version:           version
 				});
 

@@ -73,6 +73,29 @@ lychee.define('sorbet.Main').requires([
 
 	};
 
+	var _parse_parameters = function(url) {
+
+		var parameters = null;
+
+		if (url.indexOf('?') !== -1) {
+
+			parameters = {};
+
+			var tmp = url.substr(url.indexOf('?') + 1).split('&');
+			for (var t = 0, tl = tmp.length; t < tl; t++) {
+
+				var tmp2 = tmp[t].split('=');
+				parameters[tmp2[0]] = tmp2[1];
+
+			}
+
+		}
+
+
+		return parameters;
+
+	};
+
 
 
 	/*
@@ -206,7 +229,16 @@ lychee.define('sorbet.Main').requires([
 			 * 0. Blacklist of known Intruders
 			 */
 
-			if (_blacklist.process(host, response, request) === true) {
+			var result = _blacklist.check(host, response, {
+				host:      rawhost,
+				port:      rawport,
+				referer:   referer,
+				remote:    remote,
+				useragent: request.headers['user-agent'],
+				url:       url
+			});
+
+			if (result === true) {
 
 				_error.process(host, response, {
 					status:   403,
@@ -260,27 +292,43 @@ lychee.define('sorbet.Main').requires([
 
 						return response;
 
+
 					} else if (url.substr(0, 15) === '/sorbet/module/') {
 
+						var moduleid   = url.split('/')[3] || null;
+						var action     = null;
+						var parameters = _parse_parameters(url);
 
-						var mid = url.substr(15).toLowerCase();
-						if (mid.length) {
+						if (
+							   moduleid !== null
+							&& parameters !== null
+						) {
 
-							var module = this.modules.get(mid);
+							url    = url.substr(0, url.indexOf('?'));
+							action = url.substr(url.indexOf(moduleid) + moduleid.length + 1);
+
+						}
+
+
+						if (moduleid !== null) {
+
+							var module = this.modules.get(moduleid.toLowerCase());
 							if (
 								   module !== null
 								&& module.type === 'public'
 							) {
 
 								if (lychee.debug === true) {
-									console.log('sorbet.Main: Processing Module call: "' + mid + ', ' + url + '"');
+									console.log('sorbet.Main: Processing Module call: "' + moduleid + ', ' + url + ', ' + JSON.stringify(parameters) + '"');
 								}
 
 								module.process(host, response, {
-									referer: referer,
-									host:    rawhost,
-									port:    rawport,
-									url:     url
+									action:     action,
+									parameters: parameters,
+									referer:    referer,
+									host:       rawhost,
+									port:       rawport,
+									url:        url
 								});
 
 							}
