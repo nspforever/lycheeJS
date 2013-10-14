@@ -23,13 +23,11 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 	};
 
-	var _get_projects = function(vhost, folder, data) {
+	var _get_projects = function(vhost, folder, projects) {
 
-		folder = typeof folder === 'string' ? folder : null;
-		data   = data !== undefined         ? data   : null;
+		folder   = typeof folder === 'string' ? folder   : null;
+		projects = projects instanceof Array  ? projects : [];
 
-
-		var projects = [];
 
 		var fs   = vhost.fs;
 		var root = vhost.root;
@@ -149,19 +147,15 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 				console.log('sorbet.module.Server: Booting VHost "' + vhost.id + '"');
 			}
 
-			var forge_project = _get_projects.call(this, vhost, '/forge')[0] || null;
-			if (forge_project !== null) {
-				_build_project.call(this, forge_project);
-			}
 
-			var internal_projects = _get_projects.call(this, vhost, '/game');
-			for (var i = 0, il = internal_projects.length; i < il; i++) {
-				_build_project.call(this, internal_projects[i]);
-			}
+			var projects = [];
 
-			var external_projects = _get_projects.call(this, vhost, '/external');
-			for (var e = 0, el = external_projects.length; e < el; e++) {
-				_build_project.call(this, external_projects[i]);
+			_get_projects.call(this, vhost, '/forge',    projects);
+			_get_projects.call(this, vhost, '/game',     projects);
+			_get_projects.call(this, vhost, '/external', projects);
+
+			for (var p = 0, pl = projects.length; p < pl; p++) {
+				_build_project.call(this, projects[p]);
 			}
 
 		}

@@ -66,11 +66,13 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 
 			var mime = Class.MIME['default'];
 			if (Class.MIME[ext] !== undefined) {
+
 				mime = Class.MIME[ext];
+
 			} else {
 
 				if (lychee.debug === true) {
-					console.error('sorbet.module.File: Unknown MIME type for "' + url + '"');
+					console.error('sorbet.module.File: Unknown MIME type for "' + resolved + '"');
 				}
 
 			}
