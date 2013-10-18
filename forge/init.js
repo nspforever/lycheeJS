@@ -17,7 +17,6 @@ lychee.tag({
 lychee.build(function(lychee, global) {
 
 	var settings = {
-		state: 'font'
 	};
 
 

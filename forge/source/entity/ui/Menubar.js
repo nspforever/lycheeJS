@@ -1,5 +1,5 @@
 
-lychee.define('game.entity.ui.Project').requires([
+lychee.define('game.entity.ui.Menubar').requires([
 	'lychee.ui.Button',
 	'lychee.ui.Select'
 ]).includes([
@@ -82,6 +82,37 @@ lychee.define('game.entity.ui.Project').requires([
 	 */
 
 	var Class = function(game, settings) {
+
+		if (settings === undefined) {
+			settings = {};
+		}
+
+
+		this.game = game;
+
+		this.__options  = [];
+		this.__projects = [];
+
+
+		var renderer = this.game.renderer || null;
+		if (renderer !== null) {
+
+			var env = renderer.getEnvironment();
+
+			settings.width  = env.width / 2;
+			settings.height = 64;
+
+		}
+
+
+		lychee.ui.Layer.call(this, settings);
+
+		settings = null;
+
+
+		this.reset();
+
+		_process_update.call(this, _default_projects);
 
 	};
 

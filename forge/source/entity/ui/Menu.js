@@ -6,6 +6,9 @@ lychee.define('game.entity.ui.Menu').requires([
 	'lychee.ui.Layer'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _defaults = {
+	};
+
 	var Class = function(game, settings) {
 
 		if (settings === undefined) {
@@ -15,16 +18,13 @@ lychee.define('game.entity.ui.Menu').requires([
 
 		this.game = game;
 
-		this.__options  = [];
-		this.__projects = [];
-
 
 		var renderer = this.game.renderer || null;
 		if (renderer !== null) {
 
 			var env = renderer.getEnvironment();
 
-			settings.width  = env.width / 2;
+			settings.width  = env.width;
 			settings.height = 64;
 
 		}

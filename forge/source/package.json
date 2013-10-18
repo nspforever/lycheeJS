@@ -30,8 +30,7 @@
 		"entity": {
 
 			"ui": {
-				"Menu":    [ "js" ],
-				"Project": [ "js", "json" ],
+				"Menu":    [ "js", "json" ],
 				"Sandbox": [ "js" ],
 				"Scene":   [ "js" ],
 				"Sidebar": [ "js" ],
