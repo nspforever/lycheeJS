@@ -123,9 +123,18 @@ var child = exec('grep -R ": function" ./lychee/source', function(error, stdout,
 
 var _show_summary = function() {
 
+	var missing = {
+		methods:   [],
+		defblocks: []
+	};
+
 	for (var id in _cache) {
 
 		var entry = _cache[id];
+		if (entry.doc === null) {
+			missing.defblocks.push(entry.defpath);
+			continue;
+		}
 
 
 		for (var m = 0, ml = entry.methods.length; m < ml; m++) {
@@ -140,29 +149,18 @@ var _show_summary = function() {
 				var article  = "<article id=\"" + idpath + "\">";
 				var headline = "\) " + protopath + "(";
 
-				var regex =  '';
-
-				regex += '/' + method.name + '\:\wfunction\(';
-
-				regex += '\)';
-
 				if (
 					   entry.doc.indexOf(article) !== -1
 					&& entry.doc.indexOf(headline) !== -1
-					&& entry.doc.match(regex)
 				) {
 
-console.log(entry.defpath + ' >> ' + method.name + ' DOCUMENTED');
+					// TODO: Verification of method signatures
 
 				} else {
 
-console.log(entry.defpath + ' >> ' + method.name + ' UNDOCUMENTED');
+					missing.methods.push(protopath);
 
 				}
-
-			} else if (entry.doc === null) {
-
-				_show_undocumented(entry, method);
 
 			}
 
@@ -170,9 +168,22 @@ console.log(entry.defpath + ' >> ' + method.name + ' UNDOCUMENTED');
 
 	}
 
-};
+	console.log('- - - - -');
+	console.log('Missing API Docs (Methods):');
+	console.log('- - - - -');
+
+	for (var mm = 0, mml = missing.methods.length; mm < mml; mm++) {
+		console.log(missing.methods[mm]);
+	}
 
 
-var _show_undocumented = function(entry, method) {
+	console.log('- - - - -');
+	console.log('Missing API Docs (Files):');
+	console.log('- - - - -');
+
+	for (var md = 0, mdl = missing.defblocks.length; md < mdl; md++) {
+		console.log(missing.defblocks[md]);
+	}
+
 };
 

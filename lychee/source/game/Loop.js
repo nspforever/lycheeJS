@@ -11,7 +11,15 @@ lychee.define('lychee.game.Loop').includes([
 
 }).exports(function(lychee, global) {
 
-	var _instances = [];
+    var _instances   = [];
+ 	var _timeout_id  = 0;
+	var _interval_id = 0;
+
+
+
+	/*
+	 * EVENTS
+	 */
 
 	var _listeners = {
 
@@ -22,8 +30,8 @@ lychee.define('lychee.game.Loop').includes([
 				var instance = _instances[i];
 				var clock    = Date.now() - instance.__clock.start;
 
-				instance._updateLoop(clock);
-				instance._renderLoop(clock);
+				_update_loop.call(instance, clock);
+				_render_loop.call(instance, clock);
 
 			}
 
@@ -32,11 +40,16 @@ lychee.define('lychee.game.Loop').includes([
 	};
 
 
-	(function(callsPerSecond) {
 
-		var interval = typeof setInterval === 'function';
+	/*
+	 * FEATURE DETECTION
+	 */
+
+	(function(delta) {
+
+		var interval = typeof global.setInterval === 'function';
 		if (interval === true) {
-			global.setInterval(_listeners.interval, callsPerSecond);
+			global.setInterval(_listeners.interval, delta);
 		}
 
 
@@ -51,14 +64,77 @@ lychee.define('lychee.game.Loop').includes([
 
 		}
 
-
 	})(1000 / 60);
 
 
 
-	var _timeoutId  = 0,
-		_intervalId = 0;
+	/*
+	 * HELPERS
+	 */
 
+	var _update_loop = function(clock) {
+
+		if (this.__state !== 'running') return;
+
+
+		var delta = clock - this.__clock.update;
+		if (delta >= this.__ms.update) {
+			this.trigger('update', [ clock, delta ]);
+			this.__clock.update = clock;
+		}
+
+
+		var data;
+		for (var iId in this.__intervals) {
+
+			data = this.__intervals[iId];
+
+			// Skip cleared intervals
+			if (data === null) continue;
+
+			var curStep = Math.floor((clock - data.start) / data.delta);
+			if (curStep > data.step) {
+				data.step = curStep;
+				data.callback.call(data.scope, clock - data.start, curStep);
+			}
+
+		}
+
+
+		for (var tId in this.__timeouts) {
+
+			data = this.__timeouts[tId];
+
+			// Skip cleared timeouts
+			if (data === null) continue;
+
+			if (clock >= data.start) {
+				this.__timeouts[tId] = null;
+				data.callback.call(data.scope, clock);
+			}
+
+		}
+
+	};
+
+	var _render_loop = function(clock) {
+
+		if (this.__state !== 'running') return;
+
+
+		var delta = clock - this.__clock.render;
+		if (delta >= this.__ms.render) {
+			this.trigger('render', [ clock, delta ]);
+			this.__clock.render = clock;
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(data) {
 
@@ -154,7 +230,7 @@ lychee.define('lychee.game.Loop').includes([
 			}
 
 
-			var id = _timeoutId++;
+			var id = _timeout_id++;
 			this.__timeouts[id] = {
 				start:    this.__clock.update + delta,
 				callback: callback,
@@ -183,7 +259,7 @@ lychee.define('lychee.game.Loop').includes([
 			}
 
 
-			var id = _intervalId++;
+			var id = _interval_id++;
 			this.__intervals[id] = {
 				start:    this.__clock.update + delta,
 				delta:    delta,
@@ -199,70 +275,6 @@ lychee.define('lychee.game.Loop').includes([
 					that.__intervals[id] = null;
 				}
 			};
-
-		},
-
-
-
-		/*
-		 * PROTECTED API
-		 */
-
-		_renderLoop: function(clock) {
-
-			if (this.__state !== 'running') return;
-
-
-			var delta = clock - this.__clock.render;
-			if (delta >= this.__ms.render) {
-				this.trigger('render', [ clock, delta ]);
-				this.__clock.render = clock;
-			}
-
-		},
-
-		_updateLoop: function(clock) {
-
-			if (this.__state !== 'running') return;
-
-
-			var delta = clock - this.__clock.update;
-			if (delta >= this.__ms.update) {
-				this.trigger('update', [ clock, delta ]);
-				this.__clock.update = clock;
-			}
-
-
-			var data;
-			for (var iId in this.__intervals) {
-
-				data = this.__intervals[iId];
-
-				// Skip cleared intervals
-				if (data === null) continue;
-
-				var curStep = Math.floor((clock - data.start) / data.delta);
-				if (curStep > data.step) {
-					data.step = curStep;
-					data.callback.call(data.scope, clock - data.start, curStep);
-				}
-
-			}
-
-
-			for (var tId in this.__timeouts) {
-
-				data = this.__timeouts[tId];
-
-				// Skip cleared timeouts
-				if (data === null) continue;
-
-				if (clock >= data.start) {
-					this.__timeouts[tId] = null;
-					data.callback.call(data.scope, clock);
-				}
-
-			}
 
 		}
 
