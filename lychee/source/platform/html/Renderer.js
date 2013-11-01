@@ -125,11 +125,11 @@ lychee.define('Renderer').tags({
 			}
 
 
-			var canvas = this.__canvas;
-
-
 			this.__width  = width;
 			this.__height = height;
+
+
+			var canvas = this.__canvas;
 
 			canvas.width  = width;
 			canvas.height = height;
@@ -571,7 +571,6 @@ lychee.define('Renderer').tags({
 
 				var margin  = 0;
 				var texture = font.texture;
-
 				if (texture !== null) {
 
 					for (t = 0, l = text.length; t < l; t++) {

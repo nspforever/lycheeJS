@@ -28,11 +28,13 @@
 		}
 
 
-		this.baseline   = typeof data.baseline === 'number'    ? data.baseline   : this.baseline;
-		this.charset    = typeof data.charset === 'string'     ? data.charset    : this.charset;
-		this.spacing    = typeof data.spacing === 'number'     ? data.spacing    : this.spacing;
-		this.kerning    = typeof data.kerning === 'number'     ? data.kerning    : this.kerning;
-		this.lineheight = typeof data.lineheight === 'number'  ? data.lineheight : this.lineheight;
+		this.charset    = typeof data.charset === 'string' ? data.charset : this.charset;
+
+		// ASCII Renderer integration
+		this.baseline   = 0;
+		this.kerning    = 0;
+		this.spacing    = 0;
+		this.lineheight = 1;
 
 
 		if (data.map instanceof Array) {
@@ -43,9 +45,9 @@
 
 				var chr = {
 					id:     this.charset[c],
-					width:  data.map[c] + this.spacing * 2,
+					width:  1,
 					height: this.lineheight,
-					real:   data.map[c],
+					real:   1,
 					x:      offset - this.spacing,
 					y:      0
 				};
