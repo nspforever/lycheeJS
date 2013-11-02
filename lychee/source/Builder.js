@@ -472,9 +472,7 @@ console.log('NAMESPACE!', id);
 			}
 
 
-// TODO: Refactor candidates stuff,
-// doesn't work for namespaces due to
-// nodes[n] having no id. Damn it!
+// TODO: Refactor candidates stuff, doesn't work for namespaces due to nodes[n] having no id.
 
 			if (Object.keys(filtered).length > 0) {
 

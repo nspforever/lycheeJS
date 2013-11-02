@@ -123,6 +123,7 @@ lychee.define('lychee.game.Main').requires([
 		serialize: function() {
 
 			// TODO: Diff algorithm for settings
+
 			var settings = this.settings;
 			var blob     = {};
 
@@ -134,9 +135,8 @@ lychee.define('lychee.game.Main').requires([
 
 
 			return {
-// TODO: Evaluate if constructor and arguments are necessary
-//				'constructor': 'lychee.game.Main'
-//				'arguments':   [ settings ]
+				'constructor': 'lychee.game.Main'
+				'arguments':   [ settings ]
 				'blob':        blob
 			};
 

@@ -320,7 +320,6 @@ lychee.define('lychee.net.Protocol').tags({
 
 		write: function(data, isBinary, isClose) {
 
-			// TODO: Is this necessary?
 			if (this.__socket.writable === false) {
 				return this.close(true);
 			}
