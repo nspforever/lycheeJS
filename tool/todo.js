@@ -236,25 +236,6 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 
 
 	console.log('\n');
-
-	console.log('- - - - -');
-	console.log('Missing API Docs (Methods):');
-	console.log('- - - - -');
-
-	for (var mm = 0, mml = missing.methods.length; mm < mml; mm++) {
-
-		filepath = missing.methods[mm][0];
-
-		str = filepath + ': ';
-		for (var l = 0; l < length - filepath.length; l++) str += ' ';
-		str += missing.methods[mm][1];
-
-		console.log(str);
-
-	}
-
-	console.log('\n');
-
 	console.log('- - - - -');
 	console.log('Missing API Docs (Classes):');
 	console.log('- - - - -');
@@ -266,6 +247,24 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 		str = filepath + ': ';
 		for (var l = 0; l < length - filepath.length; l++) str += ' ';
 		str += missing.defblocks[md][1];
+
+		console.log(str);
+
+	}
+
+
+	console.log('\n');
+	console.log('- - - - -');
+	console.log('Missing API Docs (Methods):');
+	console.log('- - - - -');
+
+	for (var mm = 0, mml = missing.methods.length; mm < mml; mm++) {
+
+		filepath = missing.methods[mm][0];
+
+		str = filepath + ': ';
+		for (var l = 0; l < length - filepath.length; l++) str += ' ';
+		str += missing.methods[mm][1];
 
 		console.log(str);
 
@@ -313,7 +312,6 @@ exec('grep -R "// TODO:" ./lychee/source', function(error, stdout, stderr) {
 
 
 	console.log('\n');
-
 	console.log('- - - - -');
 	console.log('Missing Functionality (TODO):');
 	console.log('- - - - -');
