@@ -135,8 +135,8 @@ lychee.define('lychee.game.Main').requires([
 
 
 			return {
-				'constructor': 'lychee.game.Main'
-				'arguments':   [ settings ]
+				'constructor': 'lychee.game.Main',
+				'arguments':   [ settings ],
 				'blob':        blob
 			};
 
