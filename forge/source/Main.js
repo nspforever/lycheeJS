@@ -127,23 +127,6 @@ lychee.define('game.Main').requires([
 //			this.builder    = new game.Builder(this);
 			this.controller = new game.Controller(this);
 			this.menu       = new game.entity.ui.Menu(this);
-			this.scene      = new game.entity.ui.Scene(this);
-
-
-			this.menu.state.bind('change', function(id) {
-
-				var state = this.getState(id);
-				if (state !== null) {
-					this.changeState(id);
-				}
-
-			}, this);
-
-			this.menu.project.bind('change', function(project) {
-
-				this.controller.setProject(project);
-
-			}, this);
 
 
 			this.setState('font',  new game.state.Font(this));

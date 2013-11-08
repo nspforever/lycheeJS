@@ -44,11 +44,18 @@
 
 		"net": {
 
+			"proxy": {
+				"Entity":  [ "js" ],
+				"Project": [ "js" ]
+			},
+
 			"client": {
+				"Entity":  [ "js" ],
 				"Project": [ "js" ]
 			},
 
 			"remote": {
+				"Entity":  [ "js" ],
 				"Project": [ "js" ]
 			}
 

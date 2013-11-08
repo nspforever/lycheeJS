@@ -25,6 +25,8 @@ lychee.define('game.state.Base').requires([
 	Module.reset = function() {
 
 		var tile = 24;
+		var menu = this.game.menu;
+		var h    = menu.height;
 
 
 		lychee.game.State.prototype.reset.call(this);
@@ -48,16 +50,12 @@ lychee.define('game.state.Base').requires([
 			var layer3  = new lychee.game.Layer();
 			var swidth  = 10 * tile;
 
-
-			var menu    = this.game.menu;
-			var project = this.game.project;
-
 			var scene = new _scene({
 				width:  width  - 2 * swidth,
-				height: height - project.height,
+				height: height - h,
 				position: {
 					x: 0,
-					y: project.height / 2
+					y: h / 2
 				}
 			});
 
@@ -66,42 +64,36 @@ lychee.define('game.state.Base').requires([
 				height: tile * 3,
 				position: {
 					x: 0,
-					y: 1/2 * scene.height - tile * 3/2 + project.height / 2
+					y: 1/2 * scene.height - tile * 3/2 + h / 2
 				}
 			});
 
 			var entities = new _sidebar({
 				width:  swidth,
-				height: height - project.height,
+				height: height - h,
 				margin: tile / 2,
 				position: {
 					x: -1/2 * width + swidth / 2,
-					y:  project.height / 2
+					y:  h / 2
 				},
 				scrollable: true
 			});
 
 			var settings = new _sidebar({
 				width:  swidth,
-				height: height - project.height,
+				height: height - h,
 				margin: tile / 2,
 				position: {
 					x: 1/2 * width - swidth / 2,
-					y: project.height / 2
+					y: h / 2
 				},
 				scrollable: true
 			});
 
 			menu.setPosition({
-				x:  1/2 * width  - menu.width  / 2,
+				x:  0,
 				y: -1/2 * height + menu.height / 2
 			});
-
-			project.setPosition({
-				x: -1/2 * width  + project.width  / 2,
-				y: -1/2 * height + project.height / 2
-			});
-
 
 			layer1.setEntity('scene',    scene);
 			layer1.setEntity('toolbar',  toolbar);
@@ -109,7 +101,6 @@ lychee.define('game.state.Base').requires([
 			layer2.setEntity('entities', entities);
 			layer2.setEntity('settings', settings);
 
-			layer3.setEntity('project',  project);
 			layer3.setEntity('menu',     menu);
 
 

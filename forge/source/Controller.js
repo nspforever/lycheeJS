@@ -13,6 +13,8 @@ lychee.define('game.Controller').requires([
 
 		this.game = game;
 
+		this.__map = {};
+
 
 		lychee.event.Emitter.call(this);
 

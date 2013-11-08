@@ -1,6 +1,7 @@
 
 lychee.define('game.Server').requires([
 	'game.net.remote.Project',
+	'game.net.remote.Entity',
 	'sorbet.data.Filesystem'
 ]).includes([
 	'lychee.net.Server'
@@ -8,6 +9,7 @@ lychee.define('game.Server').requires([
 
 	var _filesystem = sorbet.data.Filesystem;
 	var _project    = game.net.remote.Project;
+	var _entity     = game.net.remote.Entity;
 
 
 	var Class = function(root) {
@@ -27,6 +29,7 @@ lychee.define('game.Server').requires([
 			console.log('(Forge) game.Server: New Remote (' + remote.id + ')');
 
 			remote.register('project', _project);
+			remote.register('entity',  _entity);
 			remote.accept();
 
 		}, this);
