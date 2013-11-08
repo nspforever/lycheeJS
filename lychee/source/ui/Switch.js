@@ -28,6 +28,42 @@ lychee.define('lychee.ui.Switch').includes([
 
 	};
 
+	var _refresh = function(x, y) {
+
+		var type   = this.type;
+		var width  = this.width;
+		var height = this.height;
+		var index  = 0;
+
+
+		if (type === Class.TYPE.horizontal) {
+			var segw = width  / this.options.length;
+			index    = ((x + width  / 2) / segw) | 0;
+		} else if (type === Class.TYPE.vertical) {
+			var segh = height / this.options.length;
+			index    = ((y + height / 2) / segh) | 0;
+		}
+
+
+		if (index >= 0) {
+
+			var value = this.options[index] || null;
+			if (
+				   value !== null
+				&& value !== this.value
+			) {
+
+				var result = this.setValue(value);
+				if (result === true) {
+					this.trigger('change', [ this.value ]);
+				}
+
+			}
+
+		}
+
+	};
+
 
 
 	/*
@@ -65,6 +101,25 @@ lychee.define('lychee.ui.Switch').includes([
 
 
 		lychee.ui.Entity.call(this, settings);
+
+
+
+		/*
+		 * INITIALIZATION
+		 */
+
+		this.bind('touch', function(id, position, delta) {
+			_refresh.call(this, position.x, position.y);
+		}, this);
+
+		this.bind('focus', function() {
+			this.setState('active');
+		}, this);
+
+		this.bind('blur', function() {
+			this.setState('default');
+		}, this);
+
 
 		settings = null;
 
@@ -122,25 +177,20 @@ lychee.define('lychee.ui.Switch').includes([
 			var oy = position.y + offsetY;
 
 			var color   = this.state === 'active' ? '#0099cc' : '#575757';
+			var color2  = this.state === 'active' ? '#33b5e5' : '#0099cc';
+			var alpha   = this.state === 'active' ? 0.6       : 0.3;
 			var hwidth  = this.width / 2;
 			var hheight = this.height / 2;
-
-
-			renderer.drawLine(
-				ox - hwidth,
-				oy + hheight,
-				ox + hwidth,
-				oy + hheight,
-				color,
-				2
-			);
 
 
 			var font = this.font;
 			if (font !== null) {
 
-				var x = ox - hwidth;
-				var y = oy;
+				var x1 = ox - hwidth;
+				var x2 = ox - hwidth;
+				var y1 = oy - hheight;
+				var y2 = oy - hheight;
+
 
 				var options = this.options;
 				var value   = this.value;
@@ -148,33 +198,46 @@ lychee.define('lychee.ui.Switch').includes([
 				var type = this.type;
 				if (type === Class.TYPE.horizontal) {
 
-					var segmentwidth = (this.width / options.length) | 0;
+					renderer.drawLine(
+						ox - hwidth,
+						oy + hheight,
+						ox + hwidth,
+						oy + hheight,
+						color,
+						2
+					);
+
+
+					var segw = (this.width / options.length) | 0;
+
+					x2 += segw;
+					y2 += hheight * 2;
 
 					for (var o = 0, ol = options.length; o < ol; o++) {
 
 						var text = options[o];
 						if (text === value) {
 
-							renderer.setAlpha(0.6);
+							renderer.setAlpha(alpha);
 
 							renderer.drawBox(
-								x,
-								y - hheight,
-								x + segmentwidth,
-								y + hheight,
-								'#33b5e5',
+								x1,
+								y1,
+								x2,
+								y2,
+								color2,
 								true
 							);
 
 							renderer.setAlpha(1.0);
 
 							renderer.drawTriangle(
-								x + segmentwidth - 14,
-								y + hheight,
-								x + segmentwidth,
-								y + hheight - 14,
-								x + segmentwidth,
-								y + hheight,
+								x2 - 14,
+								y2,
+								x2,
+								y2 - 14,
+								x2,
+								y2,
 								color,
 								true
 							);
@@ -182,19 +245,79 @@ lychee.define('lychee.ui.Switch').includes([
 						}
 
 						renderer.drawText(
-							x + segmentwidth / 2,
-							y,
+							x1 + segw / 2,
+							y1 + hheight,
 							text,
 							font,
 							true
 						);
 
-						x += segmentwidth;
+						x1 += segw;
+						x2 += segw;
 
 					}
 
 
 				} else if (type === Class.TYPE.vertical) {
+
+					renderer.drawLine(
+						ox + hwidth,
+						oy - hheight,
+						ox + hwidth,
+						oy + hheight,
+						color,
+						2
+					);
+
+
+					var segh = (this.height / options.length) | 0;
+
+					x2 += hwidth * 2;
+					y2 += segh;
+
+					for (var o = 0, ol = options.length; o < ol; o++) {
+
+						var text = options[o];
+						if (text === value) {
+
+							renderer.setAlpha(alpha);
+
+							renderer.drawBox(
+								x1,
+								y1,
+								x2,
+								y2,
+								color2,
+								true
+							);
+
+							renderer.setAlpha(1.0);
+
+							renderer.drawTriangle(
+								x2 - 14,
+								y2,
+								x2,
+								y2 - 14,
+								x2,
+								y2,
+								color,
+								true
+							);
+
+						}
+
+						renderer.drawText(
+							x1 + hwidth,
+							y1 + segh / 2,
+							text,
+							font,
+							true
+						);
+
+						y1 += segh;
+						y2 += segh;
+
+					}
 
 				}
 
@@ -256,7 +379,7 @@ lychee.define('lychee.ui.Switch').includes([
 					this.width  = this.__width;
 					this.height = 28;
 				} else if (type === Class.TYPE.vertical) {
-					this.width  = 28;
+					this.width  = 140;
 					this.height = this.__height;
 				}
 

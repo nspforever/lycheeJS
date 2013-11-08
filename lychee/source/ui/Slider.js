@@ -284,7 +284,7 @@ lychee.define('lychee.ui.Slider').includes([
 					this.width  = this.__width;
 					this.height = 28;
 				} else if (type === Class.TYPE.vertical) {
-					this.width  = 28;
+					this.width  = 140;
 					this.height = this.__height;
 				}
 
