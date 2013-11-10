@@ -61,9 +61,29 @@
 	};
 
 
+
+	var _font_cache = {};
+
+
+	var _clone_font = function(origin, clone) {
+
+		clone.texture    = origin.texture;
+
+		clone.baseline   = origin.baseline;
+		clone.charset    = origin.charset;
+		clone.spacing    = origin.spacing;
+		clone.kerning    = origin.kerning;
+		clone.lineheight = origin.lineheight;
+
+		clone.__buffer   = origin.__buffer;
+
+	};
+
+
 	var Font = function(url) {
 
-		// Hint: default charset from 32 to 126
+		url = typeof url === 'string' ? url : null;
+
 
 		this.url        = url;
 		this.onload     = null;
@@ -77,10 +97,23 @@
 
 		this.__buffer   = {};
 
+
+		var url = this.url;
+
+		if (_font_cache[url] !== undefined) {
+			_clone_font(_font_cache[url], this);
+		} else {
+			_font_cache[url] = this;
+		}
+
 	};
 
 
 	Font.prototype = {
+
+		serialize: function() {
+			return this.url || null;
+		},
 
 		get: function(character) {
 
@@ -150,6 +183,7 @@
 	var _clone_texture = function(origin, clone) {
 
 		clone.id     = origin.id;
+
 		clone.buffer = origin.buffer;
 		clone.width  = origin.width;
 		clone.height = origin.height;
@@ -158,6 +192,9 @@
 
 
 	var Texture = function(url) {
+
+		url = typeof url === 'string' ? url : null;
+
 
 		this.id      = _texture_id++;
 		this.url     = url;
@@ -168,16 +205,22 @@
 		this.height  = 0;
 
 
-		if (_texture_cache[this.url] !== undefined) {
-			_clone_texture(_texture_cache[this.url], this);
+		var url = this.url;
+
+		if (_texture_cache[url] !== undefined) {
+			_clone_texture(_texture_cache[url], this);
 		} else {
-			_texture_cache[this.url] = this;
+			_texture_cache[url] = this;
 		}
 
 	};
 
 
 	Texture.prototype = {
+
+		serialize: function() {
+			return this.url || null;
+		},
 
 		load: function() {
 
