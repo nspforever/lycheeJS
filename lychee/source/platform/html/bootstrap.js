@@ -112,7 +112,12 @@
 	Font.prototype = {
 
 		serialize: function() {
-			return this.url || null;
+
+			return {
+				'constructor': 'Font',
+				'arguments':   [ this.url ]
+			};
+
 		},
 
 		get: function(character) {
@@ -219,7 +224,12 @@
 	Texture.prototype = {
 
 		serialize: function() {
-			return this.url || null;
+
+			return {
+				'constructor': 'Texture',
+				'arguments':   [ this.url ]
+			};
+
 		},
 
 		load: function() {
