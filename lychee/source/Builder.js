@@ -8,6 +8,8 @@
 		global.lychee = lychee = {};
 	}
 
+
+
 	/*
 	 * HELPERS
 	 */
@@ -891,6 +893,7 @@
 
 	};
 
+
 	lychee.Builder.prototype = {
 
 		build: function(env, callback, scope) {
@@ -958,12 +961,13 @@
 	}
 
 
-	var _builder = null;
-
 	lychee.build = function(callback, scope) {
 
-		_builder = new lychee.Builder();
-		_builder.build(lychee.getEnvironment(), callback, scope);
+		new lychee.Builder().build(
+			lychee.getEnvironment(),
+			callback,
+			scope
+		);
 
 	};
 

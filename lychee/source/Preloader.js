@@ -1,9 +1,20 @@
 
-// Preloader is platform specific and required for lychee.Builder
 (function(lychee, global) {
+
+	// Asynchronous loading, this file
+	// can be ready before lycheeJS core
+
+	if (lychee === undefined) {
+		global.lychee = lychee = {};
+	}
+
+
 
 	var _instances = [];
 
+	/*
+	 * HELPERS
+	 */
 
 	var _globalIntervalId = null;
 	var _globalInterval   = function() {
@@ -96,6 +107,11 @@
 
 	};
 
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	lychee.Preloader = function(data) {
 

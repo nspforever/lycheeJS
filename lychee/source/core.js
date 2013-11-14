@@ -397,9 +397,13 @@ if (typeof global !== 'undefined') {
 	};
 
 
-	lychee.build = function(callback, scope) {
-		throw "lychee.build: You need to include the lychee.Builder to build the dependency tree.";
-	};
+	if (typeof lychee.build !== 'function') {
+
+		lychee.build = function(callback, scope) {
+			throw "lychee.build: You need to include the lychee.Builder to build the dependency tree.";
+		};
+
+	}
 
 
 	var _throw_warning = function(message) {
