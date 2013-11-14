@@ -72,32 +72,27 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 			data = data instanceof Array    ? data : null;
 
 
-			var args = data;
-
 			if (this.___events[type] !== undefined) {
 
 				for (var e = 0, el = this.___events[type].length; e < el; e++) {
 
+					var args  = [];
 					var entry = this.___events[type][e];
 
 					if (entry.passAction === true) {
 
-						if (data !== null) {
-							args = [ type, this ];
-							args.push.apply(args, data);
-						} else {
-							args = [ type, this ];
-						}
+						args.push(type);
+						args.push(this);
 
 					} else if (entry.passSelf === true) {
 
-						if (data !== null) {
-							args = [ this ];
-							args.push.apply(args, data);
-						} else {
-							args = [ this ];
-						}
+						args.push(this);
 
+					}
+
+
+					if (data !== null) {
+						args.push.apply(args, data);
 					}
 
 
@@ -133,33 +128,40 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 			scope    = scope !== undefined          ? scope    : null;
 
 
-			if (this.___events[type] === undefined) {
-				return true;
+			if (type === null) {
+				return false;
 			}
 
 
-			var found = false;
+			if (this.___events[type] !== undefined) {
 
-			for (var e = 0, el = this.___events[type].length; e < el; e++) {
+				var found = false;
 
-				var entry = this.___events[type][e];
+				for (var e = 0, el = this.___events[type].length; e < el; e++) {
 
-				if (
-					(callback === null || entry.callback === callback)
-					&& (scope === null || entry.scope === scope)
-				) {
+					var entry = this.___events[type][e];
 
-					found = true;
+					if (
+						(callback === null || entry.callback === callback)
+						&& (scope === null || entry.scope === scope)
+					) {
 
-					this.___events[type].splice(e, 1);
-					el--;
+						found = true;
+
+						this.___events[type].splice(e, 1);
+						el--;
+
+					}
 
 				}
 
+
+				return found;
+
 			}
 
 
-			return found;
+			return false;
 
 		}
 

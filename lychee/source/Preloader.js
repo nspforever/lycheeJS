@@ -104,13 +104,14 @@
 		settings.timeout  = typeof settings.timeout === 'number' ? settings.timeout : 3000;
 
 
-		this.__timeout  = settings.timeout;
+		this.__timeout = settings.timeout;
 
-		this.__events  = {};
 		this.__fired   = {}; // cached fired events per request
 		this.__map     = {}; // associated data per request
 		this.__pending = {}; // pending requests
 		this.__clock   = null;
+
+		this.___events = {};
 
 
 		_instances.push(this);
@@ -124,39 +125,56 @@
 	lychee.Preloader.prototype = {
 
 		/*
-		 * EVENT BINDINGS
+		 * EVENT API
 		 *
-		 * (not using lychee.event.Emitter
-		 *  due to no-dependency
-		 *  reasons)
+		 * simplified API of lychee.event.Emitter
+		 * due to no-dependency reasons
+		 *
 		 */
 
-		bind: function(event, callback, scope) {
+		bind: function(type, callback, scope) {
 
-			event    = typeof event === 'string'    ? event    : null;
+			type     = typeof type === 'string'     ? type     : null;
 			callback = callback instanceof Function ? callback : null;
 			scope    = scope !== undefined          ? scope    : this;
 
 
-			if (event !== null && callback !== null) {
-
-				this.__events[event] = {
-					callback: callback,
-					scope: scope
-				};
-
+			if (type === null || callback === null) {
+				return false;
 			}
+
+
+			this.___events[type] = {
+				callback: callback,
+				scope:    scope
+			};
+
+
+			return true;
 
 		},
 
-		unbind: function(event) {
+		trigger: function(type, data) {
 
-			event = typeof event === 'string' ? event : null;
+			type = typeof type === 'string' ? type : null;
+			data = data instanceof Array    ? data : null;
 
 
-			if (event !== null && this.__events[event] !== undefined) {
-				delete this.__events[event];
+			if (this.___events[type] !== undefined) {
+
+				var args  = [];
+				var entry = this.___events[type];
+
+				if (data !== null) {
+					args.push.apply(args, data);
+				}
+
+
+				entry.callback.apply(entry.scope, args);
+
+
 				return true;
+
 			}
 
 
@@ -164,14 +182,22 @@
 
 		},
 
-		trigger: function(event, args) {
+		unbind: function(type) {
 
-			args = args instanceof Array ? args : [];
+			type = typeof type === 'string' ? type : null;
 
 
-			if (this.__events[event] !== undefined) {
-				this.__events[event].callback.apply(this.__events[event].scope, args);
+			if (type === null) {
+				return false;
+			}
+
+
+			if (this.___events[type] !== undefined) {
+
+				delete this.___events[type];
+
 				return true;
+
 			}
 
 

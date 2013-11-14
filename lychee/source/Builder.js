@@ -250,8 +250,6 @@
 
 						namespaceId = classId.substr(0, classId.indexOf('*') - 1);
 
-console.log(namespaceId, candidates);
-
 						var overallRequired = 0;
 						for (var c = 0, l = candidates.length; c < l; c++) {
 							overallRequired += candidates[c].attachments.length + 1;
@@ -392,8 +390,6 @@ console.log(namespaceId, candidates);
 									var namespace = path.substr(0, path.indexOf('*') - 1);
 									if (all[a].substr(folder.length + 1, namespace.length) === namespace) {
 
-console.log('>>>', namespace);
-
 										id = namespace + '.' + all[a].substr(folder.length + namespace.length + 2).split('/').join('.');
 
 										if (filtered[id] === undefined) {
@@ -440,8 +436,6 @@ console.log('>>>', namespace);
 
 							id = all[a].split('/').join('.');
 
-console.log('NAMESPACE!', id);
-
 							if (filtered[id] === undefined) {
 								filtered[id] = [ all[a] ];
 							} else {
@@ -472,7 +466,7 @@ console.log('NAMESPACE!', id);
 			}
 
 
-// TODO: Refactor candidates stuff, doesn't work for namespaces due to nodes[n] having no id.
+			// TODO: Refactor candidates stuff, doesn't work for namespaces due to nodes[n] having no id.
 
 			if (Object.keys(filtered).length > 0) {
 
