@@ -16,8 +16,8 @@ UNAME_P=$(uname -p);
 NODEJS=$(which nodejs);
 NODE=$(which node);
 SORBET_ROOT=$(cd "$(dirname "$0")"; pwd);
-SORBET_LOG=$SORBET_ROOT/log.txt;
-SORBET_PID=$SORBET_ROOT/.pid;
+SORBET_LOG=$SORBET_ROOT/sorbet/.log;
+SORBET_PID=$SORBET_ROOT/sorbet/.pid;
 
 
 

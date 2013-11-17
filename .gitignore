@@ -1,3 +1,4 @@
 /external
-/.pid
-/log.txt
+/sorbet/.log
+/sorbet/.pid
+/lychee/build/*

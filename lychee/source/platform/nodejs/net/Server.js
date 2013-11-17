@@ -229,7 +229,13 @@ lychee.define('lychee.net.Server').tags({
 				this.remotes.push(remote);
 				this.trigger('connect', [ remote ]);
 
+
+				return true;
+
 			}
+
+
+			return false;
 
 		},
 
@@ -255,7 +261,13 @@ lychee.define('lychee.net.Server').tags({
 
 				this.trigger('disconnect', [ remote ]);
 
+
+				return true;
+
 			}
+
+
+			return false;
 
 		}
 
