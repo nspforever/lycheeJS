@@ -54,6 +54,7 @@ if (typeof global !== 'undefined') {
 	 */
 
 	lychee.debug   = false;
+	lychee.dynamic = true;
 	lychee.VERSION = 0.8;
 
 
@@ -572,8 +573,21 @@ if (typeof global !== 'undefined') {
 			var id = this.toString();
 			if (_environment.tree[id] == null) {
 
-				if (this._supports === null || this._supports.call(global, lychee, global) === true) {
+				if (lychee.dynamic === true) {
+
+					if (
+						   this._supports === null
+						|| this._supports.call(global, lychee, global) === true
+					) {
+
+						_environment.tree[id] = this;
+
+					}
+
+				} else {
+
 					_environment.tree[id] = this;
+
 				}
 
 			}

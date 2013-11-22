@@ -1,6 +1,8 @@
 
 lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, attachments) {
 
+	// TODO: Complete implementation of Building-Task system
+
 	var child_process = require('child_process');
 
 

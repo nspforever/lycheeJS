@@ -1,3 +1,6 @@
+#!/usr/bin/env nodejs
+
+
 
 var path = "../lychee/source";
 
