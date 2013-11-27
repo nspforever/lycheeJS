@@ -110,6 +110,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		});
 
 		this.main.servers.set(id, server);
+		this.queue.flush();
 
 
 		return true;
@@ -154,7 +155,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 			_get_projects.call(this, vhost, '/external', projects);
 
 			for (var p = 0, pl = projects.length; p < pl; p++) {
-				_build_project.call(this, projects[p]);
+				this.queue.add(projects[p]);
 			}
 
 		}

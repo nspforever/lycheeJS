@@ -78,7 +78,7 @@ lychee.define('sorbet.module.Project').requires([
 
 	var _build_project = function(project) {
 
-console.log(project);
+// console.log(project);
 
 
 		var root = project.root;
