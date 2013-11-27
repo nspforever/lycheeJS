@@ -28,56 +28,48 @@ lychee.define('sorbet.module.Project').requires([
 
 	};
 
-	var _get_projects = function(vhost, folder) {
+	var _get_projects = function(vhost, folder, projects) {
 
-		folder = typeof folder === 'string' ? folder : null;
-
-
-		var projects = [];
-
-		if (folder !== null) {
-
-			var fs   = vhost.fs;
-			var root = vhost.root;
-
-			var files = fs.filter(
-				root + folder,
-				'package.json',
-				sorbet.data.Filesystem.TYPE.file
-			);
+		folder   = typeof folder === 'string' ? folder   : '';
+		projects = projects instanceof Array  ? projects : [];
 
 
-			for (var f = 0, fl = files.length; f < fl; f++) {
+		var fs   = vhost.fs;
+		var root = vhost.root;
 
-				var resolved = files[f];
+		var files = fs.filter(
+			root + folder,
+			'package.json',
+			sorbet.data.Filesystem.TYPE.file
+		);
 
 
-				var tmp = resolved.split('/');
-				tmp.pop();
-				tmp.pop();
+		for (var f = 0, fl = files.length; f < fl; f++) {
 
-				var projectroot  = tmp.join('/');
-				var resolvedroot = projectroot;
-				var title        = tmp.pop();
+			var resolved = files[f];
 
-				// TODO: Verify that this is correct behaviour for all VHosts
-				projectroot = projectroot.substr(this.main.root.length + 1);
-				projectroot = '../' + projectroot;
 
-				projects.push({
-					vhost:        vhost,
-					root:         projectroot,
-					resolvedroot: resolvedroot,
-					resolved:     resolved,
-					title:        title
-				});
+			var tmp = resolved.split('/');
+			tmp.pop();
+			tmp.pop();
 
-			}
+			var projectroot  = tmp.join('/');
+			var resolvedroot = projectroot;
+			var title        = tmp.pop();
+
+			// TODO: Verify that this is correct behaviour for all VHosts
+			projectroot = projectroot.substr(this.main.root.length + 1);
+			projectroot = '../' + projectroot;
+
+			projects.push({
+				vhost:        vhost,
+				root:         projectroot,
+				resolvedroot: resolvedroot,
+				resolved:     resolved,
+				title:        title
+			});
 
 		}
-
-
-		return projects;
 
 	};
 
@@ -92,7 +84,7 @@ console.log(project);
 		var root = project.root;
 
 		if (lychee.debug === true) {
-			console.log('sorbet.module.Builder: Building optimized Package for ' + root);
+			console.log('sorbet.module.Project: Building Package for ' + root);
 		}
 
 
@@ -162,29 +154,31 @@ console.log(resolved);
 		_init_database.call(this);
 
 
-		var lychee_project = _get_projects.call(this, this.main, '/lychee')[0] || null;
-		if (lychee_project !== null) {
-			this.queue.add(lychee_project);
+		var buffer = [];
+
+		_get_projects.call(this, this.main, '/lychee', buffer);
+
+		if (buffer[0] != null) {
+			this.queue.add(buffer[0]);
 		}
 
 
 		var vhosts = this.main.vhosts.values();
 		for (var v = 0, vl = vhosts.length; v < vl; v++) {
 
-			var vhost = vhosts[v];
+			var vhost    = vhosts[v];
+			var projects = [];
 
 			if (lychee.debug === true) {
-				console.log('sorbet.module.Builder: Booting VHost "' + vhost.id + '"');
+				console.log('sorbet.module.Project: Booting VHost "' + vhost.id + '"');
 			}
 
-			var internal_projects = _get_projects.call(this, vhost, '/game');
-			for (var i = 0, il = internal_projects.length; i < il; i++) {
-				this.queue.add(internal_projects[i]);
-			}
 
-			var external_projects = _get_projects.call(this, vhost, '/external');
-			for (var e = 0, el = external_projects.length; e < el; e++) {
-				this.queue.add(external_projects[e]);
+			_get_projects.call(this, vhost, '/game',     projects);
+			_get_projects.call(this, vhost, '/external', projects);
+
+			for (var p = 0, pl = projects.length; p < pl; p++) {
+				this.queue.add(projects[p]);
 			}
 
 		}

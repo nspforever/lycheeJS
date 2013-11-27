@@ -25,7 +25,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 	var _get_projects = function(vhost, folder, projects) {
 
-		folder   = typeof folder === 'string' ? folder   : null;
+		folder   = typeof folder === 'string' ? folder   : '';
 		projects = projects instanceof Array  ? projects : [];
 
 
@@ -65,9 +65,6 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 		}
 
-
-		return projects;
-
 	};
 
 
@@ -82,7 +79,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		var root = project.root;
 
 		if (lychee.debug === true) {
-			console.log('sorbet.module.Server: Building Isolated Server Instance for ' + root);
+			console.log('sorbet.module.Server: Building Server for ' + root);
 		}
 
 
@@ -131,6 +128,9 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		this.type     = 'public';
 		this.database = null;
 
+		this.queue = new sorbet.data.Queue();
+		this.queue.bind('update', _build_project, this);
+
 
 		_init_database.call(this);
 
@@ -141,14 +141,13 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 		var vhosts = this.main.vhosts.values();
 		for (var v = 0, vl = vhosts.length; v < vl; v++) {
 
-			var vhost = vhosts[v];
+			var vhost    = vhosts[v];
+			var projects = [];
 
 			if (lychee.debug === true) {
 				console.log('sorbet.module.Server: Booting VHost "' + vhost.id + '"');
 			}
 
-
-			var projects = [];
 
 			_get_projects.call(this, vhost, '/forge',    projects);
 			_get_projects.call(this, vhost, '/game',     projects);
