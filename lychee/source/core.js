@@ -13,7 +13,9 @@ if (typeof global !== 'undefined') {
 		tree:   {},
 		unique: {},
 		tags:   {},
-		bases:  { 'lychee': './lychee' }
+		bases:  {
+			'lychee': '/lychee/source'
+		}
 	};
 
 	var _environment = _default;
@@ -205,19 +207,21 @@ if (typeof global !== 'undefined') {
 
 	lychee.createEnvironment = function() {
 
-		var sandboxenv = {
+		var environment = {
 			assets: {},
 			tree:   {},
 			unique: {},
 			tags:   {},
-			bases:  { 'lychee': './lychee' }
+			bases:  {
+				'lychee': '/lychee/source'
+			}
 		};
 
 
 		for (var id in _default.tree) {
 
 			if (id.substr(0, 6) === 'lychee') {
-				sandboxenv.tree[id] = _default.tree[id];
+				environment.tree[id] = _default.tree[id];
 			}
 
 		}
@@ -226,22 +230,22 @@ if (typeof global !== 'undefined') {
 		for (var uid in _default.unique) {
 
 			if (uid.substr(0, 6) === 'lychee') {
-				_sandboxenv.unique[uid] = _default.unique[uid];
+				environment.unique[uid] = _default.unique[uid];
 			}
 
 		}
 
 
-		return sandboxenv;
+		return environment;
 
 	};
 
 
 	lychee.createSandbox = function() {
 
-		var sandbox = {};
-
-		sandbox.lychee = {};
+		var sandbox = {
+			lychee: {}
+		};
 
 
 		for (var id in lychee) {
@@ -281,10 +285,13 @@ if (typeof global !== 'undefined') {
 
 	lychee.setEnvironment = function(object) {
 
-		if (
-			   object !== null
-			&& object instanceof Object
-		) {
+		if (object === null) {
+
+			_environment = _default;
+
+			return true;
+
+		} else if (object instanceof Object) {
 
 			if (object.assets === undefined) {
 				object.assets = {};
@@ -299,17 +306,11 @@ if (typeof global !== 'undefined') {
 			}
 
 			if (object.bases === undefined) {
-				object.bases = { 'lychee': './lychee' };
+				object.bases = { 'lychee': '/lychee/source' };
 			}
 
 
 			_environment = object;
-
-			return true;
-
-		} else {
-
-			_environment = _default;
 
 			return true;
 

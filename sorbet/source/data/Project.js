@@ -72,7 +72,7 @@ lychee.define('sorbet.data.Project').exports(function(lychee, sorbet, global, at
 		this.__cache = {};
 
 
-		_read_profile.call(this);
+		_read_package.call(this);
 
 	};
 
@@ -82,6 +82,11 @@ lychee.define('sorbet.data.Project').exports(function(lychee, sorbet, global, at
 		/*
 		 * PUBLIC API
 		 */
+
+		// TODO: resolve() should return the filepath by a given identifier (lychee.data.BitON) and the tags config
+
+		resolve: function(id, tags) {
+		},
 
 		flush: function() {
 

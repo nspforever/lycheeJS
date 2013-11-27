@@ -9,15 +9,17 @@
 			"Filesystem": [ "js" ],
 			"Map":        [ "js" ],
 			"Profile":    [ "js" ],
+			"Project":    [ "js" ],
+			"Queue":      [ "js" ],
 			"Template":   [ "js" ],
 			"VHost":      [ "js" ]
 		},
 
 		"module": {
 			"Blacklist":  [ "js" ],
-			"Builder":    [ "js" ],
 			"Error":      [ "js", "html" ],
 			"File":       [ "js" ],
+			"Project":    [ "js" ],
 			"Redirect":   [ "js" ],
 			"Server":     [ "js" ],
 			"Welcome":    [ "js", "html" ]

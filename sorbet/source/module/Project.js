@@ -1,9 +1,12 @@
 
-lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, attachments) {
-
-	// TODO: Complete implementation of Building-Task system
+lychee.define('sorbet.module.Project').requires([
+	'sorbet.data.Queue',
+	'sorbet.data.Project'
+]).exports(function(lychee, sorbet, global, attachments) {
 
 	var child_process = require('child_process');
+
+	var _project = sorbet.data.Project;
 
 
 
@@ -78,7 +81,13 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 
 	};
 
+
+	var _environment = lychee.getEnvironment();
+
 	var _build_project = function(project) {
+
+console.log(project);
+
 
 		var root = project.root;
 
@@ -87,59 +96,52 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 		}
 
 
-		var resolved = project.resolved;
+		this.queue.flush();
 
 
-		this.preloader.load(resolved, project);
+/*
+
+		var sandbox     = lychee.createSandbox();
+		var environment = lychee.createEnvironment();
+
+
+		lychee.rebase({
+			lychee: _environment.bases.lychee + '/source',
+			game:   project.resolvedroot + '/source'
+		});
+
+		lychee.tag({
+			platform: [ 'webgl' ]
+		});
+
+		lychee.dynamic = false;
+
+
+		lychee.build(function() {
+
+			lychee.setEnvironment(null);
+
+		}, sandbox);
+
+		lychee.setEnvironment(_environment);
+
+
+console.log(project.root);
+
+
+
+		var vproj = new _project(project.resolved);
+
+
+
+		var resolved = vproj.resolve('lychee.data.BitON');
+
+console.log(resolved);
+
+*/
+
 
 	};
-
-	var _get_build_variants = function(tree) {
-
-		var builds = {};
-
-
-		for (var nsId in tree) {
-
-			var namespace = tree[nsId];
-
-		}
-
-
-
-
-		return builds;
-
-	};
-
-	var _prepare_project = function(assets, mappings) {
-
-		for (var url in assets) {
-
-			var data = assets[url];
-			var map  = mappings[url];
-
-
-			var id = map.resolved;
-			if (this.__done[id] !== true) {
-
-				var builds = _get_build_variants(data.tree);
-
-
-//console.log('----------------------');
-//console.log(id);
-//console.log('----------------------');
-//console.log('BUILD VARIANTS', builds);
-
-
-				this.__done[id] = true;
-
-			}
-
-		}
-
-	};
-
 
 
 
@@ -153,20 +155,16 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 		this.type     = 'public';
 		this.database = null;
 
+		this.queue = new sorbet.data.Queue();
+		this.queue.bind('update', _build_project, this);
+
 
 		_init_database.call(this);
 
 
-		this.preloader = new lychee.Preloader();
-		this.preloader.bind('ready', _prepare_project, this);
-		this.preloader.bind('error', _prepare_project, this);
-
-		this.__done = {};
-
-
 		var lychee_project = _get_projects.call(this, this.main, '/lychee')[0] || null;
 		if (lychee_project !== null) {
-			_build_project.call(this, lychee_project);
+			this.queue.add(lychee_project);
 		}
 
 
@@ -181,12 +179,12 @@ lychee.define('sorbet.module.Builder').exports(function(lychee, sorbet, global, 
 
 			var internal_projects = _get_projects.call(this, vhost, '/game');
 			for (var i = 0, il = internal_projects.length; i < il; i++) {
-				_build_project.call(this, internal_projects[i]);
+				this.queue.add(internal_projects[i]);
 			}
 
 			var external_projects = _get_projects.call(this, vhost, '/external');
 			for (var e = 0, el = external_projects.length; e < el; e++) {
-				_build_project.call(this, external_projects[e]);
+				this.queue.add(external_projects[e]);
 			}
 
 		}

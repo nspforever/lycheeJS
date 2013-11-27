@@ -1,9 +1,9 @@
 
 lychee.define('sorbet.Main').requires([
 	'sorbet.module.Blacklist',
-	'sorbet.module.Builder',
 	'sorbet.module.Error',
 	'sorbet.module.File',
+	'sorbet.module.Project',
 	'sorbet.module.Redirect',
 	'sorbet.module.Server',
 	'sorbet.module.Welcome',
@@ -156,7 +156,7 @@ lychee.define('sorbet.Main').requires([
 
 		var that = this;
 		setTimeout(function() { that.modules.set('server',  new _module['Server'](that));  }, 1000);
-		setTimeout(function() { that.modules.set('builder', new _module['Builder'](that)); }, 3000);
+		setTimeout(function() { that.modules.set('builder', new _module['Project'](that)); }, 2000);
 
 	};
 

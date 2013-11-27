@@ -313,7 +313,7 @@
 			if (reference.indexOf('*') > 0) {
 
 				var namespace = reference.substr(0, reference.length - 2);
-				for (var id in this.__tree) {
+				for (var id in this) {
 
 					if (id.substr(0, namespace.length) === namespace) {
 						_sort_tree.call(this, id, list, visited);
@@ -324,7 +324,7 @@
 
 			} else {
 
-				var node = this.__tree[reference];
+				var node = this[reference];
 				if (node === null) return;
 
 				for (var r = 0, rl = node._requires.length; r < rl; r++) {
@@ -819,20 +819,20 @@
 		// 2. If all dependencies are loaded, sort the dependency tree
 		if (allDependenciesLoaded === true) {
 
-			this.__buildOrder = [];
+			var order = [];
 
-			_sort_tree.call(this, this.__buildStart, this.__buildOrder);
+			_sort_tree.call(this.__tree, this.__buildStart, order);
 
 
 			if (lychee.debug === true) {
 				console.log('Starting Build');
-				console.log(this.__buildOrder);
+				console.log(order);
 				console.groupEnd();
 			}
 
 
-			for (var b = 0, l = this.__buildOrder.length; b < l; b++) {
-				_export_definitionblock.call(this, this.__tree[this.__buildOrder[b]]);
+			for (var o = 0, l = order.length; o < l; o++) {
+				_export_definitionblock.call(this, this.__tree[order[o]]);
 			}
 
 
@@ -871,7 +871,6 @@
 		this.__bases         = null;
 		this.__tags          = null;
 		this.__buildCallback = null;
-		this.__buildOrder    = [];
 		this.__buildScope    = null;
 		this.__buildStart    = null;
 
