@@ -246,6 +246,35 @@
 				that.width  = this.width;
 				that.height = this.height;
 
+
+				var url = that.url;
+				var is_embedded = url.substr(0, 10) === 'data:image';
+				if (is_embedded === false) {
+
+					var tmp = url.split('.');
+					var ext = tmp[tmp.length - 1];
+
+					if (ext !== 'png') {
+
+						if (lychee.debug === true) {
+							console.error('Texture at ' + that.url + ' is invalid. It is NOT a PNG file.');
+						}
+
+					}
+
+				}
+
+
+				var is_power_of_two = (this.width & (this.width - 1)) === 0 && (this.height & (this.height - 1)) === 0;
+				if (is_power_of_two === false && is_embedded === false) {
+
+					if (lychee.debug === true) {
+						console.warn('Texture at ' + that.url + ' is NOT power-of-two. Mipmaps cannot be generated.');
+					}
+
+				}
+
+
 				if (that.onload instanceof Function) {
 					that.onload();
 				}

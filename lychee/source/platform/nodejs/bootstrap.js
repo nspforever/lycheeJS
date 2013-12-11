@@ -251,7 +251,7 @@
 				if (data === null) {
 
 					if (lychee.debug === true) {
-						console.error('bootstrap.js: Font at ' + url + ' is invalid.');
+						console.error('bootstrap.js: Texture at ' + url + ' is invalid.');
 					}
 
 				}
