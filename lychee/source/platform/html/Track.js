@@ -145,7 +145,7 @@ lychee.define('Track').tags({
 
 				// Shared context = more performance
 				this.__context = _context;
-				this.__gain    = this.__context.createGainNode();
+				this.__gain    = this.__context.createGain();
 
 				this.__loopingBuffer = null;
 
@@ -194,7 +194,7 @@ lychee.define('Track').tags({
 					source.buffer = this.__settings.buffer;
 					source.connect(this.__gain);
 					source.connect(this.__context.destination);
-					source.noteOn(this.__context.currentTime);
+					source.start(this.__context.currentTime);
 
 
 					if (loop === true) {

@@ -35,6 +35,10 @@ lychee.define('Renderer').tags({
 
 }).exports(function(lychee, global, attachments) {
 
+// TODO: REMOVE THIS SHIT
+
+global.COUNT = 1;
+
 	/*
 	 * HELPERS
 	 */
@@ -71,15 +75,15 @@ lychee.define('Renderer').tags({
 
 
 
-	var _init_program = function(shaderId) {
+	var _init_program = function(id) {
 
-		shaderId = typeof shaderId === 'string' ? shaderId : '';
+		id = typeof id === 'string' ? id : '';
 
 
-		if (_shaders[shaderId] instanceof Object) {
+		if (_programs[id] instanceof Object) {
 
 			var gl      = this.__ctx;
-			var shader  = _shaders[shaderId];
+			var shader  = _programs[id];
 			var program = gl.createProgram();
 
 
@@ -88,11 +92,15 @@ lychee.define('Renderer').tags({
 			gl.shaderSource(fs, shader.fs);
 			gl.compileShader(fs);
 
+console.log(gl.getShaderInfoLog(fs));
+
+
 			var vs = gl.createShader(gl.VERTEX_SHADER);
 
 			gl.shaderSource(vs, shader.vs);
 			gl.compileShader(vs);
 
+console.log(gl.getShaderInfoLog(vs));
 
 			gl.attachShader(program, vs);
 			gl.attachShader(program, fs);
@@ -101,11 +109,16 @@ lychee.define('Renderer').tags({
 
 			if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 
-				program._aPosition = gl.getAttribLocation(program, "aPosition");
+				gl.useProgram(program);
+
+				program._uTexture  = gl.getUniformLocation(program, 'uTexture');
+				program._uViewport = gl.getUniformLocation(program, 'uViewport');
+
+				program._aPosition = gl.getAttribLocation(program,  'aPosition');
 				gl.enableVertexAttribArray(program._aPosition);
 
-				program._uSampler  = gl.getUniformLocation(program, "uSampler");
-				program._uViewport = gl.getUniformLocation(program, "uViewport");
+				program._aTexture  = gl.getAttribLocation(program,  'aTexture');
+				gl.enableVertexAttribArray(program._aTexture);
 
 
 				return program;
@@ -140,22 +153,28 @@ lychee.define('Renderer').tags({
 
 			gl.bindTexture(gl.TEXTURE_2D, texture._gl);
 
-			// TODO: Remove this line ... gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.buffer);
 
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.CLAMP_TO_EDGE);
 
-			gl.generateMipmap(gl.TEXTURE_2D);
+/*
+ * TODO: Figure out why Mipmaps won't work :/
+			var is_power_of_two = texture.width === texture.height && (texture.width & (texture.width - 1) === 0);
+			if (is_power_of_two === true) {
+				gl.generateMipmap(gl.TEXTURE_2D);
+			}
+*/
 
 			gl.bindTexture(gl.TEXTURE_2D, null);
 
 
-			return gltexture;
+			return texture;
 
 		}
 
@@ -526,7 +545,7 @@ lychee.define('Renderer').tags({
 
 
 			if (this.__cache[texture.url] === undefined) {
-				_init_texture.call(this, texture);
+				this.__cache[texture.url] = _init_texture.call(this, texture);
 			}
 
 
@@ -539,7 +558,27 @@ lychee.define('Renderer').tags({
 
 				var gl = this.__ctx;
 
+				var tx1, ty1, tx2, ty2;
 				var x2, y2;
+
+
+				if (map === null) {
+
+					x2 = x1 + texture.width;
+					y2 = y1 + texture.height;
+
+					tx1 = 0;             ty1 = 0;
+					tx2 = texture.width; ty2 = texture.height;
+
+				} else {
+
+					x2 = x1 + map.w;
+					y2 = y1 + map.h;
+
+					tx1 = map.x;       ty1 = map.y;
+					tx2 = tx1 + map.w; ty2 = ty1 + map.h;
+
+				}
 
 
 				gl.useProgram(program);
@@ -547,105 +586,65 @@ lychee.define('Renderer').tags({
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, texture._gl);
 
-				gl.uniform1i(program._uSampler,  0);
+console.log('position:', x1, y1, x2, y2);
+console.log('texture:',  tx1, ty1, tx2, ty2);
+
 
 				// TODO: Evaluate if this can be done in reset()
-				gl.uniform2i(program._uViewport, this.__width | 0, this.__height | 0);
+				gl.uniform2f(program._uViewport, this.__width,  this.__height);
 
 
-				var bPosition = gl.createBuffer();
-
-				if (map === null) {
-
-					// aPosition in Vertex Shader:
-					// x, y = position coordinates
-					// z, w = texture coordinates
-
-					x2 = x1 + texture.width;
-					y2 = y1 + texture.height;
+				// TODO: Bake this in the texture via Fragment Shader
+				gl.uniform1i(program._uSampler, 0);
+				gl.uniform2f(program._uTexture, texture.width, texture.height);
 
 
-					gl.bindBuffer(gl.ARRAY_BUFFER, bPosition);
-					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-						// TODO: Evaluate if you can use gl.viewport width & height inside the Vertex Shader to vec2(1.0, 1.0) them
-					]), gl.STATIC_DRAW);
+				var position = gl.createBuffer();
+				var texture  = gl.createBuffer();
 
-//					gl.bindBuffer(gl.ARRAY_BUFFER, bPosition);
-					gl.vertexAttribPointer(program._aPosition, 4, gl.FLOAT, false, 0, 0);
-					gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+				gl.bindBuffer(gl.ARRAY_BUFFER, position);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+					x1, y1,
+					x2, y1,
+					x2, y2,
+					x1, y2
+				]), gl.STATIC_DRAW);
 
-					// TODO: Implement drawSprite() without map
+				gl.bindBuffer(gl.ARRAY_BUFFER, texture);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+					tx1, ty1,
+					tx2, ty1,
+					tx2, ty2,
+					tx1, ty2
+				]), gl.STATIC_DRAW);
 
-				} else {
+//				gl.bindBuffer(gl.ARRAY_BUFFER, bPosition);
+				gl.vertexAttribPointer(program._aPosition, 2, gl.FLOAT, false, 0, 0);
+				gl.vertexAttribPointer(program._aTexture,  2, gl.FLOAT, false, 0, 0);
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 2);
 
-					x2 = x1 + map.w;
-					y2 = y1 + map.h;
+/*
+				if (lychee.debug === true) {
 
-
-					if (lychee.debug === true) {
-
-						this.drawBox(
-							x1,
-							y1,
-							x1 + map.w,
-							y1 + map.h,
-							'#ff0000',
-							false,
-							1
-						);
-
-					}
-
-					// TODO: Implement drawSprite() with map
+					this.drawBox(
+						x1,
+						y1,
+						x1 + map.w,
+						y1 + map.h,
+						'#ff0000',
+						false,
+						1
+					);
 
 				}
+*/
+
+
+if (++global.COUNT > 10) {
+	this.stop();
+}
 
 			}
-
-
-/*
- * TODO: Delete this snippety snippet from this codety code. Then clappity clap clap!
- *
- * This snipped translates the coordinates to 1.0 / 1.0 based coordinates
- * but it would be better to do this on the shader side.
- *
- * 1. Evaluate if we can use texture.width inside the Fragment Shader
- * so we can pass in the px based coordinates.
- *
- * 2. Evaluate if you can use gl.viewportWidth inside the Vertex Shader
- * so we can pass in integers as coordinates, that would speedup
- * the calculation process.
- */
-
-/*
-var center_x =       x / (viewport_width  / 2) - 1;
-var center_y = -1 * (y / (viewport_height / 2) - 1);
-
-var tex_x = src_x/texture.width;
-var tex_y = src_y/texture.height;
-(etc... from 0.0 to 1.0)
-
-
-positionArray[vertexIndex++] = center_x - width;
-positionArray[vertexIndex++] = center_y + height;
-positionArray[vertexIndex++] = tex_x;
-positionArray[vertexIndex++] = tex_y;
-
-positionArray[vertexIndex++] = center_x - width;
-positionArray[vertexIndex++] = center_y - height;
-positionArray[vertexIndex++] = tex_x;
-positionArray[vertexIndex++] = tex_y + tex_h;
-
-positionArray[vertexIndex++] = center_x + width;
-positionArray[vertexIndex++] = center_y + height;
-positionArray[vertexIndex++] = tex_x + tex_w;
-positionArray[vertexIndex++] = tex_y;
-
-positionArray[vertexIndex++] = center_x + width;
-positionArray[vertexIndex++] = center_y - height;
-positionArray[vertexIndex++] = tex_x + tex_w;
-positionArray[vertexIndex++] = tex_y + tex_h;
-*/
 
 		},
 
