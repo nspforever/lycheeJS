@@ -39,6 +39,131 @@ lychee.define('Renderer').tags({
 	 * HELPERS
 	 */
 
+	var _programs = {};
+
+	(function(attachments) {
+
+		for (var file in attachments) {
+
+			var tmp = file.split('.');
+			var id  = tmp[0];
+			var ext = tmp[1];
+
+
+			var entry = _programs[id] || null;
+			if (entry === null) {
+				entry = _programs[id] = {
+					fs: '',
+					vs: ''
+				};
+			}
+
+
+			if (ext === 'fs') {
+				entry.fs = attachments[file];
+			} else if (ext === 'vs') {
+				entry.vs = attachments[file];
+			}
+
+		}
+
+	})(attachments);
+
+
+
+	var _init_program = function(shaderId) {
+
+		shaderId = typeof shaderId === 'string' ? shaderId : '';
+
+
+		if (_shaders[shaderId] instanceof Object) {
+
+			var gl      = this.__ctx;
+			var shader  = _shaders[shaderId];
+			var program = gl.createProgram();
+
+
+			var fs = gl.createShader(gl.FRAGMENT_SHADER);
+
+			gl.shaderSource(fs, shader.fs);
+			gl.compileShader(fs);
+
+			var vs = gl.createShader(gl.VERTEX_SHADER);
+
+			gl.shaderSource(vs, shader.vs);
+			gl.compileShader(vs);
+
+
+			gl.attachShader(program, vs);
+			gl.attachShader(program, fs);
+			gl.linkProgram(program);
+
+
+			if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
+
+				program._aPosition = gl.getAttribLocation(program, "aPosition");
+				gl.enableVertexAttribArray(program._aPosition);
+
+				program._uSampler = gl.getUniformLocation(program, "uSampler");
+
+
+				return program;
+
+			}
+
+		}
+
+
+		return null;
+
+	};
+
+	var _init_texture = function(texture) {
+
+		if (texture instanceof Texture) {
+
+			var gl = this.__ctx;
+
+			if (texture._gl === undefined) {
+				texture._gl = gl.createTexture();
+			} else {
+				// TODO: Evaluate what has to be done if texture is already used on different GPU or GL context
+			}
+
+
+			var max = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+			if (texture.width > max || texture.height > max) {
+				return null;
+			}
+
+
+			gl.bindTexture(gl.TEXTURE_2D, texture._gl);
+
+			// TODO: Remove this line ... gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.buffer);
+
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.CLAMP_TO_EDGE);
+
+			gl.generateMipmap(gl.TEXTURE_2D);
+
+			gl.bindTexture(gl.TEXTURE_2D, null);
+
+
+			return gltexture;
+
+		}
+
+
+		return null;
+
+	};
+
+
 	var _is_color = function(color) {
 
 		if (
@@ -72,39 +197,6 @@ lychee.define('Renderer').tags({
 
 
 	/*
-	 * SHADERS
-	 */
-
-	var _shaders = {
-		fragment: {},
-		vertex:   {}
-	};
-
-	(function(attachments) {
-
-		for (var file in attachments) {
-
-			var tmp = file.split('.');
-			var id  = tmp[0];
-			var ext = tmp[1];
-
-			if (ext === 'fs') {
-				_shaders.fragment[id] = attachments[file];
-			} else if (ext === 'vs') {
-				_shaders.vertex[id]   = attachments[file];
-			}
-
-		}
-
-
-console.log('----- SHADERS ------');
-console.log(_shaders);
-
-	})(attachments);
-
-
-
-	/*
 	 * IMPLEMENTATION
 	 */
 
@@ -113,9 +205,10 @@ console.log(_shaders);
 		id = typeof id === 'string' ? id : null;
 
 
-		this.__id     = id;
-		this.__canvas = global.document.createElement('canvas');
-		this.__ctx    = this.__canvas.getContext('webgl');
+		this.__id       = id;
+		this.__canvas   = global.document.createElement('canvas');
+		this.__ctx      = this.__canvas.getContext('webgl');
+		this.__programs = {};
 
 		this.__environment = {
 			width:  null,
@@ -140,6 +233,11 @@ console.log(_shaders);
 		if (!this.__canvas.parentNode) {
 			this.__canvas.className = 'lychee-Renderer-canvas';
 			global.document.body.appendChild(this.__canvas);
+		}
+
+
+		for (var id in _programs) {
+			this.__programs[id] = _init_program.call(this, id);
 		}
 
 	};
@@ -167,9 +265,12 @@ console.log(_shaders);
 
 
 			var canvas = this.__canvas;
+			var gl     = this.__ctx;
 
 			canvas.width  = width;
 			canvas.height = height;
+
+			gl.viewport(0, 0, width, height);
 
 			canvas.style.width  = width + 'px';
 			canvas.style.height = height + 'px';
@@ -196,7 +297,7 @@ console.log(_shaders);
 			var bg = this.__background;
 			if (bg !== null) {
 
-				gl.clearColor(bg[0], bg[1], bg[2], 1.0);
+				gl.clearColor(bg[0], bg[1], bg[2], bg[3]);
 
 			} else {
 
@@ -423,13 +524,58 @@ console.log(_shaders);
 			map     = map instanceof Object      ? map     : null;
 
 
-			if (texture !== null) {
+			if (this.__cache[texture.url] === undefined) {
+				_init_texture.call(this, texture);
+			}
+
+
+			var program = this.__programs['Sprite'];
+
+			if (
+				   program !== null
+				&& texture !== null
+			) {
+
+				var gl = this.__ctx;
+
+				var x2, y2;
+
+
+				gl.useProgram(program);
+				// TODO: Evaluate if gl.activeTexture() usage is correct
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, texture._gl);
+				gl.uniform1i(program.uSampler, 0);
+
+
+				var bPosition = gl.createBuffer();
 
 				if (map === null) {
+
+					// aPosition in Vertex Shader:
+					// x, y = position coordinates
+					// z, w = texture coordinates
+
+					x2 = x1 + texture.width;
+					y2 = y1 + texture.height;
+
+
+					gl.bindBuffer(gl.ARRAY_BUFFER, bPosition);
+					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+						// TODO: Evaluate if you can use gl.viewport width & height inside the Vertex Shader to vec2(1.0, 1.0) them
+					]), gl.STATIC_DRAW);
+
+//					gl.bindBuffer(gl.ARRAY_BUFFER, bPosition);
+					gl.vertexAttribPointer(program._aPosition, 4, gl.FLOAT, false, 0, 0);
+					gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 					// TODO: Implement drawSprite() without map
 
 				} else {
+
+					x2 = x1 + map.w;
+					y2 = y1 + map.h;
+
 
 					if (lychee.debug === true) {
 
@@ -450,6 +596,47 @@ console.log(_shaders);
 				}
 
 			}
+
+
+/*
+ * TODO: Delete this snippety snippet from this codety code. Then clappity clap clap!
+ *
+ * This snipped translates the coordinates to 1.0 / 1.0 based coordinates
+ * but it would be better to do this on the shader side.
+ *
+ * 1. Evaluate if we can use texture.width inside the Fragment Shader
+ * so we can pass in the px based coordinates.
+ *
+ * 2. Evaluate if you can use gl.viewportWidth inside the Vertex Shader
+ * so we can pass in integers as coordinates, that would speedup
+ * the calculation process.
+ */
+
+/*
+var center_x =       x / (viewport_width  / 2) - 1;
+var center_y = -1 * (y / (viewport_height / 2) - 1);
+
+
+positionArray[vertexIndex++] = center_x - width;
+positionArray[vertexIndex++] = center_y + height;
+positionArray[vertexIndex++] = tex_x;
+positionArray[vertexIndex++] = tex_y;
+
+positionArray[vertexIndex++] = center_x - width;
+positionArray[vertexIndex++] = center_y - height;
+positionArray[vertexIndex++] = tex_x;
+positionArray[vertexIndex++] = tex_y + tex_h;
+
+positionArray[vertexIndex++] = center_x + width;
+positionArray[vertexIndex++] = center_y + height;
+positionArray[vertexIndex++] = tex_x + tex_w;
+positionArray[vertexIndex++] = tex_y;
+
+positionArray[vertexIndex++] = center_x + width;
+positionArray[vertexIndex++] = center_y - height;
+positionArray[vertexIndex++] = tex_x + tex_w;
+positionArray[vertexIndex++] = tex_y + tex_h;
+*/
 
 		},
 
