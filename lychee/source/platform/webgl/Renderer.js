@@ -104,7 +104,8 @@ lychee.define('Renderer').tags({
 				program._aPosition = gl.getAttribLocation(program, "aPosition");
 				gl.enableVertexAttribArray(program._aPosition);
 
-				program._uSampler = gl.getUniformLocation(program, "uSampler");
+				program._uSampler  = gl.getUniformLocation(program, "uSampler");
+				program._uViewport = gl.getUniformLocation(program, "uViewport");
 
 
 				return program;
@@ -545,7 +546,11 @@ lychee.define('Renderer').tags({
 				// TODO: Evaluate if gl.activeTexture() usage is correct
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, texture._gl);
-				gl.uniform1i(program.uSampler, 0);
+
+				gl.uniform1i(program._uSampler,  0);
+
+				// TODO: Evaluate if this can be done in reset()
+				gl.uniform2i(program._uViewport, this.__width | 0, this.__height | 0);
 
 
 				var bPosition = gl.createBuffer();
@@ -615,6 +620,10 @@ lychee.define('Renderer').tags({
 /*
 var center_x =       x / (viewport_width  / 2) - 1;
 var center_y = -1 * (y / (viewport_height / 2) - 1);
+
+var tex_x = src_x/texture.width;
+var tex_y = src_y/texture.height;
+(etc... from 0.0 to 1.0)
 
 
 positionArray[vertexIndex++] = center_x - width;
