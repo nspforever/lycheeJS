@@ -35,10 +35,6 @@ lychee.define('Renderer').tags({
 
 }).exports(function(lychee, global, attachments) {
 
-// TODO: REMOVE THIS SHIT
-
-global.COUNT = 1;
-
 	/*
 	 * HELPERS
 	 */
@@ -165,7 +161,7 @@ console.log(gl.getShaderInfoLog(vs));
 
 /*
  * TODO: Figure out why Mipmaps won't work :/
-			var is_power_of_two = texture.width === texture.height && (texture.width & (texture.width - 1) === 0);
+			var is_power_of_two = (texture.width & (texture.width - 1) === 0);
 			if (is_power_of_two === true) {
 				gl.generateMipmap(gl.TEXTURE_2D);
 			}
@@ -586,9 +582,6 @@ console.log(gl.getShaderInfoLog(vs));
 				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, texture._gl);
 
-console.log('position:', x1, y1, x2, y2);
-console.log('texture:',  tx1, ty1, tx2, ty2);
-
 
 				// TODO: Evaluate if this can be done in reset()
 				gl.uniform2f(program._uViewport, this.__width,  this.__height);
@@ -638,11 +631,6 @@ console.log('texture:',  tx1, ty1, tx2, ty2);
 
 				}
 */
-
-
-if (++global.COUNT > 10) {
-	this.stop();
-}
 
 			}
 

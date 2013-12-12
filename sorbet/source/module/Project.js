@@ -78,9 +78,6 @@ lychee.define('sorbet.module.Project').requires([
 
 	var _build_project = function(project) {
 
-// console.log(project);
-
-
 		var root = project.root;
 
 		if (lychee.debug === true) {
@@ -88,50 +85,41 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		this.queue.flush();
-
-
-/*
-
 		var sandbox     = lychee.createSandbox();
 		var environment = lychee.createEnvironment();
 
 
+		lychee.setEnvironment(environment);
+
 		lychee.rebase({
-			lychee: _environment.bases.lychee + '/source',
+			lychee: _environment.bases.lychee,
 			game:   project.resolvedroot + '/source'
 		});
 
+		// TODO: Dynamic tag integration for all tags based on package config
 		lychee.tag({
-			platform: [ 'webgl' ]
+			platform: [ 'html' ]
 		});
 
+//		lychee.debug   = false;
 		lychee.dynamic = false;
 
 
+		var that = this;
+
+console.log(lychee.getEnvironment());
+
 		lychee.build(function() {
 
+console.log('SANDBOX BUILD READY!');
+
+			lychee.debug   = true;
+			lychee.dynamic = true;
 			lychee.setEnvironment(null);
 
+			that.queue.flush();
+
 		}, sandbox);
-
-		lychee.setEnvironment(_environment);
-
-
-console.log(project.root);
-
-
-
-		var vproj = new _project(project.resolved);
-
-
-
-		var resolved = vproj.resolve('lychee.data.BitON');
-
-console.log(resolved);
-
-*/
-
 
 	};
 
@@ -162,6 +150,9 @@ console.log(resolved);
 			this.queue.add(buffer[0]);
 		}
 
+
+// TODO: remove this return
+return;
 
 		var vhosts = this.main.vhosts.values();
 		for (var v = 0, vl = vhosts.length; v < vl; v++) {

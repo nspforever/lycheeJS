@@ -14,6 +14,27 @@
 	 * HELPERS
 	 */
 
+	var _validate_enum = function(enumobject, value) {
+
+		if (typeof value !== 'number') return false;
+
+
+		var found = false;
+
+		for (var id in enumobject) {
+
+			if (value === enumobject[id]) {
+				found = true;
+				break;
+			}
+
+		}
+
+
+		return found;
+
+	};
+
 	var _requires_load = function(reference) {
 
 		// Namespace Include Reference
@@ -171,7 +192,7 @@
 			} else if (mapping.packageId !== null && mapping.classId !== null) {
 
 				if (lychee.debug === true) {
-					console.warn('Package Tree index is corrupt, couldn\'t load ' + url + ' (refered by ' + mapping.packageId + '.' + mapping.classId + ')');
+					console.error('Package Tree index is corrupt, couldn\'t load ' + url + ' (refered by ' + mapping.packageId + '.' + mapping.classId + ')');
 				}
 
 
@@ -181,7 +202,7 @@
 
 					this.__loading.classes[mapping.packageId + '.' + mapping.classId] = false;
 
-					console.log('No Alternatives available for ' + url);
+					console.error('No Alternatives available for ' + url);
 
 				}
 
@@ -226,7 +247,7 @@
 		// 2. Load Class
 		} else if (packageId !== null && classId !== null) {
 
-			// Wait for next __refresh() if package config wasn't loaded yet
+			// Wait for next _refresh_dependencies() if package config wasn't loaded yet
 			if (this.__packages[packageId] == null) return;
 
 
@@ -610,7 +631,7 @@
 		var id        = definitionblock._space + '.' + definitionblock._name;
 		var libspace  = definitionblock._space.split('.')[0];
 		var classname = definitionblock._name;
-		var namespace = _get_namespace(definitionblock._space, this.__buildScope);
+		var namespace = _get_namespace(definitionblock._space, this.__scope);
 
 
 		// 1. Collect required Attachments
@@ -641,8 +662,8 @@
 
 				data = definitionblock._exports.call(
 					definitionblock._exports,
-					this.__buildScope.lychee,
-					this.__buildScope,
+					this.__scope.lychee,
+					this.__scope,
 					attachmentsmap
 				);
 
@@ -650,9 +671,9 @@
 
 				data = definitionblock._exports.call(
 					definitionblock._exports,
-					this.__buildScope.lychee,
-					this.__buildScope[libspace],
-					this.__buildScope,
+					this.__scope.lychee,
+					this.__scope[libspace],
+					this.__scope,
 					attachmentsmap
 				);
 
@@ -697,7 +718,7 @@
 
 				var id = includes[i];
 
-				var incLyDefBlock = _get_node(this.__buildScope, id, '.');
+				var incLyDefBlock = _get_node(this.__scope, id, '.');
 				if (!incLyDefBlock || !incLyDefBlock.prototype) {
 
 					if (lychee.debug === true) {
@@ -705,7 +726,7 @@
 					}
 
 				} else {
-					args.push(_get_node(this.__buildScope, id, '.').prototype);
+					args.push(_get_node(this.__scope, id, '.').prototype);
 				}
 
 			}
@@ -821,32 +842,42 @@
 
 			var order = [];
 
-			_sort_tree.call(this.__tree, this.__buildStart, order);
+			_sort_tree.call(this.__tree, this.__candidate, order);
 
 
+			this.duration = Date.now() - this.clock;
 			if (lychee.debug === true) {
-				console.log('Starting Build');
+				console.log('LOAD TIME: Finished in ' + this.duration + 'ms');
 				console.log(order);
 				console.groupEnd();
 			}
 
 
-			for (var o = 0, l = order.length; o < l; o++) {
-				_export_definitionblock.call(this, this.__tree[order[o]]);
+			if (this.mode === lychee.Builder.MODE.normal) {
+
+				for (var o = 0, l = order.length; o < l; o++) {
+					_export_definitionblock.call(this, this.__tree[order[o]]);
+				}
+
 			}
 
 
-			var duration = Date.now() - this.__clock;
+			this.duration = Date.now() - this.clock;
 			if (lychee.debug === true) {
-				console.log('COMPILE TIME END: Finished in ' + duration + 'ms');
+				console.log('COMPILE TIME: Finished in ' + this.duration + 'ms');
 			}
 
 
-			this.__buildCallback.call(
-				this.__buildScope,
-				this.__buildScope.lychee,
-				this.__buildScope
-			);
+			if (this.__callback !== null) {
+
+				this.__callback.call(
+					this.__scope,
+					this.__scope.lychee,
+					this.__scope,
+					order
+				);
+
+			}
 
 		}
 
@@ -860,6 +891,9 @@
 
 	lychee.Builder = function() {
 
+		this.clock = 0;
+		this.mode  = 0;
+
 		this.__attachments = {};
 		this.__candidates  = {};
 		this.__classes     = {};
@@ -867,19 +901,19 @@
 		this.__packages    = {};
 
 		// will be set in build()
+		this.__candidate     = null;
 		this.__tree          = null;
 		this.__bases         = null;
 		this.__tags          = null;
-		this.__buildCallback = null;
-		this.__buildScope    = null;
-		this.__buildStart    = null;
+
+		this.__callback = null;
+		this.__scope    = null;
 
 		this.__loading = {
 			packages: {},
 			classes:  {}
 		};
 
-		this.__clock = 0;
 
 
 		// This stuff here can't timeout on slow internet connections!
@@ -890,6 +924,12 @@
 		this.__preloader.bind('ready', _load_asset,   this);
 		this.__preloader.bind('error', _unload_asset, this);
 
+	};
+
+
+	lychee.Builder.MODE = {
+		normal:     0,
+		simulation: 1
 	};
 
 
@@ -906,25 +946,23 @@
 			}
 
 
-			this.__clock = Date.now();
-			this.__tree  = env.tree instanceof Object  ? env.tree  : {};
+			this.clock = Date.now();
+
+ 			this.__tree  = env.tree instanceof Object  ? env.tree  : {};
 			this.__bases = env.bases instanceof Object ? env.bases : {};
 			this.__tags  = env.tags instanceof Object  ? env.tags  : {};
-
-			this.__buildCallback = callback;
-			this.__buildScope    = scope;
 
 
 			var candidates = Object.keys(this.__tree);
 			if (candidates.length === 1) {
-				this.__buildStart = candidates[0];
+				this.__candidate = candidates[0];
 			} else {
 
 				for (var c = 0, cl = candidates.length; c < cl; c++) {
 
 					var candidate = candidates[c];
 					if (candidate.match(/Main/)) {
-						this.__buildStart = candidate;
+						this.__candidate = candidate;
 						break;
 					}
 
@@ -933,22 +971,39 @@
 			}
 
 
-			if (this.__buildStart === null) {
+			if (this.__candidate === null) {
 				console.warn('Could not determine build candidate automatically. (Expecting either 1 candidate or *.Main being loaded already.)');
 				return;
 			}
 
 
 			if (lychee.debug === true) {
-				console.log('Loading Dependencies for ' + this.__buildStart);
+				console.log('Preloading Dependencies for ' + this.__candidate);
 			}
 
 
-			// 1. Load Package Configurations
-			// (will automatically refresh afterwards)
-			for (var id in this.__bases) {
+			this.__callback = callback;
+			this.__scope    = scope;
+
+
+			for (var id in env.bases) {
 				_load_definitionblock.call(this, id, null);
 			}
+
+		},
+
+		setMode: function(mode) {
+
+			if (_validate_enum(lychee.Builder.MODE, mode) === true) {
+
+				this.mode = mode;
+
+				return true;
+
+			}
+
+
+			return false;
 
 		}
 
@@ -960,13 +1015,26 @@
 	}
 
 
-	lychee.build = function(callback, scope) {
+	lychee.build = function(callback, scope, simulation) {
 
-		new lychee.Builder().build(
-			lychee.getEnvironment(),
-			callback,
-			scope
-		);
+		var builder     = new lychee.Builder();
+		var environment = lychee.getEnvironment();
+
+
+		if (simulation === true) {
+			builder.setMode(lychee.Builder.MODE['simulation']);
+		} else {
+			builder.setMode(lychee.Builder.MODE['normal']);
+		}
+
+
+		var result = builder.build(environment, callback, scope);
+		if (result === true) {
+			return true;
+		}
+
+
+		return false;
 
 	};
 

@@ -172,6 +172,8 @@ lychee.define('Renderer').tags({
 
 			if (this.__state !== 1 || typeof command !== 'number') return;
 
+			// TODO: Implement flush commands
+
 		},
 
 
@@ -198,7 +200,7 @@ lychee.define('Renderer').tags({
 				&& alpha <= 1
 			) {
 
-				this.__ctx.globalAlpha = alpha;
+				this.__alpha = alpha;
 
 			}
 
@@ -231,6 +233,7 @@ lychee.define('Renderer').tags({
 		clearBuffer: function(buffer) {
 
 			var ctx = buffer.getContext('2d');
+
 
 			ctx.clearRect(0, 0, buffer.width, buffer.height);
 
@@ -265,6 +268,7 @@ lychee.define('Renderer').tags({
 			var pi2 = Math.PI * 2;
 
 
+			ctx.globalAlpha = this.__alpha;
 			ctx.beginPath();
 
 			ctx.arc(
@@ -300,6 +304,8 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
+			ctx.globalAlpha = this.__alpha;
+
 			if (background === false) {
 				ctx.lineWidth   = lineWidth;
 				ctx.strokeStyle = color;
@@ -313,11 +319,11 @@ lychee.define('Renderer').tags({
 
 		drawBuffer: function(x1, y1, buffer) {
 
-			this.__ctx.drawImage(
-				buffer,
-				x1,
-				y1
-			);
+			var ctx = this.__ctx;
+
+
+			ctx.globalAlpha = this.__alpha;
+			ctx.drawImage(buffer, x1, y1);
 
 		},
 
@@ -333,6 +339,7 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
+			ctx.globalAlpha = this.__alpha;
 			ctx.beginPath();
 
 			ctx.arc(
@@ -367,8 +374,8 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
+			ctx.globalAlpha = this.__alpha;
 			ctx.beginPath();
-
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
 
@@ -392,12 +399,12 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
+			ctx.globalAlpha = this.__alpha;
 			ctx.beginPath();
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
 			ctx.lineTo(x3, y3);
 			ctx.lineTo(x1, y1);
-
 
 			if (background === false) {
 				ctx.lineWidth   = lineWidth;
@@ -452,6 +459,7 @@ lychee.define('Renderer').tags({
 				var ctx = this.__ctx;
 
 
+				ctx.globalAlpha = this.__alpha;
 				ctx.beginPath();
 				ctx.moveTo(x1, y1);
 
@@ -491,9 +499,14 @@ lychee.define('Renderer').tags({
 
 			if (texture !== null) {
 
+				var ctx = this.__ctx;
+
+
+				ctx.globalAlpha = this.__alpha;
+
 				if (map === null) {
 
-					this.__ctx.drawImage(
+					ctx.drawImage(
 						texture.buffer,
 						x1,
 						y1
@@ -515,8 +528,7 @@ lychee.define('Renderer').tags({
 
 					}
 
-
-					this.__ctx.drawImage(
+					ctx.drawImage(
 						texture.buffer,
 						map.x,
 						map.y,
@@ -573,6 +585,11 @@ lychee.define('Renderer').tags({
 				var texture = font.texture;
 				if (texture !== null) {
 
+					var ctx = this.__ctx;
+
+
+					ctx.globalAlpha = this.__alpha;
+
 					for (t = 0, l = text.length; t < l; t++) {
 
 						var chr = font.get(text[t]);
@@ -591,7 +608,7 @@ lychee.define('Renderer').tags({
 
 						}
 
-						this.__ctx.drawImage(
+						ctx.drawImage(
 							texture.buffer,
 							chr.x,
 							chr.y,
