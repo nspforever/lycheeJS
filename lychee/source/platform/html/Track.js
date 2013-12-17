@@ -64,15 +64,15 @@ lychee.define('Track').tags({
 	}
 
 
-	var _supportedFormats = [];
+	var _supported_formats = [];
 	for (var ext in _codecs) {
 		if (_codecs[ext] !== false) {
-			_supportedFormats.push(ext);
+			_supported_formats.push(ext);
 		}
 	}
 
 	if (lychee.debug === true) {
-		console.log("lychee.Track: Supported media formats are " + _supportedFormats.join(', '));
+		console.log("lychee.Track: Supported media formats are " + _supported_formats.join(', '));
 	}
 
 
@@ -97,7 +97,7 @@ lychee.define('Track').tags({
 		this.__isReady   = isReady;
 
 
-		var playableFormat = null;
+		var supported_format = null;
 
 		if (settings.formats instanceof Array) {
 
@@ -105,10 +105,12 @@ lychee.define('Track').tags({
 
 				var format = settings.formats[f];
 				if (
-					playableFormat === null
+					   supported_format === null
 					&& _codecs[format] !== false
 				) {
-					playableFormat = format;
+
+					supported_format = format;
+
 				}
 
 			}
@@ -120,10 +122,16 @@ lychee.define('Track').tags({
 		this.__settings = settings;
 
 
-		if (playableFormat === null) {
-			throw "Your Environment does only support these codecs: " + _supportedFormats.join(', ');
+		if (supported_format === null) {
+
+			if (lychee.debug === true) {
+				console.log("lychee.Track: Supported media formats are " + _supported_formats.join(', '));
+			}
+
 		} else {
-			this.__init(settings.base + '.' + playableFormat);
+
+			_init_track.call(this, settings.base + '.' + supported_format);
+
 		}
 
 	};
@@ -131,57 +139,68 @@ lychee.define('Track').tags({
 
 
 	/*
+	 * HELPERS
+	 */
+
+	var _init_track = function(url) {
+		// If this method is executed, the build system is fucked up anyways.
+	};
+
+
+
+	/*
 	 * ADVANCED AUDIO API
 	 */
+
 	if (_context !== null) {
 
+		/*
+		 * HELPERS
+		 */
+
+		_init_track = function(url) {
+
+			// Shared context = more performance
+			this.__context = _context;
+			this.__gain    = this.__context.createGain();
+
+			this.__loopingBuffer = null;
+
+
+			if (this.__settings.buffer === null) {
+
+				var that = this;
+				var xhr = new XMLHttpRequest();
+
+				xhr.open('GET', url);
+				xhr.responseType = 'arraybuffer';
+
+				xhr.onload = function() {
+
+					that.__context.decodeAudioData(xhr.response, function(buffer) {
+						that.__settings.buffer = buffer;
+						that.__isReady = true;
+					});
+
+				};
+
+				xhr.send();
+
+			} else {
+
+				this.__isReady = true;
+
+			}
+
+		};
+
+
+
+		/*
+		 * IMPLEMENTATION
+		 */
+
 		Class.prototype = {
-
-			/*
-			 * PRIVATE API
-			 */
-
-			__init: function(url) {
-
-				// Shared context = more performance
-				this.__context = _context;
-				this.__gain    = this.__context.createGain();
-
-				this.__loopingBuffer = null;
-
-
-				if (this.__settings.buffer === null) {
-
-					var that = this;
-					var xhr = new XMLHttpRequest();
-
-					xhr.open('GET', url);
-					xhr.responseType = 'arraybuffer';
-
-					xhr.onload = function() {
-
-						that.__context.decodeAudioData(xhr.response, function(buffer) {
-							that.__settings.buffer = buffer;
-							that.__isReady = true;
-						});
-
-					};
-
-					xhr.send();
-
-				} else {
-
-					this.__isReady = true;
-
-				}
-
-			},
-
-
-
-			/*
-			 * PUBLIC API
-			 */
 
 			play: function(loop) {
 
@@ -232,7 +251,7 @@ lychee.define('Track').tags({
 			},
 
 
-			// TODO: Implement pause and resume methods,
+			// TODO: Implement pause and resume methods.
 			// At the time this was written, there was only
 			// a setTimeout() way of doing this, but it caused
 			// several timing problems due to different behaviours
@@ -266,7 +285,7 @@ lychee.define('Track').tags({
 			},
 
 			isReady: function() {
-				return this.__isReady && this.isPlaying() === false;
+				return this.__isReady && !this.isPlaying();
 			},
 
 			setMuted: function(muted) {
@@ -323,75 +342,58 @@ lychee.define('Track').tags({
 		};
 
 
+
 	/*
 	 * BASIC AUDIO API
 	 */
+
 	} else if (_audio !== null) {
 
-		Class.prototype = {
+		/*
+		 * HELPERS
+		 */
 
-			/*
-			 * PRIVATE API
-			 */
+		_init_track = function(url) {
 
-			__init: function(url) {
-
-				this.__audio = new Audio(url);
-				this.__audio.autobuffer = true; // old WebKit
-				this.__audio.preload = true; // new WebKit
-				this.__audio.load();
+			this.__audio = new Audio(url);
+			this.__audio.autobuffer = true; // old WebKit
+			this.__audio.preload = true; // new WebKit
+			this.__audio.load();
 
 
-				var that = this;
-				this.__audio.addEventListener('ended', function() {
-					that.__onEnd();
+			var that = this;
+			this.__audio.addEventListener('ended', function() {
+
+				if (that.__isLooping === true) {
+					that.play(true);
+				} else {
+					that.__isIdle = true;
+				}
+
+			}, true);
+
+
+			if (this.__isReady === false) {
+
+				this.__audio.addEventListener('canplaythrough', function() {
+					that.__isReady = true;
 				}, true);
 
+				setTimeout(function() {
+					that.__isReady = true;
+				}, 500);
 
-				if (this.__isReady === false) {
+			}
 
-					this.__audio.addEventListener('canplaythrough', function() {
-						that.__isReady = true;
-					}, true);
-
-					setTimeout(function() {
-						that.__isReady = true;
-					}, 500);
-
-				}
-
-			},
-
-			__onEnd: function() {
-
-				if (this.__isLooping === true) {
-
-					this.play(true);
-					return false;
-
-				} else {
-
-					this.__isIdle = true;
-					return true;
-
-				}
-
-			},
-
-			__resetPointer: function() {
-
-				try {
-					this.__audio.currentTime = 0;
-				} catch(e) {
-				}
-
-			},
+		};
 
 
 
-			/*
-			 * PUBLIC API
-			 */
+		/*
+		 * IMPLEMENTATION
+		 */
+
+		Class.prototype = {
 
 			play: function(loop) {
 
@@ -400,7 +402,11 @@ lychee.define('Track').tags({
 
 				if (this.__isReady === true) {
 
-					this.__resetPointer();
+					try {
+						this.__audio.currentTime = 0;
+					} catch(e) {
+					}
+
 					this.__audio.play();
 					this.__endTime = Date.now() + (this.__audio.duration * 1000);
 					this.__isIdle = false;
@@ -416,7 +422,11 @@ lychee.define('Track').tags({
 				this.__isLooping = false;
 
 				this.__audio.pause();
-				this.__resetPointer();
+
+				try {
+					this.__audio.currentTime = 0;
+				} catch(e) {
+				}
 
 			},
 
@@ -426,29 +436,6 @@ lychee.define('Track').tags({
 
 			resume: function() {
 				this.__audio.play();
-			},
-
-			mute: function() {
-
-				if (this.muted === false) {
-
-					this.__unmuteVolume = this.__audio.volume;
-					this.__audio.volume = 0;
-					this.muted = true;
-
-				}
-
-			},
-
-			unmute: function() {
-
-				if (this.muted === true) {
-
-					this.__audio.volume = this.__unmuteVolume || 1;
-					this.muted = false;
-
-				}
-
 			},
 
 			clone: function() {
@@ -462,12 +449,18 @@ lychee.define('Track').tags({
 
 			isPlaying: function() {
 
-				if (Date.now() > this.__endTime) {
-					return this.__onEnd();
-				}
+				if (
+					   Date.now() > this.__endTime
+					|| this.__audio.currentTime >= this.__audio.duration
+				) {
 
-				if (this.__audio.currentTime >= this.__audio.duration) {
-					return this.__onEnd();
+					if (this.__isLooping === true) {
+						this.play(true);
+						return true;
+					} else {
+						this.__isIdle = true;
+					}
+
 				}
 
 
@@ -476,7 +469,40 @@ lychee.define('Track').tags({
 			},
 
 			isReady: function() {
-				return this.__isReady && this.isPlaying() === false;
+				return this.__isReady && !this.isPlaying();
+			},
+
+			setMuted: function(muted) {
+
+				muted = muted === true;
+
+
+				if (
+					muted === true
+					&& this.muted === false
+				) {
+
+					this.__unmuteVolume = this.__audio.volume;
+					this.__audio.volume = 0;
+					this.muted = true;
+
+					return true;
+
+				} else if (
+					muted === false
+					&& this.muted === true
+				) {
+
+					this.__audio.volume = this.__unmuteVolume || 1;
+					this.muted = false;
+
+					return true;
+
+				}
+
+
+				return false;
+
 			},
 
 			setVolume: function(volume) {

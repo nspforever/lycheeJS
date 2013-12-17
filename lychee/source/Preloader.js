@@ -310,7 +310,7 @@
 		 */
 
 		_load: function(url, type, _cache) {
-			throw "lychee.Preloader: You need to include the platform-specific bootstrap.js to load other files.";
+			console.error("lychee.Preloader: You need to include the platform-specific bootstrap.js to load other files.");
 		},
 
 		_progress: function(url, _cache) {

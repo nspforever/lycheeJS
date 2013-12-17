@@ -402,7 +402,7 @@ if (typeof global !== 'undefined') {
 	if (typeof lychee.build !== 'function') {
 
 		lychee.build = function(callback, scope) {
-			throw "lychee.build: You need to include the lychee.Builder to build the dependency tree.";
+			console.error("lychee.build: You need to include the lychee.Builder to build the dependency tree.");
 		};
 
 	}

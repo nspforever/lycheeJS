@@ -61,7 +61,14 @@ lychee.define('Jukebox').requires([
 
 
 			if (id === null || this.__tracks[id] === undefined) {
-				throw "Unknown Track ID, add the Track before playing it.";
+
+				if (lychee.debug === true) {
+					console.error('lychee.Jukebox: Unknown id ' + id + ', add the lychee.Track before playing it.')
+				}
+
+
+				return false;
+
 			}
 
 
