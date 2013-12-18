@@ -257,7 +257,7 @@
 					if (ext !== 'png') {
 
 						if (lychee.debug === true) {
-							console.error('Texture at ' + that.url + ' is invalid. It is NOT a PNG file.');
+							console.error('bootstrap.js: Texture at ' + that.url + ' is invalid. It is NOT a PNG file.');
 						}
 
 					}
@@ -269,7 +269,7 @@
 				if (is_power_of_two === false && is_embedded === false) {
 
 					if (lychee.debug === true) {
-						console.warn('Texture at ' + that.url + ' is NOT power-of-two. Mipmaps cannot be generated.');
+						console.warn('bootstrap.js: Texture at ' + that.url + ' is NOT power-of-two. Mipmaps cannot be generated.');
 					}
 
 				}
@@ -329,7 +329,7 @@
 					try {
 						data = JSON.parse(xhr.responseText);
 					} catch(e) {
-						console.warn('JSON file at ' + url + ' is invalid.');
+						console.warn('bootstrap.js: JSON file at ' + url + ' is invalid.');
 					}
 
 

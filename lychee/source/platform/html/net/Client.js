@@ -331,7 +331,7 @@ lychee.define('lychee.net.Client').tags({
 
 
 			if (
-				data === null
+				   data === null
 				|| this.__isRunning === false
 			) {
 				return false;

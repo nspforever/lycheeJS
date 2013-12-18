@@ -104,12 +104,16 @@
 
 		"net": {
 
+			"Service": [ "js" ],
+
 			"client": {
-				"RoomService": [ "js" ]
+				"Chat":        [ "js" ],
+				"Multiplayer": [ "js" ]
 			},
 
 			"remote": {
-				"RoomService": [ "js" ]
+				"Chat":        [ "js" ],
+				"Multiplayer": [ "js" ]
 			}
 
 		},
