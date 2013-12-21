@@ -107,11 +107,13 @@
 			"Service": [ "js" ],
 
 			"client": {
+				"Session":     [ "js" ],
 				"Chat":        [ "js" ],
 				"Multiplayer": [ "js" ]
 			},
 
 			"remote": {
+				"Session":     [ "js" ],
 				"Chat":        [ "js" ],
 				"Multiplayer": [ "js" ]
 			}

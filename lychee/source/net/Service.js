@@ -84,11 +84,7 @@ lychee.define('lychee.net.Service').includes([
 
 	};
 
-	var _send_broadcast = function(data, service) {
-
-		data    = data instanceof Object    ? data    : null;
-		service = service instanceof Object ? service : null;
-
+	var _broadcast_packet = function(packet) {
 
 		var id = this.id;
 		if (id !== null) {
@@ -105,8 +101,8 @@ lychee.define('lychee.net.Service').includes([
 						if (tunnel !== null) {
 
 							tunnel.send(
-								data,
-								service
+								packet.data,
+								packet.service
 							);
 
 						}
@@ -139,8 +135,8 @@ lychee.define('lychee.net.Service').includes([
 		this.id        = id;
 		this.tunnel    = tunnel;
 
-		this.broadcast = false;
 		this.type      = 0;
+		this.broadcast = false;
 
 
 		if (lychee.debug === true) {
@@ -156,20 +152,31 @@ lychee.define('lychee.net.Service').includes([
 		}
 
 
-		this.setBroadcast(settings.broadcast);
 		this.setType(settings.type);
+		this.setBroadcast(settings.broadcast);
 
 
 		lychee.event.Emitter.call(this);
 
 		settings = null;
 
+
+		this.bind('broadcast', function(packet) {
+
+			var type = this.type;
+			if (type === Class.TYPE.remote) {
+				_broadcast_packet.call(this, packet.data);
+			}
+
+		}, this);
+
 	};
 
 
 	Class.TYPE = {
-		'client':  1,
-		'remote':  2
+		// default: 0 (deactivated)
+		'client': 1,
+		'remote': 2
 	};
 
 
@@ -241,23 +248,13 @@ lychee.define('lychee.net.Service').includes([
 						data:    data,
 						service: service
 					}, {
-						id:     this.id,
-						method: 'broadcast'
+						id:    this.id,
+						event: 'broadcast'
 					});
 
 					return true;
 
 				}
-
-			} else if (type === Class.TYPE.remote) {
-
-				_send_broadcast.call(
-					this,
-					data.data,
-					data.service
-				);
-
-				return true;
 
 			}
 
@@ -268,14 +265,13 @@ lychee.define('lychee.net.Service').includes([
 
 		plug: function() {
 
-			var broadcast = this.broadcast;
-			var type      = this.type;
-			if (
-				   broadcast === true
-				&& type === Class.TYPE.remote
-			) {
+			var type = this.type;
+			if (type === Class.TYPE.remote) {
 
-				_plug_broadcast(this);
+				var broadcast = this.broadcast;
+				if (broadcast === true) {
+					_plug_broadcast(this);
+				}
 
 			}
 
