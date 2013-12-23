@@ -19,16 +19,9 @@ lychee.define('lychee.net.client.Chat').includes([
 		delete settings.user;
 
 
-		settings.type      = lychee.net.Service.TYPE.client;
-		settings.broadcast = true;
-
-
-		lychee.net.Service.call(this, 'chat', client, settings);
+		lychee.net.Service.call(this, 'chat', client, lychee.net.Service.TYPE.client);
 
 		settings = null;
-
-
-		this.sync();
 
 	};
 
@@ -47,6 +40,7 @@ lychee.define('lychee.net.client.Chat').includes([
 			if (room !== null) {
 
 				this.room = room;
+				this.sync();
 
 				return true;
 
@@ -65,6 +59,7 @@ lychee.define('lychee.net.client.Chat').includes([
 			if (user !== null) {
 
 				this.user = user;
+				this.sync();
 
 				return true;
 
@@ -120,10 +115,6 @@ lychee.define('lychee.net.client.Chat').includes([
 						user:    user,
 						room:    room
 					}, null);
-					//{
-					//	id:    this.id,
-					//	event: 'message'
-					//});
 
 				}
 

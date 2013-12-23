@@ -27,6 +27,10 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 		// Media: Video
 		'webm':    { encoding: 'binary', type: 'video/webm'                    },
 
+		// Source: Shaders
+		'fs':      { encoding: 'utf8',   type: 'x-shader/x-fragment'           },
+		'vs':      { encoding: 'utf8',   type: 'x-shader/x-vertex'             },
+
 		// Source: Web
 		'html':    { encoding: 'utf8',   type: 'text/html'                     },
 		'css':     { encoding: 'utf8',   type: 'text/css'                      },

@@ -132,7 +132,7 @@ lychee.define('lychee.net.Remote').tags({
 
 
 			if (lychee.debug === true) {
-				console.log('lychee.net.Remote: Plugged in Service (' + id + ')');
+				console.log('lychee.net.Remote: Plugged service (' + service.id + ')');
 			}
 
 
@@ -150,7 +150,7 @@ lychee.define('lychee.net.Remote').tags({
 		} else {
 
 			if (lychee.debug === true) {
-				console.log('lychee.net.Remote: Unplugged Service (' + id + ')');
+				console.log('lychee.net.Remote: Unplugged service (' + id + ')');
 			}
 
 
@@ -191,7 +191,7 @@ lychee.define('lychee.net.Remote').tags({
 
 
 		if (lychee.debug === true) {
-			console.log('lychee.net.Remote: Unplugged Service (' + id + ')');
+			console.log('lychee.net.Remote: Unplugged service (' + id + ')');
 		}
 
 

@@ -30,17 +30,20 @@ lychee.define('lychee.net.remote.Chat').includes([
 
 				cache = _cache[room] = {
 					messages: [],
-					users:    [ user ]
+					users:    [ user ],
+					tunnels:  [ this.tunnel ]
 				};
 
 			// 2. Join Room
 			} else {
 
-				var users = cache.users;
-				if (users.indexOf(user) === -1) {
-					users.push(user);
-					sync = true;
+				if (cache.users.indexOf(user) === -1) {
+					cache.users.push(user);
+					cache.tunnels.push(this.tunnel);
 				}
+
+
+				_sync_room.call(this, cache);
 
 			}
 
@@ -50,19 +53,12 @@ lychee.define('lychee.net.remote.Chat').includes([
 
 				if (rId === room) continue;
 
-				var users = _cache[rId].users;
-				var index = users.indexOf(user);
+				var index = _cache[rId].users.indexOf(user);
 				if (index !== -1) {
 					_cache[rId].users.splice(index, 1);
-					sync = true;
+					_cache[rId].tunnels.splice(index, 1);
+					_sync_room.call(this, _cache[rId]);
 				}
-
-			}
-
-
-			if (sync === true) {
-
-				// TODO: Synchronize room users across all other members
 
 			}
 
@@ -98,7 +94,31 @@ lychee.define('lychee.net.remote.Chat').includes([
 				});
 
 
-				// TODO: Synchronize room messages across all other members
+				_sync_room.call(this, cache);
+
+			}
+
+		}
+
+	};
+
+	var _sync_room = function(room) {
+
+		var data = {
+			messages: cache.messages,
+			users:    cache.users
+		};
+
+
+		for (var t = 0, tl = cache.tunnels.length; t < tl; t++) {
+
+			var tunnel = cache.tunnels[t];
+			if (tunnel !== null) {
+
+				tunnel.send(data, {
+					id:    this.id,
+					event: 'sync'
+				});
 
 			}
 
@@ -125,11 +145,7 @@ lychee.define('lychee.net.remote.Chat').includes([
 		delete settings.limit;
 
 
-		settings.type      = lychee.net.Service.TYPE.remote;
-		settings.broadcast = true;
-
-
-		lychee.net.Service.call(this, 'chat', remote, settings);
+		lychee.net.Service.call(this, 'chat', remote, lychee.net.Service.TYPE.remote);
 
 
 

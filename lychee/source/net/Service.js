@@ -86,6 +86,9 @@ lychee.define('lychee.net.Service').includes([
 
 	var _broadcast_packet = function(packet) {
 
+		if (packet.service === null) return;
+
+
 		var id = this.id;
 		if (id !== null) {
 
@@ -123,43 +126,42 @@ lychee.define('lychee.net.Service').includes([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(id, tunnel, data) {
+	var Class = function(id, tunnel, type) {
 
 		id     = typeof id === 'string'                                            ? id     : null;
 		tunnel = (typeof tunnel === 'object' && typeof tunnel.send === 'function') ? tunnel : null;
+		type   = _validate_enum(Class.TYPE, type) === true                         ? type   : null;
 
 
-		var settings = lychee.extend({}, data);
-
-
-		this.id        = id;
-		this.tunnel    = tunnel;
-
-		this.type      = 0;
-		this.broadcast = false;
+		this.id     = id;
+		this.tunnel = tunnel;
+		this.type   = type;
 
 
 		if (lychee.debug === true) {
 
 			if (this.id === null) {
-				console.error('lychee.net.Service: Invalid id. It has to be kept in sync with the lychee.net.Client and lychee.net.Remote instance.');
+				console.error('lychee.net.Service: Invalid (string) id. It has to be kept in sync with the lychee.net.Client and lychee.net.Remote instance.');
 			}
 
 			if (this.tunnel === null) {
-				console.error('lychee.net.Service: Invalid tunnel. It has to be either a lychee.net.Client or lychee.net.Remote instance.');
+				console.error('lychee.net.Service: Invalid (lychee.net.Client || lychee.net.Remote) tunnel.');
+			}
+
+			if (this.type === null) {
+				console.error('lychee.net.Service: Invalid (lychee.net.Service.TYPE) type.');
 			}
 
 		}
 
 
-		this.setType(settings.type);
-		this.setBroadcast(settings.broadcast);
-
-
 		lychee.event.Emitter.call(this);
 
-		settings = null;
 
+
+		/*
+		 * INITIALIZATION
+		 */
 
 		this.bind('broadcast', function(packet) {
 
@@ -188,8 +190,6 @@ lychee.define('lychee.net.Service').includes([
 
 		deserialize: function(blob) {
 
-			// TODO: Implement serialize() method for lychee.net.Client and lychee.net.Remote
-
 			if (blob.tunnel instanceof Object) {
 				this.tunnel = lychee.deserialize(blob.tunnel);
 			}
@@ -198,21 +198,21 @@ lychee.define('lychee.net.Service').includes([
 
 		serialize: function() {
 
-			var settings = {};
-
-
-			if (this.broadcast !== false)            settings.broadcast = this.broadcast;
-			if (this.type !== Class.TYPE['default']) settings.type      = this.type;
-
+			var id     = null;
+			var tunnel = null;
+			var type   = null;
 
 			var blob = {};
 
+
+			if (this.id !== null)     id = this.id;
 			if (this.tunnel !== null) blob.tunnel = this.tunnel.serialize();
+			if (this.type !== null)   type = this.type;
 
 
 			return {
 				'constructor': 'lychee.net.Service',
-				'arguments':   [ this.id, null, settings ],
+				'arguments':   [ id, tunnel, type ],
 				'blob':        blob
 			};
 
@@ -233,7 +233,6 @@ lychee.define('lychee.net.Service').includes([
 			if (
 				   data === null
 				|| this.id === null
-				|| this.broadcast === false
 			) {
 				return false;
 			}
@@ -256,6 +255,10 @@ lychee.define('lychee.net.Service').includes([
 
 				}
 
+			} else if (type === Class.TYPE.remote) {
+
+				// TODO: Evaluate if broadcast shall be received by own remote or others only
+
 			}
 
 
@@ -267,49 +270,17 @@ lychee.define('lychee.net.Service').includes([
 
 			var type = this.type;
 			if (type === Class.TYPE.remote) {
-
-				var broadcast = this.broadcast;
-				if (broadcast === true) {
-					_plug_broadcast(this);
-				}
-
+				_plug_broadcast(this);
 			}
 
 		},
 
 		unplug: function() {
 
-			_unplug_broadcast(this);
-
-		},
-
-		setBroadcast: function(broadcast) {
-
-			if (broadcast === true || broadcast === false) {
-
-				this.broadcast = broadcast;
-
-				return true;
-
+			var type = this.type;
+			if (type === Class.TYPE.remote) {
+				_unplug_broadcast(this);
 			}
-
-
-			return false;
-
-		},
-
-		setType: function(type) {
-
-			if (_validate_enum(Class.TYPE, type) === true) {
-
-				this.type = type;
-
-				return true;
-
-			}
-
-
-			return false;
 
 		}
 
