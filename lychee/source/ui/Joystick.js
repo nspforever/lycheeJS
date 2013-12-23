@@ -95,6 +95,8 @@ lychee.define('lychee.ui.Joystick').includes([
 		 * ENTITY API
 		 */
 
+		// deserialize: function(blob) { },
+
 		serialize: function() {
 
 			var data = lychee.ui.Entity.prototype.serialize.call(this);

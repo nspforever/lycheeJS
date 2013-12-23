@@ -235,6 +235,8 @@ lychee.define('lychee.ui.Input').includes([
 		 * ENTITY API
 		 */
 
+		// deserialize: function(blob) {},
+
 		serialize: function() {
 
 			var data = lychee.ui.Entity.prototype.serialize.call(this);

@@ -95,11 +95,7 @@ lychee.define('lychee.ui.Select').includes([
 		 * ENTITY API
 		 */
 
-		deserialize: function(blob) {
-
-			this.setFont(lychee.deserialize(blob.font));
-
-		},
+		// deserialize: function(blob) { },
 
 		serialize: function() {
 
@@ -107,15 +103,12 @@ lychee.define('lychee.ui.Select').includes([
 			data['constructor'] = 'lyche.ui.Select';
 
 			var settings = data['arguments'][0];
-			var blob     = data['blob'] = (data['blob'] || {});
 
 
+			if (this.width !== 140)        settings.width   = this.width;
+			if (this.font !== null)        settings.font    = this.font.serialize();
 			if (this.options.length !== 0) settings.options = [].slice.call(this.options, 0);
 			if (this.value !== '')         settings.value   = this.value;
-			if (this.width !== 140)        settings.width   = this.width;
-
-
-			if (this.font !== null) blob.font = this.font.serialize();
 
 
 			return data;

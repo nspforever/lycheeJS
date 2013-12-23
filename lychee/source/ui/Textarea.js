@@ -116,6 +116,8 @@ lychee.define('lychee.ui.Textarea').includes([
 		 * ENTITY API
 		 */
 
+		// deserialize: function(blob) { },
+
 		serialize: function() {
 
 			var data = lychee.ui.Entity.prototype.serialize.call(this);
@@ -123,12 +125,10 @@ lychee.define('lychee.ui.Textarea').includes([
 
 			var settings = data['arguments'][0];
 
-
-			if (this.font !== null) settings.font  = this.font.serialize();
-			if (this.value !== '')  settings.value = this.value;
-
-			if (this.width !== 240)  settings.width  = this.width;
-			if (this.height !== 144) settings.height = this.height;
+			if (this.width !== 140)  settings.width  = this.width;
+			if (this.height !== 140) settings.height = this.height;
+			if (this.font !== null)  settings.font   = this.font.serialize();
+			if (this.value !== '')   settings.value  = this.value;
 
 
 			return data;

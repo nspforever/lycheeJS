@@ -81,6 +81,8 @@ lychee.define('lychee.ui.Connector').exports(function(lychee, global) {
 		 * ENTITY API
 		 */
 
+		// deserialize: function(blob) { },
+
 		serialize: function() {
 
 			var settings = {};

@@ -124,7 +124,6 @@
 			"Button":    [ "js" ],
 			"Connector": [ "js" ],
 			"Entity":    [ "js" ],
-			"Font":      [ "js" ],
 			"Input":     [ "js" ],
 			"Joystick":  [ "js" ],
 			"Layer":     [ "js" ],

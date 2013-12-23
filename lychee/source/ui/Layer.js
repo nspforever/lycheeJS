@@ -90,8 +90,6 @@ lychee.define('lychee.ui.Layer').includes([
 			var blob     = data['blob'] = (data['blob'] || {});
 
 
-			if (this.visible !== true) settings.visible = this.visible;
-
 			if (
 				   this.offset.x !== 0
 				|| this.offset.y !== 0
@@ -105,6 +103,9 @@ lychee.define('lychee.ui.Layer').includes([
 				if (this.offset.z !== 0) settings.offset.z = this.offset.z;
 
 			}
+
+			if (this.overflow !== true) settings.overflow = this.overflow;
+			if (this.visible !== true)  settings.visible  = this.visible;
 
 
 			var entities = [];

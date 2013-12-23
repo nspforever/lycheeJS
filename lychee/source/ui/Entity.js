@@ -120,9 +120,7 @@ lychee.define('lychee.ui.Entity').includes([
 		 * ENTITY API
 		 */
 
-		// No Recursion of other instances contained,
-		// so there's no deserialize() method!
-		// deserialize: function(blob) {},
+		// deserialize: function(blob) { },
 
 		serialize: function() {
 

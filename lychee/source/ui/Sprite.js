@@ -42,12 +42,17 @@ lychee.define('lychee.ui.Sprite').includes([
 		 * ENTITY API
 		 */
 
+		// deserialize: function(blob) { },
+
 		serialize: function() {
 
 			var data = lychee.ui.Entity.prototype.serialize.call(this);
 			data['constructor'] = 'lyche.game.Sprite';
 
 			var settings = data['arguments'][0];
+
+
+			if (this.texture !== null) settings.texture = this.texture.serialize();
 
 
 			if (this.__animation.active === true) {
@@ -57,7 +62,7 @@ lychee.define('lychee.ui.Sprite').includes([
 				if (this.__animation.duration !== 1000) settings.animation.duration = this.__animation.duration;
 				if (this.frame !== 0)                   settings.animation.frame    = this.frame;
 				if (this.__animation.frames !== 25)     settings.animation.frames   = this.__animation.frames;
-				if (this.__animation.loop !== false)    settings.animation.loop     = true;
+				if (this.__animation.loop !== false)    settings.animation.loop     = this.__animation.loop;
 
 			}
 
