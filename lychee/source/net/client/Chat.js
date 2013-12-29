@@ -85,11 +85,17 @@ lychee.define('lychee.net.client.Chat').includes([
 				&& room !== null
 			) {
 
-				this.broadcast({
-					type: 'sync',
-					user: user,
-					room: room
-				}, null);
+				if (this.tunnel !== null) {
+
+					this.tunnel.send({
+						user: user,
+						room: room
+					}, {
+						id:    this.id,
+						event: 'sync'
+					});
+
+				}
 
 			}
 
@@ -109,12 +115,18 @@ lychee.define('lychee.net.client.Chat').includes([
 					&& room !== null
 				) {
 
-					this.broadcast({
-						type:    'message',
-						message: message,
-						user:    user,
-						room:    room
-					}, null);
+					if (this.tunnel !== null) {
+
+						this.tunnel.send({
+							message: message,
+							user:    user,
+							room:    room
+						}, {
+							id:    this.id,
+							event: 'message'
+						});
+
+					}
 
 				}
 

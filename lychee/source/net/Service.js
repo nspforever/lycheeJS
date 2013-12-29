@@ -266,6 +266,30 @@ lychee.define('lychee.net.Service').includes([
 
 		},
 
+		report: function(message, blob) {
+
+			message = typeof message === 'string' ? message : null;
+			blob    = blob instanceof Object      ? blob    : null;
+
+
+			if (message !== null) {
+
+				if (this.tunnel !== null) {
+
+					this.tunnel.send({
+						message: message,
+						blob:    blob
+					}, {
+						id:    this.id,
+						event: 'error'
+					});
+
+				}
+
+			}
+
+		},
+
 		plug: function() {
 
 			var type = this.type;

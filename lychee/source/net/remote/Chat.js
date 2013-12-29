@@ -9,9 +9,7 @@ lychee.define('lychee.net.remote.Chat').includes([
 
 	var _cache = {};
 
-	var _on_sync = function(packet) {
-
-		var data = packet.data;
+	var _on_sync = function(data) {
 
 		var user = data.user || null;
 		var room = data.room || null;
@@ -66,9 +64,7 @@ lychee.define('lychee.net.remote.Chat').includes([
 
 	};
 
-	var _on_message = function(packet) {
-
-		var data = packet.data;
+	var _on_message = function(data) {
 
 		var user    = data.user || null;
 		var room    = data.room || null;
@@ -105,14 +101,14 @@ lychee.define('lychee.net.remote.Chat').includes([
 	var _sync_room = function(room) {
 
 		var data = {
-			messages: cache.messages,
-			users:    cache.users
+			messages: room.messages,
+			users:    room.users
 		};
 
 
-		for (var t = 0, tl = cache.tunnels.length; t < tl; t++) {
+		for (var t = 0, tl = room.tunnels.length; t < tl; t++) {
 
-			var tunnel = cache.tunnels[t];
+			var tunnel = room.tunnels[t];
 			if (tunnel !== null) {
 
 				tunnel.send(data, {
@@ -153,21 +149,8 @@ lychee.define('lychee.net.remote.Chat').includes([
 		 * INITIALIZATION
 		 */
 
-		this.bind('broadcast', function(packet) {
-
-			var type = this.type;
-			if (type === Class.TYPE.remote) {
-
-				var data = packet.data;
-				if (data.type === 'sync') {
-					_on_sync.call(this, packet);
-				} else if (data.type === 'message') {
-					_on_message.call(this, packet);
-				}
-
-			}
-
-		}, this);
+		this.bind('sync',    _on_sync,    this);
+		this.bind('message', _on_message, this);
 
 
 		settings = null;
