@@ -399,6 +399,58 @@ if (typeof global !== 'undefined') {
 	};
 
 
+	lychee.validate = function(template, instance) {
+
+		// 1. Enum validation
+		if (
+			   template instanceof Object
+			&& typeof instance === 'number'
+		) {
+
+			var valid = false;
+
+			for (var value in template) {
+
+				if (instance === template[value]) {
+					valid = true;
+					break;
+				}
+
+			}
+
+
+			return valid;
+
+
+		// 2. Interface validation
+		} else if (
+			   template instanceof Function
+			&& template.prototype instanceof Object
+			&& instance instanceof Object
+		) {
+
+			var valid = true;
+
+			for (var method in template.prototype) {
+
+				if (typeof template.prototype[method] !== typeof instance[method]) {
+					valid = false;
+					break;
+				}
+
+			}
+
+
+			return valid;
+
+		}
+
+
+		return false;
+
+	};
+
+
 	if (typeof lychee.build !== 'function') {
 
 		lychee.build = function(callback, scope) {

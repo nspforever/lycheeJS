@@ -9,24 +9,19 @@ lychee.define('lychee.net.Service').includes([
 
 	var _services = {};
 
-	var _validate_enum = function(enumobject, value) {
+	var _validate_tunnel = function(tunnel, type) {
 
-		if (typeof value !== 'number') return false;
+		if (type === null) return false;
 
 
-		var found = false;
-
-		for (var id in enumobject) {
-
-			if (value === enumobject[id]) {
-				found = true;
-				break;
-			}
-
+		if (type === Class.TYPE.client) {
+			return lychee.validate(lychee.net.Client, tunnel);
+		} else if (type === Class.TYPE.remote) {
+			return lychee.validate(lychee.net.Remote, tunnel);
 		}
 
 
-		return found;
+		return false;
 
 	};
 
@@ -84,42 +79,6 @@ lychee.define('lychee.net.Service').includes([
 
 	};
 
-	var _broadcast_packet = function(packet) {
-
-		if (packet.service === null) return;
-
-
-		var id = this.id;
-		if (id !== null) {
-
-			var cache = _services[id] || null;
-			if (cache !== null) {
-
-				for (var c = 0, cl = cache.length; c < cl; c++) {
-
-					var service = cache[c];
-					if (service !== this) {
-
-						var tunnel = service.tunnel;
-						if (tunnel !== null) {
-
-							tunnel.send(
-								packet.data,
-								packet.service
-							);
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-	};
-
 
 
 	/*
@@ -128,14 +87,17 @@ lychee.define('lychee.net.Service').includes([
 
 	var Class = function(id, tunnel, type) {
 
-		id     = typeof id === 'string'                                            ? id     : null;
-		tunnel = (typeof tunnel === 'object' && typeof tunnel.send === 'function') ? tunnel : null;
-		type   = _validate_enum(Class.TYPE, type) === true                         ? type   : null;
+		id     = typeof id === 'string'                     ? id   : null;
+		type   = lychee.validate(Class.TYPE, type) === true ? type : null;
+
+		// tunnel needs to be validated after type, due to inclusion dependencies
+		tunnel = _validate_tunnel(tunnel, type) === true   ? tunnel : null;
 
 
-		this.id     = id;
-		this.tunnel = tunnel;
-		this.type   = type;
+		this.id        = id;
+		this.multicast = [];
+		this.tunnel    = tunnel;
+		this.type      = type;
 
 
 		if (lychee.debug === true) {
@@ -156,21 +118,6 @@ lychee.define('lychee.net.Service').includes([
 
 
 		lychee.event.Emitter.call(this);
-
-
-
-		/*
-		 * INITIALIZATION
-		 */
-
-		this.bind('broadcast', function(packet) {
-
-			var type = this.type;
-			if (type === Class.TYPE.remote) {
-				_broadcast_packet.call(this, packet.data);
-			}
-
-		}, this);
 
 	};
 
@@ -224,6 +171,73 @@ lychee.define('lychee.net.Service').includes([
 		 * CUSTOM API
 		 */
 
+		multicast: function(data, service) {
+
+			data    = data instanceof Object    ? data    : null;
+			service = service instanceof Object ? service : null;
+
+
+			if (data === null) {
+				return false;
+			}
+
+
+			var type = this.type;
+			if (type === Class.TYPE.client) {
+
+				if (service === null) {
+
+					service = {
+						id:    this.id,
+						event: 'multicast'
+					};
+
+				}
+
+
+				if (this.tunnel !== null) {
+
+					this.tunnel.send({
+						data:    data,
+						service: service
+					}, {
+						id:     this.id,
+						method: 'multicast'
+					});
+
+					return true;
+
+				}
+
+			} else if (type === Class.TYPE.remote) {
+
+				if (data.service !== null) {
+
+					for (var m = 0, ml = this.multicast.length; m < ml; m++) {
+
+						var tunnel = this.multicast[m];
+						if (tunnel !== this.tunnel) {
+
+							tunnel.send(
+								data.data,
+								data.service
+							);
+
+						}
+
+					}
+
+					return true;
+
+				}
+
+			}
+
+
+			return false;
+
+		},
+
 		broadcast: function(data, service) {
 
 			data    = data instanceof Object    ? data    : null;
@@ -241,14 +255,24 @@ lychee.define('lychee.net.Service').includes([
 			var type = this.type;
 			if (type === Class.TYPE.client) {
 
+				if (service === null) {
+
+					service = {
+						id:    this.id,
+						event: 'broadcast'
+					};
+
+				}
+
+
 				if (this.tunnel !== null) {
 
 					this.tunnel.send({
 						data:    data,
 						service: service
 					}, {
-						id:    this.id,
-						event: 'broadcast'
+						id:     this.id,
+						method: 'broadcast'
 					});
 
 					return true;
@@ -257,7 +281,30 @@ lychee.define('lychee.net.Service').includes([
 
 			} else if (type === Class.TYPE.remote) {
 
-				// TODO: Evaluate if broadcast shall be received by own remote or others only
+				if (data.service !== null) {
+
+					var broadcast = _services[this.id] || null;
+					if (broadcast !== null) {
+
+						for (var b = 0, bl = broadcast.length; b < bl; b++) {
+
+							var tunnel = broadcast[b].tunnel;
+							if (tunnel !== this.tunnel) {
+
+								tunnel.send(
+									data.data,
+									data.service
+								);
+
+							}
+
+						}
+
+						return true;
+
+					}
+
+				}
 
 			}
 
@@ -304,6 +351,24 @@ lychee.define('lychee.net.Service').includes([
 			var type = this.type;
 			if (type === Class.TYPE.remote) {
 				_unplug_broadcast(this);
+				_unplug_multicast(this);
+			}
+
+		},
+
+		setMulticast: function(multicast) {
+
+			if (multicast instanceof Array) {
+
+				var filtered = [];
+
+				for (var m = 0, ml = multicast.length; m < ml; m++) {
+
+					if (type === Class.TYPE.remote) {
+					}
+
+				}
+
 			}
 
 		}

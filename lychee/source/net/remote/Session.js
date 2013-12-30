@@ -18,12 +18,14 @@ lychee.define('lychee.net.remote.Session').includes([
 			var cache = _cache[sid] || null;
 			if (cache === null) {
 
-				var limit = typeof data.limit === 'number' ? data.limit : 4;
+				var autorun = data.autorun === false         ? false      : true;
+				var limit   = typeof data.limit === 'number' ? data.limit : 4;
 
 				cache = _cache[sid] = {
 					sid:     sid,
 					limit:   limit,
 					tunnels: [ this.tunnel ],
+					autorun: autorun,
 					running: false
 				};
 
@@ -77,7 +79,10 @@ lychee.define('lychee.net.remote.Session').includes([
 
 				var index = cache.tunnels.indexOf(this.tunnel);
 				if (index !== -1) {
+
 					cache.tunnels.splice(index, 1);
+					this.session = null;
+
 				}
 
 
@@ -136,6 +141,9 @@ lychee.define('lychee.net.remote.Session').includes([
 			}
 
 
+			this.session = session;
+
+
 			for (var t = 0, tl = session.tunnels.length; t < tl; t++) {
 
 				var tunnel = session.tunnels[t];
@@ -167,6 +175,9 @@ lychee.define('lychee.net.remote.Session').includes([
 		var settings = lychee.extend({}, data);
 
 
+		this.session = null;
+
+
 		lychee.net.Service.call(this, 'session', remote, lychee.net.Service.TYPE.remote);
 
 
@@ -178,6 +189,14 @@ lychee.define('lychee.net.remote.Session').includes([
 		this.bind('join',  _on_join,  this);
 		this.bind('leave', _on_leave, this);
 
+		this.bind('multicast', function(data) {
+
+			if (this.session !== null) {
+
+
+			}
+
+		}, this);
 
 		settings = null;
 
@@ -198,11 +217,7 @@ lychee.define('lychee.net.remote.Session').includes([
 				var cache = _cache[sid];
 				var index = cache.tunnels.indexOf(this.tunnel);
 				if (index !== -1) {
-
-					_on_leave.call(this, {
-						sid: sid
-					});
-
+					_on_leave.call(this, cache);
 				}
 
 			}

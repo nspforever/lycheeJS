@@ -3,35 +3,12 @@ lychee.define('lychee.ui.Entity').includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
 
-	var _default_state  = 'default';
-	var _default_states = { 'default': null, 'active': null };
-
-
-
 	/*
 	 * HELPERS
 	 */
 
-	var _validate_enum = function(enumobject, value) {
-
-		if (typeof value !== 'number') return false;
-
-
-		var found = false;
-
-		for (var id in enumobject) {
-
-			if (value === enumobject[id]) {
-				found = true;
-				break;
-			}
-
-		}
-
-
-		return found;
-
-	};
+	var _default_state  = 'default';
+	var _default_states = { 'default': null, 'active': null };
 
 
 
@@ -287,7 +264,7 @@ lychee.define('lychee.ui.Entity').includes([
 
 		setShape: function(shape) {
 
-			if (_validate_enum(Class.SHAPE, shape) === true) {
+			if (lychee.validate(Class.SHAPE, shape) === true) {
 
 				this.shape = shape;
 
@@ -344,8 +321,8 @@ lychee.define('lychee.ui.Entity').includes([
 
 				var tween = this.__tween;
 
-				tween.type     = _validate_enum(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
-				tween.duration = typeof settings.duration === 'number'      ? settings.duration : 1000;
+				tween.type     = lychee.validate(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
+				tween.duration = typeof settings.duration === 'number'       ? settings.duration : 1000;
 
 				if (settings.position instanceof Object) {
 					tween.toposition.x = typeof settings.position.x === 'number' ? settings.position.x : this.position.x;

@@ -1,39 +1,9 @@
 
 (function(lychee, global) {
 
-	// Asynchronous loading, this file
-	// can be ready before lycheeJS core.
-
-	if (lychee === undefined) {
-		global.lychee = lychee = {};
-	}
-
-
-
 	/*
 	 * HELPERS
 	 */
-
-	var _validate_enum = function(enumobject, value) {
-
-		if (typeof value !== 'number') return false;
-
-
-		var found = false;
-
-		for (var id in enumobject) {
-
-			if (value === enumobject[id]) {
-				found = true;
-				break;
-			}
-
-		}
-
-
-		return found;
-
-	};
 
 	var _requires_load = function(reference) {
 
@@ -994,7 +964,7 @@
 
 		setMode: function(mode) {
 
-			if (_validate_enum(lychee.Builder.MODE, mode) === true) {
+			if (lychee.validate(lychee.Builder.MODE, mode) === true) {
 
 				this.mode = mode;
 

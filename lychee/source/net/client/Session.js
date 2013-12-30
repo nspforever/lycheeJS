@@ -20,13 +20,16 @@ lychee.define('lychee.net.client.Session').includes([
 		var settings = lychee.extend({}, data);
 
 
-		this.sid   = 'session-' + _id++;
-		this.limit = 4;
+		this.autorun = true;
+		this.sid     = 'session-' + _id++;
+		this.limit   = 4;
 
 
+		this.setAutorun(settings.autorun);
 		this.setSid(settings.sid);
 		this.setLimit(settings.limit);
 
+		delete settings.autorun;
 		delete settings.sid;
 		delete settings.limit;
 
@@ -93,6 +96,21 @@ lychee.define('lychee.net.client.Session').includes([
 		// plug: function() { },
 		// unplug: function() { },
 
+		setAutorun: function(autorun) {
+
+			if (autorun === true || autorun === false) {
+
+				this.autorun = autorun;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
 		setSid: function(sid) {
 
 			sid = typeof sid === 'string' ? sid : null;
@@ -137,16 +155,14 @@ lychee.define('lychee.net.client.Session').includes([
 
 		join: function() {
 
-			var sid = this.sid;
-			if (sid !== null) {
-
-				var limit = this.limit;
+			if (this.sid !== null) {
 
 				if (this.tunnel !== null) {
 
 					this.tunnel.send({
-						sid:   sid,
-						limit: limit
+						autorun: this.autorun,
+						sid:     this.sid,
+						limit:   this.limit
 					}, {
 						id:    this.id,
 						event: 'join'
@@ -160,13 +176,12 @@ lychee.define('lychee.net.client.Session').includes([
 
 		leave: function() {
 
-			var sid = this.sid;
-			if (sid !== null) {
+			if (this.sid !== null) {
 
 				if (this.tunnel !== null) {
 
 					this.tunnel.send({
-						sid:   sid
+						sid:   this.sid
 					}, {
 						id:    this.id,
 						event: 'leave'

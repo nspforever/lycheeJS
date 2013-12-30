@@ -3,37 +3,6 @@ lychee.define('lychee.ui.Input').includes([
 	'lychee.ui.Entity'
 ]).exports(function(lychee, global) {
 
-	/*
-	 * HELPERS
-	 */
-
-	var _validate_enum = function(enumobject, value) {
-
-		if (typeof value !== 'number') return false;
-
-
-		var found = false;
-
-		for (var id in enumobject) {
-
-			if (value === enumobject[id]) {
-				found = true;
-				break;
-			}
-
-		}
-
-
-		return found;
-
-	};
-
-
-
-	/*
-	 * IMPLEMENTATION
-	 */
-
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
@@ -441,7 +410,7 @@ lychee.define('lychee.ui.Input').includes([
 
 		setType: function(type) {
 
-			if (_validate_enum(Class.TYPE, type) === true) {
+			if (lychee.validate(Class.TYPE, type) === true) {
 
 				this.type = type;
 

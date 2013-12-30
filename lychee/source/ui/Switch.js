@@ -7,27 +7,6 @@ lychee.define('lychee.ui.Switch').includes([
 	 * HELPERS
 	 */
 
-	var _validate_enum = function(enumobject, value) {
-
-		if (typeof value !== 'number') return false;
-
-
-		var found = false;
-
-		for (var id in enumobject) {
-
-			if (value === enumobject[id]) {
-				found = true;
-				break;
-			}
-
-		}
-
-
-		return found;
-
-	};
-
 	var _refresh = function(x, y) {
 
 		var type   = this.type;
@@ -367,7 +346,7 @@ lychee.define('lychee.ui.Switch').includes([
 
 		setType: function(type) {
 
-			if (_validate_enum(Class.TYPE, type) === true) {
+			if (lychee.validate(Class.TYPE, type) === true) {
 
 				if (type === Class.TYPE.horizontal) {
 					this.width  = this.__width;
