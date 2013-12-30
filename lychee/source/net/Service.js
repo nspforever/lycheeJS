@@ -350,8 +350,11 @@ lychee.define('lychee.net.Service').includes([
 
 			var type = this.type;
 			if (type === Class.TYPE.remote) {
+
 				_unplug_broadcast(this);
-				_unplug_multicast(this);
+
+				this.setMulticast([]);
+
 			}
 
 		},
@@ -361,15 +364,26 @@ lychee.define('lychee.net.Service').includes([
 			if (multicast instanceof Array) {
 
 				var filtered = [];
+				var type     = this.type;
 
 				for (var m = 0, ml = multicast.length; m < ml; m++) {
 
-					if (type === Class.TYPE.remote) {
+					if (_validate_tunnel(multicast[m], type) === true) {
+						filtered.push(multicast[m]);
 					}
 
 				}
 
+
+				this.multicast = filtered;
+
+
+				return true;
+
 			}
+
+
+			return false;
 
 		}
 
