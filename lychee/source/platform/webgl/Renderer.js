@@ -149,7 +149,7 @@ console.log(gl.getShaderInfoLog(vs));
 
 			gl.bindTexture(gl.TEXTURE_2D, texture._gl);
 
-			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+//			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.buffer);
@@ -579,7 +579,7 @@ console.log(gl.getShaderInfoLog(vs));
 
 				gl.useProgram(program);
 				// TODO: Evaluate if gl.activeTexture() usage is correct
-				gl.activeTexture(gl.TEXTURE0);
+//				gl.activeTexture(gl.TEXTURE0);
 				gl.bindTexture(gl.TEXTURE_2D, texture._gl);
 
 
@@ -602,6 +602,8 @@ console.log(gl.getShaderInfoLog(vs));
 					x2, y2,
 					x1, y2
 				]), gl.STATIC_DRAW);
+				gl.vertexAttribPointer(program._aPosition, 2, gl.FLOAT, false, 0, 0);
+
 
 				gl.bindBuffer(gl.ARRAY_BUFFER, texture);
 				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
@@ -610,11 +612,13 @@ console.log(gl.getShaderInfoLog(vs));
 					tx2, ty2,
 					tx1, ty2
 				]), gl.STATIC_DRAW);
-
-//				gl.bindBuffer(gl.ARRAY_BUFFER, bPosition);
-				gl.vertexAttribPointer(program._aPosition, 2, gl.FLOAT, false, 0, 0);
 				gl.vertexAttribPointer(program._aTexture,  2, gl.FLOAT, false, 0, 0);
-				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 2);
+
+
+				gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+
+				gl.deleteBuffer(position);
+				gl.deleteBuffer(texture);
 
 /*
 				if (lychee.debug === true) {
