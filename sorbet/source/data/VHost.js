@@ -8,9 +8,10 @@ lychee.define('sorbet.data.VHost').requires([
 
 	var _id = 0;
 
-	var Class = function(id, config) {
+	var Class = function(main, id, config) {
 
 		this.id   = id || ('vhost-' + _id++);
+		this.main = main;
 		this.root = config.root;
 
 		this.fs = new _filesystem(this.root);
@@ -73,6 +74,63 @@ lychee.define('sorbet.data.VHost').requires([
 
 
 			return redirect;
+
+		},
+
+		getProjects: function() {
+
+			var projects = [];
+
+			var files = this.fs.filter(
+				this.root,
+				'package.json',
+				sorbet.data.Filesystem.TYPE.file
+			);
+
+
+			for (var f = 0, fl = files.length; f < fl; f++) {
+
+				var abspackage = files[f];
+
+
+				var tmp = abspackage.split('/');
+				tmp.pop();
+				tmp.pop();
+
+				var absroot = tmp.join('/');
+				var title   = tmp.pop();
+
+				var relroot    = './' + absroot.substr(this.main.root.length + 1);
+				var relpackage = './' + abspackage.substr(this.main.root.length + 1);
+
+
+				var server = null;
+
+				var server_process = this.main.servers.get(absroot);
+				if (server_process !== null) {
+
+					server = {
+						host: server_process.host,
+						port: server_process.port
+					};
+
+				}
+
+				projects.push({
+					'title':   title,
+					'root':    [ absroot,    relroot    ],
+					'package': [ abspackage, relpackage ],
+					'server':  server,
+					'init': [
+						this.fs.isFile(absroot + '/init.js'),
+						this.fs.isFile(absroot + '/init-server.js')
+					]
+				});
+
+			}
+
+
+			return projects;
 
 		}
 

@@ -29,8 +29,8 @@ lychee.tag({
 
 lychee.build(function(lychee, global) {
 
-	var port = process.argv[2] || '8181';
-	var host = process.argv[3] || 'null';
+	var host = process.argv[2] || 'null';
+	var port = process.argv[3] || '8181';
 
 
 	if (host === 'null') host = null;

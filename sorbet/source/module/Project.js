@@ -6,7 +6,8 @@ lychee.define('sorbet.module.Project').requires([
 
 	var child_process = require('child_process');
 
-	var _project = sorbet.data.Project;
+	var _environment = lychee.getEnvironment();
+	var _project     = sorbet.data.Project;
 
 
 
@@ -27,54 +28,6 @@ lychee.define('sorbet.module.Project').requires([
 		this.database = database;
 
 	};
-
-	var _get_projects = function(vhost, folder, projects) {
-
-		folder   = typeof folder === 'string' ? folder   : '';
-		projects = projects instanceof Array  ? projects : [];
-
-
-		var fs   = vhost.fs;
-		var root = vhost.root;
-
-		var files = fs.filter(
-			root + folder,
-			'package.json',
-			sorbet.data.Filesystem.TYPE.file
-		);
-
-
-		for (var f = 0, fl = files.length; f < fl; f++) {
-
-			var resolved = files[f];
-
-
-			var tmp = resolved.split('/');
-			tmp.pop();
-			tmp.pop();
-
-			var projectroot  = tmp.join('/');
-			var resolvedroot = projectroot;
-			var title        = tmp.pop();
-
-			// TODO: Verify that this is correct behaviour for all VHosts
-			projectroot = projectroot.substr(this.main.root.length + 1);
-			projectroot = '../' + projectroot;
-
-			projects.push({
-				vhost:        vhost,
-				root:         projectroot,
-				resolvedroot: resolvedroot,
-				resolved:     resolved,
-				title:        title
-			});
-
-		}
-
-	};
-
-
-	var _environment = lychee.getEnvironment();
 
 	var _build_project = function(project) {
 
@@ -142,34 +95,27 @@ console.log('SANDBOX BUILD READY!');
 		_init_database.call(this);
 
 
-		var buffer = [];
-
-		_get_projects.call(this, this.main, '/lychee', buffer);
-
-		if (buffer[0] != null) {
-			this.queue.add(buffer[0]);
-		}
-
-
-// TODO: remove this return
+// TODO: Implement _build_project method to correctly build tag-based prebuilds of projects
 return;
 
 		var vhosts = this.main.vhosts.values();
 		for (var v = 0, vl = vhosts.length; v < vl; v++) {
 
-			var vhost    = vhosts[v];
-			var projects = [];
+			var vhost = vhosts[v];
 
 			if (lychee.debug === true) {
 				console.log('sorbet.module.Project: Booting VHost "' + vhost.id + '"');
 			}
 
 
-			_get_projects.call(this, vhost, '/game',     projects);
-			_get_projects.call(this, vhost, '/external', projects);
-
+			var projects = vhost.getProjects();
 			for (var p = 0, pl = projects.length; p < pl; p++) {
-				this.queue.add(projects[p]);
+
+				var project = projects[p];
+				if (project.init[0] === true) {
+					this.queue.add(project);
+				}
+
 			}
 
 		}

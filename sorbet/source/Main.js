@@ -131,7 +131,7 @@ lychee.define('sorbet.Main').requires([
 
 				if (name !== null) {
 
-					var vhost = new _vhost(name, config);
+					var vhost = new _vhost(this, name, config);
 
 					this.vhosts.set(name, vhost);
 
