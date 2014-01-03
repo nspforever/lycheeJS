@@ -3,7 +3,10 @@ lychee.define('lychee.net.client.Chat').includes([
 	'lychee.net.Service'
 ]).exports(function(lychee, global, attachments) {
 
-	var Class = function(client, data) {
+	var Class = function(id, client, data) {
+
+		id = typeof id === 'string' ? id : 'chat';
+
 
 		var settings = lychee.extend({}, data);
 
@@ -19,7 +22,7 @@ lychee.define('lychee.net.client.Chat').includes([
 		delete settings.user;
 
 
-		lychee.net.Service.call(this, 'chat', client, lychee.net.Service.TYPE.client);
+		lychee.net.Service.call(this, id, client, lychee.net.Service.TYPE.client);
 
 		settings = null;
 
@@ -27,50 +30,6 @@ lychee.define('lychee.net.client.Chat').includes([
 
 
 	Class.prototype = {
-
-		/*
-		 * SERVICE API
-		 */
-
-		setRoom: function(room) {
-
-			room = typeof room === 'number' ? room : null;
-
-
-			if (room !== null) {
-
-				this.room = room;
-				this.sync();
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-		setUser: function(user) {
-
-			user = typeof user === 'string' ? user : null;
-
-
-			if (user !== null) {
-
-				this.user = user;
-				this.sync();
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-
 
 		/*
 		 * CUSTOM API
@@ -131,6 +90,44 @@ lychee.define('lychee.net.client.Chat').includes([
 				}
 
 			}
+
+		},
+
+		setRoom: function(room) {
+
+			room = typeof room === 'number' ? room : null;
+
+
+			if (room !== null) {
+
+				this.room = room;
+				this.sync();
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setUser: function(user) {
+
+			user = typeof user === 'string' ? user : null;
+
+
+			if (user !== null) {
+
+				this.user = user;
+				this.sync();
+
+				return true;
+
+			}
+
+
+			return false;
 
 		}
 

@@ -173,7 +173,10 @@ lychee.define('lychee.net.remote.Session').includes([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(remote, data) {
+	var Class = function(id, remote, data) {
+
+		id = typeof id === 'string' ? id : 'session';
+
 
 		var settings = lychee.extend({}, data);
 
@@ -181,7 +184,7 @@ lychee.define('lychee.net.remote.Session').includes([
 		this.session = null;
 
 
-		lychee.net.Service.call(this, 'session', remote, lychee.net.Service.TYPE.remote);
+		lychee.net.Service.call(this, id, remote, lychee.net.Service.TYPE.remote);
 
 
 
@@ -192,24 +195,7 @@ lychee.define('lychee.net.remote.Session').includes([
 		this.bind('join',  _on_join,  this);
 		this.bind('leave', _on_leave, this);
 
-
-		settings = null;
-
-	};
-
-
-	Class.prototype = {
-
-		/*
-		 * SERVICE API
-		 */
-
-		// plug: function() { },
-
-		unplug: function() {
-
-			lychee.net.Service.prototype.unplug.call(this);
-
+		this.bind('unplug', function() {
 
 			for (var sid in _cache) {
 
@@ -221,9 +207,15 @@ lychee.define('lychee.net.remote.Session').includes([
 
 			}
 
-		},
+		}, this);
 
 
+		settings = null;
+
+	};
+
+
+	Class.prototype = {
 
 		/*
 		 * CUSTOM API

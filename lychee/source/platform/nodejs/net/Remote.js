@@ -49,7 +49,7 @@ lychee.define('lychee.net.Remote').tags({
 				if (method.charAt(0) === '@') {
 
 					if (method === '@plug') {
-						_plug_service.call(this, data._serviceId, service);
+						_plug_service.call(this,   data._serviceId, service);
 					} else if (method === '@unplug') {
 						_unplug_service.call(this, data._serviceId, service);
 					}
@@ -130,14 +130,10 @@ lychee.define('lychee.net.Remote').tags({
 			service = new construct(this);
 			this.__services.push(service);
 
+			service.trigger('plug', []);
 
 			if (lychee.debug === true) {
 				console.log('lychee.net.Remote: Plugged service (' + service.id + ')');
-			}
-
-
-			if (typeof service.plug === 'function') {
-				service.plug();
 			}
 
 
@@ -190,16 +186,14 @@ lychee.define('lychee.net.Remote').tags({
 		}
 
 
-		if (lychee.debug === true) {
-			console.log('lychee.net.Remote: Unplugged service (' + id + ')');
-		}
-
-
 		if (found === true) {
 
-			if (typeof service.unplug === 'function') {
-				service.unplug();
+			service.trigger('unplug', []);
+
+			if (lychee.debug === true) {
+				console.log('lychee.net.Remote: Unplugged service (' + id + ')');
 			}
+
 
 			this.send({}, {
 				id:     id,
@@ -215,12 +209,7 @@ lychee.define('lychee.net.Remote').tags({
 		var services = this.__services;
 
 		for (var s = 0; s < services.length; s++) {
-
-			var service = services[s];
-			if (typeof service.unplug === 'function') {
-				service.unplug();
-			}
-
+			services[s].trigger('unplug', []);
 		}
 
 		this.__services = [];

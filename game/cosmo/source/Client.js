@@ -10,41 +10,6 @@ lychee.define('game.Client').requires([
 	var _multiplayer = game.net.client.Multiplayer;
 
 
-
-	/*
-	 * HELPERS
-	 */
-
-	var _init_highscore = function(service) {
-
-		this.game.services.highscore = service;
-
-		var state = this.game.getState('menu');
-		var root  = state.getLayer('ui').getEntity('root');
-		if (root !== null) {
-			root.getEntity('highscore').setState('highscore');
-		}
-
-	};
-
-	var _init_multiplayer = function(service) {
-
-		this.game.services.multiplayer = service;
-
-		var state = this.game.getState('menu');
-		var root  = state.getLayer('ui').getEntity('root');
-		if (root !== null) {
-			root.getEntity('multiplayer').setState('multiplayer');
-		}
-
-	};
-
-
-
-	/*
-	 * IMPLEMENTATION
-	 */
-
 	var Class = function(settings, game) {
 
 		this.game = game;
@@ -58,9 +23,6 @@ lychee.define('game.Client').requires([
 			var highscore   = new _highscore(this);
 			var multiplayer = new _multiplayer(this);
 
-			highscore.bind(  '#init', _init_highscore,   this, true);
-			multiplayer.bind('#init', _init_multiplayer, this, true);
-
 			this.plug(highscore);
 			this.plug(multiplayer);
 
@@ -68,21 +30,7 @@ lychee.define('game.Client').requires([
 
 		this.bind('disconnect', function(code, reason) {
 
-			this.game.client               = null;
-			this.game.services.highscore   = null;
-			this.game.services.multiplayer = null;
-
-
-			var state = this.game.getState('menu');
-			if (state !== null) {
-
-				var root = state.getLayer('ui').getEntity('root');
-				if (root !== null) {
-					root.getEntity('highscore').setState('highscore-disabled');
-					root.getEntity('multiplayer').setState('multiplayer-disabled');
-				}
-
-			}
+			this.game.client = null;
 
 		}, this);
 

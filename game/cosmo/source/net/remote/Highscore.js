@@ -1,34 +1,16 @@
 
 lychee.define('game.net.remote.Highscore').includes([
-	'lychee.event.Emitter'
+	'lychee.net.Service'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var Class = function(remote) {
 
-		this.id     = 'highscore';
-		this.remote = remote;
-
-
-		lychee.event.Emitter.call(this);
+		lychee.net.Service.call(this, 'highscore', remote, lychee.net.Service.TYPE.remote);
 
 	};
 
 
 	Class.prototype = {
-
-		/*
-		 * SERVICE API
-		 */
-
-		plug: function() {
-
-		},
-
-		unplug: function() {
-
-		},
-
-
 
 		/*
 		 * CUSTOM API

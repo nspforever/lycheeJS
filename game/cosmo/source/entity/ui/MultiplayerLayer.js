@@ -11,47 +11,76 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 	 * HELPERS
 	 */
 
-	var _get_code = function() {
-
-		var result = null;
-
+	var _enter_number = function(entity) {
 
 		var code = this.getEntity('code');
-		if (code !== null) {
+		var tmp  = code.label.split(' ');
 
-			var tmp = parseInt(code.label.split(' ').join(''), 10);
-			if (!isNaN(tmp)) {
-				result = tmp;
+		if (typeof entity.label === 'string') {
+			tmp[this.__cursor] = entity.label;
+			code.setLabel(tmp.join(' '));
+		}
+
+		this.__cursor += 1;
+		this.__cursor %= 4;
+
+		if (this.__cursor === 0) {
+
+			var service = this.game.services.multiplayer;
+			if (service !== null) {
+
+				service.leave();
+				service.setSid(code.label);
+				service.join();
+
 			}
 
 		}
-
-
-		return result;
 
 	};
 
-	var _validate_code = function() {
+	var _on_start = function(data) {
 
-		var result = true;
+		if (this.game.isState('menu') === true) {
 
+			this.game.changeState('game', {
+				type:    'multiplayer',
+				players: data.users,
+				player:  data.userid
+			});
 
-		var code = this.getEntity('code');
-		if (code !== null) {
-
-			var tmp = code.label.split(' ');
-
-			for (var t = 0, tl = tmp.length; t < tl; t++) {
-				if (tmp[t] === '*') {
-					result = false;
-					break;
-				}
-			}
+			this.getEntity('code').setLabel(data.sid);
 
 		}
 
+	};
 
-		return result;
+	var _on_stop = function(data) {
+
+		if (this.game.isState('game') === true) {
+			this.game.changeState('menu');
+			this.getEntity('code').setLabel(data.sid);
+		}
+
+	};
+
+	var _on_update = function(data) {
+
+		this.getEntity('code').setLabel(data.sid);
+
+	};
+
+	var _on_error = function(data) {
+
+		if (typeof data.message === 'string') {
+
+			var message = this.getEntity('message');
+			if (message !== null) {
+				message.setLabel(data.message);
+				message.setVisible(true);
+			}
+
+		}
 
 	};
 
@@ -70,7 +99,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 		settings.height = 312;
 
 
-		this.__cursor  = 0;
+		this.__cursor = 0;
 
 
 		lychee.ui.Layer.call(this, settings);
@@ -146,7 +175,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 					}
 				});
 
-				button.bind('#touch', this.processNumber, this);
+				button.bind('#touch', _enter_number, this);
 
 				this.addEntity(button);
 
@@ -177,54 +206,17 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 		enter: function() {
 
-			this.resetCode();
-			this.setMessage(null);
+			this.getEntity('code').setLabel('* * * *');
+			this.getEntity('message').setVisible(false);
 
 
 			var service = this.game.services.multiplayer;
 			if (service !== null) {
 
-				service.bind('session', function(data) {
-
-					if (data.code === null) {
-
-						this.resetCode();
-
-						if (typeof data.message === 'string') {
-							this.setMessage(data.message);
-						}
-
-					} else {
-
-						if (typeof data.message === 'string') {
-							this.setMessage(data.message);
-						}
-
-					}
-
-				}, this);
-
-				service.bind('start', function(data) {
-
-					if (this.game.isState('menu') === true) {
-
-						this.game.changeState('game', {
-							type:    'multiplayer',
-							players: data.players,
-							player:  data.player
-						});
-
-					}
-
-				}, this);
-
-				service.bind('stop', function(data) {
-
-					if (this.game.isState('game') === true) {
-						this.game.changeState('menu');
-					}
-
-				}, this);
+				service.bind('start',  _on_start,  this);
+				service.bind('stop',   _on_stop,   this);
+				service.bind('update', _on_update, this);
+				service.bind('error',  _on_error,  this);
 
 			}
 
@@ -232,78 +224,19 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 		leave: function() {
 
-			this.resetCode();
-			this.setMessage(null);
+			this.getEntity('code').setLabel('* * * *');
+			this.getEntity('message').setVisible(false);
 
 
 			var service = this.game.services.multiplayer;
 			if (service !== null) {
 
-				service.unbind('verification');
-				service.unbind('start');
-				service.unbind('stop');
+				service.unbind('start',  _on_start,  this);
+				service.unbind('stop',   _on_stop,   this);
+				service.unbind('update', _on_update, this);
+				service.unbind('error',  _on_error,  this);
 
 				service.leave();
-
-			}
-
-		},
-
-		resetCode: function() {
-			this.getEntity('code').setLabel('* * * *');
-			_validate_code.call(this);
-		},
-
-		setMessage: function(message) {
-
-			message = typeof message === 'string' ? message : null;
-
-
-			var entity = this.getEntity('message');
-			if (entity !== null) {
-
-				if (message !== null) {
-					entity.setLabel(message);
-					entity.visible = true;
-				} else {
-					entity.visible = false;
-				}
-
-			}
-
-		},
-
-		processNumber: function(entity, id, position, delta) {
-
-			var code = this.getEntity('code');
-			var tmp  = code.label.split(' ');
-
-			if (typeof entity.label === 'string') {
-
-				var number = entity.label;
-				tmp[this.__cursor] = number;
-
-				code.setLabel(tmp.join(' '));
-				_validate_code.call(this);
-
-			}
-
-			this.__cursor++;
-
-
-			if (this.__cursor === 4) {
-
-				this.__cursor %= 4;
-
-
-				var service = this.game.services.multiplayer;
-				if (service !== null) {
-
-					service.enter({
-						code: _get_code.call(this)
-					});
-
-				}
 
 			}
 

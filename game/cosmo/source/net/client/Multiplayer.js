@@ -1,25 +1,74 @@
 
 lychee.define('game.net.client.Multiplayer').includes([
-	'lychee.event.Emitter'
+	'lychee.net.client.Session'
 ]).exports(function(lychee, game, global, attachments) {
+
+	/*
+	 * HELPERS
+	 */
+
+	var _plug_service = function() {
+
+		this.game.services.multiplayer = this;
+
+
+		var state = this.game.getState('menu');
+		if (state !== null) {
+
+			var root = state.getLayer('ui').getEntity('root');
+			if (root !== null) {
+
+				var entity = root.getEntity('multiplayer');
+				if (entity !== null) {
+					entity.setState('multiplayer');
+				}
+
+			}
+
+		}
+
+	};
+
+	var _unplug_service = function() {
+
+		this.game.services.multiplayer = null;
+
+
+		var state = this.game.getState('menu');
+		if (state !== null) {
+
+			var root = state.getLayer('ui').getEntity('root');
+			if (root !== null) {
+
+				var entity = root.getEntity('multiplayer');
+				if (entity !== null) {
+					entity.setState('multiplayer-disabled');
+				}
+
+			}
+
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(client) {
 
-		this.id      = 'multiplayer';
-		this.client  = client;
-		this.session = null;
+		this.game = client.game;
+
+		lychee.net.client.Session.call(this, 'multiplayer', client, {
+			autorun: true,
+			limit:   2
+		});
 
 
-		lychee.event.Emitter.call(this);
-
-
-		this.bind('session', function(data) {
-
-			if (data.session !== null) {
-				this.session = data.session;
-			}
-
-		}, this);
+		this.bind('plug',   _plug_service,   this);
+		this.bind('unplug', _unplug_service, this);
 
 	};
 
@@ -27,67 +76,19 @@ lychee.define('game.net.client.Multiplayer').includes([
 	Class.prototype = {
 
 		/*
-		 * SERVICE API
-		 */
-
-		init: function() {
-			this.trigger('init', []);
-		},
-
-
-
-		/*
 		 * CUSTOM API
 		 */
 
-		enter: function(data) {
-
-			if (typeof data.code === 'number') {
-
-				this.client.send({
-					code: data.code
-				}, {
-					id:     this.id,
-					method: 'enter'
-				});
-
-			}
-
-		},
-
-		leave: function() {
-
-			if (this.session !== null) {
-
-				this.client.send({
-					code: this.session
-				}, {
-					id:     this.id,
-					method: 'leave'
-				});
-
-
-				this.session = null;
-
-			}
-
-		},
-
 		control: function(data) {
 
-			if (
-				   this.session !== null
-				&& typeof data.id === 'string'
-			) {
+			// TODO: multicast data with a given player id etc.
 
-				data.code = this.session;
-
-				this.client.send(data, {
-					id:     this.id,
-					method: 'control'
-				});
-
-			}
+			this.multicast({
+				playerid: 123
+			}, {
+				id:    this.id,
+				event: 'control'
+			});
 
 		}
 

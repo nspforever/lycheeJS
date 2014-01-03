@@ -176,12 +176,13 @@ lychee.define('lychee.net.Client').tags({
 
 		if (found === true) {
 
+			this.__services.active.push(service);
+
+			service.trigger('plug', []);
+
 			if (lychee.debug === true) {
 				console.log('lychee.net.Client: Remote plugged in Service (' + id + ')');
 			}
-
-			this.__services.active.push(service);
-			service.init && service.init();
 
 		}
 
@@ -199,19 +200,42 @@ lychee.define('lychee.net.Client').tags({
 		}
 
 
+		var found = false;
+
 		for (var a = 0, al = this.__services.active.length; a < al; a++) {
 
 			if (this.__services.active[a] === service) {
 				this.__services.active.splice(a, 1);
+				found = true;
 				al--;
 			}
 
 		}
 
 
-		if (lychee.debug === true) {
-			console.log('lychee.net.Client: Remote unplugged Service (' + id + ')');
+		if (found === true) {
+
+			service.trigger('unplug', []);
+
+			if (lychee.debug === true) {
+				console.log('lychee.net.Client: Remote unplugged Service (' + id + ')');
+			}
+
 		}
+
+	};
+
+	var _cleanup_services = function() {
+
+		var services = this.__services.active;
+
+		for (var s = 0; s < services.length; s++) {
+			services[s].trigger('unplug', []);
+		}
+
+
+		this.__services.active  = [];
+		this.__services.waiting = [];
 
 	};
 
@@ -315,6 +339,8 @@ lychee.define('lychee.net.Client').tags({
 			this.__socket.onclose = function(event) {
 
 				that.__isRunning = false;
+				_cleanup_services.call(that);
+
 				that.trigger('disconnect', [ event.code, event.reason ]);
 
 			};

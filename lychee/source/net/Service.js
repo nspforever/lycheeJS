@@ -25,9 +25,9 @@ lychee.define('lychee.net.Service').includes([
 
 	};
 
-	var _plug_broadcast = function(service) {
+	var _plug_broadcast = function() {
 
-		var id = service.id;
+		var id = this.id;
 		if (id !== null) {
 
 			var cache = _services[id] || null;
@@ -49,16 +49,19 @@ lychee.define('lychee.net.Service').includes([
 
 
 			if (found === false) {
-				cache.push(service);
+				cache.push(this);
 			}
 
 		}
 
 	};
 
-	var _unplug_broadcast = function(service) {
+	var _unplug_broadcast = function() {
 
-		var id = service.id;
+		this.setMulticast([]);
+
+
+		var id = this.id;
 		if (id !== null) {
 
 			var cache = _services[id] || null;
@@ -66,7 +69,7 @@ lychee.define('lychee.net.Service').includes([
 
 				for (var c = 0, cl = cache.length; c < cl; c++) {
 
-					if (cache[c] === service) {
+					if (cache[c] === this) {
 						cache.splice(c, 1);
 						break;
 					}
@@ -119,6 +122,19 @@ lychee.define('lychee.net.Service').includes([
 
 		lychee.event.Emitter.call(this);
 
+
+
+		/*
+		 * INITIALIZATION
+		 */
+
+		if (this.type === Class.TYPE.remote) {
+
+			this.bind('plug',   _plug_broadcast,   this);
+			this.bind('unplug', _unplug_broadcast, this);
+
+		}
+
 	};
 
 
@@ -168,7 +184,7 @@ lychee.define('lychee.net.Service').includes([
 
 
 		/*
-		 * CUSTOM API
+		 * SERVICE API
 		 */
 
 		multicast: function(data, service) {
@@ -332,28 +348,6 @@ lychee.define('lychee.net.Service').includes([
 					});
 
 				}
-
-			}
-
-		},
-
-		plug: function() {
-
-			var type = this.type;
-			if (type === Class.TYPE.remote) {
-				_plug_broadcast(this);
-			}
-
-		},
-
-		unplug: function() {
-
-			var type = this.type;
-			if (type === Class.TYPE.remote) {
-
-				_unplug_broadcast(this);
-
-				this.setMulticast([]);
 
 			}
 

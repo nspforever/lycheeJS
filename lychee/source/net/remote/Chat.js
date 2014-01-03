@@ -128,12 +128,15 @@ lychee.define('lychee.net.remote.Chat').includes([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(remote, data) {
+	var Class = function(id, remote, data) {
+
+		id = typeof id === 'string' ? id : 'chat';
+
 
 		var settings = lychee.extend({}, data);
 
 
-		this.limit = 100;
+		this.limit = 128;
 
 
 		this.setLimit(settings.limit);
@@ -141,7 +144,7 @@ lychee.define('lychee.net.remote.Chat').includes([
 		delete settings.limit;
 
 
-		lychee.net.Service.call(this, 'chat', remote, lychee.net.Service.TYPE.remote);
+		lychee.net.Service.call(this, id, remote, lychee.net.Service.TYPE.remote);
 
 
 

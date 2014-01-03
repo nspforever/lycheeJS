@@ -1,30 +1,16 @@
 
 lychee.define('game.net.client.Highscore').includes([
-	'lychee.event.Emitter'
+	'lychee.net.Service'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var Class = function(client) {
 
-		this.id      = 'highscore';
-		this.client  = client;
-
-
-		lychee.event.Emitter.call(this);
+		lychee.net.Service.call(this, 'highscore', client, lychee.net.Service.TYPE.client);
 
 	};
 
 
 	Class.prototype = {
-
-		/*
-		 * SERVICE API
-		 */
-
-		init: function() {
-			this.trigger('init', []);
-		},
-
-
 
 		/*
 		 * CUSTOM API
