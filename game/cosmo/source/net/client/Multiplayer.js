@@ -76,8 +76,7 @@ lychee.define('game.net.client.Multiplayer').includes([
 		this.game = client.game;
 
 		lychee.net.client.Session.call(this, 'multiplayer', client, {
-			// autostart: true,
-			autostart: false,
+			autostart: true,
 			limit:     2
 		});
 
@@ -99,27 +98,19 @@ lychee.define('game.net.client.Multiplayer').includes([
 
 		sync: function(data) {
 
-			if (this.tunnel !== null) {
-
-				this.multicast(data, {
-					id:    this.id,
-					event: 'sync'
-				});
-
-			}
+			this.multicast(data, {
+				id:    this.id,
+				event: 'sync'
+			});
 
 		},
 
 		control: function(data) {
 
-			if (this.tunnel !== null) {
-
-				this.multicast(data, {
-					id:    this.id,
-					event: 'control'
-				});
-
-			}
+			this.multicast(data, {
+				id:    this.id,
+				event: 'control'
+			});
 
 		}
 

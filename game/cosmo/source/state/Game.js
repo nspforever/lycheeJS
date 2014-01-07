@@ -1,21 +1,56 @@
 
 lychee.define('game.state.Game').requires([
+	'game.logic.Controller',
 	'game.entity.ui.HUDLayer',
 	'game.entity.ui.ResultLayer'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _resultlayer = game.entity.ui.ResultLayer;
+	var _controller  = game.logic.Controller;
 	var _hudlayer    = game.entity.ui.HUDLayer;
+	var _resultlayer = game.entity.ui.ResultLayer;
 
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _process_update = function(data) {
+
+		this.__hud.processUpdate(data);
+
+	};
+
+	var _process_success = function(data) {
+
+		this.__hud.visible    = false;
+		this.__result.visible = true;
+		this.__result.processSuccess(data);
+
+	};
+
+	var _process_failure = function(data) {
+
+		this.__hud.visible    = false;
+		this.__result.visible = true;
+		this.__result.processFailure(data);
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(game) {
 
 		lychee.game.State.call(this, game);
 
-		this.logic = game.logic || null;
-		this.stage = { level: 'stage1' };
+		this.controllers = [];
+		this.logic       = game.logic || null;
 
 		this.__result = new _resultlayer({}, game, this);
 		this.__hud    = new _hudlayer({}, game, this);
@@ -73,7 +108,7 @@ lychee.define('game.state.Game').requires([
 			data.type    = data.type === 'multiplayer'     ? 'multiplayer' : 'singleplayer';
 			data.level   = typeof data.level === 'string'  ? data.level    : 'stage1';
 			data.players = data.players instanceof Array   ? data.players  : [ 'local:1337' ];
-			data.player  = typeof data.player === 'number' ? data.player   : 0;
+			data.player  = typeof data.player === 'string' ? data.player   : 'local:1337';
 
 
 			var renderer   = this.renderer;
@@ -89,32 +124,69 @@ lychee.define('game.state.Game').requires([
 				data.height = typeof data.height === 'number' ? data.height : env.height;
 
 
-				logic.bind('update', function(data) {
-
-					this.__hud.processUpdate(data);
-
-				}, this);
-
-				logic.bind('success', function(data) {
-
-					this.__hud.visible    = false;
-					this.__result.visible = true;
-					this.__result.processSuccess(data);
-
-				}, this);
-
-				logic.bind('failure', function(data) {
-
-					this.__hud.visible    = false;
-					this.__result.visible = true;
-					this.__result.processFailure(data);
-
-				}, this);
-
-				logic.enter(data);
+				var level = this.logic.createLevel(data);
 
 
-				this.stage = data;
+				if (data.type === 'singleplayer') {
+
+					var player1 = new _controller(data.players[0]);
+					var ship1   = level.ships[0];
+
+					player1.setMode(_controller.MODE.local);
+					player1.setShip(ship1);
+					ship1.setColor('red');
+
+					this.controller = player1;
+
+				} else {
+
+					var service = this.game.services.multiplayer;
+					var player1 = new _controller(data.players[0]);
+					var player2 = new _controller(data.players[1]);
+					var ship1   = level.ships[0];
+					var ship2   = level.ships[1];
+
+					player1.setMode(_controller.MODE.online);
+					player1.setService(service);
+					player1.setShip(ship1);
+
+					player2.setMode(_controller.MODE.online);
+					player2.setService(service);
+					player2.setShip(ship2);
+
+					ship1.setColor('red');
+					ship2.setColor('blue');
+
+
+					if (data.player === data.players[0]) {
+
+console.log('PLAYER 1 (red)', data.player, data.players);
+
+						this.controller = player1;
+
+global._PLAYER = player1;
+
+					} else {
+
+console.log('PLAYER 2 (blue)', data.player, data.players);
+
+						this.controller = player2;
+
+global._PLAYER = player2;
+
+					}
+
+				}
+
+
+				level.bind('update',  _process_update,  this);
+				level.bind('success', _process_success, this);
+				level.bind('failure', _process_failure, this);
+
+
+				this.logic.setLevel(level);
+				this.logic.setShip(this.controller.ship);
+				this.logic.enter();
 
 			}
 
@@ -204,9 +276,8 @@ lychee.define('game.state.Game').requires([
 
 			} else {
 
-				var logic = this.logic;
-				if (logic !== null) {
-					logic.controller.processKey(key);
+				if (this.controller !== null) {
+					this.controller.processKey(key);
 				}
 
 			}
@@ -238,9 +309,8 @@ lychee.define('game.state.Game').requires([
 
 				}
 
-				var logic = this.logic;
-				if (logic !== null) {
-					logic.controller.processTouch(position);
+				if (this.controller !== null) {
+					this.controller.processTouch(position);
 				}
 
 			}

@@ -14,23 +14,21 @@ lychee.define('game.logic.Controller').requires([
 	 * HELPERS
 	 */
 
-	var _process_control = function(data) {
+	var _on_control = function(data) {
 
 		if (data.id === this.id) {
 
-			var key    = data.key    || null;
-			var update = data.update || null;
-			var touch  = data.touch  || null;
+			var key   = data.key   || null;
+			var touch = data.touch || null;
 
-			if (key !== null)    this.processKey(key, true);
-			if (update !== null) this.processUpdate(update, true);
-			if (touch !== null)  this.processTouch(touch, true);
+			if (key !== null)   this.processKey(key,     true);
+			if (touch !== null) this.processTouch(touch, true);
 
 		}
 
 	};
 
-	var _process_sync = function(data) {
+	var _on_sync = function(data) {
 
 		if (data.id === this.id) {
 
@@ -45,6 +43,19 @@ lychee.define('game.logic.Controller').requires([
 
 			}
 
+		}
+
+	};
+
+	var _service_control = function(data) {
+
+		data.id    = this.id;
+		data.key   = data.key   || null;
+		data.touch = data.touch || null;
+
+
+		if (this.service !== null) {
+			this.service.control(data);
 		}
 
 	};
@@ -150,12 +161,11 @@ lychee.define('game.logic.Controller').requires([
 				&& this.mode === Class.MODE.online
 			) {
 
-				var data = {
-					id:  this.id,
-					key: key
-				};
+console.log('broadcasting key!');
 
-				this.trigger('control', [ data ]);
+				_service_control.call(this, {
+					key: key
+				});
 
 			}
 
@@ -202,12 +212,12 @@ lychee.define('game.logic.Controller').requires([
 				&& this.mode === Class.MODE.online
 			) {
 
-				var data = {
-					id:    this.id,
-					touch: { x: position.x, y: position.y }
-				};
-
-				this.trigger('control', [ data ]);
+				_service_control.call(this, {
+					touch: {
+						x: position.x,
+						y: position.y
+					}
+				});
 
 			}
 
@@ -239,15 +249,15 @@ lychee.define('game.logic.Controller').requires([
 			if (service instanceof _service) {
 
 				this.service = service;
-				this.service.bind('control', _process_control, this);
-				this.service.bind('sync',    _process_sync,    this);
+				this.service.bind('control', _on_control, this);
+				this.service.bind('sync',    _on_sync,    this);
 
 				return true;
 
 			} else if (service === null) {
 
-				this.service.unbind('sync',    _process_sync,    this);
-				this.service.unbind('control', _process_control, this);
+				this.service.unbind('sync',    _on_sync,    this);
+				this.service.unbind('control', _on_control, this);
 				this.service = null;
 
 				return true;

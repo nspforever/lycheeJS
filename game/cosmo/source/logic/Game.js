@@ -2,7 +2,6 @@
 lychee.define('game.logic.Game').requires([
 	'game.entity.Background',
 	'game.entity.Shield',
-	'game.logic.Controller',
 	'game.logic.Level',
 	'lychee.game.Layer'
 ]).includes([
@@ -11,7 +10,7 @@ lychee.define('game.logic.Game').requires([
 
 	var _config = attachments["json"];
 
-
+	var _level      = game.logic.Level;
 	var _background = game.entity.Background;
 	var _blackhole  = game.entity.Blackhole;
 	var _enemy      = game.entity.Enemy;
@@ -19,9 +18,6 @@ lychee.define('game.logic.Game').requires([
 	var _meteor     = game.entity.Meteor;
 	var _shield     = game.entity.Shield;
 	var _ship       = game.entity.Ship;
-
-	var _controller = game.logic.Controller;
-	var _level      = game.logic.Level;
 
 
 
@@ -36,38 +32,28 @@ lychee.define('game.logic.Game').requires([
 		var state = ship.state;
 		if (state.substr(0, 5) === 'level') {
 
-			level = parseInt(state.substr(-1), 10);
-
-		} else if (
-			   state.substr(0, 7) === 'upgrade'
-			|| state.substr(0, 9) === 'downgrade'
-		) {
-
-			level = -1;
+			var t = parseInt(state.substr(-1), 10);
+			if (!isNaN(t)) {
+				level = t;
+			}
 
 		}
 
 
-		return isNaN(level) ? 0 : level;
+		return level;
 
 	};
 
+
 	var _get_level_points = function(points) {
 
-		var level = -1;
+		var level = 0;
 
 		for (var levelid in _config.level) {
 
 			var current = parseInt(levelid, 10);
-			var next    = current + 1;
-
-			var currentmin = _config.level[current];
-			var nextmin    = _config.level[next] || Infinity;
-
-			if (
-				   points > currentmin
-				&& points < nextmin
-			) {
+			var min     = _config.level[current];
+			if (min <= points) {
 				level = current;
 			}
 
@@ -78,23 +64,27 @@ lychee.define('game.logic.Game').requires([
 
 	};
 
-	var _process_update = function(player1, player2) {
+	var _process_update = function() {
 
-		var ship1 = this.__level.ships[0];
-		var ship2 = this.__level.ships[1];
+		var level = this.level;
+		if (level !== null) {
 
+			for (var a = 0, al = arguments.length; a < al; a++) {
 
-		_process_update_player.call(this, player1, ship1);
+				var ship = level.ships[a] || null;
+				if (ship !== null) {
 
-		if (
-			   player2 !== undefined
-			&& ship2 !== undefined
-		) {
-			_process_update_player.call(this, player2, ship2);
+					_process_update_player.call(
+						this,
+						arguments[a],
+						ship
+					);
+
+				}
+
+			}
+
 		}
-
-
-		this.trigger('update', [ player1, player2 ]);
 
 	};
 
@@ -103,66 +93,47 @@ lychee.define('game.logic.Game').requires([
 		var oldlevel = _get_level_ship(ship);
 		var newlevel = _get_level_points(data.points);
 
-		if (
-			   oldlevel !== newlevel
-			&& oldlevel !== -1
-			&& newlevel !== -1
-		) {
+		if (newlevel > oldlevel) {
 
-			if (newlevel > oldlevel) {
-				ship.setState('upgrade' + newlevel);
-				data.health = 100;
-//			} else if (newlevel < oldlevel) {
-//				ship.setState('downgrade' + newlevel);
-			}
-
+			ship.setState('upgrade' + newlevel);
+			data.health  = 100;
+			data.points += 500;
 
 			if (this.game.settings.sound === true) {
 				this.jukebox.play('ship-transformation');
 			}
 
+/*		} else if (newlevel < oldlevel) {
 
-			this.loop.timeout(1000, function() {
+			ship.setState('downgrade' + newlevel);
 
-				var state = this.state;
-				if (state.substr(0, 7) === 'upgrade') {
+			if (this.game.settings.sound === true) {
+				this.jukebox.play('ship-transformation');
+			}
+*/
+		}
 
-					var level = parseInt(state.substr(-1), 10);
+
+		this.loop.timeout(1000, function() {
+
+			var state = this.state;
+			if (state.substr(0, 7) === 'upgrade') {
+
+				var level = parseInt(state.substr(-1), 10);
+				this.setState('level' + level);
+
+			} else if (state.substr(0, 9) === 'downgrade') {
+
+				var level = parseInt(state.substr(-1), 10) - 1;
+				if (level > 0) {
 					this.setState('level' + level);
-
-//				} else if (state.substr(0, 9) === 'downgrade') {
-//
-//					var level = parseInt(state.substr(-1), 10) - 1;
-//					if (level > 0) {
-//						this.setState('level' + level);
-//					} else {
-//						this.setState('default');
-//					}
-//
+				} else {
+					this.setState('default');
 				}
 
-			}, ship);
-
-		}
-
-	};
-
-
-
-	var _interval = function() {
-
-		var level = this.__level;
-		if (level === null) return;
-
-
-		var controllers = this.controllers;
-		if (controllers.length > 1) {
-
-			for (var c = 0, cl = controllers.length; c < cl; c++) {
-				controllers[c].sync();
 			}
 
-		}
+		}, ship);
 
 	};
 
@@ -179,17 +150,16 @@ lychee.define('game.logic.Game').requires([
 		this.loop     = game.loop;
 		this.renderer = game.renderer;
 
-		this.controller  = null;
-		this.controllers = [];
-
+		this.level        = null;
+		this.ship         = null;
 
 		this.__background = null;
-		this.__level      = null;
-		this.__width      = null;
-		this.__height     = null;
-		this.__stage      = null;
-		this.__session    = { ships: [], stage: null };
 		this.__interval   = null;
+		this.__session    = {
+			ships:  [],
+			level:  null,
+			points: null
+		};
 
 
 		lychee.event.Emitter.call(this);
@@ -198,20 +168,6 @@ lychee.define('game.logic.Game').requires([
 
 
 	Class.prototype = {
-
-		/*
-		 * PRIVATE API
-		 */
-
-		__processSuccess: function(data) {
-			this.trigger('success', [ data ]);
-		},
-
-		__processFailure: function(data) {
-			this.trigger('failure', [ data ]);
-		},
-
-
 
 		/*
 		 * LOGIC INTERACTION
@@ -237,16 +193,16 @@ lychee.define('game.logic.Game').requires([
 					}
 
 					var data  = null;
-					var index = this.__level.ships.indexOf(owner);
+					var index = this.level.ships.indexOf(owner);
 					if (index !== -1) {
 
-						data = this.__level.data[index];
+						data = this.level.data[index];
 
 						for (var a = 0, al = posarray.length; a < al; a++) {
 							data.points -= 10;
 						}
 
-						_process_update.apply(this, this.__level.data);
+						_process_update.apply(this, this.level.data);
 
 					}
 
@@ -259,7 +215,7 @@ lychee.define('game.logic.Game').requires([
 					var vel = velarray[a];
 
 
-					this.__level.spawn(
+					this.level.spawn(
 						construct,
 						pos.x,
 						pos.y,
@@ -275,185 +231,58 @@ lychee.define('game.logic.Game').requires([
 		},
 
 
+		enter: function(stage) {
 
-		/*
-		 * PUBLIC API
-		 */
+			if (this.renderer !== null) {
 
-		enter: function(stage, width, height) {
+				var env = this.renderer.getEnvironment();
 
-			/*
-			 * CLEANUP
-			 */
-
-			for (var c = 0, cl = this.controllers.length; c < cl; c++) {
-				this.controllers[c].setService(null);
-			}
-
-			this.controller  = null;
-			this.controllers = [];
-
-			if (this.__level !== null) {
-				this.__level.unbind('failure');
-				this.__level.unbind('success');
-				this.__level.unbind('update');
-			}
-
-			this.__width  = width;
-			this.__height = height;
-
-
-
-			/*
-			 * LEVEL SETUP
-			 */
-
-			var data = {
-				points: null,
-				width:  width,
-				height: height,
-				ships:  stage.type === 'multiplayer' ? 2 : 1,
-				level:  stage.level
-			};
-
-
-			var newstage = data.level;
-			var oldstage = this.__session.stage;
-			if (oldstage !== null) {
-
-				var oldstglvl = parseInt(oldstage.substr(-1), 10);
-				var newstglvl = parseInt(newstage.substr(-1), 10);
-
-				if (newstglvl > oldstglvl) {
-					data.ships  = this.__session.ships;
-					data.points = this.__session.points;
-				}
-
-			}
-
-
-			this.__level = new game.logic.Level(data, this);
-//			this.__level.bind('failure', this.__processFailure, this);
-//			this.__level.bind('success', this.__processSuccess, this);
-			this.__level.bind('update',  _process_update, this);
-			this.__stage = newstage;
-
-
-
-			/*
-			 * CONTROLLER SETUP
-			 */
-
-			if (stage.type === 'singleplayer') {
-
-
-				var ship = this.__level.ships[0];
-
-				ship.setColor('red');
-
-				var controller = new _controller(stage.players[0], {
-					mode: _controller.MODE.local,
-					ship: ship
+				this.__background = new _background({
+					width:  env.width,
+					height: env.height
 				});
 
-				this.controllers.push(controller);
-				this.controller = controller;
-
-
-			} else if (stage.type === 'multiplayer') {
-
-				var colors  = [ 'red', 'blue', 'green' ];
-				var service = this.game.services.multiplayer;
-
-				for (var p = 0, pl = stage.players.length; p < pl; p++) {
-
-					var ship = this.__level.ships[p];
-
-					ship.setColor(colors[p % 3]);
-
-					var controller = new _controller(stage.players[p], {
-						mode:    _controller.MODE.online,
-						service: service,
-						ship:    ship
-					});
-
-					this.controllers.push(controller);
-
-
-					if (p === stage.player) {
-						this.controller = controller;
-					}
-
-				}
-
 			}
 
 
-
-			/*
-			 * BACKGROUND SETUP
-			 */
-
-			this.__background = new _background({
-				width:  width,
-				height: height
-			});
-
-
-			this.__interval = this.loop.interval(1000, _interval, this);
-
-
-			_process_update.apply(this, this.__level.data);
+			_process_update.apply(this, this.level.data);
 
 		},
 
 		leave: function() {
 
-			this.__session.ships  = this.__level.ships;
-			this.__session.stage  = this.__stage;
-			this.__session.points = this.__level.data.points;
-
-
-			var interval = this.__interval
-			if (interval !== null) {
-				interval.clear();
-			}
-
-
-			/*
-			 * CLEANUP TODO: Evaluate if cleanup is necessary
-			 */
-
-/*
-			for (var c = 0, cl = this.controllers.length; c < cl; c++) {
-				this.controllers[c].setService(null);
-			}
-
-			this.controller  = null;
-			this.controllers = [];
-*/
+			this.__session.ships  = this.level.ships;
+			this.__session.level  = this.level.stage;
+			this.__session.points = this.level.data.points;
 
 		},
 
 		update: function(clock, delta) {
 
-			var level = this.__level;
-			if (level === null) return;
+			if (
+				   this.level === null
+				|| this.ship === null
+			) {
+				return;
+			}
 
 
-    		var ship = level.ships[0];
-			var miny = -1/2 * this.__height;
-			var maxy =  1/2 * this.__height;
-			var minx = -1/2 * this.__width;
-			var maxx =  1/2 * this.__width;
+			var level  = this.level;
+			var ship   = this.ship;
+			var width  = level.width;
+			var height = level.height;
+			var miny   = -1/2 * height;
+			var maxy   =  1/2 * height;
+			var minx   = -1/2 * width;
+			var maxx   =  1/2 * width;
 
 
 			var config = {
 				scrollx:  (delta / 1000) * ship.speedx,
 				scrolly:  (delta / 1000) * ship.speedy,
 				entities: level.entities,
-				width:    this.__width,
-				height:   this.__height
+				width:    width,
+				height:   height
 			};
 
 
@@ -588,18 +417,20 @@ lychee.define('game.logic.Game').requires([
 		render: function(clock, delta) {
 
 			var renderer = this.renderer;
-			var level    = this.__level;
+			var level    = this.level;
 			if (
 				renderer !== null
 				&& level !== null
 			) {
 
-				var offsetX = this.__width / 2;
-				var offsetY = this.__height / 2;
+				var env     = renderer.getEnvironment();
+				var offsetX = env.width / 2;
+				var offsetY = env.height / 2;
 
 
 				var background = this.__background;
 				if (background !== null) {
+
 
 					background.render(
 						renderer,
@@ -639,6 +470,77 @@ lychee.define('game.logic.Game').requires([
 				}
 
 			}
+
+		},
+
+
+
+		/*
+		 * GAME STATE INTERACTION
+		 */
+
+		createLevel: function(data) {
+
+			var settings = {
+				points: null,
+				width:  data.width,
+				height: data.height,
+				ships:  data.players.length,
+				level:  data.level
+			};
+
+
+			var newstage = settings.level;
+			var oldstage = this.__session.level;
+			if (oldstage !== null) {
+
+				var oldstglvl = parseInt(oldstage.substr(-1), 10);
+				var newstglvl = parseInt(newstage.substr(-1), 10);
+
+				if (newstglvl > oldstglvl) {
+					settings.ships  = this.__session.ships;
+					settings.points = this.__session.points;
+				}
+
+			}
+
+
+			return new game.logic.Level(this, settings);
+
+		},
+
+		setShip: function(ship) {
+
+			if (ship instanceof _ship) {
+
+				this.ship = ship;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setLevel: function(level) {
+
+			if (level instanceof _level) {
+
+				if (this.level !== null) {
+					this.level.unbind('update', _process_update, this);
+				}
+
+				this.level = level;
+				this.level.bind('update', _process_update, this);
+
+				return true;
+
+			}
+
+
+			return false;
 
 		}
 

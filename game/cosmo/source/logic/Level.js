@@ -65,11 +65,7 @@ lychee.define('game.logic.Level').requires([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(data, logic) {
-
-		var settings = lychee.extend({
-		}, data);
-
+	var Class = function(logic, settings) {
 
 		this.logic = logic || null;
 
@@ -78,8 +74,9 @@ lychee.define('game.logic.Level').requires([
 		this.enemies  = [];
 		this.entities = [];
 		this.ships    = [];
+		this.stage    = 'stage1';
 		this.width    = 0;
-
+		this.height   = 0;
 
 		this.__cache  = { x: 0, y: 0 };
 		this.__boundY = 0;
@@ -87,8 +84,7 @@ lychee.define('game.logic.Level').requires([
 
 		lychee.event.Emitter.call(this);
 
-
-		this.reset(settings)
+		this.reset(settings);
 
 	};
 
@@ -106,7 +102,8 @@ lychee.define('game.logic.Level').requires([
 			this.entities = [];
 			this.ships    = [];
 
-			this.__boundY = ((stage.height / 80) | 0);
+			this.height   = stage.height;
+			this.__boundY = ((this.height / 80) | 0);
 
 
 			var ship, data;
@@ -121,7 +118,7 @@ lychee.define('game.logic.Level').requires([
 					ship = new _ship({}, this.logic);
 					ship.setState('default');
 					ship.setHealth(data.health);
-					ship.setPosition(_translate_to_position.call(this, 0, 1));
+					ship.setPosition(_translate_to_position.call(this, -4 + 2 * s, 1));
 
 					this.data.push(data);
 					this.entities.push(ship);
@@ -149,24 +146,10 @@ lychee.define('game.logic.Level').requires([
 
 				}
 
-			} else {
-
-				data = new _data();
-				data.points = typeof stage.points === 'number' ? stage.points : 0;
-
-				ship = new _ship({}, this.logic);
-				ship.setState('default');
-				ship.setHealth(data.health);
-				ship.setPosition(_translate_to_position.call(this, 0, 1));
-
-				this.data.push(data);
-				this.entities.push(ship);
-				this.ships.push(ship);
-
 			}
 
 
-			this.spawnStage(stage.level);
+			this.setStage(stage.level);
 
 		},
 
@@ -366,7 +349,7 @@ lychee.define('game.logic.Level').requires([
 
 		},
 
-		spawnStage: function(id) {
+		setStage: function(id) {
 
 			id = typeof id === 'string' ? id : null;
 
@@ -374,7 +357,9 @@ lychee.define('game.logic.Level').requires([
 			if (id !== null) {
 
 				var stage = _config[id] || null;
-				if (stage === null) return;
+				if (stage === null) {
+					return false;
+				}
 
 
 				var offsetX = (-1 * stage[0].length / 2) | 0;
@@ -400,8 +385,15 @@ lychee.define('game.logic.Level').requires([
 				}
 
 				this.width = stage[0].length * 80;
+				this.stage = id;
+
+
+				return true;
 
 			}
+
+
+			return false;
 
 		},
 

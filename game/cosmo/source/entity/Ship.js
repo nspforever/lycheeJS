@@ -64,35 +64,6 @@ lychee.define('game.entity.Ship').requires([
 		 * ENTITY API
 		 */
 
-		deserialize: function(blob) {
-
-			this.setHealth(blob.health);
-			this.setSpeedX(blob.speedx);
-			this.setSpeedY(blob.speedy);
-
-		},
-
-		serialize: function() {
-
-			var data = lychee.game.Sprite.prototype.serialize.call(this);
-			data['constructor'] = 'game.entity.Ship';
-
-			var settings = data['arguments'][0];
-			var blob     = data['blob'] = (data['blob'] || {});
-
-
-			if (this.color !== 'red') settings.color = this.color;
-
-
-			if (this.health !== 200) blob.health = this.health;
-			if (this.speedx !== 0)   blob.speedx = this.speedx;
-			if (this.speedy !== 0)   blob.speedy = this.speedy;
-
-
-			return data;
-
-		},
-
 		update: function(clock, delta, config) {
 
 			lychee.game.Sprite.prototype.update.call(this, clock, delta);
@@ -177,9 +148,7 @@ lychee.define('game.entity.Ship').requires([
 				|| state.substr(0, 5) === 'level'
 			) {
 
-				var logic = this.logic;
-				if (logic !== null) {
-
+				if (this.logic !== null) {
 
 					var weapons  = this.weapons;
 
@@ -204,7 +173,7 @@ lychee.define('game.entity.Ship').requires([
 					}
 
 
-					logic.spawn(
+					this.logic.spawn(
 						_lazer,
 						posarray,
 						velarray,

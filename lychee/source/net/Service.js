@@ -358,20 +358,19 @@ lychee.define('lychee.net.Service').includes([
 
 			if (multicast instanceof Array) {
 
-				var filtered = [];
-				var type     = this.type;
+				var valid = true;
+				var type  = this.type;
 
 				for (var m = 0, ml = multicast.length; m < ml; m++) {
 
-					if (_validate_tunnel(multicast[m], type) === true) {
-						filtered.push(multicast[m]);
+					if (_validate_tunnel(multicast[m], type) === false) {
+						valid = false;
+						break;
 					}
 
 				}
 
-
-				this.__multicast = filtered;
-
+				this.__multicast = multicast;
 
 				return true;
 
