@@ -5,6 +5,8 @@ lychee.define('lychee.net.Remote').tags({
 	'lychee.net.Protocol'
 ]).includes([
 	'lychee.event.Emitter'
+]).requires([
+	'lychee.net.Service'
 ]).supports(function(lychee, global) {
 
 	if (typeof process !== 'undefined') {
@@ -321,20 +323,20 @@ lychee.define('lychee.net.Remote').tags({
 
 		register: function(id, construct) {
 
-			id        = typeof id === 'string'          ? id        : null;
-			construct = typeof construct === 'function' ? construct : null;
+			id = typeof id === 'string' ? id : null;
 
 
-			if (
-				   id !== null
-				&& construct !== null
-			) {
+//			if (lychee.validate(lychee.net.Service, construct) === true) {
 
-				this.__servicesmap[id] = construct;
+				if (id !== null) {
 
-				return true;
+					this.__servicesmap[id] = construct;
 
-			}
+					return true;
+
+				}
+
+//			}
 
 
 			return false;

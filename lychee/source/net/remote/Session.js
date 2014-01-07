@@ -15,36 +15,36 @@ lychee.define('lychee.net.remote.Session').includes([
 		if (sid !== null) {
 
 			// 1. Create Session
-			var cache = _cache[sid] || null;
-			if (cache === null) {
+			var session = _cache[sid] || null;
+			if (session === null) {
 
-				var autorun = data.autorun === false         ? false      : true;
-				var limit   = typeof data.limit === 'number' ? data.limit : 4;
+				var ready = data.autostart === false       ? false      : true;
+				var limit = typeof data.limit === 'number' ? data.limit : 4;
 
-				cache = _cache[sid] = {
+				session = _cache[sid] = {
 					sid:     sid,
 					limit:   limit,
 					tunnels: [ this.tunnel ],
-					autorun: autorun,
-					running: false
+					ready:   ready,
+					active:  false
 				};
 
 			// 2. Join Session
 			} else {
 
-				var index = cache.tunnels.indexOf(this.tunnel);
-				var users = cache.tunnels.length;
+				var index = session.tunnels.indexOf(this.tunnel);
+				var users = session.tunnels.length;
 				if (
 					   index === -1
-					&& users < cache.limit
-					&& cache.running === false
+					&& users < session.limit
+					&& session.active === false
 				) {
 
-					cache.tunnels.push(this.tunnel);
+					session.tunnels.push(this.tunnel);
 
-					_sync_session.call(this, cache);
+					_sync_session.call(this, session);
 
-				} else if (cache.running === true) {
+				} else if (session.active === true) {
 
 					this.report('Session is already running.', {
 						sid:   sid,
@@ -52,7 +52,7 @@ lychee.define('lychee.net.remote.Session').includes([
 						limit: limit
 					});
 
-				} else if (users >= cache.limit) {
+				} else if (users >= session.limit) {
 
 					this.report('Session is full.', {
 						sid:   sid,
@@ -74,13 +74,13 @@ lychee.define('lychee.net.remote.Session').includes([
 		if (sid !== null) {
 
 			// 1. Leave Session
-			var cache = _cache[sid] || null;
-			if (cache !== null) {
+			var session = _cache[sid] || null;
+			if (session !== null) {
 
-				var index = cache.tunnels.indexOf(this.tunnel);
+				var index = session.tunnels.indexOf(this.tunnel);
 				if (index !== -1) {
 
-					cache.tunnels.splice(index, 1);
+					session.tunnels.splice(index, 1);
 
 					this.setSession(null);
 					this.setMulticast([]);
@@ -88,7 +88,7 @@ lychee.define('lychee.net.remote.Session').includes([
 				}
 
 
-				var users = cache.tunnels.length;
+				var users = session.tunnels.length;
 				if (users === 0) {
 
 					delete _cache[sid];
@@ -105,38 +105,117 @@ lychee.define('lychee.net.remote.Session').includes([
 
 	};
 
+	var _on_start = function(data) {
+
+		var sid = data.sid || null;
+		if (sid !== null) {
+
+			var session = _cache[sid] || null;
+			if (
+				   session !== null
+				&& session.active === false
+			) {
+
+				session.ready = true;
+
+				_sync_session.call(this, cache);
+
+			}
+
+		}
+
+	};
+
+	var _on_stop = function(data) {
+
+		var sid = data.sid || null;
+		if (sid !== null) {
+
+			var session = _cache[sid] || null;
+			if (
+				   session !== null
+				&& session.active === true
+			) {
+
+				session.ready = false;
+
+				_sync_session.call(this, cache);
+
+			}
+
+		}
+
+	};
+
 	var _sync_session = function(session) {
 
 		var sid = session.sid;
 		if (sid !== null) {
 
-			var users = session.tunnels.length;
 			var limit = session.limit;
 
+			var tunnels = [];
+			for (var t = session.tunnels.length; t < tl; t++) {
+				tunnels.push(session.tunnels[t].id);
+			}
+
+
 			var data = {
-				type:   'update',
-				sid:    sid,
-				userid: 0,
-				users:  users,
-				limit:  limit
+				type:    'update',
+				sid:     sid,
+				limit:   limit,
+				tid:     'localhost:1337',
+				tunnels: tunnels
 			};
 
 
-			if (users === limit) {
+			if (tunnels.length === limit) {
 
-				data.type     = 'start';
-				cache.running = true;
+				if (
+					   session.ready === true
+					&& session.active === false
+				) {
 
-			} else if (users < limit) {
+					data.type = 'start';
+					session.active = true;
 
-				if (cache.running === true) {
+					if (lychee.debug === true) {
+						console.log('lychee.net.remote.Session: Starting session "' + sid + '"');
+					}
 
-					data.type     = 'stop';
-					cache.running = false;
+				} else if (
+					   session.ready === false
+					&& session.active === true
+				) {
+
+					data.type = 'stop';
+					session.active = false;
+
+					if (lychee.debug === true) {
+						console.log('lychee.net.remote.Session: Stopping session "' + sid + '"');
+					}
+
+				}
+
+
+			} else if (tunnels.length < limit) {
+
+				if (session.active === true) {
+
+					data.type = 'stop';
+					session.active = false;
+
+					if (lychee.debug === true) {
+						console.log('lychee.net.remote.Session: Stopping session "' + sid + '"');
+					}
 
 				} else {
 
 					data.type = 'update';
+
+					if (lychee.debug === true) {
+						console.log('lychee.net.remote.Session: Updating session "' + sid + '" (' + tunnels.length + ' of ' + limit + ' tunnels)');
+					}
 
 				}
 
@@ -152,7 +231,7 @@ lychee.define('lychee.net.remote.Session').includes([
 				var tunnel = session.tunnels[t];
 				if (tunnel !== null) {
 
-					data.userid = t;
+					data.tid = tunnel.id;
 
 					tunnel.send(data, {
 						id:    this.id,
@@ -194,6 +273,9 @@ lychee.define('lychee.net.remote.Session').includes([
 
 		this.bind('join',  _on_join,  this);
 		this.bind('leave', _on_leave, this);
+		this.bind('start', _on_start, this);
+		this.bind('stop',  _on_stop,  this);
+
 
 		this.bind('unplug', function() {
 

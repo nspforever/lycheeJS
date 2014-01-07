@@ -3,6 +3,8 @@ lychee.define('lychee.net.Client').tags({
 	platform: 'html'
 }).includes([
 	'lychee.event.Emitter'
+]).requires([
+	'lychee.net.Service'
 ]).supports(function(lychee, global) {
 
 	if (
@@ -291,7 +293,7 @@ lychee.define('lychee.net.Client').tags({
 			this.__socket = new WebSocket(url);
 
 			if (
-				typeof ArrayBuffer !== 'undefined'
+				   typeof ArrayBuffer !== 'undefined'
 				&& typeof this.__socket.binaryType !== 'undefined'
 			) {
 				this.__socket.binaryType = 'arraybuffer';
@@ -412,6 +414,11 @@ lychee.define('lychee.net.Client').tags({
 
 		plug: function(service) {
 
+			if (lychee.validate(lychee.net.Service, service) === false) {
+				return false;
+			}
+
+
 			if (
 				   _is_service_waiting.call(this, service) === false
 				&& _is_service_active.call(this, service) === false
@@ -435,6 +442,11 @@ lychee.define('lychee.net.Client').tags({
 		},
 
 		unplug: function(service) {
+
+			if (lychee.validate(lychee.net.Service, service) === false) {
+				return false;
+			}
+
 
 			if (
 				   _is_service_waiting.call(this, service) === true

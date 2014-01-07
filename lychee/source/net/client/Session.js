@@ -23,16 +23,16 @@ lychee.define('lychee.net.client.Session').includes([
 		var settings = lychee.extend({}, data);
 
 
-		this.autorun = true;
-		this.sid     = 'session-' + _id++;
-		this.limit   = 4;
+		this.autostar = true;
+		this.sid      = 'session-' + _id++;
+		this.limit    = 4;
 
 
-		this.setAutorun(settings.autorun);
+		this.setAutostart(settings.autostart);
 		this.setSid(settings.sid);
 		this.setLimit(settings.limit);
 
-		delete settings.autorun;
+		delete settings.autostart;
 		delete settings.sid;
 		delete settings.limit;
 
@@ -63,10 +63,10 @@ lychee.define('lychee.net.client.Session').includes([
 			) {
 
 				var args = [{
-					sid:    this.sid,
-					userid: data.userid,
-					users:  data.users,
-					limit:  data.limit
+					sid:     this.sid,
+					limit:   this.limit,
+					tid:     data.tid,
+					tunnels: data.tunnels
 				}];
 
 
@@ -103,13 +103,56 @@ lychee.define('lychee.net.client.Session').includes([
 
 				if (this.tunnel !== null) {
 
+					if (lychee.debug === true) {
+						console.log('lychee.net.client.Session: Joining session "' + this.sid + '"');
+					}
+
+
 					this.tunnel.send({
-						autorun: this.autorun,
-						sid:     this.sid,
-						limit:   this.limit
+						autostart: this.autostart,
+						sid:       this.sid,
+						limit:     this.limit
 					}, {
 						id:    this.id,
 						event: 'join'
+					});
+
+				}
+
+			}
+
+		},
+
+		start: function() {
+
+			if (this.sid !== null) {
+
+				if (this.tunnel !== null) {
+
+					this.tunnel.send({
+						sid: this.sid
+					}, {
+						id:    this.id,
+						event: 'start'
+					});
+
+				}
+
+			}
+
+		},
+
+		stop: function() {
+
+			if (this.sid !== null) {
+
+				if (this.tunnel !== null) {
+
+					this.tunnel.send({
+						sid: this.sid
+					}, {
+						id:    this.id,
+						event: 'stop'
 					});
 
 				}
@@ -124,6 +167,11 @@ lychee.define('lychee.net.client.Session').includes([
 
 				if (this.tunnel !== null) {
 
+					if (lychee.debug === true) {
+						console.log('lychee.net.client.Session: Leaving session "' + this.sid + '"');
+					}
+
+
 					this.tunnel.send({
 						sid:   this.sid
 					}, {
@@ -137,11 +185,11 @@ lychee.define('lychee.net.client.Session').includes([
 
 		},
 
-		setAutorun: function(autorun) {
+		setAutostart: function(autostart) {
 
-			if (autorun === true || autorun === false) {
+			if (autostart === true || autostart === false) {
 
-				this.autorun = autorun;
+				this.autostart = autostart;
 
 				return true;
 

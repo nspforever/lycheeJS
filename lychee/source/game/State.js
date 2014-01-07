@@ -390,6 +390,45 @@ lychee.define('lychee.game.State').requires([
 
 		},
 
+		queryLayer: function(id, query) {
+
+			id    = typeof id === 'string'    ? id    : null;
+			query = typeof query === 'string' ? query : null;
+
+
+			if (
+				   id !== null
+				&& query !== null
+			) {
+
+				var layer = this.getLayer(id);
+				if (layer !== null) {
+
+					var entity = layer;
+					var ids    = query.split(' > ');
+
+					for (var i = 0, il = ids.length; i < il; i++) {
+
+						entity = entity.getEntity(ids[i]);
+
+						if (entity === null) {
+							break;
+						}
+
+					}
+
+
+					return entity;
+
+				}
+
+			}
+
+
+			return null;
+
+		},
+
 		removeLayer: function(id) {
 
 			id = typeof id === 'string' ? id : null;

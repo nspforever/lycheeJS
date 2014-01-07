@@ -40,7 +40,7 @@ lychee.define('lychee.net.Service').includes([
 
 			for (var c = 0, cl = cache.length; c < cl; c++) {
 
-				if (cache[c] === service) {
+				if (cache[c] === this) {
 					found = true;
 					break;
 				}
@@ -97,10 +97,11 @@ lychee.define('lychee.net.Service').includes([
 		tunnel = _validate_tunnel(tunnel, type) === true   ? tunnel : null;
 
 
-		this.id        = id;
-		this.multicast = [];
-		this.tunnel    = tunnel;
-		this.type      = type;
+		this.id     = id;
+		this.tunnel = tunnel;
+		this.type   = type;
+
+		this.__multicast = [];
 
 
 		if (lychee.debug === true) {
@@ -229,9 +230,9 @@ lychee.define('lychee.net.Service').includes([
 
 				if (data.service !== null) {
 
-					for (var m = 0, ml = this.multicast.length; m < ml; m++) {
+					for (var m = 0, ml = this.__multicast.length; m < ml; m++) {
 
-						var tunnel = this.multicast[m];
+						var tunnel = this.__multicast[m];
 						if (tunnel !== this.tunnel) {
 
 							tunnel.send(
@@ -369,7 +370,7 @@ lychee.define('lychee.net.Service').includes([
 				}
 
 
-				this.multicast = filtered;
+				this.__multicast = filtered;
 
 
 				return true;

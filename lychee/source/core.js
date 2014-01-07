@@ -422,7 +422,30 @@ if (typeof global !== 'undefined') {
 			return valid;
 
 
-		// 2. Interface validation
+		// 2. Interface validation on template
+		} else if (
+			   template instanceof Function
+			&& template.prototype instanceof Object
+			&& instance instanceof Function
+			&& instance.prototype instanceof Object
+		) {
+
+			var valid = true;
+
+			for (var method in template.prototype) {
+
+				if (typeof template.prototype[method] !== typeof instance.prototype[method]) {
+					valid = false;
+					break;
+				}
+
+			}
+
+
+			return valid;
+
+
+		// 3. Interface validation on instance
 		} else if (
 			   template instanceof Function
 			&& template.prototype instanceof Object
