@@ -326,7 +326,7 @@ lychee.define('lychee.net.Remote').tags({
 			id = typeof id === 'string' ? id : null;
 
 
-//			if (lychee.validate(lychee.net.Service, construct) === true) {
+			if (lychee.validate(lychee.net.Service, construct) === true) {
 
 				if (id !== null) {
 
@@ -336,7 +336,7 @@ lychee.define('lychee.net.Remote').tags({
 
 				}
 
-//			}
+			}
 
 
 			return false;
