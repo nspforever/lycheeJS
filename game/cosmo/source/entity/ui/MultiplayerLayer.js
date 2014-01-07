@@ -39,34 +39,14 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 	};
 
-	var _on_start = function(data) {
-
-		if (this.game.isState('menu') === true) {
-
-			this.game.changeState('game', {
-				type:    'multiplayer',
-				players: data.users,
-				player:  data.userid
-			});
-
-			this.getEntity('code').setLabel(data.sid);
-
-		}
-
-	};
-
-	var _on_stop = function(data) {
-
-		if (this.game.isState('game') === true) {
-			this.game.changeState('menu');
-			this.getEntity('code').setLabel(data.sid);
-		}
-
-	};
-
 	var _on_update = function(data) {
 
 		this.getEntity('code').setLabel(data.sid);
+
+		var message = this.getEntity('message');
+		if (message !== null) {
+			message.setLabel(data.tunnels.length + ' of ' + data.limit + ' connected. (They need to enter the same code.)');
+		}
 
 	};
 
@@ -213,8 +193,6 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			var service = this.game.services.multiplayer;
 			if (service !== null) {
 
-				service.bind('start',  _on_start,  this);
-				service.bind('stop',   _on_stop,   this);
 				service.bind('update', _on_update, this);
 				service.bind('error',  _on_error,  this);
 
@@ -231,8 +209,6 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			var service = this.game.services.multiplayer;
 			if (service !== null) {
 
-				service.unbind('start',  _on_start,  this);
-				service.unbind('stop',   _on_stop,   this);
 				service.unbind('update', _on_update, this);
 				service.unbind('error',  _on_error,  this);
 

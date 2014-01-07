@@ -5,7 +5,8 @@ lychee.define('game.logic.Controller').requires([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _ship = game.entity.Ship;
+	var _service = game.net.client.Multiplayer;
+	var _ship    = game.entity.Ship;
 
 
 
@@ -13,24 +14,38 @@ lychee.define('game.logic.Controller').requires([
 	 * HELPERS
 	 */
 
-	var _validate_enum = function(enumobject, value) {
+	var _process_control = function(data) {
 
-		if (typeof value !== 'number') return false;
+		if (data.id === this.id) {
 
+			var key    = data.key    || null;
+			var update = data.update || null;
+			var touch  = data.touch  || null;
 
-		var found = false;
-
-		for (var id in enumobject) {
-
-			if (value === enumobject[id]) {
-				found = true;
-				break;
-			}
+			if (key !== null)    this.processKey(key, true);
+			if (update !== null) this.processUpdate(update, true);
+			if (touch !== null)  this.processTouch(touch, true);
 
 		}
 
+	};
 
-		return found;
+	var _process_sync = function(data) {
+
+		if (data.id === this.id) {
+
+			var ship = this.ship;
+			if (ship !== null) {
+
+				ship.position.x = data.px;
+				ship.position.y = data.py;
+
+				ship.velocity.x = data.vx;
+				ship.velocity.y = data.vy;
+
+			}
+
+		}
 
 	};
 
@@ -47,10 +62,12 @@ lychee.define('game.logic.Controller').requires([
 
 		this.id = id || null;
 
-		this.mode  = Class.MODE.local;
-		this.ship  = null;
+		this.mode    = Class.MODE.local;
+		this.service = null;
+		this.ship    = null;
 
 		this.setMode(settings.mode);
+		this.setService(settings.service);
 		this.setShip(settings.ship);
 
 
@@ -78,45 +95,21 @@ lychee.define('game.logic.Controller').requires([
 			var ship = this.ship;
 			if (ship !== null) {
 
-				var position = ship.position;
-
-				position.x |= 0;
-				position.y |= 0;
-
-
-				var velocity = ship.velocity;
-
-				velocity.x |= 0;
-				velocity.y |= 0;
-
-
 				var data = {
 					id: this.id,
 					update: {
-						px: position.x,
-						py: position.y,
-						vx: velocity.x,
-						vy: velocity.y
+						px: ship.position.x | 0,
+						py: ship.position.y | 0,
+						vx: ship.velocity.x | 0,
+						vy: ship.velocity.y | 0
 					}
 				};
 
-				this.trigger('control', [ data ]);
 
-			}
-
-		},
-
-		control: function(data) {
-
-			if (data.id === this.id) {
-
-				var key    = data.key    || null;
-				var update = data.update || null;
-				var touch  = data.touch  || null;
-
-				if (key !== null)    this.processKey(key, true);
-				if (update !== null) this.processUpdate(update, true);
-				if (touch !== null)  this.processTouch(touch, true);
+				var service = this.service;
+				if (service !== null) {
+					service.sync(data);
+				}
 
 			}
 
@@ -163,24 +156,6 @@ lychee.define('game.logic.Controller').requires([
 				};
 
 				this.trigger('control', [ data ]);
-
-			}
-
-		},
-
-		processUpdate: function(update, silent) {
-
-			silent = silent === true;
-
-
-			var ship = this.ship;
-			if (ship !== null) {
-
-				ship.position.x = update.px;
-				ship.position.y = update.py;
-
-				ship.velocity.x = update.vx;
-				ship.velocity.y = update.vy;
 
 			}
 
@@ -246,9 +221,34 @@ lychee.define('game.logic.Controller').requires([
 
 		setMode: function(mode) {
 
-			if (_validate_enum(Class.MODE, mode) === true) {
+			if (lychee.validate(Class.MODE, mode) === true) {
 
 				this.mode = mode;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setService: function(service) {
+
+			if (service instanceof _service) {
+
+				this.service = service;
+				this.service.bind('control', _process_control, this);
+				this.service.bind('sync',    _process_sync,    this);
+
+				return true;
+
+			} else if (service === null) {
+
+				this.service.unbind('sync',    _process_sync,    this);
+				this.service.unbind('control', _process_control, this);
+				this.service = null;
 
 				return true;
 

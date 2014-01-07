@@ -15,14 +15,9 @@ lychee.define('game.net.client.Multiplayer').includes([
 		var state = this.game.getState('menu');
 		if (state !== null) {
 
-			var root = state.getLayer('ui').getEntity('root');
-			if (root !== null) {
-
-				var entity = root.getEntity('multiplayer');
-				if (entity !== null) {
-					entity.setState('multiplayer');
-				}
-
+			var entity = state.queryLayer('ui', 'root > multiplayer');
+			if (entity !== null) {
+				entity.setState('multiplayer');
 			}
 
 		}
@@ -34,19 +29,38 @@ lychee.define('game.net.client.Multiplayer').includes([
 		this.game.services.multiplayer = null;
 
 
+		// TODO: Tween back to menu main if user is in multiplayer layer
+
 		var state = this.game.getState('menu');
 		if (state !== null) {
 
-			var root = state.getLayer('ui').getEntity('root');
-			if (root !== null) {
-
-				var entity = root.getEntity('multiplayer');
-				if (entity !== null) {
-					entity.setState('multiplayer-disabled');
-				}
-
+			var entity = state.queryLayer('ui', 'root > multiplayer');
+			if (entity !== null) {
+				entity.setState('multiplayer-disabled');
 			}
 
+		}
+
+	};
+
+	var _on_start = function(data) {
+
+		if (this.game.isState('menu') === true) {
+
+			this.game.changeState('game', {
+				type:    'multiplayer',
+				players: data.tunnels,
+				player:  data.tid
+			});
+
+		}
+
+	};
+
+	var _on_stop = function(data) {
+
+		if (this.game.isState('game') === true) {
+			this.game.changeState('menu');
 		}
 
 	};
@@ -62,13 +76,17 @@ lychee.define('game.net.client.Multiplayer').includes([
 		this.game = client.game;
 
 		lychee.net.client.Session.call(this, 'multiplayer', client, {
-			autorun: true,
-			limit:   2
+			// autostart: true,
+			autostart: false,
+			limit:     2
 		});
 
 
 		this.bind('plug',   _plug_service,   this);
 		this.bind('unplug', _unplug_service, this);
+
+		this.bind('start', _on_start, this);
+		this.bind('stop',  _on_stop,  this);
 
 	};
 
@@ -79,16 +97,29 @@ lychee.define('game.net.client.Multiplayer').includes([
 		 * CUSTOM API
 		 */
 
+		sync: function(data) {
+
+			if (this.tunnel !== null) {
+
+				this.multicast(data, {
+					id:    this.id,
+					event: 'sync'
+				});
+
+			}
+
+		},
+
 		control: function(data) {
 
-			// TODO: multicast data with a given player id etc.
+			if (this.tunnel !== null) {
 
-			this.multicast({
-				playerid: 123
-			}, {
-				id:    this.id,
-				event: 'control'
-			});
+				this.multicast(data, {
+					id:    this.id,
+					event: 'control'
+				});
+
+			}
 
 		}
 

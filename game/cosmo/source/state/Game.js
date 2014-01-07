@@ -85,6 +85,9 @@ lychee.define('game.state.Game').requires([
 
 				var env = renderer.getEnvironment();
 
+				data.width  = typeof data.width === 'number'  ? data.width  : env.width;
+				data.height = typeof data.height === 'number' ? data.height : env.height;
+
 
 				logic.bind('update', function(data) {
 
@@ -108,11 +111,7 @@ lychee.define('game.state.Game').requires([
 
 				}, this);
 
-				logic.enter(
-					data,
-					env.width,
-					env.height
-				);
+				logic.enter(data);
 
 
 				this.stage = data;
@@ -206,10 +205,7 @@ lychee.define('game.state.Game').requires([
 			} else {
 
 				var logic = this.logic;
-				if (
-					   logic !== null
-					&& logic.controller !== null
-				) {
+				if (logic !== null) {
 					logic.controller.processKey(key);
 				}
 
@@ -243,51 +239,11 @@ lychee.define('game.state.Game').requires([
 				}
 
 				var logic = this.logic;
-				if (
-					   logic !== null
-					&& logic.controller !== null
-				) {
+				if (logic !== null) {
 					logic.controller.processTouch(position);
 				}
 
 			}
-
-		},
-
-
-
-		/*
-		 * CUSTOM API
-		 */
-
-		__updateStatistics: function(data) {
-
-			var blob = [
-				data.destroyed + '',
-				data.missed + '',
-				((data.destroyed / (data.destroyed + data.missed) * 100) + '').substr(0, 5) + '%'
-			];
-
-			var length = 0;
-			for (var b = 0; b < blob.length; b++) {
-				length = Math.max(blob[b].length, length);
-			}
-
-
-			for (var b = 0; b < blob.length; b++) {
-				for (var l = blob[b].length; l <= length; l++) {
-					blob[b] = ' ' + blob[b];
-				}
-			}
-
-
-			var dest = this.__destroyed;
-			var miss = this.__missed;
-			var rate = this.__rating;
-
-			dest.setLabel('Destroyed: ' + blob[0]);
-			miss.setLabel('Missed:    ' + blob[1]);
-			rate.setLabel('Result:    ' + blob[2]);
 
 		}
 

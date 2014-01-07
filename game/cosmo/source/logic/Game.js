@@ -149,6 +149,25 @@ lychee.define('game.logic.Game').requires([
 
 
 
+	var _interval = function() {
+
+		var level = this.__level;
+		if (level === null) return;
+
+
+		var controllers = this.controllers;
+		if (controllers.length > 1) {
+
+			for (var c = 0, cl = controllers.length; c < cl; c++) {
+				controllers[c].sync();
+			}
+
+		}
+
+	};
+
+
+
 	/*
 	 * IMPLEMENTATION
 	 */
@@ -164,14 +183,13 @@ lychee.define('game.logic.Game').requires([
 		this.controllers = [];
 
 
-		this.__background  = null;
-		this.__level       = null;
-		this.__width       = null;
-		this.__height      = null;
-		this.__stage       = null;
-		this.__session     = { ships: [], stage: null };
-		this.__synctimeout = 0;
-		this.__isRunning   = false;
+		this.__background = null;
+		this.__level      = null;
+		this.__width      = null;
+		this.__height     = null;
+		this.__stage      = null;
+		this.__session    = { ships: [], stage: null };
+		this.__interval   = null;
 
 
 		lychee.event.Emitter.call(this);
@@ -186,12 +204,10 @@ lychee.define('game.logic.Game').requires([
 		 */
 
 		__processSuccess: function(data) {
-			this.__isRunning = false;
 			this.trigger('success', [ data ]);
 		},
 
 		__processFailure: function(data) {
-			this.__isRunning = false;
 			this.trigger('failure', [ data ]);
 		},
 
@@ -270,14 +286,8 @@ lychee.define('game.logic.Game').requires([
 			 * CLEANUP
 			 */
 
-			var service = this.game.services.multiplayer;
-			if (service !== null) {
-
-				for (var c = 0, cl = this.controllers.length; c < cl; c++) {
-					var controller = this.controllers[c];
-					service.unbind('control-' + controller.id, controller.control, controller);
-				}
-
+			for (var c = 0, cl = this.controllers.length; c < cl; c++) {
+				this.controllers[c].setService(null);
 			}
 
 			this.controller  = null;
@@ -352,7 +362,8 @@ lychee.define('game.logic.Game').requires([
 
 			} else if (stage.type === 'multiplayer') {
 
-				var colors = [ 'red', 'blue', 'green' ];
+				var colors  = [ 'red', 'blue', 'green' ];
+				var service = this.game.services.multiplayer;
 
 				for (var p = 0, pl = stage.players.length; p < pl; p++) {
 
@@ -361,8 +372,9 @@ lychee.define('game.logic.Game').requires([
 					ship.setColor(colors[p % 3]);
 
 					var controller = new _controller(stage.players[p], {
-						mode: _controller.MODE.online,
-						ship: ship
+						mode:    _controller.MODE.online,
+						service: service,
+						ship:    ship
 					});
 
 					this.controllers.push(controller);
@@ -370,26 +382,6 @@ lychee.define('game.logic.Game').requires([
 
 					if (p === stage.player) {
 						this.controller = controller;
-					}
-
-				}
-
-
-				var service = this.game.services.multiplayer;
-				if (service !== null) {
-
-					for (var c = 0, cl = this.controllers.length; c < cl; c++) {
-
-						var controller = this.controllers[c];
-
-						service.bind(
-							'control-' + controller.id,
-							controller.control,
-							controller
-						);
-
-						controller.bind('control', service.control, service);
-
 					}
 
 				}
@@ -408,9 +400,10 @@ lychee.define('game.logic.Game').requires([
 			});
 
 
-			_process_update.apply(this, this.__level.data);
+			this.__interval = this.loop.interval(1000, _interval, this);
 
-			this.__isRunning = true;
+
+			_process_update.apply(this, this.__level.data);
 
 		},
 
@@ -419,6 +412,26 @@ lychee.define('game.logic.Game').requires([
 			this.__session.ships  = this.__level.ships;
 			this.__session.stage  = this.__stage;
 			this.__session.points = this.__level.data.points;
+
+
+			var interval = this.__interval
+			if (interval !== null) {
+				interval.clear();
+			}
+
+
+			/*
+			 * CLEANUP TODO: Evaluate if cleanup is necessary
+			 */
+
+/*
+			for (var c = 0, cl = this.controllers.length; c < cl; c++) {
+				this.controllers[c].setService(null);
+			}
+
+			this.controller  = null;
+			this.controllers = [];
+*/
 
 		},
 
@@ -566,16 +579,6 @@ lychee.define('game.logic.Game').requires([
 
 				if (this.game.settings.sound === true) {
 					this.jukebox.play('ship-shield');
-				}
-
-			}
-
-
-			var controllers = this.controllers;
-			if (controllers.length > 1) {
-
-				for (var c = 0, cl = controllers.length; c < cl; c++) {
-					controllers[c].sync();
 				}
 
 			}

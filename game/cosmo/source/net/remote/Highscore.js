@@ -3,6 +3,35 @@ lychee.define('game.net.remote.Highscore').includes([
 	'lychee.net.Service'
 ]).exports(function(lychee, game, global, attachments) {
 
+	/*
+	 * HELPERS
+	 */
+
+	var _get_highscores = function() {
+
+		// TODO: Implement _get_highscores based on filesystem
+
+		var highscores = [];
+
+
+		highscore.push({
+			name:  'Christoph',
+			mode:  'multiplayer',
+			stage: 'stage1',
+			points: 20000
+		});
+
+
+		return highscores;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(remote) {
 
 		lychee.net.Service.call(this, 'highscore', remote, lychee.net.Service.TYPE.remote);
@@ -16,26 +45,18 @@ lychee.define('game.net.remote.Highscore').includes([
 		 * CUSTOM API
 		 */
 
-		update: function(data) {
+		sync: function() {
 
-			// TODO: Implement Highscores via Database
+			if (this.tunnel !== null) {
 
-			var highscore = [];
+				this.tunnel.send({
+					highscores: _get_highscores()
+				}, {
+					id:    this.id,
+					event: 'sync'
+				});
 
-			highscore.push({
-				name:  'Christoph',
-				mode:  'multiplayer',
-				stage: 'stage1',
-				points: 20000
-			});
-
-
-			this.remote.send({
-				highscore: highscore
-			}, {
-				id:     this.id,
-				event:  'update'
-			});
+			}
 
 		}
 
