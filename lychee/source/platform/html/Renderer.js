@@ -363,6 +363,45 @@ lychee.define('Renderer').tags({
 
 		},
 
+		drawCircleGradient: function(x, y, radius, palette) {
+
+			if (this.__state !== 1) return;
+
+//			color1     = _is_color(color1) === true ? color1 : '#000000';
+//			color2     = _is_color(color2) === true ? color2 : '#000000';
+
+
+			var ctx = this.__ctx;
+
+
+			var gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+
+			for (var p = 0, pl = palette.length; p < pl; p++) {
+
+				var stop = palette[p];
+				gradient.addColorStop('' + stop[0], stop[1]);
+
+			}
+
+
+			ctx.globalAlpha = this.__alpha;
+			ctx.beginPath();
+
+			ctx.arc(
+				x,
+				y,
+				radius,
+				0,
+				Math.PI * 2
+			);
+
+			ctx.fillStyle = gradient;
+			ctx.fill();
+
+			ctx.closePath();
+
+		},
+
 		drawLine: function(x1, y1, x2, y2, color, lineWidth) {
 
 			if (this.__state !== 1) return;

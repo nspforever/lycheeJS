@@ -50,7 +50,9 @@ lychee.define('game.net.client.Multiplayer').includes([
 			this.game.changeState('game', {
 				type:    'multiplayer',
 				players: data.tunnels,
-				player:  data.tid
+				player:  data.tid,
+				width:   this.env.width,
+				height:  this.env.height
 			});
 
 		}
@@ -65,6 +67,38 @@ lychee.define('game.net.client.Multiplayer').includes([
 
 	};
 
+	var _update_env = function() {
+
+		var renderer = this.game.renderer;
+		if (renderer !== null) {
+
+			var env = this.game.renderer.getEnvironment();
+
+			this.env.width  = env.width;
+			this.env.height = env.height;
+
+		}
+
+	};
+
+	var _on_syncenv = function(data) {
+
+		data.width  = typeof data.width === 'number'  ? data.width  : null;
+		data.height = typeof data.height === 'number' ? data.height : null;
+
+
+		if (
+			   data.width !== null
+			&& data.height !== null
+		) {
+
+			this.env.width  = Math.min(this.env.width,  data.width);
+			this.env.height = Math.min(this.env.height, data.height);
+
+		}
+
+	};
+
 
 
 	/*
@@ -74,18 +108,31 @@ lychee.define('game.net.client.Multiplayer').includes([
 	var Class = function(client) {
 
 		this.game = client.game;
+		this.env  = {
+			width:  0,
+			height: 0
+		};
+
 
 		lychee.net.client.Session.call(this, 'multiplayer', client, {
 			autostart: true,
 			limit:     2
 		});
 
+		_update_env.call(this);
+
+
+
+		/*
+		 * INITIALIZATION
+		 */
 
 		this.bind('plug',   _plug_service,   this);
 		this.bind('unplug', _unplug_service, this);
 
-		this.bind('start', _on_start, this);
-		this.bind('stop',  _on_stop,  this);
+		this.bind('start',   _on_start,   this);
+		this.bind('stop',    _on_stop,    this);
+		this.bind('syncenv', _on_syncenv, this);
 
 	};
 
@@ -94,6 +141,42 @@ lychee.define('game.net.client.Multiplayer').includes([
 
 		/*
 		 * CUSTOM API
+		 */
+
+		join: function() {
+
+			lychee.net.client.Session.prototype.join.call(this);
+
+
+			var renderer = this.game.renderer;
+			if (renderer !== null) {
+
+				var env = renderer.getEnvironment();
+
+				this.multicast({
+					width:  env.width,
+					height: env.height
+				},{
+					id:    this.id,
+					event: 'syncenv'
+				});
+
+			}
+
+		},
+
+		leave: function() {
+
+			lychee.net.client.Session.prototype.leave.call(this);
+
+			_update_env.call(this);
+
+		},
+
+
+
+		/*
+		 * CUSTOM API: CONTROLLER
 		 */
 
 		sync: function(data) {

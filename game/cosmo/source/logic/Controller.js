@@ -161,8 +161,6 @@ lychee.define('game.logic.Controller').requires([
 				&& this.mode === Class.MODE.online
 			) {
 
-console.log('broadcasting key!');
-
 				_service_control.call(this, {
 					key: key
 				});

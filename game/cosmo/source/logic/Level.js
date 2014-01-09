@@ -70,7 +70,7 @@ lychee.define('game.logic.Level').requires([
 		this.logic = logic || null;
 
 
-		this.data     = [];
+		this.data     = [ null, null, null, null ];
 		this.enemies  = [];
 		this.entities = [];
 		this.ships    = [];
@@ -97,10 +97,10 @@ lychee.define('game.logic.Level').requires([
 
 		reset: function(stage) {
 
-			this.data     = [];
+			this.data     = [ null, null, null, null ];
 			this.enemies  = [];
 			this.entities = [];
-			this.ships    = [];
+			this.ships    = [ null, null, null, null ];
 
 			this.height   = stage.height;
 			this.__boundY = ((this.height / 80) | 0);
@@ -120,9 +120,9 @@ lychee.define('game.logic.Level').requires([
 					ship.setHealth(data.health);
 					ship.setPosition(_translate_to_position.call(this, -4 + 2 * s, 1));
 
-					this.data.push(data);
+					this.data[s]  = data;
+					this.ships[s] = ship;
 					this.entities.push(ship);
-					this.ships.push(ship);
 
 				}
 
@@ -140,9 +140,9 @@ lychee.define('game.logic.Level').requires([
 					ship.setHealth(data.health);
 					ship.setPosition(_translate_to_position.call(this, 0, 1));
 
-					this.data.push(data);
+					this.data[s]  = data;
+					this.ships[s] = ship;
 					this.entities.push(ship);
-					this.ships.push(ship);
 
 				}
 

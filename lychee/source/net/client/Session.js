@@ -62,15 +62,9 @@ lychee.define('lychee.net.client.Session').includes([
 				|| type === 'stop'
 			) {
 
-				var args = [{
-					sid:     this.sid,
-					limit:   this.limit,
-					tid:     data.tid,
-					tunnels: data.tunnels
-				}];
+				delete data.type;
 
-
-				this.trigger(type, args);
+				this.trigger(type, [ data ]);
 
 			}
 

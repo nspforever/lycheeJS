@@ -17,17 +17,17 @@ lychee.define('game.state.Game').requires([
 	 * HELPERS
 	 */
 
-	var _process_update = function(data) {
+	var _process_update = function(player1, player2) {
 
-		this.__hud.processUpdate(data);
+		this.__hud.trigger('update', [ player1, player2 ]);
 
 	};
 
-	var _process_success = function(data) {
+	var _process_success = function(player1, player2) {
 
 		this.__hud.visible    = false;
 		this.__result.visible = true;
-		this.__result.processSuccess(data);
+		this.__result.trigger('success', arguments);
 
 	};
 
@@ -35,7 +35,7 @@ lychee.define('game.state.Game').requires([
 
 		this.__hud.visible    = false;
 		this.__result.visible = true;
-		this.__result.processFailure(data);
+		this.__result.trigger('failure', arguments);
 
 	};
 
@@ -111,17 +111,24 @@ lychee.define('game.state.Game').requires([
 			data.player  = typeof data.player === 'string' ? data.player   : 'local:1337';
 
 
-			var renderer   = this.renderer;
-			var logic      = this.logic;
 			if (
-				renderer !== null
-				&& logic !== null
+				   this.renderer !== null
+				&& this.logic !== null
 			) {
 
-				var env = renderer.getEnvironment();
+				var env = this.renderer.getEnvironment();
 
 				data.width  = typeof data.width === 'number'  ? data.width  : env.width;
 				data.height = typeof data.height === 'number' ? data.height : env.height;
+
+
+
+data.height = 500;
+
+
+				if (lychee.debug === true) {
+					console.log('game.state.Game: Creating level ', data);
+				}
 
 
 				var level = this.logic.createLevel(data);
@@ -159,21 +166,9 @@ lychee.define('game.state.Game').requires([
 
 
 					if (data.player === data.players[0]) {
-
-console.log('PLAYER 1 (red)', data.player, data.players);
-
 						this.controller = player1;
-
-global._PLAYER = player1;
-
 					} else {
-
-console.log('PLAYER 2 (blue)', data.player, data.players);
-
 						this.controller = player2;
-
-global._PLAYER = player2;
-
 					}
 
 				}
@@ -211,14 +206,18 @@ global._PLAYER = player2;
 			}
 
 
-			var logic = this.game.logic;
-			if (logic !== null) {
+			if (this.logic !== null) {
 
-				logic.unbind('update');
-				logic.unbind('success');
-				logic.unbind('failure');
+				var level = this.logic.level;
+				if (level !== null) {
 
-				logic.leave();
+					level.unbind('update',  _process_update,  this);
+					level.unbind('success', _process_success, this);
+					level.unbind('failure', _process_failure, this);
+
+				}
+
+				this.logic.leave();
 
 			}
 
@@ -229,7 +228,7 @@ global._PLAYER = player2;
 
 		update: function(clock, delta) {
 
-			var logic = this.game.logic;
+			var logic = this.logic;
 			if (logic !== null) {
 				logic.update(clock, delta);
 			}
@@ -254,7 +253,7 @@ global._PLAYER = player2;
 				renderer.clear();
 
 
-				var logic = this.game.logic;
+				var logic = this.logic;
 				if (logic !== null) {
 					logic.render(clock, delta);
 				}
@@ -276,8 +275,9 @@ global._PLAYER = player2;
 
 			} else {
 
-				if (this.controller !== null) {
-					this.controller.processKey(key);
+				var controller = this.controller;
+				if (controller !== null) {
+					controller.processKey(key);
 				}
 
 			}
@@ -309,8 +309,10 @@ global._PLAYER = player2;
 
 				}
 
-				if (this.controller !== null) {
-					this.controller.processTouch(position);
+
+				var controller = this.controller;
+				if (controller !== null) {
+					controller.processTouch(position);
 				}
 
 			}

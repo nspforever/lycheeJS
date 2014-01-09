@@ -17,6 +17,20 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 	 * HELPERS
 	 */
 
+	var _get_points = function(points) {
+
+		var pre = '';
+		var str = points + '';
+
+		for (var l = str.length; l < 9; l++) {
+			pre += '0';
+		}
+
+		return pre + str;
+
+	};
+
+/*
 	var _get_level = function(points) {
 
 		var level = 0;
@@ -43,26 +57,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	};
 
-	var _get_points = function(points) {
-
-		points = points >= 0 ? points : 0;
-
-
-		var pre = '';
-		var str = points + '';
-		if (str.length < 8) {
-
-			for (var l = str.length; l < 8; l++) {
-				pre += '0';
-			}
-
-		}
-
-		return pre + points;
-
-	};
-
-	var _process_update = function(data, index) {
+	var _OLD_process_update = function(data, index) {
 
 		var level   = this.__map.level;
 		var points  = this.__map.points;
@@ -77,6 +72,16 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 		this.__map.level  = '' + level;
 		this.__map.points = '' + points;
+
+	};
+
+*/
+
+
+	var _process_update = function(player1, player2) {
+
+
+		this.__map.points = _get_points(player1.points);
 
 	};
 
@@ -100,8 +105,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		this.__map            = {};
 		this.__map.background = _config.map.background;
 		this.__map.bar        = _config.map.bar;
-		this.__map.level      = '0';
-		this.__map.points     = '00000000';
+		this.__map.points     = '000000000';
 
 		var shield = _config.map.shield;
 		this.__map.shield = {
@@ -126,6 +130,9 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		lychee.ui.Entity.call(this, settings);
 
 		settings = null;
+
+
+		this.bind('update', _process_update, this);
 
 
 		this.reset();
@@ -196,41 +203,16 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 					map.upgrade
 				);
 
-
 				renderer.drawText(
-					x1,
-					y1 + 92,
-					map.level,
-					this.__font
-				);
-
-				renderer.drawText(
-					x1 + 34,
-					y1 + 92,
+					x1 + 12,
+					y1 + 90,
 					map.points,
 					this.__font
 				);
 
 			}
 
-		},
-
-
-
-		/*
-		 * CUSTOM API
-		 */
-
-		processUpdate: function(player1, player2) {
-
-			_process_update.call(this, player1, 0);
-
-			if (player2 !== undefined) {
-				_process_update.call(this, player2, 1);
-			}
-
 		}
-
 
 	};
 

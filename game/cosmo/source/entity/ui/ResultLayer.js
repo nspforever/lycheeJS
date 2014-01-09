@@ -23,6 +23,40 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	 * HELPERS
 	 */
 
+	var _process_success = function(data) {
+
+		var headline = this.getEntity('headline');
+
+		headline.setLabel('STAGE CLEAR');
+
+
+		var restart = this.getEntity('restart');
+		var continu = this.getEntity('continue');
+
+		restart.visible = false;
+		continu.visible = true;
+
+		_show_statistics.call(this, data);
+
+	};
+
+	var _process_failure = function(data) {
+
+		var headline = this.getEntity('headline');
+
+		headline.setLabel('GAME OVER');
+
+
+		var restart = this.getEntity('restart');
+		var continu = this.getEntity('continue');
+
+		restart.visible = true;
+		continu.visible = false;
+
+		_show_statistics.call(this, data);
+
+	};
+
 	var _show_statistics = function(data) {
 
 		var percentage = data.destroyed / (data.destroyed + data.missed) * 100;
@@ -111,6 +145,10 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		lychee.ui.Layer.call(this, settings);
 
 		settings = null;
+
+
+		this.bind('success', _process_success, this);
+		this.bind('failure', _process_failure, this);
 
 
 		this.reset();
@@ -244,46 +282,6 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 
 			this.__hits = entity;
-
-		},
-
-
-
-		/*
-		 * CUSTOM API
-		 */
-
-		processSuccess: function(data) {
-
-			var headline = this.getEntity('headline');
-
-			headline.setLabel('STAGE CLEAR');
-
-
-			var restart = this.getEntity('restart');
-			var continu = this.getEntity('continue');
-
-			restart.visible = false;
-			continu.visible = true;
-
-			_show_statistics.call(this, data);
-
-		},
-
-		processFailure: function(data) {
-
-			var headline = this.getEntity('headline');
-
-			headline.setLabel('GAME OVER');
-
-
-			var restart = this.getEntity('restart');
-			var continu = this.getEntity('continue');
-
-			restart.visible = true;
-			continu.visible = false;
-
-			_show_statistics.call(this, data);
 
 		}
 
