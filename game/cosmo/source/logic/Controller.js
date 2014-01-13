@@ -229,7 +229,7 @@ lychee.define('game.logic.Controller').requires([
 
 		setMode: function(mode) {
 
-			if (lychee.validate(Class.MODE, mode) === true) {
+			if (lychee.enumof(Class.MODE, mode) === true) {
 
 				this.mode = mode;
 

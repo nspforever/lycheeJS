@@ -410,7 +410,7 @@ lychee.define('lychee.ui.Input').includes([
 
 		setType: function(type) {
 
-			if (lychee.validate(Class.TYPE, type) === true) {
+			if (lychee.enumof(Class.TYPE, type) === true) {
 
 				this.type = type;
 

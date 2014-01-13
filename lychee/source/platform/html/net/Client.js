@@ -414,7 +414,7 @@ lychee.define('lychee.net.Client').tags({
 
 		plug: function(service) {
 
-			if (lychee.validate(lychee.net.Service, service) === false) {
+			if (lychee.interfaceof(lychee.net.Service, service) === false) {
 				return false;
 			}
 
@@ -443,7 +443,7 @@ lychee.define('lychee.net.Client').tags({
 
 		unplug: function(service) {
 
-			if (lychee.validate(lychee.net.Service, service) === false) {
+			if (lychee.interfaceof(lychee.net.Service, service) === false) {
 				return false;
 			}
 

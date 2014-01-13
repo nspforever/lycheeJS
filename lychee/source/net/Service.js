@@ -15,9 +15,9 @@ lychee.define('lychee.net.Service').includes([
 
 
 		if (type === Class.TYPE.client) {
-			return lychee.validate(lychee.net.Client, tunnel);
+			return lychee.interfaceof(lychee.net.Client, tunnel);
 		} else if (type === Class.TYPE.remote) {
-			return lychee.validate(lychee.net.Remote, tunnel);
+			return lychee.interfaceof(lychee.net.Remote, tunnel);
 		}
 
 
@@ -91,7 +91,7 @@ lychee.define('lychee.net.Service').includes([
 	var Class = function(id, tunnel, type) {
 
 		id     = typeof id === 'string'                     ? id   : null;
-		type   = lychee.validate(Class.TYPE, type) === true ? type : null;
+		type   = lychee.enumof(Class.TYPE, type) === true ? type : null;
 
 		// tunnel needs to be validated after type, due to inclusion dependencies
 		tunnel = _validate_tunnel(tunnel, type) === true   ? tunnel : null;

@@ -48,15 +48,21 @@ lychee.define('game.ar.video.Socket').tags({
 
 		var that = this;
 
+
 		this.__socket = new net.Socket();
-		this.__socket.connect(this.__port, this.__ip);
 		this.__socket.setTimeout(1000);
+
 		this.__socket.on('data', function(buffer) {
 			_process_data.call(that, buffer);
 		});
 		this.__socket.on('timeout', function() {
 			this.destroy();
 		});
+		this.__socket.on('error', function() {
+			this.destroy();
+		});
+
+		this.__socket.connect(this.__port, this.__ip);
 
 
 		lychee.event.Emitter.call(this);

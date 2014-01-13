@@ -264,7 +264,7 @@ lychee.define('lychee.ui.Entity').includes([
 
 		setShape: function(shape) {
 
-			if (lychee.validate(Class.SHAPE, shape) === true) {
+			if (lychee.enumof(Class.SHAPE, shape) === true) {
 
 				this.shape = shape;
 
@@ -321,7 +321,7 @@ lychee.define('lychee.ui.Entity').includes([
 
 				var tween = this.__tween;
 
-				tween.type     = lychee.validate(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
+				tween.type     = lychee.enumof(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
 				tween.duration = typeof settings.duration === 'number'       ? settings.duration : 1000;
 
 				if (settings.position instanceof Object) {

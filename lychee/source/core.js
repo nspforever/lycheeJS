@@ -399,19 +399,18 @@ if (typeof global !== 'undefined') {
 	};
 
 
-	lychee.validate = function(template, instance) {
+	lychee.enumof = function(template, value) {
 
-		// 1. Enum validation
 		if (
 			   template instanceof Object
-			&& typeof instance === 'number'
+			&& typeof value === 'number'
 		) {
 
 			var valid = false;
 
-			for (var value in template) {
+			for (var val in template) {
 
-				if (instance === template[value]) {
+				if (value === template[val]) {
 					valid = true;
 					break;
 				}
@@ -421,9 +420,17 @@ if (typeof global !== 'undefined') {
 
 			return valid;
 
+		}
 
-		// 2. Interface validation on template
-		} else if (
+
+		return false;
+
+	};
+
+	lychee.interfaceof = function(template, instance) {
+
+		// 1. Interface validation on Template
+		if (
 			   template instanceof Function
 			&& template.prototype instanceof Object
 			&& instance instanceof Function
@@ -445,7 +452,7 @@ if (typeof global !== 'undefined') {
 			return valid;
 
 
-		// 3. Interface validation on instance
+		// 2. Interface validation on Instance
 		} else if (
 			   template instanceof Function
 			&& template.prototype instanceof Object

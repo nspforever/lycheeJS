@@ -1,7 +1,7 @@
 
 lychee.define('game.logic.Game').requires([
 	'game.entity.Background',
-	'game.entity.Shield',
+	'game.entity.Foreground',
 	'game.logic.Level',
 	'lychee.game.Layer'
 ]).includes([
@@ -12,11 +12,11 @@ lychee.define('game.logic.Game').requires([
 
 	var _level      = game.logic.Level;
 	var _background = game.entity.Background;
+	var _foreground = game.entity.Foreground;
 	var _blackhole  = game.entity.Blackhole;
 	var _enemy      = game.entity.Enemy;
 	var _lazer      = game.entity.Lazer;
 	var _meteor     = game.entity.Meteor;
-	var _shield     = game.entity.Shield;
 	var _ship       = game.entity.Ship;
 
 
@@ -154,7 +154,7 @@ lychee.define('game.logic.Game').requires([
 		this.ship         = null;
 
 		this.__background = null;
-		this.__fog        = null;
+		this.__foreground = null;
 		this.__interval   = null;
 		this.__session    = {
 			ships:  [],
@@ -244,7 +244,11 @@ lychee.define('game.logic.Game').requires([
 					height: env.height
 				});
 
-				this.__buffer = renderer.createBuffer(env.width, env.height);
+				this.__foreground = new _foreground({
+					buffer: renderer.createBuffer(env.width, env.height),
+					width:  env.width,
+					height: env.height
+				});
 
 			}
 
@@ -400,6 +404,12 @@ lychee.define('game.logic.Game').requires([
 			}
 
 
+			var foreground = this.__foreground;
+			if (foreground !== null) {
+				foreground.update(clock, delta, config);
+			}
+
+
 			if (enemyhits !== 0) {
 
 				if (this.game.settings.sound === true) {
@@ -431,7 +441,6 @@ lychee.define('game.logic.Game').requires([
 				var offsetX  = env.width / 2;
 				var offsetY  = env.height / 2;
 
-				var buffer   = this.__buffer;
 				var entities = level.entities;
 				var ships    = level.ships;
 
@@ -448,67 +457,6 @@ lychee.define('game.logic.Game').requires([
 				}
 
 
-				// TODO: Evaluate if light effects can be rendered more easily
-
-				renderer.clearBuffer(buffer);
-				renderer.setBuffer(buffer);
-
-				renderer.drawBox(
-					0,
-					0,
-					buffer.width,
-					buffer.height,
-					'#000000',
-					true
-				);
-
-
-				for (var e = 0, el = entities.length; e < el; e++) {
-
-					var entity   = entities[e];
-					var position = entity.position;
-					if (entity.type === 'ship') {
-
-						renderer.__ctx.globalCompositeOperation = 'destination-out';
-
-						renderer.drawCircleGradient(
-							offsetX + position.x,
-							offsetY + position.y,
-							200, [
-								[ 0.0,  'rgba(0,0,0,0.0)' ],
-								[ 0.4,  'rgba(0,0,0,0.1)' ],
-								[ 0.9,  'rgba(0,0,0,1.0)' ],
-								[ 1.0,  'rgba(0,0,0,0.0)' ]
-							]
-						);
-
-						renderer.__ctx.globalCompositeOperation = 'source-over';
-
-					}
-
-					if (entity.type === 'lazer') {
-
-						renderer.__ctx.globalCompositeOperation = 'destination-out';
-
-						renderer.drawCircleGradient(
-							offsetX + position.x,
-							offsetY + position.y,
-							40, [
-								[ 0.0, 'rgba(0,0,0,1.0)' ],
-								[ 1.0, 'rgba(0,0,0,0.0)' ]
-							]
-						);
-
-						renderer.__ctx.globalCompositeOperation = 'source-over';
-
-					}
-
-				}
-
-
-				renderer.setBuffer(null);
-
-
 				for (var e = 0, el = entities.length; e < el; e++) {
 
 					var entity = entities[e];
@@ -523,7 +471,16 @@ lychee.define('game.logic.Game').requires([
 				}
 
 
-				renderer.drawBuffer(0, 0, buffer);
+				var foreground = this.__foreground;
+				if (foreground !== null) {
+
+					foreground.render(
+						renderer,
+						offsetX,
+						offsetY
+					);
+
+				}
 
 
 				for (var s = 0, sl = ships.length; s < sl; s++) {

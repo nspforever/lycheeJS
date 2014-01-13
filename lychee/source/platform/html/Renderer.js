@@ -68,6 +68,34 @@ lychee.define('Renderer').tags({
 
 
 	/*
+	 * STRUCTS
+	 */
+
+	var _buffer = function(width, height) {
+
+		this.width  = typeof width === 'number'  ? width  : 1;
+		this.height = typeof height === 'number' ? height : 1;
+
+		this.__buffer = document.createElement('canvas');
+		this.__ctx    = this.__buffer.getContext('2d');
+
+		this.__buffer.width  = this.width;
+		this.__buffer.height = this.height;
+
+	};
+
+	var _gradient = function(x1, y1, x2, y2, type) {
+
+		if (type === Class.GRADIENT.radial) {
+
+		} else if (type === Class.TYPE.linear) {
+		}
+
+	};
+
+
+
+	/*
 	 * IMPLEMENTATION
 	 */
 
@@ -216,35 +244,36 @@ lychee.define('Renderer').tags({
 		},
 
 		createBuffer: function(width, height) {
-
-			width  = typeof width === 'number'  ? width  : 1;
-			height = typeof height === 'number' ? height : 1;
-
-
-			var buffer = document.createElement('canvas');
-
-			buffer.width  = width;
-			buffer.height = height;
-
-			return buffer;
-
+			return new _buffer(width, height);
 		},
 
 		clearBuffer: function(buffer) {
 
-			var ctx = buffer.getContext('2d');
-
-
-			ctx.clearRect(0, 0, buffer.width, buffer.height);
+			if (buffer instanceof _buffer) {
+				buffer.__ctx.clearRect(0, 0, buffer.width, buffer.height);
+			}
 
 		},
 
 		setBuffer: function(buffer) {
 
-			if (buffer === null) {
-				this.__ctx = this.__canvas.getContext('2d');
+			if (buffer instanceof _buffer) {
+				this.__ctx = buffer.__ctx;
 			} else {
-				this.__ctx = buffer.getContext('2d');
+				this.__ctx = this.__canvas.getContext('2d');
+			}
+
+		},
+
+		createGradient: function(x1, y1, x2, y2, type) {
+
+			return new _gradient(x1, y1, x2, y2, type);
+
+		},
+
+		clearGradient: function(gradient) {
+
+			if (gradient instanceof _gradient) {
 			}
 
 		},

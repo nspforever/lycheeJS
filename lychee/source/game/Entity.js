@@ -443,7 +443,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		setCollision: function(collision) {
 
-			if (lychee.validate(Class.COLLISION, collision) === true) {
+			if (lychee.enumof(Class.COLLISION, collision) === true) {
 
 				this.collision = collision;
 
@@ -458,7 +458,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		setShape: function(shape) {
 
-			if (lychee.validate(Class.SHAPE, shape) === true) {
+			if (lychee.enumof(Class.SHAPE, shape) === true) {
 
 				this.shape = shape;
 
@@ -516,7 +516,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 				var tween = this.__tween;
 
-				tween.type     = lychee.validate(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
+				tween.type     = lychee.enumof(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
 				tween.duration = typeof settings.duration === 'number'       ? settings.duration : 1000;
 
 				if (settings.position instanceof Object) {

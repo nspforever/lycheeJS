@@ -964,7 +964,7 @@
 
 		setMode: function(mode) {
 
-			if (lychee.validate(lychee.Builder.MODE, mode) === true) {
+			if (lychee.enumof(lychee.Builder.MODE, mode) === true) {
 
 				this.mode = mode;
 

@@ -259,7 +259,7 @@ lychee.define('lychee.ui.Slider').includes([
 
 		setType: function(type) {
 
-			if (lychee.validate(Class.TYPE, type) === true) {
+			if (lychee.enumof(Class.TYPE, type) === true) {
 
 				if (type === Class.TYPE.horizontal) {
 					this.width  = this.__width;

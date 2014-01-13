@@ -53,6 +53,7 @@ lychee.define('game.ar.navdata.Socket').tags({
 
 		var that = this;
 
+
 		this.__socket = _dgram.createSocket('udp4');
 		this.__socket.bind();
 		this.__socket.on('message', function(buffer) {
