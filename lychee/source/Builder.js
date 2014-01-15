@@ -985,16 +985,16 @@
 	}
 
 
-	lychee.build = function(callback, scope, simulation) {
+	lychee.build = function(callback, scope, environment, mode) {
 
-		var builder     = new lychee.Builder();
-		var environment = lychee.getEnvironment();
+		environment = environment instanceof Object                     ? environment : lychee.getEnvironment();
+		mode        = lychee.enumof(lychee.Builder.MODE, mode) === true ? mode        : null;
 
 
-		if (simulation === true) {
-			builder.setMode(lychee.Builder.MODE['simulation']);
-		} else {
-			builder.setMode(lychee.Builder.MODE['normal']);
+		var builder = new lychee.Builder();
+
+		if (mode !== null) {
+			builder.setMode(mode);
 		}
 
 
