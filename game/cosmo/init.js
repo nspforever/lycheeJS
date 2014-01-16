@@ -1,6 +1,6 @@
 
 // Set to true to see lychee debug messages
-// lychee.debug = true;
+lychee.debug = true;
 
 
 lychee.rebase({
@@ -10,7 +10,8 @@ lychee.rebase({
 
 
 lychee.tag({
-	platform: [ 'webgl', 'html' ]
+	// TODO: Change tags to platform: [ 'webgl', 'html' ]
+	platform: [ 'html' ]
 });
 
 
