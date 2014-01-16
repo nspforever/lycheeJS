@@ -169,7 +169,7 @@ lychee.define('game.entity.Ship').requires([
 					var velarray = [];
 
 					for (var p = 0, pl = posarray.length; p < pl; p++) {
-						velarray.push({ x: 0, y: -300 });
+						velarray.push({ x: 0, y: -400 });
 					}
 
 

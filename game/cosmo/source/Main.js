@@ -16,7 +16,8 @@ lychee.define('game.Main').requires([
 
 			fullscreen: true,
 
-			music: false, // TODO: change music to true
+			// music: true,
+			music: false,
 			sound: true,
 
 			// Is configured by sorbet/module/Server

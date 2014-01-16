@@ -35,17 +35,52 @@ lychee.define('Renderer').tags({
 	 * HELPERS
 	 */
 
+	var _color_cache = {};
+
 	var _is_color = function(color) {
 
-		if (
+		return !!(
 			   typeof color === 'string'
 			&& color.match(/(#[AaBbCcDdEeFf0-9]{6})/)
-		) {
-			return true;
+		);
+
+	};
+
+	var _hex_to_rgba = function(hex) {
+
+		if (_color_cache[hex] !== undefined) {
+			return _color_cache[hex];
+		}
+
+		var rgba = [ 0, 0, 0, 255 ];
+
+		if (typeof hex === 'string') {
+
+			if (hex.length === 7) {
+
+				rgba[0] = parseInt(hex[1] + hex[2], 16);
+				rgba[1] = parseInt(hex[3] + hex[4], 16);
+				rgba[2] = parseInt(hex[5] + hex[6], 16);
+				rgba[3] = 255;
+
+			} else if (hex.length === 9) {
+
+ 				rgba[0] = parseInt(hex[1] + hex[2], 16);
+				rgba[1] = parseInt(hex[3] + hex[4], 16);
+				rgba[2] = parseInt(hex[5] + hex[6], 16);
+				rgba[3] = parseInt(hex[7] + hex[8], 16);
+
+			}
+
 		}
 
 
-		return false;
+		var color = 'rgba(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ',' + (rgba[3] / 255) + ')';
+
+		_color_cache[hex] = color;
+
+
+		return color;
 
 	};
 
@@ -76,20 +111,11 @@ lychee.define('Renderer').tags({
 		this.width  = typeof width === 'number'  ? width  : 1;
 		this.height = typeof height === 'number' ? height : 1;
 
-		this.__buffer = document.createElement('canvas');
+		this.__buffer = global.document.createElement('canvas');
 		this.__ctx    = this.__buffer.getContext('2d');
 
 		this.__buffer.width  = this.width;
 		this.__buffer.height = this.height;
-
-	};
-
-	var _gradient = function(x1, y1, x2, y2, type) {
-
-		if (type === Class.GRADIENT.radial) {
-
-		} else if (type === Class.TYPE.linear) {
-		}
 
 	};
 
@@ -134,6 +160,7 @@ lychee.define('Renderer').tags({
 		}
 
 	};
+
 
 
 	Class.prototype = {
@@ -265,19 +292,6 @@ lychee.define('Renderer').tags({
 
 		},
 
-		createGradient: function(x1, y1, x2, y2, type) {
-
-			return new _gradient(x1, y1, x2, y2, type);
-
-		},
-
-		clearGradient: function(gradient) {
-
-			if (gradient instanceof _gradient) {
-			}
-
-		},
-
 
 
 		/*
@@ -348,11 +362,15 @@ lychee.define('Renderer').tags({
 
 		drawBuffer: function(x1, y1, buffer) {
 
-			var ctx = this.__ctx;
+			if (buffer instanceof _buffer) {
+
+				var ctx = this.__ctx;
 
 
-			ctx.globalAlpha = this.__alpha;
-			ctx.drawImage(buffer, x1, y1);
+				ctx.globalAlpha = this.__alpha;
+				ctx.drawImage(buffer.__buffer, x1, y1);
+
+			}
 
 		},
 
@@ -379,6 +397,7 @@ lychee.define('Renderer').tags({
 				Math.PI * 2
 			);
 
+
 			if (background === false) {
 				ctx.lineWidth   = lineWidth;
 				ctx.strokeStyle = color;
@@ -392,12 +411,13 @@ lychee.define('Renderer').tags({
 
 		},
 
-		drawCircleGradient: function(x, y, radius, palette) {
+		drawLight: function(x, y, radius, color, background, lineWidth) {
 
 			if (this.__state !== 1) return;
 
-//			color1     = _is_color(color1) === true ? color1 : '#000000';
-//			color2     = _is_color(color2) === true ? color2 : '#000000';
+			color      = _hex_to_rgba(color);
+			background = background === true;
+			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
 
 			var ctx = this.__ctx;
@@ -405,12 +425,8 @@ lychee.define('Renderer').tags({
 
 			var gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
 
-			for (var p = 0, pl = palette.length; p < pl; p++) {
-
-				var stop = palette[p];
-				gradient.addColorStop('' + stop[0], stop[1]);
-
-			}
+			gradient.addColorStop(0, color);
+			gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
 
 			ctx.globalAlpha = this.__alpha;
@@ -424,8 +440,15 @@ lychee.define('Renderer').tags({
 				Math.PI * 2
 			);
 
-			ctx.fillStyle = gradient;
-			ctx.fill();
+
+			if (background === false) {
+				ctx.lineWidth   = lineWidth;
+				ctx.strokeStyle = gradient;
+				ctx.stroke();
+			} else {
+				ctx.fillStyle   = gradient;
+				ctx.fill();
+			}
 
 			ctx.closePath();
 

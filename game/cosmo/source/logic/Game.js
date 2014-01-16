@@ -64,6 +64,20 @@ lychee.define('game.logic.Game').requires([
 
 	};
 
+	var _process_explosion = function(x, y) {
+
+		var foreground = this.__foreground;
+		if (foreground !== null) {
+
+			foreground.setExplosion({
+				x: x,
+				y: y
+			});
+
+		}
+
+	};
+
 	var _process_update = function() {
 
 		var level = this.level;
@@ -558,11 +572,13 @@ lychee.define('game.logic.Game').requires([
 			if (level instanceof _level) {
 
 				if (this.level !== null) {
-					this.level.unbind('update', _process_update, this);
+					this.level.unbind('explosion', _process_explosion, this);
+					this.level.unbind('update',    _process_update,    this);
 				}
 
 				this.level = level;
-				this.level.bind('update', _process_update, this);
+				this.level.bind('update',    _process_update,    this);
+				this.level.bind('explosion', _process_explosion, this);
 
 				return true;
 

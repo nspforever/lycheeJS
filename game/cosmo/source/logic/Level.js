@@ -239,6 +239,7 @@ lychee.define('game.logic.Level').requires([
 						data.destroyed++;
 
 						this.trigger('update', this.data);
+						this.trigger('explosion', [ entity.position.x, entity.position.y ]);
 
 					} else {
 

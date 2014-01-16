@@ -90,11 +90,9 @@ lychee.define('lychee.net.Service').includes([
 
 	var Class = function(id, tunnel, type) {
 
-		id     = typeof id === 'string'                     ? id   : null;
-		type   = lychee.enumof(Class.TYPE, type) === true ? type : null;
-
-		// tunnel needs to be validated after type, due to inclusion dependencies
-		tunnel = _validate_tunnel(tunnel, type) === true   ? tunnel : null;
+		id     = typeof id === 'string'                   ? id     : null;
+		type   = lychee.enumof(Class.TYPE, type) === true ? type   : null;
+		tunnel = _validate_tunnel(tunnel, type) === true  ? tunnel : null;
 
 
 		this.id     = id;
