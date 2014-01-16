@@ -18,6 +18,8 @@ lychee.tag({
 lychee.build(function(lychee, global) {
 
 	var settings = {
+//		music: false,
+//		sound: false
 	};
 
 

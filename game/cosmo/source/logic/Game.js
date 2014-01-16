@@ -76,6 +76,10 @@ lychee.define('game.logic.Game').requires([
 
 		}
 
+		if (this.game.settings.sound === true) {
+			this.jukebox.play('explosion');
+		}
+
 	};
 
 	var _process_update = function() {
@@ -425,11 +429,7 @@ lychee.define('game.logic.Game').requires([
 
 
 			if (enemyhits !== 0) {
-
-				if (this.game.settings.sound === true) {
-					this.jukebox.play('explosion');
-				}
-
+				// TODO: Evaluate if sound shall be played here
 			}
 
 			if (shiphits > 0) {

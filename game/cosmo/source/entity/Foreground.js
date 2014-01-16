@@ -5,13 +5,31 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 	 * HELPERS
 	 */
 
-	var _small_triangle = {
-		x1: -35, y1:  25,
-		x2:   0, y2: -35,
-		x3:  35, y3:  25
-	};
+	var _explosion = [];
 
-	var _translate_matrix = function(matrix, t) {
+	(function() {
+
+		for (var i = 0; i < 16; i++) {
+
+			var t = i / 16;
+			var sin = Math.sin(t * 2 * Math.PI);
+			var cos = Math.cos(t * 2 * Math.PI);
+
+			_explosion.push(sin * 200);
+			_explosion.push(cos * 200);
+
+		};
+
+	})();
+
+
+	var _small_triangle = [
+		-35,  25,
+		 0,  -35,
+		 35,  25
+	];
+
+	var _translate_triangle = function(matrix, t) {
 
 		var mat = _small_triangle;
 		var sin = Math.sin(t * 2 * Math.PI);
@@ -19,13 +37,30 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 		var scale = Math.sin(Math.PI * t);
 
-		matrix.x1 = (cos * mat.x1 - sin * mat.y1) * scale;
-		matrix.x2 = (cos * mat.x2 - sin * mat.y2) * scale;
-		matrix.x3 = (cos * mat.x3 - sin * mat.y3) * scale;
+		matrix[0] = (cos * mat[0] - sin * mat[1]) * scale;
+		matrix[2] = (cos * mat[2] - sin * mat[3]) * scale;
+		matrix[4] = (cos * mat[4] - sin * mat[5]) * scale;
 
-		matrix.y1 = (sin * mat.x1 + cos * mat.y1) * scale;
-		matrix.y2 = (sin * mat.x2 + cos * mat.y2) * scale;
-		matrix.y3 = (sin * mat.x3 + cos * mat.y3) * scale;
+		matrix[1] = (sin * mat[0] + cos * mat[1]) * scale;
+		matrix[3] = (sin * mat[2] + cos * mat[3]) * scale;
+		matrix[5] = (sin * mat[4] + cos * mat[5]) * scale;
+
+	};
+
+	var _translate_explosion = function(matrix, t) {
+
+		var mat = _explosion;
+ 		var sin = Math.sin(t * 2 * Math.PI);
+		var cos = Math.cos(t * 2 * Math.PI);
+
+		var scale = t;
+
+		for (var m = 0, ml = mat.length; m < ml; m += 2) {
+
+			matrix[m]     = (cos * mat[m] - sin * mat[m + 1]) * scale;
+			matrix[m + 1] = (sin * mat[m] + cos * mat[m + 1]) * scale;
+
+		}
 
 	};
 
@@ -52,16 +87,18 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			x:      0,
 			y:      0,
 			radius: 0,
-			alpha:  1.0
+			alpha:  1.0,
+			matrix: _explosion.slice(0)
 		};
-
-		this.__lights_big   = [];
-		this.__lights_small = [];
-		this.__radar_big    = [];
-		this.__radar_matrix = lychee.extend({}, _small_triangle);
-		this.__radar_alpha  = 1.0;
-		this.__radar_small  = [];
-		this.__clock        = [];
+		this.__lights = {
+			big:   [],
+			small: []
+		};
+		this.__radar = {
+			alpha:     1.0,
+			matrix:    _small_triangle.slice(0),
+			positions: []
+		};
 
 
 		this.setExplosion(settings.explosion);
@@ -114,10 +151,11 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				&& explosion.start !== null
 			) {
 
-				var t = (this.__clock - explosion.start) / 500;
+				var t = (this.__clock - explosion.start) / 400;
 
 				if (t <= 1) {
 
+					_translate_explosion(explosion.matrix, t);
 					explosion.radius = (t * 200) | 0;
 					explosion.alpha  = 1.0 - t;
 
@@ -130,10 +168,13 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			}
 
 
-			var lights_big   = [];
-			var lights_small = [];
-			var radar_big    = [];
-			var radar_small  = [];
+			var lights = this.__lights;
+			var radar  = this.__radar;
+
+
+			var lights_big      = [];
+			var lights_small    = [];
+			var radar_positions = [];
 
 
 			for (var e = 0, el = config.entities.length; e < el; e++) {
@@ -161,8 +202,8 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 					|| entity.type === 'meteor'
 				) {
 
-					radar_small.push(position.x);
-					radar_small.push(position.y);
+					radar_positions.push(position.x);
+					radar_positions.push(position.y);
 
 				}
 
@@ -170,17 +211,20 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 
 			var t = (this.__clock % 1000) / 1000;
+
 			if (t <= 1) {
-				_translate_matrix(this.__radar_matrix, t);
-				this.__radar_alpha = Math.sin(t * Math.PI) * 0.5;
+
+				_translate_triangle(radar.matrix, t);
+				radar.alpha = Math.sin(t * Math.PI) * 0.5;
+
 			}
 
 
-			this.__lights_big   = lights_big;
-			this.__lights_small = lights_small;
-			this.__radar_big    = radar_big;
-			this.__radar_small  = radar_small;
-			this.__clock        = clock;
+			lights.big      = lights_big;
+			lights.small    = lights_small;
+			radar.positions = radar_positions;
+
+			this.__clock = clock;
 
 		},
 
@@ -190,20 +234,30 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			if (explosion.active === true) {
 
 				renderer.setAlpha(explosion.alpha);
-				renderer.drawCircle(
-					offsetX + explosion.x,
-					offsetY + explosion.y,
-					explosion.radius,
-					'#ff0000',
-					true
-				);
+
+				var matrix = explosion.matrix;
+				var x = offsetX + explosion.x;
+				var y = offsetY + explosion.y;
+
+
+				renderer.setAlpha(explosion.alpha);
+
+				for (var m = 0, ml = matrix.length; m < ml; m += 4) {
+
+					renderer.drawTriangle(
+						x,                      y,
+						x + matrix[m % ml],     y + matrix[m + 1 % ml],
+						x + matrix[m + 2 % ml], y + matrix[m + 3 % ml],
+						'#2793e6',
+						true
+					);
+
+				}
+
 				renderer.setAlpha(1.0);
 
 			}
 
-
-			var matrix;
-			var p, pl, posarray;
 
 			var buffer = this.__buffer;
 			if (buffer !== null) {
@@ -226,7 +280,7 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				renderer.__ctx.globalCompositeOperation = 'destination-out';
 
 
-				// 2. Draw Explosion
+				// 2. Draw Explosion light
 				if (explosion.active === true) {
 
 					renderer.drawLight(
@@ -240,12 +294,14 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				}
 
 
-				// 3. Draw small lights (lazers)
-				posarray = this.__lights_big;
-				for (var p = 0, pl = posarray.length; p < pl; p += 2) {
+				var lights = this.__lights;
 
-					var x = offsetX + posarray[p];
-					var y = offsetY + posarray[p + 1];
+				// 3. Draw small lights (lazers)
+				var positions = lights.big;
+				for (var p = 0, pl = positions.length; p < pl; p += 2) {
+
+					var x = offsetX + positions[p];
+					var y = offsetY + positions[p + 1];
 
 					renderer.drawLight(
 						x,
@@ -259,11 +315,11 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 
 				// 4. Draw big lights (ships and blackholes)
-				posarray = this.__lights_small;
-				for (var p = 0, pl = posarray.length; p < pl; p += 2) {
+				var positions = lights.small;
+				for (var p = 0, pl = positions.length; p < pl; p += 2) {
 
-					var x = offsetX + posarray[p];
-					var y = offsetY + posarray[p + 1];
+					var x = offsetX + positions[p];
+					var y = offsetY + positions[p + 1];
 
 					renderer.drawLight(
 						x,
@@ -279,20 +335,22 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 
 				// 5. Draw small radar triangles
-				renderer.setAlpha(this.__radar_alpha);
 
-				posarray = this.__radar_small;
-				matrix   = this.__radar_matrix;
- 				for (var p = 0, pl = posarray.length; p < pl; p += 2) {
+				var radar = this.__radar;
 
-					var x = offsetX + posarray[p];
-					var y = offsetY + posarray[p + 1];
+				renderer.setAlpha(radar.alpha);
 
+				var positions = radar.positions;
+				var matrix    = radar.matrix;
+ 				for (var p = 0, pl = positions.length; p < pl; p += 2) {
+
+					var x = offsetX + positions[p];
+					var y = offsetY + positions[p + 1];
 
 					renderer.drawTriangle(
-						x + matrix.x1, y + matrix.y1,
-						x + matrix.x2, y + matrix.y2,
-						x + matrix.x3, y + matrix.y3,
+						x + matrix[0], y + matrix[1],
+						x + matrix[2], y + matrix[3],
+						x + matrix[4], y + matrix[5],
 						'#2793e6',
 						false,
 						3
