@@ -128,55 +128,23 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 		process: function(host, response, data) {
 
-			var referer = data.referer;
-			if (referer !== null) {
+			var fs   = host.fs;
+			var root = host.root;
 
-				var tmp = referer.split(/\//);
-				for (var t = 0, tl = tmp.length; t < tl; t++) {
+			var resolved = fs.resolve(root);
 
-					var str = tmp[t];
-					if (
-						   str === ''
-						|| str === 'http:'
-						|| str === 'https:'
-						|| str.match(/(.*)\:([0-9]{0,5})/)
-						|| str === 'index.html'
-					) {
-						tmp.splice(t, 1);
-						tl--;
-						t--;
-					}
+			var server = this.main.servers.get(resolved);
+			if (server !== null) {
 
-				}
+				var settings = {
+					port: server.port,
+					host: server.host !== null ? server.host : data.host
+				};
 
 
-				var game = tmp.join('/');
-				var fs   = host.fs;
-				var root = host.root;
-
-				var resolved = fs.resolve(root + '/' + game);
-				if (
-					   resolved !== null
-					&& fs.isDirectory(resolved)
-					&& fs.isFile(resolved + '/index.html') === true
-				) {
-
-					var server = this.main.servers.get(resolved);
-					if (server !== null) {
-
-						var settings = {
-							port: server.port,
-							host: server.host !== null ? server.host : data.host
-						};
-
-
-						response.status                 = 200;
-						response.header['Content-Type'] = 'application/json';
-						response.content                = JSON.stringify(settings);
-
-					}
-
-				}
+				response.status                 = 200;
+				response.header['Content-Type'] = 'application/json';
+				response.content                = JSON.stringify(settings);
 
 
 				return true;
