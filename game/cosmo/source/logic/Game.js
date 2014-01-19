@@ -268,6 +268,8 @@ lychee.define('game.logic.Game').requires([
 					height: env.height
 				});
 
+				this.__foreground.setFlash(5000);
+
 			}
 
 

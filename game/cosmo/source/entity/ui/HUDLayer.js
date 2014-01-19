@@ -7,8 +7,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 	var _config  = attachments["json"];
 
 
-	// TODO: Evaluate if it makes sense to query Assets
-	// of other lychee.DefinitionBlocks
+	// TODO: Evaluate if it makes sense to query Assets of other lychee.DefinitionBlocks
 	var _gameconfig = new lychee.Preloader().get('./source/logic/Game.json');
 
 
@@ -17,7 +16,27 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 	 * HELPERS
 	 */
 
-	var _get_points = function(points) {
+	var _get_level = function(points) {
+
+		var level = 0;
+
+		for (var levelid in _gameconfig.level) {
+
+			if (points > _gameconfig.level[levelid]) {
+				level = parseInt(levelid, 10);
+			}
+
+		}
+
+		return level;
+
+	};
+
+	var _get_points = function(level) {
+		return _gameconfig.level[level] || 999999999;
+	};
+
+	var _points_to_str = function(points) {
 
 		var pre = '';
 		var str = points + '';
@@ -30,58 +49,25 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	};
 
-/*
-	var _get_level = function(points) {
-
-		var level = 0;
-
-		for (var levelid in _config.level) {
-
-			var current = parseInt(levelid, 10);
-			var next    = current + 1;
-
-			var currentmin = _config.level[current];
-			var nextmin    = _config.level[next] || Infinity;
-
-			if (
-				   points > currentmin
-				&& points < nextmin
-			) {
-				level = current;
-			}
-
-		}
-
-
-		return level;
-
-	};
-
-	var _OLD_process_update = function(data, index) {
-
-		var level   = this.__map.level;
-		var points  = this.__map.points;
-		var shield  = this.__map.shield;
-		var upgrade = this.__map.upgrade;
-
-		level     =  _get_level(data.points);
-		points    =  _get_points(data.points);
-
-		shield.w  = shield._x  + (shield._w  * (data.health / 100));
-		upgrade.w = upgrade._x + (upgrade._w * (data.points / (_gameconfig.level['' + (level + 1)] || 999999999)));
-
-		this.__map.level  = '' + level;
-		this.__map.points = '' + points;
-
-	};
-
-*/
-
-
 	var _process_update = function(player1, player2) {
 
+		_process_update_player.call(this.__player1, player1);
+		_process_update_player.call(this.__player2, player2);
 
-		this.__map.points = _get_points(player1.points);
+	};
+
+	var _process_update_player = function(data) {
+
+		if (data === null) return;
+
+		var shield  = this.shield;
+		var upgrade = this.upgrade;
+		var level   = _get_level(data.points);
+
+		shield.w  = shield._x  + (shield._w  * (data.health / 100));
+		upgrade.w = upgrade._x + (upgrade._w * (data.points / _get_points(level + 1)));
+
+		this.points = _points_to_str(data.points);
 
 	};
 
@@ -99,27 +85,19 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		}
 
 
+		this.font    = game.fonts.hud || null;
 		this.texture = _texture;
 
-		this.__font           = game.fonts.hud;
-		this.__map            = {};
-		this.__map.background = _config.map.background;
-		this.__map.bar        = _config.map.bar;
-		this.__map.points     = '000000000';
 
-		var shield = _config.map.shield;
-		this.__map.shield = {
-			x:  shield.x,   y: shield.y,
-			w:  shield.w,   h: shield.h,
-			_w: shield._w, _x: shield._x
-		};
+		this.__player1 = {};
+		this.__player1.shield  = lychee.extend({}, _config.map.shield);
+		this.__player1.upgrade = lychee.extend({}, _config.map.upgrade);
+		this.__player1.points  = '000000000';
 
-		var upgrade = _config.map.upgrade;
-		this.__map.upgrade = {
-			x:  upgrade.x,   y: upgrade.y,
-			w:  upgrade.w,   h: upgrade.h,
-			_w: upgrade._w, _x: upgrade._x
-		};
+		this.__player2 = {};
+		this.__player1.shield  = lychee.extend({}, _config.map.shield);
+		this.__player1.upgrade = lychee.extend({}, _config.map.upgrade);
+		this.__player1.points  = '000000000';
 
 
 		settings.width  = _config.width;
@@ -155,10 +133,15 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 			if (this.visible === false) return;
 
 
-			var map = this.__map;
+			var map     = _config.map;
+			var player1 = this.__player1;
 
+			var font    = this.font;
 			var texture = this.texture;
-			if (texture !== null) {
+			if (
+				   font !== null
+				&& texture !== null
+			) {
 
 				var position = this.position;
 
@@ -166,49 +149,14 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 				var y1 = position.y + offsetY - this.height / 2;
 
 
-				renderer.drawSprite(
-					x1,
-					y1,
-					texture,
-					map.background
-				);
+				renderer.drawSprite(x1,      y1,      texture, map.background);
 
+				renderer.drawSprite(x1,      y1 +  8, texture, map.bar);
+				renderer.drawSprite(x1,      y1 +  8, texture, player1.shield);
+				renderer.drawSprite(x1,      y1 + 48, texture, map.bar);
+				renderer.drawSprite(x1,      y1 + 48, texture, player1.upgrade);
 
-				renderer.drawSprite(
-					x1,
-					y1 + 8,
-					texture,
-					map.bar
-				);
-
-				renderer.drawSprite(
-					x1,
-					y1 + 8,
-					texture,
-					map.shield
-				);
-
-
-				renderer.drawSprite(
-					x1,
-					y1 + 48,
-					texture,
-					map.bar
-				);
-
-				renderer.drawSprite(
-					x1,
-					y1 + 48,
-					texture,
-					map.upgrade
-				);
-
-				renderer.drawText(
-					x1 + 12,
-					y1 + 90,
-					map.points,
-					this.__font
-				);
+				renderer.drawText(  x1 + 12, y1 + 90, player1.points, font);
 
 			}
 

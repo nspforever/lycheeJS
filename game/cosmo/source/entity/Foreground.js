@@ -90,6 +90,12 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			alpha:  1.0,
 			matrix: _explosion.slice(0)
 		};
+		this.__flash = {
+			active:   false,
+			start:    null,
+			alpha:    1.0,
+			duration: 500
+		};
 		this.__lights = {
 			big:   [],
 			small: []
@@ -102,9 +108,11 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 
 		this.setExplosion(settings.explosion);
+		this.setFlash(settings.flash);
 
 
 		delete settings.explosion;
+		delete settings.flash;
 
 
 		settings = null;
@@ -128,6 +136,10 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 				if (this.__explosion.active === true && this.__explosion.start === null) {
 					this.__explosion.start = clock;
+				}
+
+				if (this.__flash.active === true && this.__flash.start === null) {
+					this.__flash.start = clock;
 				}
 
 				this.__clock = clock;
@@ -166,6 +178,28 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				}
 
 			}
+
+
+			var flash = this.__flash;
+			if (
+				   flash.active === true
+				&& flash.start !== null
+			) {
+
+				var t = (this.__clock - flash.start) / flash.duration;
+
+				if (t <= 1) {
+
+					flash.alpha = t;
+
+				} else {
+
+					flash.active = false;
+
+				}
+
+			}
+
 
 
 			var lights = this.__lights;
@@ -267,6 +301,12 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				renderer.setBuffer(buffer);
 
 
+				var flash = this.__flash;
+				if (flash.active === true) {
+					renderer.setAlpha(flash.alpha);
+				}
+
+
 				// 1. Draw Fog
 				renderer.drawBox(
 					0,
@@ -276,6 +316,10 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 					'#000000',
 					true
 				);
+
+
+				renderer.setAlpha(1.0);
+
 
 				renderer.__ctx.globalCompositeOperation = 'destination-out';
 
@@ -398,6 +442,22 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 
 			return false;
+
+		},
+
+		setFlash: function(duration) {
+
+			duration = typeof duration === 'number' ? duration : 500;
+
+
+			var flash = this.__flash;
+
+
+			flash.alpha    = 1.0;
+			flash.duration = duration;
+
+			flash.start  = this.__clock;
+			flash.active = true;
 
 		}
 

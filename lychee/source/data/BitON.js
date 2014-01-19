@@ -83,7 +83,7 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 
 		read: function(bits) {
 
- 			var overflow = bits - this.__remaining;
+			var overflow = bits - this.__remaining;
 			var captured = this.__remaining < bits ? this.__remaining : bits;
 			var shift    = this.__remaining - captured;
 
