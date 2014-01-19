@@ -122,7 +122,7 @@ lychee.define('game.state.Game').requires([
 				data.height = typeof data.height === 'number' ? data.height : env.height;
 
 
-
+// TODO: Remove this
 data.height = 500;
 
 

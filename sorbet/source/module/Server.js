@@ -69,6 +69,66 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 	};
 
+	var _resolve_project = function(host, data) {
+
+		var fs      = host.fs;
+		var root    = host.fs.resolve(host.root);
+		var referer = data.referer || null;
+
+		/*
+		 * 1. Resolve by Domain
+		 *
+		 * cosmo.lycheejs.org/sorbet/module/Server
+		 * is called by cosmo.lycheejs.org
+		 */
+
+		var server = this.main.servers.get(root);
+		if (server !== null) {
+
+			return server;
+
+
+		/*
+		 * 2. Resolve by URL
+		 *
+		 * localhost:8080/sorbet/module/Server
+		 * is called by localhost:8080/game/cosmo/index.html
+		 */
+
+		} else if (referer !== null) {
+
+			var tmp = referer;
+
+			// remove protocol (http://, https://)
+			if (tmp.indexOf('://') >= 0) {
+				tmp = tmp.substr(tmp.indexOf('://') + 3);
+			}
+
+			// remove index.html
+			if (tmp.indexOf('/index.html') >= 0) {
+				tmp = tmp.substr(0, tmp.indexOf('/index.html'));
+			}
+
+			// remove subdomain + domain (sorbet.lycheejs.org, localhost:8080)
+			tmp = tmp.split('/');
+			tmp.splice(0, 1);
+			tmp = tmp.join('/');
+
+
+			var resolved = host.fs.resolve(host.root + '/' + tmp);
+
+			var server = this.main.servers.get(resolved);
+			if (server !== null) {
+				return server;
+			}
+
+		}
+
+
+		return null;
+
+	};
+
 
 
 	/*
@@ -128,12 +188,7 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 		process: function(host, response, data) {
 
-			var fs   = host.fs;
-			var root = host.root;
-
-			var resolved = fs.resolve(root);
-
-			var server = this.main.servers.get(resolved);
+			var server = _resolve_project.call(this, host, data);
 			if (server !== null) {
 
 				var settings = {

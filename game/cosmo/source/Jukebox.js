@@ -12,20 +12,28 @@ lychee.define('game.Jukebox').includes([
 			'./asset/sound/ship-lazer',
 			'./asset/sound/ship-shield',
 			'./asset/sound/ship-transformation',
-			'./asset/sound/explosion',
 
+			'./asset/sound/explosion',
+			'./asset/sound/powerup',
+
+			'./asset/music/boss',
+			'./asset/music/credits',
+			'./asset/music/game',
 			'./asset/music/menu',
-			'./asset/music/game'
 		];
 
 		var ids = [
 			'ship-lazer',
 			'ship-shield',
 			'ship-transformation',
-			'explosion',
 
-			'music-menu',
-			'music-game'
+			'explosion',
+			'powerup',
+
+			'music-boss',
+			'music-credits',
+			'music-game',
+			'music-menu'
 		];
 
 
