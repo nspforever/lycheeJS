@@ -117,7 +117,14 @@ lychee.define('lychee.ui.Switch').includes([
 		 * ENTITY API
 		 */
 
-		// deserialize: function(blob) { },
+		deserialize: function(blob) {
+
+			var font = lychee.deserialize(blob.font);
+			if (font !== null) {
+				this.setFont(font);
+			}
+
+		},
 
 		serialize: function() {
 
@@ -125,14 +132,17 @@ lychee.define('lychee.ui.Switch').includes([
 			data['constructor'] = 'lychee.ui.Button';
 
 			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
 
 
-			if (this.font !== null)                  settings.font    = this.font.serialize();
 			if (this.options.length !== 0)           settings.options = [].slice.call(this.options, 0);
 			if (this.type !== Class.TYPE.horizontal) settings.type    = this.type;
 			if (this.value !== '')                   settings.value   = this.value;
  			if (this.__width !== 140)                settings.width   = this.__width;
 			if (this.__height !== 140)               settings.height  = this.__height;
+
+
+			if (this.font !== null) blob.font = this.font.serialize();
 
 
 			return data;

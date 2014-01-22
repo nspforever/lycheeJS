@@ -224,7 +224,7 @@ lychee.define('lychee.net.Remote').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(server, socket, encoder, decoder) {
+	var Class = function(socket, encoder, decoder) {
 
 		encoder = encoder instanceof Function ? encoder : function(blob) { return blob; };
 		decoder = decoder instanceof Function ? decoder : function(blob) { return blob; };
@@ -233,7 +233,6 @@ lychee.define('lychee.net.Remote').tags({
 		this.id      = socket.remoteAddress + ':' + socket.remotePort;
 		this.version = _protocol.VERSION;
 		this.waiting = true;
-		this.server  = server;
 
 		this.__encoder = encoder;
 		this.__decoder = decoder;
@@ -253,7 +252,8 @@ lychee.define('lychee.net.Remote').tags({
 
 			socket.end();
 			socket.destroy();
-			server.disconnect(that);
+
+			that.trigger('destroy', [ closedByRemote ]);
 
 		});
 

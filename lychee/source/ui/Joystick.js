@@ -65,9 +65,9 @@ lychee.define('lychee.ui.Joystick').includes([
 			_refresh_drag.call(this, position.x, position.y);
 		}, this);
 
-		this.bind('swipe', function(id, type, position, delta, swipe) {
+		this.bind('swipe', function(id, state, position, delta, swipe) {
 
-			if (type === 'end') {
+			if (state === 'end') {
 				_refresh_drag.call(this, 0, 0);
 			} else {
 				_refresh_drag.call(this, position.x, position.y);

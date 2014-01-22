@@ -138,7 +138,7 @@ lychee.define('lychee.net.Service').includes([
 
 
 	Class.TYPE = {
-		// default: 0 (deactivated)
+		// 'default': 0, (deactivated)
 		'client': 1,
 		'remote': 2
 	};

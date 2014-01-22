@@ -204,7 +204,14 @@ lychee.define('lychee.ui.Input').includes([
 		 * ENTITY API
 		 */
 
-		// deserialize: function(blob) {},
+		deserialize: function(blob) {
+
+			var font = lychee.deserialize(blob.font);
+			if (font !== null) {
+				this.setFont(font);
+			}
+
+		},
 
 		serialize: function() {
 
@@ -212,14 +219,18 @@ lychee.define('lychee.ui.Input').includes([
 			data['constructor'] = 'lyche.ui.Input';
 
 			var settings = data['arguments'][0];
+			var blob     = data['blob'] = (data['blob'] || {});
+
 
 			if (this.width !== 140) settings.width = this.width;
 
-			if (this.font !== null)            settings.font  = this.font.serialize();
 			if (this.max !== Infinity)         settings.max   = this.max;
 			if (this.min !== 0)                settings.min   = this.min;
 			if (this.type !== Class.TYPE.text) settings.type  = this.type;
 			if (this.value !== null)           settings.value = this.value;
+
+
+			if (this.font !== null) blob.font = this.font.serialize();
 
 
 			return data;

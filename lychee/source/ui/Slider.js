@@ -85,7 +85,7 @@ lychee.define('lychee.ui.Slider').includes([
 			_refresh_drag.call(this, position.x, position.y);
 		}, this);
 
-		this.bind('swipe', function(id, type, position, delta, swipe) {
+		this.bind('swipe', function(id, state, position, delta, swipe) {
 			_refresh_drag.call(this, position.x, position.y);
 		}, this);
 

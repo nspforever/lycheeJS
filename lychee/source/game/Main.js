@@ -122,9 +122,7 @@ lychee.define('lychee.game.Main').requires([
 
 		serialize: function() {
 
-			// TODO: Diff algorithm for settings
-
-			var settings = this.settings;
+			var settings = _extend_recursive({}, this.settings);
 			var blob     = {};
 
 			blob.states = {};
@@ -144,8 +142,8 @@ lychee.define('lychee.game.Main').requires([
 
 		load: function() {
 
-			// Default behaviour:
-			// Directly initialize, load no assets
+			// Default Behaviour: Initialize and don't load Assets
+
 			this.init();
 
 		},

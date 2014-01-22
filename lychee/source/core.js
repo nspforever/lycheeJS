@@ -345,6 +345,11 @@ if (typeof global !== 'undefined') {
 
 	lychee.deserialize = function(data) {
 
+		if (data == null) {
+			return null;
+		}
+
+
 		if (data instanceof Object) {
 
 			if (
@@ -389,12 +394,7 @@ if (typeof global !== 'undefined') {
 		}
 
 
-		if (data === undefined) {
-			data = null;
-		}
-
-
-		return data;
+		return null;
 
 	};
 

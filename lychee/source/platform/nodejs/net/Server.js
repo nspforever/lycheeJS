@@ -16,8 +16,10 @@ lychee.define('lychee.net.Server').tags({
 
 }).exports(function(lychee, global) {
 
-	var http   = require('http');
-	var crypto = require('crypto');
+	var http    = require('http');
+	var crypto  = require('crypto');
+
+	var _remote = lychee.net.Remote;
 
 
 
@@ -115,8 +117,7 @@ lychee.define('lychee.net.Server').tags({
 			socket.removeAllListeners('timeout');
 
 
-			var remote = new lychee.net.Remote(
-				this,
+			var remote = new _remote(
 				socket,
 				this.__encoder,
 				this.__decoder
@@ -148,9 +149,9 @@ lychee.define('lychee.net.Server').tags({
 
 		this.remotes = [];
 
-		this.__encoder      = encoder;
-		this.__decoder      = decoder;
-		this.__server       = null;
+		this.__encoder = encoder;
+		this.__decoder = decoder;
+		this.__server  = null;
 
 
 		lychee.event.Emitter.call(this);
@@ -225,6 +226,8 @@ lychee.define('lychee.net.Server').tags({
 				if (lychee.debug === true) {
 					console.log('lychee.net.Server: Connected lychee.Remote (' + remote.id + ')');
 				}
+
+				remote.bind('#destroy', this.disconnect, this);
 
 				this.remotes.push(remote);
 				this.trigger('connect', [ remote ]);
