@@ -407,7 +407,7 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 		// 5: Start of Object
 		} else if (
 			data instanceof Object
-			&& !data instanceof Function
+			&& typeof data.serialize !== 'function'
 		) {
 
 			stream.write(5, 3);
@@ -431,7 +431,9 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 
 			stream.write(6, 3);
 
-			_encode(stream, data.serialize());
+			var blob = lychee.serialize(data);
+
+			_encode(stream, blob);
 
 			// Write EOO marker
 			stream.write(7, 3);
@@ -607,31 +609,9 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 			// 6: Custom High-Level Implementation
 			} else if (type === 6) {
 
-				var data = _decode(stream);
+				var blob = _decode(stream);
 
-				if (
-					typeof data.constructor === 'string'
-					&& data.arguments instanceof Array
-				) {
-
-					var construct = _resolve_constructor(data.constructor, global);
-					if (typeof construct === 'function') {
-
-						var bindargs = data.arguments;
-						bindargs.reverse();
-						bindargs.push(construct);
-						bindargs.reverse();
-
-						value = new (
-							construct.bind.apply(
-								construct,
-								bindargs
-							)
-						)();
-
-					}
-
-				}
+				value = lychee.deserialize(blob);
 
 
 				var check = stream.read(3);
