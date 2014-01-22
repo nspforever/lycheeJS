@@ -136,6 +136,10 @@ lychee.define('sorbet.module.Blacklist').exports(function(lychee, sorbet, global
 
 		process: function(host, response, request) {
 
+			if (request.host !== 'localhost') {
+				return false;
+			}
+
 			var action = request.action || null;
 			if (action !== null) {
 

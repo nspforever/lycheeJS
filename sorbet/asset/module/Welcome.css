@@ -151,6 +151,11 @@ a:active {
 	border: 3px solid #ffffff;
 }
 
+.ui-log {
+	font-size: 12px;
+	font-family: Monospace;
+}
+
 ul li a {
 	width: auto;
 	font-size: 1em;
