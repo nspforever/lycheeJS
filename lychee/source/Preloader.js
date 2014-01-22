@@ -71,12 +71,12 @@
 
 
 				if (Object.keys(errors).length > 0) {
-					instance.trigger('error', [ errors, map ]);
+					_trigger_instance.call(instance, 'error', [ errors, map ]);
 				}
 
 
 				if (Object.keys(ready).length > 0) {
-					instance.trigger('ready', [ ready, map ]);
+					_trigger_instance.call(instance, 'ready', [ ready, map ]);
 				}
 
 
@@ -104,6 +104,34 @@
 			_globalIntervalId = null;
 
 		}
+
+	};
+
+	var _trigger_instance = function(type, data) {
+
+		type = typeof type === 'string' ? type : null;
+		data = data instanceof Array    ? data : null;
+
+
+		if (this.___events[type] !== undefined) {
+
+			var args  = [];
+			var entry = this.___events[type];
+
+			if (data !== null) {
+				args.push.apply(args, data);
+			}
+
+
+			entry.callback.apply(entry.scope, args);
+
+
+			return true;
+
+		}
+
+
+		return false;
 
 	};
 
@@ -167,34 +195,6 @@
 
 
 			return true;
-
-		},
-
-		trigger: function(type, data) {
-
-			type = typeof type === 'string' ? type : null;
-			data = data instanceof Array    ? data : null;
-
-
-			if (this.___events[type] !== undefined) {
-
-				var args  = [];
-				var entry = this.___events[type];
-
-				if (data !== null) {
-					args.push.apply(args, data);
-				}
-
-
-				entry.callback.apply(entry.scope, args);
-
-
-				return true;
-
-			}
-
-
-			return false;
 
 		},
 
