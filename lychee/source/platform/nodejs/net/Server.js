@@ -141,20 +141,25 @@ lychee.define('lychee.net.Server').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(encoder, decoder) {
+	var _encoder = function(blob) { return blob; };
+	var _decoder = function(blob) { return blob; };
 
-		encoder = encoder instanceof Function ? encoder : function(msg) { return msg; };
-		decoder = decoder instanceof Function ? decoder : function(msg) { return msg; };
+
+	var Class = function(data) {
+
+		var settings = lychee.extend({}, data);
 
 
 		this.remotes = [];
 
-		this.__encoder = encoder;
-		this.__decoder = decoder;
-		this.__server  = null;
+		this.__encoder = settings.encoder instanceof Function ? settings.encoder : _encoder;
+		this.__decoder = settings.decoder instanceof Function ? settings.decoder : _decoder;
+		this.__socket  = null;
 
 
 		lychee.event.Emitter.call(this);
+
+		settings = null;
 
 	};
 
@@ -162,6 +167,9 @@ lychee.define('lychee.net.Server').tags({
 	Class.prototype = {
 
 		listen: function(port, host) {
+
+			if (this.__socket !== null) return;
+
 
 			port = typeof port === 'number' ? port : 1337;
 			host = typeof host === 'string' ? host : null;
@@ -176,8 +184,8 @@ lychee.define('lychee.net.Server').tags({
 
 			try {
 
-				this.__server = new http.Server();
-				this.__server.on('upgrade', function(request, socket, headers) {
+				this.__socket = new http.Server();
+				this.__socket.on('upgrade', function(request, socket, headers) {
 
 					if (_upgrade_to_websocket.call(that, request, socket, headers) === false) {
 						socket.end();
@@ -185,7 +193,7 @@ lychee.define('lychee.net.Server').tags({
 					}
 
 				});
-				this.__server.listen(port, host);
+				this.__socket.listen(port, host);
 
 			} catch(e) {
 

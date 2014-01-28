@@ -3,7 +3,8 @@ lychee.define('lychee.game.Main').requires([
 	'lychee.Input',
 	'lychee.Renderer',
 	'lychee.Viewport',
-	'lychee.game.Loop'
+	'lychee.game.Loop',
+	'lychee.net.Client'
 ]).includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
@@ -40,6 +41,41 @@ lychee.define('lychee.game.Main').requires([
 
 	};
 
+	var _load_client = function(url) {
+
+		url = typeof url === 'string' ? url : '/sorbet/module/Server';
+
+
+		var preloader = new lychee.Preloader();
+
+		preloader.bind('ready', function(assets, mappings) {
+
+			var settings = assets[Object.keys(assets)[0]];
+			if (settings !== null) {
+				this.settings.client = lychee.extend({}, settings);
+			}
+
+
+			preloader.unbind('ready');
+			preloader.unbind('error');
+
+			this.init();
+
+		}, this);
+
+		preloader.bind('error', function(assets, mappings) {
+
+			preloader.unbind('ready');
+			preloader.unbind('error');
+
+			this.init();
+
+		}, this);
+
+		preloader.load(url, null, 'json');
+
+	};
+
 
 
 	/*
@@ -71,7 +107,10 @@ lychee.define('lychee.game.Main').requires([
 			height:     768,
 			id:         'game',
 			background: '#222222'
-		}
+		},
+
+		client: null,
+		server: '/sorbet/module/Server'
 
 	};
 
@@ -86,6 +125,7 @@ lychee.define('lychee.game.Main').requires([
 		this.settings = _extend_recursive({}, _defaults, settings);
 		this.defaults = _extend_recursive({}, this.settings);
 
+		this.client   = null;
 		this.input    = null;
 		this.loop     = null;
 		this.renderer = null;
@@ -142,9 +182,7 @@ lychee.define('lychee.game.Main').requires([
 
 		load: function() {
 
-			// Default Behaviour: Initialize and don't load Assets
-
-			this.init();
+			_load_client.call(this, this.settings.server || null);
 
 		},
 
@@ -196,6 +234,21 @@ lychee.define('lychee.game.Main').requires([
 
 
 			var settings = this.settings;
+
+			if (settings.client !== null) {
+
+				this.client = new lychee.net.Client(settings.client);
+
+				if (
+					   settings.client.port != null
+					&& settings.client.host != null
+				) {
+
+					this.client.listen(settings.client.port, settings.client.host);
+
+				}
+
+			}
 
 			if (settings.input !== null) {
 				this.input = new lychee.Input(settings.input);

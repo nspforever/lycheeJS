@@ -9,20 +9,6 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 	 * HELPERS
 	 */
 
-	var _init_database = function() {
-
-		var database = this.main.db.get('Server');
-		if (database === null) {
-
-			this.main.db.set('Server', this.defaults);
-			database = this.main.db.get('Server');
-
-		}
-
-		this.database = database;
-
-	};
-
 	var _build_project = function(project) {
 
 		var id = project.root[0];
@@ -139,14 +125,10 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 		this.main     = main;
 		this.type     = 'public';
-		this.database = null;
+		this.database = this.main.db.init('Server', this.defaults);
 
 		this.queue = new sorbet.data.Queue();
 		this.queue.bind('update', _build_project, this);
-
-
-		_init_database.call(this);
-
 
 		this.__port = this.database.port[0];
 
@@ -198,6 +180,21 @@ lychee.define('sorbet.module.Server').exports(function(lychee, sorbet, global, a
 
 
 				response.status                 = 200;
+				response.header['Content-Type'] = 'application/json';
+				response.content                = JSON.stringify(settings);
+
+
+				return true;
+
+			} else {
+
+				var settings = {
+					port: null,
+					host: null
+				};
+
+
+				response.status                 = 404;
 				response.header['Content-Type'] = 'application/json';
 				response.content                = JSON.stringify(settings);
 

@@ -1,6 +1,6 @@
 
 lychee.define('game.Main').requires([
-	'game.Client',
+	'game.net.Client',
 	'game.Jukebox',
 	'game.entity.ui.Font',
 	'game.logic.Game',
@@ -101,45 +101,11 @@ lychee.define('game.Main').requires([
 
 		},
 
-		load: function() {
-
-			var preloader = new lychee.Preloader();
-
-
-			preloader.bind('ready', function(assets, mappings) {
-
-				var url = Object.keys(assets)[0];
-				var settings = assets[url];
-				if (settings !== null) {
-
-					this.settings.client = {
-						port: settings.port,
-						host: settings.host
-					};
-
-				}
-
-				preloader.unbind('ready');
-				preloader.unbind('error');
-
-				this.init();
-
-			}, this);
-
-			preloader.bind('error', function(assets, mappings) {
-
-				preloader.unbind('ready');
-				preloader.unbind('error');
-
-				this.init();
-
-			}, this);
-
-			preloader.load('/sorbet/module/Server', null, 'json');
-
-		},
-
 		init: function() {
+
+			// Overwrite client with game.Client
+			var clientsettings   = this.settings.client;
+			this.settings.client = null;
 
 			lychee.game.Main.prototype.init.call(this);
 			this.reset(false);
@@ -160,8 +126,8 @@ lychee.define('game.Main').requires([
 			this.jukebox = new game.Jukebox(this);
 			this.logic   = new game.logic.Game(this);
 
-			if (this.settings.client !== null) {
-				this.client = new game.Client(this.settings.client, this);
+			if (clientsettings !== null) {
+				this.client = new game.net.Client(clientsettings, this);
 			}
 
 			this.setState('game', new game.state.Game(this));

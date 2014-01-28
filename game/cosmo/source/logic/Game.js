@@ -121,14 +121,6 @@ lychee.define('game.logic.Game').requires([
 				this.jukebox.play('ship-transformation');
 			}
 
-/*		} else if (newlevel < oldlevel) {
-
-			ship.setState('downgrade' + newlevel);
-
-			if (this.game.settings.sound === true) {
-				this.jukebox.play('ship-transformation');
-			}
-*/
 		}
 
 
@@ -268,7 +260,7 @@ lychee.define('game.logic.Game').requires([
 					height: env.height
 				});
 
-				this.__foreground.setFlash(5000);
+				this.__foreground.setFlash(3000);
 
 			}
 

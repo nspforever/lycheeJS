@@ -1,5 +1,5 @@
 
-lychee.define('game.Controller').includes([
+lychee.define('game.net.Controller').includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 

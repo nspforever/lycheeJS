@@ -1,21 +1,27 @@
 
-lychee.define('game.Client').requires([
+lychee.define('game.net.Client').requires([
+	'lychee.data.BitON',
 	'game.net.client.Highscore',
 	'game.net.client.Multiplayer'
 ]).includes([
 	'lychee.net.Client'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _BitON       = lychee.data.BitON;
 	var _highscore   = game.net.client.Highscore;
 	var _multiplayer = game.net.client.Multiplayer;
 
 
 	var Class = function(settings, game) {
 
+		// required by services due to renderer
 		this.game = game;
 
 
-		lychee.net.Client.call(this, JSON.stringify, JSON.parse);
+		lychee.net.Client.call(this, {
+			encoder: settings.encoder || _BitON.encode,
+			decoder: settings.decoder || _BitON.decode
+		});
 
 
 		this.bind('connect', function() {
@@ -30,7 +36,7 @@ lychee.define('game.Client').requires([
 
 		this.bind('disconnect', function(code, reason) {
 
-			this.game.client = null;
+			console.log('Client disconnected!', code, reason);
 
 		}, this);
 

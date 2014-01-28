@@ -247,14 +247,17 @@ lychee.define('lychee.net.Client').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(encoder, decoder) {
-
-		encoder = encoder instanceof Function ? encoder : function(blob) { return blob; };
-		decoder = decoder instanceof Function ? decoder : function(blob) { return blob; };
+	var _encoder = function(blob) { return blob; };
+	var _decoder = function(blob) { return blob; };
 
 
-		this.__encoder = encoder;
-		this.__decoder = decoder;
+	var Class = function(data) {
+
+		var settings = lychee.extend({}, data);
+
+
+		this.__encoder = settings.encoder instanceof Function ? settings.encoder : _encoder;
+		this.__decoder = settings.decoder instanceof Function ? settings.decoder : _decoder;
 		this.__socket  = null;
 		this.__services  = {
 			waiting: [], // Waiting Services need to be verified from Remote
@@ -267,12 +270,17 @@ lychee.define('lychee.net.Client').tags({
 
 		lychee.event.Emitter.call(this);
 
+		settings = null;
+
 	};
 
 
 	Class.prototype = {
 
 		listen: function(port, host) {
+
+			if (this.__socket !== null) return;
+
 
 			port = typeof port === 'number' ? port : 1337;
 			host = typeof host === 'string' ? host : 'localhost';
@@ -340,6 +348,7 @@ lychee.define('lychee.net.Client').tags({
 
 			this.__socket.onclose = function(event) {
 
+				that.__socket    = null;
 				that.__isRunning = false;
 				_cleanup_services.call(that);
 

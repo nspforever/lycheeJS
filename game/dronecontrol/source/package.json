@@ -60,13 +60,16 @@
 
 		},
 
+		"net": {
+			"Controller": [ "js" ],
+			"Server":     [ "js" ]
+		},
+
 		"state": {
 			"Game": [ "js" ]
 		},
 
-		"Controller": [ "js" ],
-		"Main":       [ "js", "css" ],
-		"Server":     [ "js" ]
+		"Main": [ "js", "css" ]
 
 	}
 }

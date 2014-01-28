@@ -8,7 +8,7 @@ require(path + '/Preloader.js');
 // bootstrap.js requires the root path to this file.
 require(path + '/platform/nodejs/bootstrap.js')(__dirname);
 
-require('./source/Server.js');
+require('./source/net/Server.js');
 
 
 // lychee.debug = true;
@@ -38,7 +38,7 @@ lychee.build(function(lychee, global) {
 
 	if (!isNaN(port)) {
 
-		var server = new game.Server();
+		var server = new game.net.Server();
 
 		server.listen(port, host);
 

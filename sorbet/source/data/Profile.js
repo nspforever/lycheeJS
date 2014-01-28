@@ -83,6 +83,31 @@ lychee.define('sorbet.data.Profile').exports(function(lychee, sorbet, global, at
 		 * PUBLIC API
 		 */
 
+		init: function(id, defaults) {
+
+ 			id       = typeof id === 'string'     ? id       : null;
+			defaults = defaults instanceof Object ? defaults : {};
+
+			if (id !== null) {
+
+				var blob = this.get(id);
+				if (blob === null) {
+
+					this.set(id, defaults);
+					blob = this.get(id);
+
+				}
+
+
+				return blob;
+
+			}
+
+
+			return null;
+
+		},
+
 		get: function(id) {
 
 			id = typeof id === 'string' ? id : null;

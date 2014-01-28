@@ -40,7 +40,10 @@
 			"remote": {
 				"Highscore":   [ "js" ],
 				"Multiplayer": [ "js" ]
-			}
+			},
+
+			"Client": [ "js" ],
+			"Server": [ "js" ]
 
 		},
 
@@ -55,11 +58,10 @@
 			"Menu": [ "js" ]
 		},
 
-		"Client":     [ "js" ],
 		"Controller": [ "js" ],
 		"Jukebox":    [ "js" ],
-		"Main":       [ "js", "css" ],
-		"Server":     [ "js" ]
+		"Main":       [ "js", "css" ]
 
 	}
+
 }

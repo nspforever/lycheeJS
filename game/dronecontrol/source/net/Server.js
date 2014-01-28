@@ -1,5 +1,5 @@
 
-lychee.define('game.Server').requires([
+lychee.define('game.net.Server').requires([
 	'game.ar.Drone',
 	'lychee.game.Loop'
 ]).includes([
@@ -103,7 +103,10 @@ lychee.define('game.Server').requires([
 		this.loop   = null;
 
 
-		lychee.net.Server.call(this, JSON.stringify, JSON.parse);
+		lychee.net.Server.call(this, {
+			encoder: JSON.stringify,
+			decoder: JSON.parse
+		});
 
 
 		this.load();

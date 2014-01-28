@@ -8,21 +8,6 @@ lychee.define('sorbet.module.Blacklist').exports(function(lychee, sorbet, global
 	 * HELPERS
 	 */
 
-	var _init_database = function() {
-
-		var database = this.main.db.get('Blacklist');
-		if (database === null) {
-
-			this.main.db.set('Blacklist', {});
-			database = this.main.db.get('Blacklist');
-
-		}
-
-
-		return database;
-
-	};
-
 	var _get_database = function(host, url) {
 
 		var database = this.main.db.get('Blacklist');
@@ -118,9 +103,7 @@ lychee.define('sorbet.module.Blacklist').exports(function(lychee, sorbet, global
 
 		this.main     = main;
 		this.type     = 'public';
-
-
-		_init_database.call(this);
+		this.database = this.main.db.init('Blacklist', this.defaults);
 
 	};
 

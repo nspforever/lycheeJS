@@ -1,7 +1,6 @@
 
 lychee.define('game.Main').requires([
-	'lychee.net.Client',
-	'game.Controller',
+	'game.net.Controller',
 	'game.entity.Font',
 	'game.state.Game'
 ]).includes([
@@ -21,9 +20,6 @@ lychee.define('game.Main').requires([
 				fireTouch: true,
 				fireSwipe: true
 			},
-
-			// Is configured by /sorbet/module/Server
-			client: null,
 
 			// Is configured by ./config.json
 			drones: null,
@@ -73,7 +69,7 @@ lychee.define('game.Main').requires([
 				preloader.unbind('ready');
 				preloader.unbind('error');
 
-				this.connect();
+				lychee.game.Main.prototype.load.call(this);
 
 			}, this);
 
@@ -82,49 +78,11 @@ lychee.define('game.Main').requires([
 				preloader.unbind('ready');
 				preloader.unbind('error');
 
-				this.connect();
+				lychee.game.Main.prototype.load.call(this);
 
 			}, this);
 
 			preloader.load('./config.json');
-
-		},
-
-		connect: function() {
-
-			var preloader = new lychee.Preloader();
-
-
-			preloader.bind('ready', function(assets, mappings) {
-
-				var url = Object.keys(assets)[0];
-				var settings = assets[url];
-				if (settings !== null) {
-
-					this.settings.client = {
-						port: settings.port,
-						host: settings.host
-					};
-
-				}
-
-				preloader.unbind('ready');
-				preloader.unbind('error');
-
-				this.init();
-
-			}, this);
-
-			preloader.bind('error', function(assets, mappings) {
-
-				preloader.unbind('ready');
-				preloader.unbind('error');
-
-				this.init();
-
-			}, this);
-
-			preloader.load('/sorbet/module/Server', null, 'json');
 
 		},
 
@@ -137,15 +95,7 @@ lychee.define('game.Main').requires([
 			this.fonts = {};
 			this.fonts.normal = new game.entity.Font('normal');
 
-
-			this.client = null;
-
-			if (this.settings.client !== null) {
-				this.client = new lychee.net.Client(JSON.stringify, JSON.parse);
-				this.client.listen(this.settings.client.port, this.settings.client.host);
-			}
-
-			this.controller = new game.Controller(this);
+			this.controller = new game.net.Controller(this);
 			this.controller.setIP('192.168.1.1');
 
 			this.setState('game', new game.state.Game(this));

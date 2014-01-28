@@ -15,20 +15,6 @@ lychee.define('sorbet.module.Project').requires([
 	 * HELPERS
 	 */
 
-	var _init_database = function() {
-
-		var database = this.main.db.get('Builder');
-		if (database === null) {
-
-			this.main.db.set('Builder', this.defaults);
-			database = this.main.db.get('Builder');
-
-		}
-
-		this.database = database;
-
-	};
-
 	var _build_project = function(project) {
 
 		var root = project.root;
@@ -86,13 +72,10 @@ console.log('SANDBOX BUILD READY!');
 
 		this.main     = main;
 		this.type     = 'public';
-		this.database = null;
+		this.database = this.main.db.init('Project', this.defaults);
 
 		this.queue = new sorbet.data.Queue();
 		this.queue.bind('update', _build_project, this);
-
-
-		_init_database.call(this);
 
 
 // TODO: Implement _build_project method to correctly build tag-based prebuilds of projects
