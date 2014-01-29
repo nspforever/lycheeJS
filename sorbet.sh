@@ -330,8 +330,8 @@ case "$1" in
 
 		if [ ! -f "$SORBET_ROOT/sorbet/profile/$profile.json" ]
 		then
-			echo -e "\tInvalid <profile>, falling back to 'default'.";
-			profile="default";
+			echo -e "\tInvalid <profile>, falling back to 'localhost'.";
+			profile="localhost";
 		fi;
 
 
@@ -382,7 +382,7 @@ case "$1" in
 		profile="$2";
 		if [ "$profile" == "" ]
 		then
-			profile="default";
+			profile="localhost";
 		fi;
 
 

@@ -44,7 +44,7 @@ lychee.build(function(lychee, global) {
 	root = root.join('/');
 
 
-	var profile = './profile/' + (process.argv[2] || 'default') + '.json';
+	var profile = './profile/' + (process.argv[2] || 'localhost') + '.json';
 	var config  = JSON.parse(fs.readFileSync(profile, 'utf8'));
 
 
