@@ -18,15 +18,19 @@ lychee.define('lychee.net.remote.Session').includes([
 			var session = _cache[sid] || null;
 			if (session === null) {
 
-				var ready = data.autostart === false       ? false      : true;
-				var limit = typeof data.limit === 'number' ? data.limit : 4;
+				var autolock  = data.autolock === false      ? false    : true;
+				var autostart = data.autostart === false     ? false    : true;
+				var min       = typeof data.min === 'number' ? data.min : 2;
+				var max       = typeof data.max === 'number' ? data.max : 4;
 
 				session = _cache[sid] = {
-					sid:     sid,
-					limit:   limit,
-					tunnels: [],
-					ready:   ready,
-					active:  false
+					autolock:  autolock,
+					autostart: autostart,
+					sid:       sid,
+					min:       min,
+					max:       max,
+					tunnels:   [],
+					active:    false
 				};
 
 
@@ -38,32 +42,47 @@ lychee.define('lychee.net.remote.Session').includes([
 			// 2. Join Session
 			} else {
 
-				var index   = session.tunnels.indexOf(this.tunnel);
-				var tunnels = session.tunnels.length;
-				if (
-					   index === -1
-					&& tunnels < session.limit
-					&& session.active === false
-				) {
+				var index = session.tunnels.indexOf(this.tunnel);
+				if (index === -1) {
 
-					session.tunnels.push(this.tunnel);
-					this.setMulticast(session.tunnels);
+					if (
+						   session.active === false
+						&& session.tunnels.length < session.max
+					) {
 
-					_sync_session.call(this, session);
+						session.tunnels.push(this.tunnel);
+						this.setMulticast(session.tunnels);
 
-				} else if (session.active === true) {
+						_sync_session.call(this, session);
 
-					this.report('Session is already running.', {
-						sid:   sid,
-						limit: limit
-					});
+					} else if (
+						   session.active === true
+						&& session.autolock === false
+						&& session.tunnels.length < session.max
+					) {
 
-				} else if (tunnels >= session.limit) {
+						session.tunnels.push(this.tunnel);
+						this.setMulticast(session.tunnels);
 
-					this.report('Session is full.', {
-						sid:   sid,
-						limit: limit
-					});
+						_sync_session.call(this, session);
+
+					} else if (session.active === true) {
+
+						this.report('Session is already running.', {
+							sid: sid,
+							min: session.min,
+							max: session.max
+						});
+
+					} else {
+
+						this.report('Session is full.', {
+							sid: sid,
+							min: session.min,
+							max: session.max
+						});
+
+					}
 
 				}
 
@@ -120,7 +139,7 @@ lychee.define('lychee.net.remote.Session').includes([
 				&& session.active === false
 			) {
 
-				session.ready = true;
+				session.autostart = true;
 
 				_sync_session.call(this, session);
 
@@ -141,8 +160,6 @@ lychee.define('lychee.net.remote.Session').includes([
 				&& session.active === true
 			) {
 
-				session.ready = false;
-
 				_sync_session.call(this, session);
 
 			}
@@ -156,7 +173,8 @@ lychee.define('lychee.net.remote.Session').includes([
 		var sid = session.sid;
 		if (sid !== null) {
 
-			var limit = session.limit;
+			var min = session.min;
+			var max = session.max;
 
 			var tunnels = [];
 			for (var t = 0, tl = session.tunnels.length; t < tl; t++) {
@@ -167,58 +185,63 @@ lychee.define('lychee.net.remote.Session').includes([
 			var data = {
 				type:    'update',
 				sid:     sid,
-				limit:   limit,
+				min:     min,
+				max:     max,
 				tid:     'localhost:1337',
 				tunnels: tunnels
 			};
 
 
-			if (tunnels.length === limit) {
+			// 1. Inactive Session
+			if (session.active === false) {
 
+				// 1.1 Session Start
 				if (
-					   session.ready === true
-					&& session.active === false
+					   session.autostart === true
+					&& tunnels.length >= session.min
 				) {
 
-					data.type = 'start';
+					data.type      = 'start';
 					session.active = true;
 
 					if (lychee.debug === true) {
 						console.log('lychee.net.remote.Session: Starting session "' + sid + '"');
 					}
 
-				} else if (
-					   session.ready === false
-					&& session.active === true
-				) {
 
-					data.type = 'stop';
-					session.active = false;
-
-					if (lychee.debug === true) {
-						console.log('lychee.net.remote.Session: Stopping session "' + sid + '"');
-					}
-
-				}
-
-
-			} else if (tunnels.length < limit) {
-
-				if (session.active === true) {
-
-					data.type = 'stop';
-					session.active = false;
-
-					if (lychee.debug === true) {
-						console.log('lychee.net.remote.Session: Stopping session "' + sid + '"');
-					}
-
+				// 1.2 Session Update
 				} else {
 
 					data.type = 'update';
 
 					if (lychee.debug === true) {
-						console.log('lychee.net.remote.Session: Updating session "' + sid + '" (' + tunnels.length + ' of ' + limit + ' tunnels)');
+						console.log('lychee.net.remote.Session: Updating session "' + sid + '" (' + session.tunnels.length + ' of ' + session.max + ' tunnels)');
+					}
+
+				}
+
+
+			// 2. Active Session
+			} else {
+
+				// 2.1 Session Stop
+				if (tunnels.length < session.min) {
+
+					data.type      = 'stop';
+					session.active = false;
+
+					if (lychee.debug === true) {
+						console.log('lychee.net.remote.Session: Stopping session "' + sid + '"');
+					}
+
+
+				// 2.2 Session Update
+				} else {
+
+					data.type = 'update';
+
+					if (lychee.debug === true) {
+						console.log('lychee.net.remote.Session: Updating session "' + sid + '" (' + session.tunnels.length + ' of ' + session.max + ' tunnels)');
 					}
 
 				}

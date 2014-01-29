@@ -23,18 +23,25 @@ lychee.define('lychee.net.client.Session').includes([
 		var settings = lychee.extend({}, data);
 
 
-		this.autostar = true;
-		this.sid      = 'session-' + _id++;
-		this.limit    = 4;
+		this.autolock  = true;
+		this.autostart = true;
+		this.sid       = 'session-' + _id++;
+		this.tid       = null;
+		this.min       = 2;
+		this.max       = 4;
 
 
+		this.setAutolock(settings.autolock);
 		this.setAutostart(settings.autostart);
 		this.setSid(settings.sid);
-		this.setLimit(settings.limit);
+		this.setMin(settings.min);
+		this.setMax(settings.max);
 
+		delete settings.autolock;
 		delete settings.autostart;
 		delete settings.sid;
-		delete settings.limit;
+		delete settings.min;
+		delete settings.max;
 
 
 		lychee.net.Service.call(this, id, client, lychee.net.Service.TYPE.client);
@@ -50,8 +57,9 @@ lychee.define('lychee.net.client.Session').includes([
 			var type = data.type;
 			if (type === 'update') {
 
-				this.sid   = data.sid;
-				this.limit = data.limit;
+				this.sid = data.sid;
+				this.min = data.min;
+				this.max = data.max;
 
 			}
 
@@ -103,9 +111,11 @@ lychee.define('lychee.net.client.Session').includes([
 
 
 					this.tunnel.send({
+						autolock:  this.autolock,
 						autostart: this.autostart,
 						sid:       this.sid,
-						limit:     this.limit
+						min:       this.min,
+						max:       this.max
 					}, {
 						id:    this.id,
 						event: 'join'
@@ -179,6 +189,21 @@ lychee.define('lychee.net.client.Session').includes([
 
 		},
 
+		setAutolock: function(autolock) {
+
+			if (autolock === true || autolock === false) {
+
+				this.autolock = autolock;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
 		setAutostart: function(autostart) {
 
 			if (autostart === true || autostart === false) {
@@ -212,14 +237,32 @@ lychee.define('lychee.net.client.Session').includes([
 
 		},
 
-		setLimit: function(limit) {
+		setMax: function(max) {
 
-			limit = typeof limit === 'number' ? limit : null;
+			max = typeof max === 'number' ? max : null;
 
 
-			if (limit !== null) {
+			if (max !== null) {
 
-				this.limit = limit;
+				this.max = max;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setMin: function(min) {
+
+			min = typeof min === 'number' ? min : null;
+
+
+			if (min !== null) {
+
+				this.min = min;
 
 				return true;
 
