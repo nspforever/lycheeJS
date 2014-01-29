@@ -60,6 +60,9 @@ lychee.define('Viewport').tags({
 
 	var _process_reshape = function(width, height) {
 
+		this.width    = width;
+		this.height   = height;
+
 		this.__width  = width;
 		this.__height = height;
 
@@ -94,9 +97,13 @@ lychee.define('Viewport').tags({
 
 	var Class = function() {
 
-		this.__orientation = null; // Unsupported
-		this.__width  = process.stdout.columns;
-		this.__height = process.stdout.rows;
+		this.fullscreen = false;
+		this.width      = process.stdout.columns;
+		this.height     = process.stdout.rows;
+
+		this.__orientation = 0; // Unsupported
+		this.__width       = process.stdout.columns;
+		this.__height      = process.stdout.rows;
 
 
 		lychee.event.Emitter.call(this);

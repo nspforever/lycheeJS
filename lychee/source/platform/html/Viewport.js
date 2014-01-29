@@ -280,6 +280,9 @@ lychee.define('Viewport').tags({
 		}
 
 
+		this.width    = width;
+		this.height   = height;
+
 		this.__width  = width;
 		this.__height = height;
 
@@ -412,6 +415,8 @@ lychee.define('Viewport').tags({
 	var Class = function() {
 
 		this.fullscreen = false;
+		this.width      = global.innerWidth;
+		this.height     = global.innerHeight;
 
 		this.__orientation = typeof global.orientation === 'number' ? global.orientation : 0;
 		this.__width       = global.innerWidth;
