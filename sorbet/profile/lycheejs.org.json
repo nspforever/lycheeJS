@@ -32,7 +32,10 @@
 			"www.lycheejs.org"
 		],
 		"config": {
-			"root": "%root%/external/lycheejs.org"
+			"root": "%root%/external/lycheeJS-website"
+			"redirects": {
+				"/slides/*": "http://slides.lycheejs.org/*"
+			}
 		}
 
 	}, {
@@ -41,7 +44,7 @@
 			"slides.lycheejs.org"
 		],
 		"config": {
-			"root": "%root%/external/slides.lycheejs.org"
+			"root": "%root%/external/lycheeJS-slides"
 		}
 
 	}, {

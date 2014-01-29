@@ -14,7 +14,7 @@ and its developer tools.
 
 - Download and install the newest stable release of NodeJS from [nodejs.org](http://nodejs.org).
 
-- Download lycheeJS via [zip-file](https://github.com/martensms/lycheeJS/archive/master.zip)
+- Download lycheeJS via [zip-file](https://github.com/LazerUnicorns/lycheeJS/archive/master.zip)
 and extract its contents to **/var/www/lycheeJS**.
 
 - Navigate to the folder in the shell (or PowerShell) and execute:
@@ -38,13 +38,13 @@ at [sorbet.lycheejs.org](http://sorbet.lycheejs.org) and have fun :)
 Those games show you how to develop real cross-platform games and the best practices
 in high-performant JavaScript code.
 
-[Link to examples on github](https://github.com/martensms/lycheeJS/tree/master/game)
+[Link to examples on github](https://github.com/LazerUnicorns/lycheeJS/tree/master/game)
 
 
 # Documentation
 
 The documentation is available online at [http://lycheejs.org/docs](http://lycheejs.org/docs)
-or in the [lycheejs.org github repository](https://github.com/martensms/lycheejs.org)
+or in the [lycheejs.org github repository](https://github.com/LazerUnicorns/lycheeJS-website)
 
 
 # License

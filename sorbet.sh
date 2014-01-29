@@ -2,7 +2,7 @@
 #
 # lycheeJS Sorbet
 #
-# Copyright (c) 2013 by Christoph Martens
+# Copyright (c) 2014 by LazerUnicorns Ltd.
 #
 # This project is released under the terms
 # of the MIT License
@@ -59,7 +59,7 @@ Examples:
 
     $0 start default
     $0 stop
-    $0 install https://github.com/martensms/lycheejs.org/archive/master.zip lycheejs.org
+    $0 install https://github.com/LazerUnicorns/lycheeJS-website/archive/master.zip lycheeJS-website
     $0 start lycheejs.org
 
 EOF
@@ -104,7 +104,7 @@ finish() {
 
 		echo -e "\n\nERROR: It seems as lycheeJS Sorbet had a problem.\n\n";
 		echo -e "If this error occurs though following the guidelines,";
-		echo -e "please report an issue at https://github.com/martensms/lycheeJS/issues";
+		echo -e "please report an issue at https://github.com/LazerUnicorns/lycheeJS/issues";
 		echo -e "and attach the ./log.txt file to it. Thanks!";
 
 	fi;
