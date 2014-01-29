@@ -38,6 +38,15 @@
 	}, {
 
 		"hosts": [
+			"slides.lycheejs.org"
+		],
+		"config": {
+			"root": "%root%/external/slides.lycheejs.org"
+		}
+
+	}, {
+
+		"hosts": [
 			"sorbet.lycheejs.org"
 		],
 		"config": {
