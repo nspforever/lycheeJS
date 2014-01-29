@@ -16,8 +16,8 @@ UNAME_P=$(uname -p);
 NODEJS=$(which nodejs);
 NODE=$(which node);
 SORBET_ROOT=$(cd "$(dirname "$0")"; pwd);
-SORBET_LOG=$SORBET_ROOT/sorbet/.log;
-SORBET_PID=$SORBET_ROOT/sorbet/.pid;
+SORBET_LOG=$SORBET_ROOT/sorbet/log;
+SORBET_PID=$SORBET_ROOT/sorbet/pid;
 
 
 
@@ -32,7 +32,7 @@ This is free software, and you are welcome to redistribute it under certain cond
 See the LICENSE.txt for details.
 
 
-Recommended development environment: Ubuntu 13.04 64Bit
+Recommended development environment: Ubuntu 13.10 64Bit (amd64)
 
 Usage: $0 <task> [ <options> ]
 
@@ -41,6 +41,7 @@ Tasks:
 
     help          Shows this help message
     install       Installs a third-party github project into /external
+    clone         Clones a third-party github project into /external
     start         Starts the webserver
     stop          Stops the webserver
     restart       Restarts the webserver
@@ -53,13 +54,18 @@ Options:
 
     install <url> <name>
     <url> is a URL to the zip archive (of the specific branch) on github. The project will be installed to /external/<name>.
-	The name has to be identical to the archive's folder prefix.
+    The name has to be identical to the archive's folder prefix.
+
+    install <url> <name> <branch>
+    <url> is a URL to the git repository on github. The project will be installed to /external/<name>.
+    <branch> is the branch that is checked out afterwards. If no branch is given, "master" is used.
 
 Examples:
 
     $0 start default
     $0 stop
     $0 install https://github.com/LazerUnicorns/lycheeJS-website/archive/master.zip lycheeJS-website
+    $0 clone git@github.com:LazerUnicorns/lycheeJS-slides lycheeJS-slides master
     $0 start lycheejs.org
 
 EOF
@@ -105,7 +111,7 @@ finish() {
 		echo -e "\n\nERROR: It seems as lycheeJS Sorbet had a problem.\n\n";
 		echo -e "If this error occurs though following the guidelines,";
 		echo -e "please report an issue at https://github.com/LazerUnicorns/lycheeJS/issues";
-		echo -e "and attach the ./log.txt file to it. Thanks!";
+		echo -e "and attach the /sorbet/log file to it. Thanks!";
 
 	fi;
 
@@ -157,6 +163,39 @@ install_project() {
 
 	rm -rf "$SORBET_ROOT/external/.temp" >> $SORBET_LOG 2>&1;
 	check_success "Could not cleanup temporary folder";
+
+
+	check_success_step "SUCCESS";
+
+}
+
+# clone_project "git@github.com:LazerUnicorns/lycheeJS-slides" "lycheeJS-slides" "master"
+clone_project() {
+
+	echo -e "\n\n~ ~ ~ clone_project($1 $2 $3) ~ ~ ~\n" >> $SORBET_LOG;
+
+	cd $SORBET_ROOT;
+	echo -e "Preparing folder structure:\n" >> $SORBET_LOG;
+
+	if [ ! -d "$SORBET_ROOT/external" ]
+	then
+		mkdir "$SORBET_ROOT/external" >> $SORBET_LOG 2>&1;
+	fi;
+
+	if [ -d "$SORBET_ROOT/external/$2" ]
+	then
+		echo -e "ERROR: Folder already exists (external/$2)\n" >> $SORBET_LOG;
+		check_success_step "FAILURE";
+	fi;
+
+
+	echo -e "Cloning repository:\n" >> $SORBET_LOG;
+	git clone "$1" "$SORBET_ROOT/external/$2" >> $SORBET_LOG 2>&1;
+	check_success "Could not clone repository (git)";
+
+	cd "$SORBET_ROOT/external/$2";
+	git checkout "$3" >> $SORBET_LOG 2>&1;
+	check_success "Could not checkout branch ($3)";
 
 
 	check_success_step "SUCCESS";
@@ -263,6 +302,22 @@ case "$1" in
 
 		echo -e "\nInstalling external github project ...";
 		install_project "$2" "$3";
+
+		exit;
+		;;
+
+	clone)
+
+		echo -e "\nInstalling external github project as clone ...";
+
+		branch="master";
+
+		if [ "$4" != "" ]
+		then
+			branch="$4";
+		fi;
+
+		clone_project "$2" "$3" "$branch";
 
 		exit;
 		;;
