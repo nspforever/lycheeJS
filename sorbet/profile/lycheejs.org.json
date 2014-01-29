@@ -17,7 +17,7 @@
 			"www.christoph-martens.de"
 		],
 		"config": {
-			"root": "%root%/external/martens.ms",
+			"root": "%root%/external/martensms-website",
 			"redirects": {
 				"/lycheeJS/docs/getting-started.html": "http://lycheejs.org/docs/index.html",
 				"/lycheeJS/*": "http://lycheejs.org/*",
