@@ -242,12 +242,15 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			});
 			entity.bind('touch', function() {
 
-				var level = this._state.stage.level;
+				var leveldata = this._state._leveldata;
+				if (leveldata !== null) {
 
-				this._state.leave();
-				this._state.enter({
-					level: level
-				});
+					var data = lychee.extend({}, leveldata);
+
+					this._state.leave();
+					this._state.enter(data);
+
+				}
 
 			}, this);
 			this.setEntity('restart', entity);
@@ -261,12 +264,23 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			});
 			entity.bind('touch', function() {
 
-				var level = parseInt(this._state.stage.level.substr(-1), 10);
+				var leveldata = this._state._leveldata;
+				if (leveldata !== null) {
 
-				this._state.leave();
-				this._state.enter({
-					level: 'stage' + (level + 1)
-				});
+					var level = parseInt(leveldata.level.substr(-1), 10);
+
+					if (!isNaN(level)) {
+
+						var data = lychee.extend({}, leveldata, {
+							level: 'stage' + (level + 1)
+						});
+
+						this._state.leave();
+						this._state.enter(data);
+
+					}
+
+				}
 
 			}, this);
 			this.setEntity('continue', entity);

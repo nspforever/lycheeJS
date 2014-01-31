@@ -28,6 +28,7 @@ lychee.define('game.entity.Ship').requires([
 
 
 		this.color   = 'red';
+		this.data    = null;
 		this.health  = 0;
 		this.speedx  = 0;
 		this.speedy  = 0;
@@ -212,6 +213,12 @@ lychee.define('game.entity.Ship').requires([
 
 			return false;
 
+		},
+
+		setData: function(data) {
+			// Keeps a reference to level data
+			// performance optimization
+			this.data = data;
 		},
 
 		setHealth: function(health) {

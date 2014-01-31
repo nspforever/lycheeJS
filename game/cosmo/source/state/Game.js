@@ -29,6 +29,11 @@ lychee.define('game.state.Game').requires([
 		this.__result.visible = true;
 		this.__result.trigger('success', [ player1, player2 ]);
 
+		if (this.game.settings.music === true) {
+			this.game.jukebox.stop('music-game');
+			this.game.jukebox.play('music-credits');
+		}
+
 	};
 
 	var _process_failure = function(player1, player2) {
@@ -36,6 +41,11 @@ lychee.define('game.state.Game').requires([
 		this.__hud.visible    = false;
 		this.__result.visible = true;
 		this.__result.trigger('failure', [ player1, player2 ]);
+
+		if (this.game.settings.music === true) {
+			this.game.jukebox.stop('music-game');
+			this.game.jukebox.play('music-credits');
+		}
 
 	};
 
@@ -51,6 +61,8 @@ lychee.define('game.state.Game').requires([
 
 		this.controllers = [];
 		this.logic       = game.logic || null;
+
+		this._leveldata = null;
 
 		this.__result = new _resultlayer({}, game, this);
 		this.__hud    = new _hudlayer({}, game, this);
@@ -173,6 +185,8 @@ lychee.define('game.state.Game').requires([
 				level.bind('update',  _process_update,  this);
 				level.bind('success', _process_success, this);
 				level.bind('failure', _process_failure, this);
+
+				this._leveldata = data;
 
 
 				this.logic.setLevel(level);

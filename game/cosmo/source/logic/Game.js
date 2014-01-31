@@ -25,6 +25,29 @@ lychee.define('game.logic.Game').requires([
 	 * HELPERS
 	 */
 
+	var _check_success = function(entities) {
+
+		var success = true;
+
+		for (var e = 0, el = entities.length; e < el; e++) {
+
+			if ((entities[e] instanceof _ship) === false) {
+				success = false;
+			}
+
+		}
+
+
+		var level = this.level;
+		if (
+			   success === true
+			&& level !== null
+		) {
+			level.trigger('success', level.data);
+		}
+
+	};
+
 	var _get_level_ship = function(ship) {
 
 		var level = 0;
@@ -43,7 +66,6 @@ lychee.define('game.logic.Game').requires([
 		return level;
 
 	};
-
 
 	var _get_level_points = function(points) {
 
@@ -345,7 +367,7 @@ lychee.define('game.logic.Game').requires([
 						   position.y < miny
 						|| position.y > maxy
 					) {
-						level.destroy(entity, false);
+						level.destroy(entity, null);
 						continue;
 					}
 
@@ -393,14 +415,18 @@ lychee.define('game.logic.Game').requires([
 				) {
 
 					if (position.y > maxy) {
-						level.destroy(entity, false);
+
+						// TODO: Evaluate how to do this generically
+						// Who gets data.missed in Multiplayer Mode?
+
+						level.destroy(entity, null, level.data[0]);
+						if (entities.length <= 4) _check_success.call(this, entities);
 						continue;
 					}
 
 				}
 
 			}
-
 
 
 			var background = this.__background;

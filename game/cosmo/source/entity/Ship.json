@@ -32,21 +32,21 @@
 			"height":    100,
 			"animation": false,
 			"weapons":   [ 1, 1, 1, 0, 0, 0, 0 ],
-			"speed":     50
+			"speed":     100
 		},
 
 		"upgrade2": {
 			"animation": true,
 			"duration":  1000,
 			"loop":      false,
-			"speed":     50
+			"speed":     100
 		},
 
 		"downgrade2": {
 			"animation": true,
 			"duration":  1000,
 			"loop":      false,
-			"speed":     80
+			"speed":     100
 		},
 
 		"level2": {
@@ -54,21 +54,21 @@
 			"height":    104,
 			"animation": false,
 			"weapons":   [ 1, 1, 1, 2, 2, 0, 0 ],
-			"speed":     80
+			"speed":     200
 		},
 
 		"upgrade3": {
 			"animation": true,
 			"duration":  1000,
 			"loop":      false,
-			"speed":     80
+			"speed":     200
 		},
 
 		"downgrade3": {
 			"animation": true,
 			"duration":  1000,
 			"loop":      false,
-			"speed":     100
+			"speed":     200
 		},
 
 		"level3": {
@@ -76,7 +76,7 @@
 			"height":    109,
 			"animation": false,
 			"weapons":   [ 2, 1, 1, 2, 2, 1, 1 ],
-			"speed":     100
+			"speed":     300
 		}
 
 	},
