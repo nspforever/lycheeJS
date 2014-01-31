@@ -36,7 +36,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		return _gameconfig.level[level] || 999999999;
 	};
 
-	var _points_to_str = function(points) {
+	var _format_points = function(points) {
 
 		var pre = '';
 		var str = points + '';
@@ -51,8 +51,8 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	var _process_update = function(player1, player2) {
 
-		_process_update_player.call(this.__player1, player1);
-		_process_update_player.call(this.__player2, player2);
+		_process_update_player.call(this.__player1, player1 || null);
+		_process_update_player.call(this.__player2, player2 || null);
 
 	};
 
@@ -67,7 +67,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 		shield.w  = shield._x  + (shield._w  * (data.health / 100));
 		upgrade.w = upgrade._x + (upgrade._w * (data.points / _get_points(level + 1)));
 
-		this.points = _points_to_str(data.points);
+		this.points = _format_points(data.points);
 
 	};
 

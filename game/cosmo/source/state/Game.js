@@ -27,15 +27,15 @@ lychee.define('game.state.Game').requires([
 
 		this.__hud.visible    = false;
 		this.__result.visible = true;
-		this.__result.trigger('success', arguments);
+		this.__result.trigger('success', [ player1, player2 ]);
 
 	};
 
-	var _process_failure = function(data) {
+	var _process_failure = function(player1, player2) {
 
 		this.__hud.visible    = false;
 		this.__result.visible = true;
-		this.__result.trigger('failure', arguments);
+		this.__result.trigger('failure', [ player1, player2 ]);
 
 	};
 
@@ -120,10 +120,6 @@ lychee.define('game.state.Game').requires([
 
 				data.width  = typeof data.width === 'number'  ? data.width  : env.width;
 				data.height = typeof data.height === 'number' ? data.height : env.height;
-
-
-// TODO: Remove this
-data.height = 500;
 
 
 				if (lychee.debug === true) {

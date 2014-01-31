@@ -23,7 +23,58 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 	 * HELPERS
 	 */
 
-	var _process_success = function(data) {
+	var _get_statistics = function(data) {
+
+		var result = {};
+
+		var percentage = data.destroyed / (data.destroyed + data.missed) * 100;
+
+		result.hits    = (percentage + '').substr(0, 5) + '%';
+		result.shield  = (data.health < 0 ? 0 : data.health) + '%';
+		result.score   = data.points + '';
+
+		if (result.hits === 'NaN%') {
+			result.hits = '00.00%';
+		}
+
+		result.rank = 'A';
+
+		if (percentage < 80 || isNaN(percentage)) {
+
+			result.rank = 'B';
+
+			if (data.health < 50) {
+				result.rank = 'C';
+			}
+
+		}
+
+		var length = 0;
+
+		length = Math.max(length, result.hits.length);
+		length = Math.max(length, result.shield.length);
+		length = Math.max(length, result.score.length);
+
+		result.hits   = _format_label(result.hits,   length);
+		result.shield = _format_label(result.shield, length);
+		result.score  = _format_label(result.score,  length);
+
+
+		return result;
+
+	};
+
+	var _format_label = function(label, length) {
+
+		for (var l = label.length; l < length; l++) {
+			label = ' ' + label;
+		}
+
+		return label;
+
+	};
+
+	var _process_success = function(player1, player2) {
 
 		var headline = this.getEntity('headline');
 
@@ -36,11 +87,11 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		restart.visible = false;
 		continu.visible = true;
 
-		_show_statistics.call(this, data);
+		_process_data.call(this, player1, player2);
 
 	};
 
-	var _process_failure = function(data) {
+	var _process_failure = function(player1, player2) {
 
 		var headline = this.getEntity('headline');
 
@@ -53,64 +104,42 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		restart.visible = true;
 		continu.visible = false;
 
-		_show_statistics.call(this, data);
+		_process_data.call(this, player1, player2 || null);
 
 	};
 
-	var _show_statistics = function(data) {
+	var _process_data = function(player1, player2) {
 
-		var percentage = data.destroyed / (data.destroyed + data.missed) * 100;
-		var hits       = (percentage + '').substr(0, 5) + '%';
-		var shield     = (data.health < 0 ? 0 : data.health) + '%';
-		var score      = data.points + '';
+		player1 = player1 || null;
+		player2 = player2 || null;
 
 
-		if (hits === 'NaN%') {
-			hits = '0%';
+		var hits   = this.getEntity('hits');
+		var shield = this.getEntity('shield');
+		var score  = this.getEntity('score');
+		var rank   = this.getEntity('rank');
+
+
+		if (player2 !== null) {
+
+			var stats1 = _get_statistics(player1);
+			var stats2 = _get_statistics(player2);
+
+			hits.setLabel(  'Hits:   ' + stats1.hits   + ' | ' + stats2.hits  );
+			shield.setLabel('Shield: ' + stats1.shield + ' | ' + stats2.shield);
+			score.setLabel( 'Score:  ' + stats1.score  + ' | ' + stats2.score );
+			rank.setLabel(  'Rank:'    + stats1.rank   + ' | ' + stats2.rank  );
+
+		} else {
+
+			var stats1 = _get_statistics(player1);
+
+			hits.setLabel(  'Hits:   ' + stats1.hits  );
+			shield.setLabel('Shield: ' + stats1.shield);
+			score.setLabel( 'Score:  ' + stats1.score );
+			rank.setLabel(  'Rank: '   + stats1.rank  );
+
 		}
-
-		var rank = 'A';
-		if (percentage < 80 || isNaN(percentage)) {
-
-			rank = 'B';
-
-			if (data.health < 50) {
-				rank = 'C';
-			}
-
-		}
-
-
-		var ehits   = this.getEntity('hits');
-		var eshield = this.getEntity('shield');
-		var escore  = this.getEntity('score');
-
-		var maxlength = Math.max(
-			'Hits:   '.length + hits.length,
-			'Shield: '.length + shield.length,
-			'Score:  '.length + score.length
-		);
-
-
-		for (var l = 'Hits:   '.length + hits.length; l < maxlength; l++) {
-			hits = ' ' + hits;
-		}
-
-		for (var l = 'Shield: '.length + shield.length; l < maxlength; l++) {
-			shield = ' ' + shield;
-		}
-
-		for (var l = 'Score:  '.length + score.length; l < maxlength; l++) {
-			score = ' ' + score;
-		}
-
-
-		  ehits.setLabel('Hits:   ' + hits);
-		eshield.setLabel('Shield: ' + shield);
-		 escore.setLabel('Score:  ' + score);
-
-
-		this.getEntity('rank').setLabel('Rank:'     + rank);
 
 	};
 
