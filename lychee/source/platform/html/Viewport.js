@@ -216,7 +216,7 @@ lychee.define('Viewport').tags({
 				for (var p = 0, pl = prefixes.length; p < pl; p++) {
 
 					if (
-						typeof element[prefixes[p] + 'RequestFullScreen'] === 'function'
+						   typeof element[prefixes[p] + 'RequestFullScreen'] === 'function'
 						&& typeof document[prefixes[p] + 'CancelFullScreen'] === 'function'
 					) {
 
@@ -227,7 +227,7 @@ lychee.define('Viewport').tags({
 							};
 
 							_leaveFullscreen = function() {
-								document[prefix + 'LeaveFullScreen']();
+								document[prefix + 'CancelFullScreen']();
 							};
 
 						})(global.document, element, prefixes[p]);
@@ -436,28 +436,25 @@ lychee.define('Viewport').tags({
 		 * PUBLIC API
 		 */
 
-		enterFullscreen: function() {
+		setFullscreen: function(fullscreen) {
 
-			if (_enterFullscreen !== null) {
+			if (
+				   fullscreen === true
+				&& _enterFullscreen !== null
+			) {
 
-				this.fullscreen = true;
 				_enterFullscreen();
+				this.fullscreen = true;
 
 				return true;
 
-			}
+			} else if (
+				   fullscreen === false
+				&& _leaveFullscreen !== null
+			) {
 
-
-			return false;
-
-		},
-
-		leaveFullscreen: function() {
-
-			if (_leaveFullscreen !== null) {
-
-				this.fullscreen = false;
 				_leaveFullscreen();
+				this.fullscreen = false;
 
 				return true;
 

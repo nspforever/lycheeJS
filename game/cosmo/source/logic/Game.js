@@ -103,7 +103,7 @@ lychee.define('game.logic.Game').requires([
 
 				var foreground = this.__foreground;
 				if (foreground !== null) {
-					foreground.setFlash(1000);
+					foreground.setFlash(3000);
 				}
 
 
@@ -496,7 +496,7 @@ lychee.define('game.logic.Game').requires([
 
 
 
-				if (config.distance > level.distance) {
+				if (config.distance > level.distance - config.maxy) {
 					_process_success.call(this);
 				}
 

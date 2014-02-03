@@ -203,7 +203,7 @@ lychee.define('sorbet.Main').requires([
 				async:   false,
 				status:  0,
 				header:  {},
-				content: null
+				content: ''
 			};
 
 

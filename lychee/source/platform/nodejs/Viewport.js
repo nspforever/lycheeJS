@@ -119,13 +119,17 @@ lychee.define('Viewport').tags({
 		 * PUBLIC API
 		 */
 
-		enterFullscreen: function() {
-			// TODO: Evaluate if Fullscreen can be implemented in a TTY
-			return false;
-		},
+		setFullscreen: function(fullscreen) {
 
-		leaveFullscreen: function() {
-			return true;
+			if (fullscreen === true) {
+
+			} else if (fullscreen === false) {
+
+			}
+
+
+			return false;
+
 		}
 
 	};

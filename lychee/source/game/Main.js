@@ -109,6 +109,10 @@ lychee.define('lychee.game.Main').requires([
 			background: '#222222'
 		},
 
+		viewport: {
+			fullscreen: false
+		},
+
 		client: null,
 		server: '/sorbet/module/Server'
 
@@ -270,10 +274,17 @@ lychee.define('lychee.game.Main').requires([
 				settings.renderer = {};
 			}
 
-			this.viewport = new lychee.Viewport();
+
+			var vs = settings.viewport;
+			this.viewport = new lychee.Viewport(vs);
 			this.viewport.bind('reshape', this.reshape, this);
 			this.viewport.bind('hide',    this.stop,    this);
 			this.viewport.bind('show',    this.start,   this);
+
+
+			if (settings.viewport !== null) {
+				this.viewport.setFullscreen(settings.viewport.fullscreen);
+			}
 
 		},
 
