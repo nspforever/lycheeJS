@@ -33,7 +33,7 @@
 
 			var timedOut = false;
 			if (instance.__clock !== null) {
-				timedOut = Date.now() >= instance.__clock + instance.__timeout;
+				timedOut = Date.now() >= instance.__clock + instance.timeout;
 			} else {
 				// lychee.Preloader instance without called load()
 				timedOut = true;
@@ -138,23 +138,22 @@
 
 		var settings = lychee.extend({}, data);
 
-		settings.timeout  = typeof settings.timeout === 'number' ? settings.timeout : 3000;
 
-console.log(settings.timeout);
-
-
-		this.__timeout = settings.timeout;
+		this.timeout   = 3000;
 
 		this.__fired   = {}; // cached fired events per request
 		this.__map     = {}; // associated data per request
 		this.__pending = {}; // pending requests
 		this.__clock   = null;
-
 		this.___events = {};
 
 
-		_instances.push(this);
+		this.setTimeout(settings.timeout);
 
+		delete settings.timeout;
+
+
+		_instances.push(this);
 
 		settings = null;
 
@@ -295,6 +294,24 @@ console.log(settings.timeout);
 
 
 			return null;
+
+		},
+
+		setTimeout: function(timeout) {
+
+			timeout = typeof timeout === 'number' ? timeout : null;
+
+
+			if (timeout !== null) {
+
+				this.timeout = timeout;
+
+				return true;
+
+			}
+
+
+			return false;
 
 		},
 

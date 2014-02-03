@@ -16,20 +16,39 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 		var level = 0;
 
-		for (var levelid in this._config.level) {
 
-			if (points > _gameconfig.level[levelid]) {
-				level = parseInt(levelid, 10);
+		var logic = this.game.logic;
+		if (logic !== null) {
+
+			var config = logic._config.level;
+
+			for (var levelid in config) {
+
+				if (points > config[levelid]) {
+					level = parseInt(levelid, 10);
+				}
+
 			}
 
 		}
+
 
 		return level;
 
 	};
 
 	var _get_points = function(level) {
-		return _gameconfig.level[level] || 999999999;
+
+		var points = 999999999;
+
+		var logic = this.game.logic;
+		if (logic !== null) {
+			points = logic._config.level[level];
+		}
+
+
+		return points;
+
 	};
 
 	var _format_points = function(points) {
@@ -47,23 +66,23 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	var _process_update = function(player1, player2) {
 
-		_process_update_player.call(this.__player1, player1 || null);
-		_process_update_player.call(this.__player2, player2 || null);
+		_process_update_player.call(this, this.__player1, player1 || null);
+		_process_update_player.call(this, this.__player2, player2 || null);
 
 	};
 
-	var _process_update_player = function(data) {
+	var _process_update_player = function(player, data) {
 
 		if (data === null) return;
 
-		var shield  = this.shield;
-		var upgrade = this.upgrade;
+		var shield  = player.shield;
+		var upgrade = player.upgrade;
 		var level   = _get_level.call(this, data.points);
 
 		shield.w  = shield._x  + (shield._w  * (data.health / 100));
-		upgrade.w = upgrade._x + (upgrade._w * (data.points / _get_points(level + 1)));
+		upgrade.w = upgrade._x + (upgrade._w * (data.points / _get_points.call(this, level + 1)));
 
-		this.points = _format_points(data.points);
+		player.points = _format_points(data.points);
 
 	};
 
@@ -79,7 +98,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 			settings = {};
 		}
 
-		this._config = game.logic._config;
+		this.game    = game || null;
 		this.font    = game.fonts.hud || null;
 		this.texture = _texture;
 
