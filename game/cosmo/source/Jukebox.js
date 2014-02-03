@@ -12,6 +12,7 @@ lychee.define('game.Jukebox').includes([
 			'./asset/sound/ship-lazer',
 			'./asset/sound/ship-shield',
 			'./asset/sound/ship-transformation',
+			'./asset/sound/ship-warp',
 
 			'./asset/sound/explosion',
 			'./asset/sound/powerup',
@@ -26,6 +27,7 @@ lychee.define('game.Jukebox').includes([
 			'ship-lazer',
 			'ship-shield',
 			'ship-transformation',
+			'ship-warp',
 
 			'explosion',
 			'powerup',

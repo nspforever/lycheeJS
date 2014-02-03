@@ -26,7 +26,8 @@
 			"Lazer":      [ "js", "json", "png" ],
 			"Meteor":     [ "js", "json", "png" ],
 			"Shield":     [ "js", "png" ],
-			"Ship":       [ "js", "json", "red.png", "green.png", "blue.png" ]
+			"Ship":       [ "js", "json", "red.png", "green.png", "blue.png" ],
+			"Warp":       [ "js", "json", "png" ]
 
 		},
 

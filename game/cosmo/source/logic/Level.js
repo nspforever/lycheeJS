@@ -71,6 +71,7 @@ lychee.define('game.logic.Level').requires([
 
 
 		this.data     = [ null, null, null, null ];
+		this.distance = 0;
 		this.enemies  = [];
 		this.entities = [];
 		this.ships    = [];
@@ -80,6 +81,7 @@ lychee.define('game.logic.Level').requires([
 
 		this.__cache  = { x: 0, y: 0 };
 		this.__boundY = 0;
+		this.__goalY  = 0;
 
 
 		lychee.event.Emitter.call(this);
@@ -334,8 +336,9 @@ lychee.define('game.logic.Level').requires([
 				}
 
 
-				var offsetX = (-1 * stage[0].length / 2) | 0;
-				var offsetY = this.__boundY;
+				var distance = 0;
+				var offsetX  = (-1 * stage[0].length / 2) | 0;
+				var offsetY  = this.__boundY;
 
 				for (var y = 0, yl = stage.length; y < yl; y++) {
 
@@ -354,10 +357,15 @@ lychee.define('game.logic.Level').requires([
 
 					}
 
+
+					distance = Math.max(distance, -1 * pos.y);
+
 				}
 
-				this.width = stage[0].length * 80;
-				this.stage = id;
+
+				this.width    = stage[0].length * 80;
+				this.distance = distance + this.height;
+				this.stage    = id;
 
 
 				return true;

@@ -1,7 +1,8 @@
 
 lychee.define('game.entity.Ship').requires([
 	'game.entity.Lazer',
-	'game.entity.Shield'
+	'game.entity.Shield',
+	'game.entity.Warp'
 ]).includes([
 	'lychee.game.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
@@ -14,6 +15,7 @@ lychee.define('game.entity.Ship').requires([
 	};
 	var _lazer  = game.entity.Lazer;
 	var _shield = game.entity.Shield;
+	var _warp   = game.entity.Warp;
 
 
 	var Class = function(settings, logic) {
@@ -25,6 +27,7 @@ lychee.define('game.entity.Ship').requires([
 
 		this.logic  = logic || null;
 		this.shield = new _shield();
+		this.warp   = new _warp();
 
 
 		this.color   = 'red';
@@ -70,6 +73,7 @@ lychee.define('game.entity.Ship').requires([
 			lychee.game.Sprite.prototype.update.call(this, clock, delta);
 
 			this.shield.update(clock, delta);
+			this.warp.update(clock, delta);
 
 
 			var minx = Math.floor(-1/2 * config.width);
@@ -104,6 +108,13 @@ lychee.define('game.entity.Ship').requires([
 				renderer,
 				offsetX + position.x,
 				offsetY + position.y
+			);
+
+
+			this.warp.render(
+				renderer,
+				offsetX + position.x,
+				offsetY + position.y + 108
 			);
 
 		},

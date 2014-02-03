@@ -25,6 +25,8 @@ lychee.define('game.state.Game').requires([
 
 	var _process_success = function(player1, player2) {
 
+		this.logic.leave();
+
 		this.__hud.visible    = false;
 		this.__result.visible = true;
 		this.__result.trigger('success', [ player1, player2 ]);
@@ -37,6 +39,8 @@ lychee.define('game.state.Game').requires([
 	};
 
 	var _process_failure = function(player1, player2) {
+
+		this.logic.leave();
 
 		this.__hud.visible    = false;
 		this.__result.visible = true;
@@ -121,6 +125,9 @@ lychee.define('game.state.Game').requires([
 			data.level   = typeof data.level === 'string'  ? data.level    : 'stage1';
 			data.players = data.players instanceof Array   ? data.players  : [ 'local:1337' ];
 			data.player  = typeof data.player === 'string' ? data.player   : 'local:1337';
+
+
+data.level='debug';
 
 
 			if (

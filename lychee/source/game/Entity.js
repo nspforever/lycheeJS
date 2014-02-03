@@ -515,7 +515,7 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 				var tween = this.__tween;
 
 				tween.type     = lychee.enumof(Class.TWEEN, settings.type) ? settings.type     : Class.TWEEN.linear;
-				tween.duration = typeof settings.duration === 'number'       ? settings.duration : 1000;
+				tween.duration = typeof settings.duration === 'number'     ? settings.duration : 1000;
 
 				if (settings.position instanceof Object) {
 					tween.toposition.x = typeof settings.position.x === 'number' ? settings.position.x : this.position.x;
