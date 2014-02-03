@@ -440,6 +440,7 @@ lychee.define('Viewport').tags({
 
 			if (
 				   fullscreen === true
+				&& this.fullscreen === false
 				&& _enterFullscreen !== null
 			) {
 
@@ -450,6 +451,7 @@ lychee.define('Viewport').tags({
 
 			} else if (
 				   fullscreen === false
+				&& this.fullscreen === true
 				&& _leaveFullscreen !== null
 			) {
 

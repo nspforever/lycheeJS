@@ -275,15 +275,15 @@ lychee.define('lychee.game.Main').requires([
 			}
 
 
-			var vs = settings.viewport;
-			this.viewport = new lychee.Viewport(vs);
+			this.viewport = new lychee.Viewport();
 			this.viewport.bind('reshape', this.reshape, this);
 			this.viewport.bind('hide',    this.stop,    this);
 			this.viewport.bind('show',    this.start,   this);
 
 
 			if (settings.viewport !== null) {
-				this.viewport.setFullscreen(settings.viewport.fullscreen);
+				var vs = settings.viewport;
+				this.viewport.setFullscreen(vs.fullscreen);
 			}
 
 		},
