@@ -1,15 +1,6 @@
 
 (function(lychee, global) {
 
-	// Asynchronous loading, this file
-	// can be ready before lycheeJS core
-
-	if (lychee === undefined) {
-		global.lychee = lychee = {};
-	}
-
-
-
 	var _instances = [];
 
 	/*
@@ -23,7 +14,7 @@
 
 		var timedOutInstances = 0;
 
-		for (var i = 0, l = _instances.length; i < l; i++) {
+		for (var i = 0, il = _instances.length; i < il; i++) {
 
 			var instance = _instances[i];
 			var isReady  = true;
@@ -43,6 +34,9 @@
 			var timedOut = false;
 			if (instance.__clock !== null) {
 				timedOut = Date.now() >= instance.__clock + instance.__timeout;
+			} else {
+				// lychee.Preloader instance without called load()
+				timedOut = true;
 			}
 
 
@@ -80,7 +74,6 @@
 				}
 
 
-				// Reset the clock if the lychee.Preloader timed out
 				if (timedOut === true) {
 					timedOutInstances++;
 				}
@@ -93,10 +86,10 @@
 		if (timedOutInstances === _instances.length) {
 
 			if (lychee.debug === true) {
-				console.log('lychee.Preloader: Nothing to do, switching to idle mode.');
+				console.log('lychee.Preloader: Switching to Idle Mode');
 			}
 
-			for (var i = 0, l = _instances.length; i < l; i++) {
+			for (var i = 0, il = _instances.length; i < il; i++) {
 				_instances[i].__clock = null;
 			}
 
@@ -146,6 +139,8 @@
 		var settings = lychee.extend({}, data);
 
 		settings.timeout  = typeof settings.timeout === 'number' ? settings.timeout : 3000;
+
+console.log(settings.timeout);
 
 
 		this.__timeout = settings.timeout;

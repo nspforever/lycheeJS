@@ -888,7 +888,7 @@
 
 		// This stuff here can't timeout on slow internet connections!
 		this.__preloader = new lychee.Preloader({
-			timeout: Infinity
+			timeout: 10000
 		});
 
 		this.__preloader.bind('ready', _load_asset,   this);

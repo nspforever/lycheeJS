@@ -210,6 +210,7 @@ lychee.define('game.logic.Game').requires([
 		this.jukebox  = game.jukebox;
 		this.loop     = game.loop;
 		this.renderer = game.renderer;
+		this._config  = _config;
 
 		this.level        = null;
 		this.ship         = null;

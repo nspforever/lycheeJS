@@ -3,12 +3,8 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 	'lychee.ui.Entity'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _texture = attachments["png"];
-	var _config  = attachments["json"];
-
-
-	// TODO: Evaluate if it makes sense to query Assets of other lychee.DefinitionBlocks
-	var _gameconfig = new lychee.Preloader().get('./source/logic/Game.json');
+	var _texture    = attachments["png"];
+	var _config     = attachments["json"];
 
 
 
@@ -20,7 +16,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 		var level = 0;
 
-		for (var levelid in _gameconfig.level) {
+		for (var levelid in this._config.level) {
 
 			if (points > _gameconfig.level[levelid]) {
 				level = parseInt(levelid, 10);
@@ -62,7 +58,7 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 		var shield  = this.shield;
 		var upgrade = this.upgrade;
-		var level   = _get_level(data.points);
+		var level   = _get_level.call(this, data.points);
 
 		shield.w  = shield._x  + (shield._w  * (data.health / 100));
 		upgrade.w = upgrade._x + (upgrade._w * (data.points / _get_points(level + 1)));
@@ -79,12 +75,11 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 
 	var Class = function(settings, game, gamestate) {
 
-
 		if (settings === undefined) {
 			settings = {};
 		}
 
-
+		this._config = game.logic._config;
 		this.font    = game.fonts.hud || null;
 		this.texture = _texture;
 
