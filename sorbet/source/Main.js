@@ -216,8 +216,10 @@ lychee.define('sorbet.Main').requires([
 
 			var tmp = ('' + request.headers.host).split(':');
 
+			var version = parseFloat(request.httpVersion, 10) || 1.0;
 			var remote  = request.connection.remoteAddress;
 			var referer = request.headers.referer || null;
+			var range   = request.headers.range || null;
 			var rawhost = tmp[0] !== undefined ? tmp[0] : '';
 			var rawport = parseInt(tmp[1] !== undefined ? tmp[1] : '80', 10);
 			var host    = this.vhosts.get(rawhost);
@@ -377,7 +379,9 @@ lychee.define('sorbet.Main').requires([
 
 						_file.process(host, response, {
 							url:      url,
-							resolved: resolved
+							resolved: resolved,
+							range:    range,
+							version:  version
 						});
 
 

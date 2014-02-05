@@ -460,12 +460,6 @@ lychee.define('lychee.game.Main').requires([
 				this.__state.update && this.__state.update(t, dt);
 			}
 
-
-			var jukebox = this.jukebox;
-			if (jukebox !== null) {
-				jukebox.update(t, dt);
-			}
-
 		}
 
 	};

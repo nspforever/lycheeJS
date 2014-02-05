@@ -192,7 +192,7 @@
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', url, true);
 			xhr.setRequestHeader('Content-Type', 'application/json; charset=utf8');
-			xhr.onreadystatechange = function() {
+			xhr.onload = function() {
 
 				if (xhr.readyState === 4) {
 
@@ -299,38 +299,14 @@
 
 
 				this.buffer.addEventListener('ended', function() {
+					that.isIdle = true;
 					that.play();
-				}, false);
-
-
-				this.buffer.addEventListener('canplaythrough', function() {
-
-					if (that.onload instanceof Function) {
-						that.onload();
-						that.onload = null;
-					}
-
 				}, true);
 
 			}
 
-
-			setTimeout(function() {
-
-				if (that.onload instanceof Function) {
-					that.onload();
-					that.onload = null;
-				}
-
-			}, 500);
-
-		},
-
-		update: function() {
-
-			if (this.buffer.currentTime >= this.buffer.duration) {
-				this.stop();
-				this.play();
+			if (this.onload instanceof Function) {
+				this.onload();
 			}
 
 		},
@@ -348,8 +324,10 @@
 				} catch(e) {
 				}
 
-				this.buffer.play();
-				this.isIdle = false;
+				if (this.buffer.currentTime === 0) {
+					this.buffer.play();
+					this.isIdle = false;
+				}
 
 			}
 
@@ -501,16 +479,6 @@
 				}, true);
 
 			}
-
-
-			setTimeout(function() {
-
-				if (that.onload instanceof Function) {
-					that.onload();
-					that.onload = null;
-				}
-
-			}, 500);
 
 		},
 

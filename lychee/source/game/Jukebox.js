@@ -52,15 +52,6 @@ lychee.define('lychee.game.Jukebox').exports(function(lychee, global) {
 
 	Class.prototype = {
 
-		update: function(clock, delta) {
-
-			var music = this.__music;
-			if (music !== null) {
-				music.update();
-			}
-
-		},
-
 		play: function(track) {
 
 			if (

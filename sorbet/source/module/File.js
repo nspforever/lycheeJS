@@ -1,6 +1,45 @@
 
 lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, attachments) {
 
+	/*
+	 * HELPERS
+	 */
+
+	var _parse_range = function(range) {
+
+		if (typeof range !== 'string') return null;
+
+
+		var tmp = range.split('=');
+		if (tmp[0] === 'bytes') {
+
+			var tmp = tmp[1].split('-');
+			var min = parseInt(tmp[0], 10);
+			var max = parseInt(tmp[1], 10);
+
+			if (!isNaN(min)) {
+
+				if (isNaN(max)) {
+					max = Infinity;
+				}
+
+				return [ min, max ];
+
+			}
+
+		}
+
+
+		return null;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(main) {
 
 		this.main = main;
@@ -21,8 +60,8 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 		'svg':     { encoding: 'utf8',   type: 'image/svg+xml'                 },
 
 		// Media: Audio
-		'mp3':     { encoding: 'binary', type: 'audio/mp3'                     },
-		'ogg':     { encoding: 'binary', type: 'application/ogg'               },
+		'mp3':     { encoding: 'binary', type: 'audio/mp3'      , stream: true },
+		'ogg':     { encoding: 'binary', type: 'application/ogg', stream: true },
 
 		// Media: Video
 		'webm':    { encoding: 'binary', type: 'video/webm'                    },
@@ -60,6 +99,7 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 
 		process: function(host, response, data) {
 
+			var range  = _parse_range(data.range);
 			var _error = this.main.modules.get('error');
 
 			var resolved = data.resolved;
@@ -97,7 +137,11 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 			}
 
 
+
+
 			host.fs.read(resolved, function(buffer, modtime) {
+
+
 
 				response.header['Last-Modified'] = modtime;
 
@@ -118,7 +162,34 @@ lychee.define('sorbet.module.File').exports(function(lychee, sorbet, global, att
 					}
 
 
-					response.content = buffer;
+					if (data.version >= 1.1) {
+
+						if (range !== null) {
+
+							range[1] = Math.min(range[1], buffer.length - 1);
+
+							response.status                  = 206;
+							response.header['Content-Range'] = 'bytes ' + range[0] + '-' + range[1] + '/' + buffer.length;
+							response.content = buffer.slice(range[0], range[1] + 1);
+
+						} else if (mime.stream === true) {
+
+							response.status                  = 206;
+							response.header['Content-Range'] = '0-' + (buffer.length - 1) + '/' + buffer.length;
+							response.content = buffer;
+
+						} else {
+
+							response.content = buffer;
+
+						}
+
+					} else {
+
+						response.content = buffer;
+
+					}
+
 
 					response.ready();
 
