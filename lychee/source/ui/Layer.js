@@ -349,6 +349,7 @@ lychee.define('lychee.ui.Layer').includes([
 						this.entities.splice(e, 1);
 						found = true;
 						el--;
+						e--;
 					}
 
 				}

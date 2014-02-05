@@ -209,6 +209,7 @@ lychee.define('lychee.verlet.World').requires([
 						this.__objects.splice(o, 1);
 						found = true;
 						ol--;
+						o--;
 					}
 
 				}

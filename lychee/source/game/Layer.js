@@ -228,6 +228,7 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 						this.entities.splice(e, 1);
 						found = true;
 						el--;
+						e--;
 					}
 
 				}

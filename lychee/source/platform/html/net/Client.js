@@ -171,6 +171,7 @@ lychee.define('lychee.net.Client').tags({
 				this.__services.waiting.splice(w, 1);
 				found = true;
 				wl--;
+				w--;
 			}
 
 		}
@@ -210,6 +211,7 @@ lychee.define('lychee.net.Client').tags({
 				this.__services.active.splice(a, 1);
 				found = true;
 				al--;
+				a--;
 			}
 
 		}

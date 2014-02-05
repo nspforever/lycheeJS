@@ -183,6 +183,7 @@ lychee.define('lychee.net.Remote').tags({
 				this.__services.splice(s, 1);
 				found = true;
 				sl--;
+				s--;
 			}
 
 		}

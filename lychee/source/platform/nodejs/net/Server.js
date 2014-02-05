@@ -259,6 +259,7 @@ lychee.define('lychee.net.Server').tags({
 					found = true;
 					this.remotes.splice(r, 1);
 					rl--;
+					r--;
 				}
 
 			}
