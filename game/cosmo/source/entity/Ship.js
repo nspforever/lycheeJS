@@ -254,6 +254,23 @@ lychee.define('game.entity.Ship').requires([
 
 		},
 
+		setBombs: function(bombs) {
+
+			bombs = typeof bombs === 'number' ? bombs : null;
+
+			if (bombs !== null) {
+
+				this.bombs = bombs;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
 		setColor: function(color) {
 
 			color = typeof color === 'string' ? color : null;

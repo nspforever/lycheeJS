@@ -98,6 +98,14 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			new _explosionstruct(),
 			new _explosionstruct(),
 			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
 			new _explosionstruct()
 		];
 
@@ -246,7 +254,9 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 					lights_big.push(position.x);
 					lights_big.push(position.y);
 
-				} else if (entity.type === 'lazer') {
+				} else if (
+					   entity.type === 'lazer'
+				) {
 
 					lights_small.push(position.x);
 					lights_small.push(position.y);
@@ -256,6 +266,7 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				if (
 					   entity.type === 'enemy'
 					|| entity.type === 'meteor'
+					|| entity.type === 'bomb'
 				) {
 
 					radar_positions.push(position.x);

@@ -1,13 +1,13 @@
 
-lychee.define('game.entity.ui.Title').includes([
+lychee.define('game.entity.ui.menu.Title').includes([
 	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _texture = attachments["png"];
 	var _config  = {
 		width:  512,
 		height: 144
 	};
+	var _texture = attachments["png"];
 
 
 	var Class = function(settings) {
@@ -18,9 +18,8 @@ lychee.define('game.entity.ui.Title').includes([
 
 
 		settings.texture = _texture;
-
-		settings.width     = _config.width;
-		settings.height    = _config.height;
+		settings.width   = _config.width;
+		settings.height  = _config.height;
 
 
 		lychee.ui.Sprite.call(this, settings);

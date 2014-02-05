@@ -1,15 +1,17 @@
 
 lychee.define('game.state.Game').requires([
 	'game.logic.Controller',
-	'game.entity.ui.HUDLayer',
-	'game.entity.ui.ResultLayer'
+	'game.entity.ui.game.HUD',
+	'game.entity.ui.game.Result'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _controller  = game.logic.Controller;
-	var _hudlayer    = game.entity.ui.HUDLayer;
-	var _resultlayer = game.entity.ui.ResultLayer;
+	var _music = attachments['msc'];
+
+	var _controller = game.logic.Controller;
+	var _hud        = game.entity.ui.game.HUD;
+	var _result     = game.entity.ui.game.Result;
 
 
 
@@ -29,11 +31,12 @@ lychee.define('game.state.Game').requires([
 
 
 		if (this.game.settings.music === true) {
-			this.game.jukebox.stop('music-game');
+			_music.stop();
 		}
 
-		this.__hud.visible    = false;
-		this.__result.visible = true;
+		this.__controls.visible = false;
+		this.__hud.visible      = false;
+		this.__result.visible   = true;
 		this.__result.trigger('success', [ player1, player2 ]);
 
 	};
@@ -44,11 +47,11 @@ lychee.define('game.state.Game').requires([
 
 
 		if (this.game.settings.music === true) {
-			this.game.jukebox.stop('music-game');
+			_music.stop();
 		}
 
-		this.__hud.visible    = false;
-		this.__result.visible = true;
+		this.__hud.visible      = false;
+		this.__result.visible   = true;
 		this.__result.trigger('failure', [ player1, player2 ]);
 
 	};
@@ -67,9 +70,8 @@ lychee.define('game.state.Game').requires([
 		this.logic       = game.logic || null;
 
 		this._leveldata = null;
-
-		this.__result = new _resultlayer({}, game, this);
-		this.__hud    = new _hudlayer({}, game, this);
+		this.__hud      = new _hud({}, game);
+		this.__result   = new _result({}, game);
 
 
 		this.reset();
@@ -200,13 +202,11 @@ lychee.define('game.state.Game').requires([
 			}
 
 
-			this.__result.visible = false;
 			this.__hud.visible    = true;
+			this.__result.visible = false;
 
 
-			if (this.game.settings.music === true) {
-				this.game.jukebox.play('music-game', true);
-			}
+			this.game.jukebox.play(_music);
 
 
 			lychee.game.State.prototype.enter.call(this);
@@ -215,9 +215,7 @@ lychee.define('game.state.Game').requires([
 
 		leave: function() {
 
-			if (this.game.settings.music === true) {
-				this.game.jukebox.stop('music-game');
-			}
+			this.game.jukebox.stop(_music);
 
 
 			if (this.logic !== null) {
@@ -291,7 +289,7 @@ lychee.define('game.state.Game').requires([
 
 				var controller = this.controller;
 				if (controller !== null) {
-					controller.processKey(key);
+					controller.process(key);
 				}
 
 			}
@@ -324,9 +322,9 @@ lychee.define('game.state.Game').requires([
 				}
 
 
-				var controller = this.controller;
-				if (controller !== null) {
-					controller.processTouch(position);
+				var controls = this.__controls;
+				if (controls.visible === true) {
+					controls.processTouch(position);
 				}
 
 			}

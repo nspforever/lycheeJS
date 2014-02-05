@@ -1,6 +1,6 @@
 
-lychee.define('game.entity.ui.HighscoreLayer').requires([
-	'game.entity.ui.Menu',
+lychee.define('game.entity.ui.menu.Highscore').requires([
+	'game.entity.ui.menu.Background',
 	'lychee.ui.Button',
 	'lychee.ui.Sprite'
 ]).includes([
@@ -43,15 +43,16 @@ lychee.define('game.entity.ui.HighscoreLayer').requires([
 			var height = this.height;
 
 
-			this.addEntity(new game.entity.ui.Menu({
+			var background = new game.entity.ui.menu.Background({
 				state: 'default'
-			}));
+			});
 
+			this.addEntity(background);
 
 
 			entity = new lychee.ui.Button({
 				label:   '',
-				font:    this.game.fonts.small,
+				font:    background.font,
 				visible: false,
 				position: {
 					x: 0,

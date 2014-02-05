@@ -3,6 +3,7 @@ lychee.define('lychee.game.Main').requires([
 	'lychee.Input',
 	'lychee.Renderer',
 	'lychee.Viewport',
+	'lychee.game.Jukebox',
 	'lychee.game.Loop',
 	'lychee.net.Client'
 ]).includes([
@@ -85,16 +86,18 @@ lychee.define('lychee.game.Main').requires([
 
 	var _defaults = {
 
-		fullscreen: false,
-		music:      true,
-		sound:      true,
-
 		input: {
 			delay:        0,
 			fireKey:      false,
 			fireModifier: false,
 			fireTouch:    true,
 			fireSwipe:    false
+		},
+
+		jukebox: {
+			channels: 8,
+			music:    true,
+			sound:    false
 		},
 
 		loop: {
@@ -131,6 +134,7 @@ lychee.define('lychee.game.Main').requires([
 
 		this.client   = null;
 		this.input    = null;
+		this.jukebox  = null;
 		this.loop     = null;
 		this.renderer = null;
 		this.viewport = null;
@@ -213,7 +217,7 @@ lychee.define('lychee.game.Main').requires([
 				var rd       = this.defaults.renderer;
 
 
-				if (settings.fullscreen === true) {
+				if (settings.viewport.fullscreen === true) {
 					rs.width  = env.screen.width;
 					rs.height = env.screen.height;
 				} else {
@@ -227,6 +231,15 @@ lychee.define('lychee.game.Main').requires([
 					rs.height,
 					true
 				);
+
+			}
+
+
+			for (var id in this.__states) {
+
+				var state = this.__states[id];
+
+				state.reshape(orientation, rotation, width, height);
 
 			}
 
@@ -256,6 +269,10 @@ lychee.define('lychee.game.Main').requires([
 
 			if (settings.input !== null) {
 				this.input = new lychee.Input(settings.input);
+			}
+
+			if (settings.jukebox !== null) {
+				this.jukebox = new lychee.game.Jukebox(settings.jukebox);
 			}
 
 			if (settings.loop !== null) {
@@ -305,9 +322,9 @@ lychee.define('lychee.game.Main').requires([
 			var state = this.getState();
 			if (state !== null) {
 
-				state.leave && state.leave(leavedata);
-				state.reset && state.reset();
-				state.enter && state.enter(enterdata);
+				state.leave(leavedata);
+				state.reset();
+				state.enter(enterdata);
 
 			}
 
@@ -326,7 +343,7 @@ lychee.define('lychee.game.Main').requires([
 				var state = this.__states[id];
 				if (state === current) continue;
 
-				state.reset && state.reset();
+				state.reset();
 
 			}
 
@@ -337,11 +354,15 @@ lychee.define('lychee.game.Main').requires([
 			id = typeof id === 'string' ? id : null;
 
 
-			if (id !== null) {
+			if (lychee.interfaceof(lychee.game.State, state) === true) {
 
-				this.__states[id] = state;
+				if (id !== null) {
 
-				return true;
+					this.__states[id] = state;
+
+					return true;
+
+				}
 
 			}
 
@@ -437,6 +458,12 @@ lychee.define('lychee.game.Main').requires([
 
 			if (this.__state !== null) {
 				this.__state.update && this.__state.update(t, dt);
+			}
+
+
+			var jukebox = this.jukebox;
+			if (jukebox !== null) {
+				jukebox.update(t, dt);
 			}
 
 		}

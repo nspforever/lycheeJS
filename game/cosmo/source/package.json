@@ -6,17 +6,24 @@
 		"entity": {
 
 			"ui": {
-				"Arrow":    [ "js", "json", "png" ],
-				"Button":   [ "js", "json", "png" ],
-				"Font":     [ "js", "hud.fnt", "normal.fnt" ],
-				"Menu":     [ "js", "json", "png" ],
-				"Title":    [ "js", "png" ],
 
-				"HighscoreLayer":   [ "js" ],
-				"HUDLayer":         [ "js", "json", "png" ],
-				"MultiplayerLayer": [ "js" ],
-				"ResultLayer":      [ "js", "json", "png" ],
-				"SettingsLayer":    [ "js" ]
+				"game": {
+
+					"HUD":    [ "js", "json", "png", "fnt" ],
+					"Result": [ "js", "json", "png", "fnt", "msc" ]
+				},
+
+				"menu": {
+					"Background":  [ "js", "json", "png", "fnt" ],
+					"Highscore":   [ "js" ],
+					"Multiplayer": [ "js" ],
+					"Settings":    [ "js" ],
+					"Title":       [ "js", "png" ]
+				},
+
+				"Arrow":  [ "js", "json", "png" ],
+				"Button": [ "js", "json", "png" ]
+
 			},
 
 			"Background": [ "js", "png" ],
@@ -51,17 +58,22 @@
 
 		"logic": {
 			"Controller": [ "js" ],
-			"Game":       [ "js", "json" ],
+			"Game":       [ "js", "json",
+				"explosion.snd",
+				"lazer.snd",
+				"shield.snd",
+				"transformation.snd",
+				"warp.snd"
+			],
 			"Level":      [ "js", "json" ]
 		},
 
 		"state": {
-			"Game": [ "js" ],
-			"Menu": [ "js" ]
+			"Game": [ "js", "msc" ],
+			"Menu": [ "js", "msc" ]
 		},
 
 		"Controller": [ "js" ],
-		"Jukebox":    [ "js" ],
 		"Main":       [ "js", "css" ]
 
 	}

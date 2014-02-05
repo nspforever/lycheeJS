@@ -245,7 +245,21 @@ lychee.define('lychee.game.State').requires([
 
 				var env = renderer.getEnvironment();
 
-				this.__layerOffsetX = env.width / 2;
+				this.__layerOffsetX = env.width  / 2;
+				this.__layerOffsetY = env.height / 2;
+
+			}
+
+		},
+
+		reshape: function(orientation, rotation, width, height) {
+
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				var env = renderer.getEnvironment();
+
+				this.__layerOffsetX = env.width  / 2;
 				this.__layerOffsetY = env.height / 2;
 
 			}

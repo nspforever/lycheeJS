@@ -1,23 +1,51 @@
 
-lychee.define('lychee.game.Jukebox').requires([
-	'lychee.game.Loop'
-]).includes([
-	'lychee.Jukebox'
-]).exports(function(lychee, global) {
+lychee.define('lychee.game.Jukebox').exports(function(lychee, global) {
 
-	var Class = function(maxPoolSize, loop) {
+	/*
+	 * HELPERS
+	 */
 
-		this.__clock    = 0;
-		this.__effects  = {};
-		this.__effectId = 0;
+	var _refresh_channels = function(amount) {
 
+		var sounds = [];
 
-		lychee.Jukebox.call(this, maxPoolSize);
-
-
-		if (loop instanceof lychee.game.Loop) {
-			loop.bind('update', this.update, this);
+		for (var a = 0; a < amount; a++) {
+			sounds.push(null);
 		}
+
+		this.__sounds = sounds;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
+	var Class = function(data) {
+
+		var settings = lychee.extend({}, data);
+
+
+		this.channels = 8;
+		this.music    = true;
+		this.sound    = true;
+
+		this.__music  = null;
+		this.__sounds = [
+			null, null,
+			null, null,
+			null, null,
+			null, null
+		];
+
+
+		this.setChannels(settings.channels);
+		this.setMusic(settings.music);
+		this.setSound(settings.sound);
+
+		settings = null;
 
 	};
 
@@ -26,111 +54,186 @@ lychee.define('lychee.game.Jukebox').requires([
 
 		update: function(clock, delta) {
 
-			for (var e in this.__effects) {
+			var music = this.__music;
+			if (music !== null) {
+				music.update();
+			}
 
-				var effect = this.__effects[e];
-				if (effect === null) continue;
+		},
 
-				if (effect.end <= this.__clock) {
+		play: function(track) {
 
-					if (effect.type === 'fade-out') {
-						this.stop(effect.id);
+			if (
+				   track instanceof Music
+				&& this.music === true
+			) {
+
+				var music = this.__music;
+				if (music !== null) {
+					music.stop();
+				}
+
+
+				this.__music = track;
+				this.__music.play();
+
+
+				return true;
+
+			} else if (
+				   track instanceof Sound
+				&& this.sound === true
+			) {
+
+				var sounds = this.__sounds;
+				for (var s = 0, sl = sounds.length; s < sl; s++) {
+
+					var sound = sounds[s];
+					if (sound === null) {
+
+						sounds[s] = track.clone();
+						sounds[s].play();
+
+						break;
+
+					} else if (sound.isIdle === true) {
+
+						if (sound.url === track.url) {
+							sound.play();
+						} else {
+							sounds[s] = track.clone();
+							sounds[s].play();
+						}
+
+
+						break;
+
 					}
 
-					this.__effects[e] = null;
-					continue;
-
 				}
 
 
-				var pos = (this.__clock - effect.start) / (effect.end - effect.start);
-				if (effect.type === 'fade-in') {
-					this.setVolume(effect.id, pos * effect.diff);
-				} else if (effect.type === 'fade-out') {
-					this.setVolume(effect.id, (1 - pos) * effect.diff);
-				}
+				return true;
 
 			}
 
-			this.__clock = clock;
+
+			return false;
 
 		},
 
-		fadeIn: function(id, duration, loop, volume) {
+		stop: function(track) {
 
-			id       = typeof id === 'string'       ? id       : null;
-			duration = typeof duration === 'number' ? duration : 1000;
-			loop     = loop === true                ? true     : false;
-			volume   = typeof volume === 'number'   ? volume   : 1;
-
-
-			if (id !== null) {
-
-				this.play(id, loop);
-				this.setVolume(id, 0);
-
-				var effect = {
-					id:    id,
-					type:  'fade-in',
-					start: this.__clock,
-					end:   this.__clock + duration,
-					diff:  volume
-				};
-
-				this.__effects[++this.__effectId] = effect;
-
-			}
-
-		},
-
-		fadeOut: function(id, duration) {
-
-			id       = typeof id === 'string'       ? id       : null;
-			duration = typeof duration === 'number' ? duration : 1000;
-
-
-			if (id !== null) {
-
-				var current = this.getVolume(id);
-
-				var effect = {
-					id:    id,
-					type:  'fade-out',
-					start: this.__clock,
-					end:   this.__clock + duration,
-					diff:  current
-				};
-
-				this.__effects[++this.__effectId] = effect;
-
-			}
-
-		},
-
-		removeEffects: function(id, type) {
-
-			id   = typeof id === 'string'   ? id   : null;
-			type = typeof type === 'string' ? type : null;
+			track = (track instanceof Music || track instanceof Sound) ? track : null;
 
 
 			var found = false;
 
-			for (var e in this.__effects) {
 
-				if (this.__effects[e] === null) continue;
+			if (track instanceof Music) {
 
-				if (
-					   (id === null   || this.__effects[e].id === id)
-					&& (type === null || this.__effects[e].type === type)
-				) {
-					this.__effects[e] = null;
+				var music = this.__music;
+				if (music === track) {
 					found = true;
+					music.stop();
+				}
+
+
+				this.__music = null;
+
+			} else if (track instanceof Sound) {
+
+				var sounds = this.__sounds;
+				for (var s = 0, sl = sounds.length; s < sl; s++) {
+
+					var sound = sounds[s];
+					if (
+						   sound !== null
+						&& sound.url === track.url
+						&& sound.isIdle === false
+					) {
+						found = true;
+						sound.stop();
+					}
+
+				}
+
+			} else if (track === null) {
+
+				var music = this.__music;
+				if (music !== null) {
+					found = true;
+					music.stop();
+				}
+
+
+				var sounds = this.__sounds;
+				for (var s = 0, sl = sounds.length; s < sl; s++) {
+
+					var sound = sounds[s];
+					if (
+						   sound !== null
+						&& sound.isIdle === false
+					) {
+						found = true;
+						sound.stop();
+					}
+
 				}
 
 			}
 
 
 			return found;
+
+		},
+
+		setChannels: function(channels) {
+
+			channels = typeof channels === 'number' ? channels : null;
+
+			if (channels !== null) {
+
+				this.channels = channels;
+
+				_refresh_channels.call(this, channels);
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setMusic: function(music) {
+
+			if (music === true || music === false) {
+
+				this.music = music;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setSound: function(sound) {
+
+			if (sound === true || sound === false) {
+
+				this.sound = sound;
+
+				return true;
+
+			}
+
+
+			return false;
 
 		}
 

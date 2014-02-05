@@ -1,10 +1,11 @@
 
-lychee.define('game.entity.ui.HUDLayer').includes([
+lychee.define('game.entity.ui.game.HUD').includes([
 	'lychee.ui.Entity'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _texture    = attachments["png"];
-	var _config     = attachments["json"];
+	var _config  = attachments["json"];
+	var _font    = attachments["fnt"];
+	var _texture = attachments["png"];
 
 
 
@@ -92,14 +93,14 @@ lychee.define('game.entity.ui.HUDLayer').includes([
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(settings, game, gamestate) {
+	var Class = function(settings, game) {
 
 		if (settings === undefined) {
 			settings = {};
 		}
 
 		this.game    = game || null;
-		this.font    = game.fonts.hud || null;
+		this.font    = _font;
 		this.texture = _texture;
 
 

@@ -1,10 +1,11 @@
 
-lychee.define('game.entity.ui.Menu').includes([
+lychee.define('game.entity.ui.menu.Background').includes([
 	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _texture = attachments["png"];
 	var _config  = attachments["json"];
+	var _font    = attachments["fnt"];
+	var _texture = attachments["png"];
 
 
 	var Class = function(settings) {
@@ -12,6 +13,9 @@ lychee.define('game.entity.ui.Menu').includes([
 		if (settings === undefined) {
 			settings = {};
 		}
+
+
+		this.font = _font;
 
 
 		settings.texture = _texture;

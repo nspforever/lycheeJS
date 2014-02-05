@@ -1,6 +1,6 @@
 
-lychee.define('game.entity.ui.MultiplayerLayer').requires([
-	'game.entity.ui.Menu',
+lychee.define('game.entity.ui.menu.Multiplayer').requires([
+	'game.entity.ui.menu.Background',
 	'lychee.ui.Button',
 	'lychee.ui.Sprite'
 ]).includes([
@@ -99,14 +99,16 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			var height = this.height;
 
 
-			this.addEntity(new game.entity.ui.Menu({
+			var background = new game.entity.ui.menu.Background({
 				state: 'default'
-			}));
+			});
+
+			this.addEntity(background);
 
 
 			entity = new lychee.ui.Button({
-				label: 'Enter Code',
-				font: this.game.fonts.normal,
+				label:    'Enter Code',
+				font:     background.font,
 				position: {
 					x:  0,
 					y: -1/2 * height + 32
@@ -117,7 +119,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 			entity = new lychee.ui.Button({
 				label:    '_ _ _ _',
-				font:     this.game.fonts.normal,
+				font:     background.font,
 				position: {
 					x:  0,
 					y: -1/2 * height + 64 + 20
@@ -128,7 +130,7 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 			entity = new lychee.ui.Button({
 				label:    '* * * *',
-				font:     this.game.fonts.normal,
+				font:     background.font,
 				position: {
 					x:  0,
 					y: -1/2 * height + 64 + 16
@@ -147,8 +149,8 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 			for (var n = 1; n <= 9; n++) {
 
 				var button = new lychee.ui.Button({
-					label: n + '',
-					font:  this.game.fonts.normal,
+					label:    n + '',
+					font:     background.font,
 					position: {
 						x: ox + x * 56,
 						y: oy + y * 48
@@ -171,9 +173,9 @@ lychee.define('game.entity.ui.MultiplayerLayer').requires([
 
 
 			entity = new lychee.ui.Button({
-				label:   '',
-				font:    this.game.fonts.small,
-				visible: false,
+				label:    '',
+				font:     background.font,
+				visible:  false,
 				position: {
 					x: 0,
 					y: 1/2 * height - 32

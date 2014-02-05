@@ -1,5 +1,6 @@
 
-lychee.define('game.entity.ui.ResultLayer').requires([
+lychee.define('game.entity.ui.game.Result').requires([
+	'game.entity.ui.menu.Background',
 	'lychee.ui.Button',
 	'lychee.ui.Sprite'
 ]).includes([
@@ -8,6 +9,8 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 	var _texture = attachments["png"];
 	var _config  = attachments["json"];
+	var _font    = attachments["fnt"];
+	var _music   = attachments["msc"];
 
 	var _spriteconfig = {
 		texture: _texture,
@@ -90,9 +93,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		_process_data.call(this, player1, player2);
 
 
-		if (this.game.settings.music === true) {
-			this.game.jukebox.play('music-credits');
-		}
+		this.game.jukebox.play(_music);
 
 	};
 
@@ -112,9 +113,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		_process_data.call(this, player1, player2 || null);
 
 
-		if (this.game.settings.music === true) {
-			this.game.jukebox.play('music-credits');
-		}
+		this.game.jukebox.play(_music);
 
 	};
 
@@ -211,17 +210,16 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			var height = this.height;
 
 
-			entity = new lychee.ui.Sprite(_spriteconfig);
-			entity.width  = width;
-			entity.height = height;
-			entity.setState('background');
-			this.addEntity(entity);
+			var background = new game.entity.ui.menu.Background({
+				state: 'default'
+			});
 
+			this.addEntity(background);
 
 
 			entity = new lychee.ui.Button({
 				label: 'Game Over',
-				font: this.game.fonts.normal,
+				font: background.font,
 				position: {
 					x:  0,
 					y: -1/2 * height + 32
@@ -240,10 +238,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			});
 			entity.bind('touch', function() {
 
-				if (this.game.settings.music === true) {
-					this.game.jukebox.stop('music-credits');
-				}
-
+				this.game.jukebox.stop(_music);
 				this.game.changeState('menu');
 
 			}, this);
@@ -258,9 +253,8 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			});
 			entity.bind('touch', function() {
 
-				if (this.game.settings.music === true) {
-					this.game.jukebox.stop('music-credits');
-				}
+				this.game.jukebox.stop(_music);
+
 
 				var leveldata = this._state._leveldata;
 				if (leveldata !== null) {
@@ -307,7 +301,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 
 			entity = new lychee.ui.Button({
-				font: this.game.fonts.small,
+				font:     _font,
 				position: {
 					x: 0,
 					y: -48
@@ -316,7 +310,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			this.setEntity('hits', entity);
 
 			entity = new lychee.ui.Button({
-				font: this.game.fonts.small,
+				font:     _font,
 				position: {
 					x: 0,
 					y: -24
@@ -325,7 +319,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 			this.setEntity('shield', entity);
 
 			entity = new lychee.ui.Button({
-				font: this.game.fonts.small,
+				font:     _font,
 				position: {
 					x: 0,
 					y: 0
@@ -335,7 +329,7 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 
 			entity = new lychee.ui.Button({
-				font: this.game.fonts.normal,
+				font:     _font,
 				position: {
 					x: 0,
 					y: 48

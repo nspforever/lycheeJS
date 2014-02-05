@@ -2,15 +2,18 @@
 lychee.define('game.state.Menu').requires([
 	'game.entity.Background',
 	'game.entity.ui.Arrow',
-	'game.entity.ui.Menu',
-	'game.entity.ui.Title',
-	'game.entity.ui.HighscoreLayer',
-	'game.entity.ui.MultiplayerLayer',
-	'game.entity.ui.SettingsLayer',
+	'game.entity.ui.menu.Background',
+	'game.entity.ui.menu.Highscore',
+	'game.entity.ui.menu.Multiplayer',
+	'game.entity.ui.menu.Settings',
+	'game.entity.ui.menu.Title',
 	'lychee.ui.Layer'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
+
+	var _music = attachments['msc'];
+
 
 	/*
 	 * HELPERS
@@ -159,8 +162,9 @@ lychee.define('game.state.Menu').requires([
 		lychee.game.State.call(this, game);
 
 
-		this.__background = null;
+		this.music = _music;
 
+		this.__background = null;
 		this.__cache      = { x: 0, y: 0 };
 		this.__locked     = false;
 
@@ -202,7 +206,7 @@ lychee.define('game.state.Menu').requires([
 					&& height >= 440
 				) {
 
-					entity = new game.entity.ui.Title({
+					entity = new game.entity.ui.menu.Title({
 						position: {
 							x: 0,
 							y: -1/2 * height + 64
@@ -224,7 +228,7 @@ lychee.define('game.state.Menu').requires([
 					layer.setEntity('root', root);
 
 
-					entity = new game.entity.ui.Menu({
+					entity = new game.entity.ui.menu.Background({
 						state: 'singleplayer',
 						position: {
 							x: -3/2 * width,
@@ -240,7 +244,7 @@ lychee.define('game.state.Menu').requires([
 					root.addEntity(entity);
 
 
-					entity = new game.entity.ui.Menu({
+					entity = new game.entity.ui.menu.Background({
 						state: 'controls',
 						position: {
 							x: -3/2 * width,
@@ -266,7 +270,7 @@ lychee.define('game.state.Menu').requires([
 					 * MULTI PLAYER
 					 */
 
-					entity = new game.entity.ui.Menu({
+					entity = new game.entity.ui.menu.Background({
 						state: 'multiplayer-disabled',
 						position: {
 							x: -1/2 * width,
@@ -312,7 +316,7 @@ lychee.define('game.state.Menu').requires([
 					root.setEntity('multiplayer', entity);
 
 
-					entity = new game.entity.ui.MultiplayerLayer({
+					entity = new game.entity.ui.menu.Multiplayer({
 						position: {
 							x: -1/2 * width,
 							y:  1/2 * height
@@ -327,7 +331,7 @@ lychee.define('game.state.Menu').requires([
 					 * SETTINGS
 					 */
 
-					entity = new game.entity.ui.Menu({
+					entity = new game.entity.ui.menu.Background({
 						state: 'settings',
 						position: {
 							x:  1/2 * width,
@@ -342,7 +346,7 @@ lychee.define('game.state.Menu').requires([
 
 					root.addEntity(entity);
 
-					entity = new game.entity.ui.SettingsLayer({
+					entity = new game.entity.ui.menu.Settings({
 						position: {
 							x: 1/2 * width,
 							y: 1/2 * height
@@ -357,7 +361,7 @@ lychee.define('game.state.Menu').requires([
 					 * HIGH SCORES
 					 */
 
-					entity = new game.entity.ui.Menu({
+					entity = new game.entity.ui.menu.Background({
 						state: 'highscore-disabled',
 						position: {
 							x:  3/2 * width,
@@ -394,7 +398,7 @@ lychee.define('game.state.Menu').requires([
 					root.setEntity('highscore', entity);
 
 
-					entity = new game.entity.ui.HighscoreLayer({
+					entity = new game.entity.ui.menu.Highscore({
 						position: {
 							x: 3/2 * width,
 							y: 1/2 * height
@@ -458,7 +462,7 @@ lychee.define('game.state.Menu').requires([
 
 				} else {
 
-					layer.addEntity(new game.entity.ui.Menu({
+					layer.addEntity(new game.entity.ui.menu.Background({
 						state: 'default',
 						position: {
 							x: 0,
@@ -534,12 +538,9 @@ lychee.define('game.state.Menu').requires([
 		enter: function(data) {
 
 			this.loop.timeout(1000, function() {
-
-				if (this.game.settings.music === true) {
-					this.game.jukebox.play('music-menu', true);
-				}
-
+				this.game.jukebox.play(_music);
 			}, this);
+
 
 			lychee.game.State.prototype.enter.call(this);
 
@@ -547,9 +548,8 @@ lychee.define('game.state.Menu').requires([
 
 		leave: function(data) {
 
-			if (this.game.settings.music === true) {
-				this.game.jukebox.stop('music-menu');
-			}
+			this.game.jukebox.stop(_music);
+
 
 			lychee.game.State.prototype.leave.call(this);
 
@@ -617,11 +617,14 @@ lychee.define('game.state.Menu').requires([
 
 			switch(key) {
 
-				case 'arrow-left':  case 'a': left.visible === true  && _navigate_horizontal.call(this, -1); break;
-				case 'arrow-down':  case 's': this.simulateTouch(0, { x: 0, y: 0 }, 0);                      break;
-				case 'arrow-right': case 'd': right.visible === true && _navigate_horizontal.call(this,  1); break;
 				case 'arrow-up':    case 'w': top.visible === true   && _navigate_vertical.call(this,   -1); break;
-				case 'space':                 this.simulateTouch(0, { x: 0, y: 0 }, 0);                      break;
+				case 'arrow-down':  case 's': this.simulateTouch(0, { x: 0, y: 0 }, 0);                      break;
+				case 'arrow-left':  case 'a': left.visible === true  && _navigate_horizontal.call(this, -1); break;
+				case 'arrow-right': case 'd': right.visible === true && _navigate_horizontal.call(this,  1); break;
+
+				case 'escape': top.visible === true && _navigate_vertical.call(this, -1); break;
+				case 'enter':  this.simulateTouch(0, { x: 0, y: 0 }, 0);                  break;
+				case 'space':  this.simulateTouch(0, { x: 0, y: 0 }, 0);                  break;
 
 			}
 

@@ -9,6 +9,14 @@ lychee.define('game.logic.Game').requires([
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _config = attachments["json"];
+	var _sounds = {
+		explosion:      attachments["explosion.snd"],
+		lazer:          attachments["lazer.snd"],
+		shield:         attachments["shield.snd"],
+		transformation: attachments["transformation.snd"],
+		warp:           attachments["warp.snd"]
+	};
+
 
 	var _level      = game.logic.Level;
 	var _background = game.entity.Background;
@@ -75,9 +83,8 @@ lychee.define('game.logic.Game').requires([
 
 		}
 
-		if (this.game.settings.sound === true) {
-			this.jukebox.play('explosion');
-		}
+
+		this.game.jukebox.play(_sounds.explosion);
 
 	};
 
@@ -90,9 +97,8 @@ lychee.define('game.logic.Game').requires([
 			&& ship !== null
 		) {
 
-			if (this.game.settings.sound === true) {
-				this.jukebox.play('ship-warp');
-			}
+			this.game.jukebox.play(_sounds.warp);
+
 
 			ship.setCollision(lychee.game.Entity.COLLISION.none);
 			ship.warp.setState('warp');
@@ -163,9 +169,8 @@ lychee.define('game.logic.Game').requires([
 			data.health  = 100;
 			data.points += 500;
 
-			if (this.game.settings.sound === true) {
-				this.jukebox.play('ship-transformation');
-			}
+
+			this.game.jukebox.play(_sounds.transformation);
 
 		}
 
@@ -255,11 +260,7 @@ lychee.define('game.logic.Game').requires([
 			) {
 
 				if (construct === _lazer) {
-
-					if (this.game.settings.sound === true) {
-						this.jukebox.play('ship-lazer');
-					}
-
+					this.game.jukebox.play(_sounds.lazer);
 				}
 
 
@@ -322,6 +323,7 @@ lychee.define('game.logic.Game').requires([
 
 					ship.position.y = env.height / 2 + 256;
 
+					ship.setBombs(3);
 					ship.setCollision(lychee.game.Entity.COLLISION.none);
 					ship.setTween(tween);
 
@@ -486,11 +488,7 @@ lychee.define('game.logic.Game').requires([
 			}
 
 			if (shiphits > 0) {
-
-				if (this.game.settings.sound === true) {
-					this.jukebox.play('ship-shield');
-				}
-
+				this.game.jukebox.play(_sounds.shield);
 			}
 
 

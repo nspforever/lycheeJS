@@ -246,7 +246,7 @@ lychee.define('game.logic.Level').requires([
 			} else if (entity instanceof _ship) {
 
 				data.missed += this.entities.length;
-				this.trigger('gameover', this.data);
+				this.trigger('failure', this.data);
 
 			}
 

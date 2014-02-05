@@ -1,8 +1,6 @@
 
 lychee.define('game.Main').requires([
 	'game.net.Client',
-	'game.Jukebox',
-	'game.entity.ui.Font',
 	'game.logic.Game',
 	'game.state.Game',
 	'game.state.Menu'
@@ -14,11 +12,6 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
-			fullscreen: true,
-
-			music: true,
-			sound: true,
-
 			// Is configured by sorbet/module/Server
 			client: null,
 
@@ -29,10 +22,19 @@ lychee.define('game.Main').requires([
 				fireSwipe:    false
 			},
 
+			jukebox: {
+				music: true,
+				sound: true
+			},
+
 			renderer: {
 				id:     'game',
 				width:  800,
 				height: 600
+			},
+
+			viewport: {
+				fullscreen: true
 			}
 
 		}, data);
@@ -51,6 +53,7 @@ lychee.define('game.Main').requires([
 
 			var resetstates = false;
 
+/*
 			var renderer = this.renderer;
 			if (
 				   width !== undefined
@@ -73,7 +76,7 @@ lychee.define('game.Main').requires([
 				}
 
 			}
-
+*/
 
 			lychee.game.Main.prototype.reshape.call(this, orientation, rotation, width, height);
 
@@ -111,20 +114,13 @@ lychee.define('game.Main').requires([
 			this.reset(false);
 
 
-			this.fonts = {};
-			this.fonts.hud    = new game.entity.ui.Font('hud');
-			this.fonts.normal = new game.entity.ui.Font('normal');
-			this.fonts.small  = new game.entity.ui.Font('hud');
-
-
 			this.client   = null;
 			this.services = {
 				highscore:   null,
 				multiplayer: null
 			};
 
-			this.jukebox = new game.Jukebox(this);
-			this.logic   = new game.logic.Game(this);
+			this.logic = new game.logic.Game(this);
 
 			if (clientsettings !== null) {
 				this.client = new game.net.Client(clientsettings, this);

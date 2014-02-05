@@ -2,6 +2,57 @@
 (function(lychee, global) {
 
 	/*
+	 * FEATURE DETECTION
+	 */
+
+	var _codecs = {};
+
+	(function() {
+
+		var mime = {
+			'ogg':  [ 'application/ogg', 'audio/ogg', 'audio/ogg; codecs=theora, vorbis' ],
+			'mp3':  [ 'audio/mpeg' ]
+
+// TODO: Evaluate if other formats are necessary
+/*
+			'aac':  [ 'audio/aac', 'audio/aacp' ],
+			'caf':  [ 'audio/x-caf', 'audio/x-aiff; codecs="IMA-ADPCM, ADPCM"' ],
+
+			'webm': [ 'audio/webm', 'audio/webm; codecs=vorbis' ]
+			'3gp':  [ 'audio/3gpp', 'audio/3gpp2'],
+			'amr':  [ 'audio/amr' ],
+			'm4a':  [ 'audio/mp4; codecs=mp4a' ],
+			'mp4':  [ 'audio/mp4' ],
+			'wav':  [ 'audio/wave', 'audio/wav', 'audio/wav; codecs="1"', 'audio/x-wav', 'audio/x-pn-wav' ],
+*/
+		};
+
+
+		if (global.Audio) {
+
+			var audio = new Audio();
+
+			for (var ext in mime) {
+
+				var variants = mime[ext];
+				for (var v = 0, vl = variants.length; v < vl; v++) {
+
+					if (audio.canPlayType(variants[v])) {
+						_codecs[ext] = ext;
+						break;
+					}
+
+				}
+
+			}
+
+		}
+
+	})();
+
+
+
+	/*
 	 * FONT IMPLEMENTATION
 	 */
 
@@ -178,6 +229,374 @@
 
 
 	/*
+	 * MUSIC IMPLEMENTATION
+	 */
+
+	var _music_cache = {};
+
+
+	var _clone_music = function(origin, clone) {
+
+		clone.buffer = new Audio(origin.buffer.src);
+		clone.buffer.autobuffer = true;
+		clone.buffer.preload    = true;
+		clone.buffer.load();
+
+		clone.buffer.addEventListener('ended', function() {
+			clone.play();
+		}, true);
+
+	};
+
+
+	var Music = function(url) {
+
+		url = typeof url === 'string' ? url : null;
+
+
+		this.url       = url;
+		this.onload    = null;
+		this.buffer    = null;
+		this.volume    = 1.0;
+		this.isIdle    = true;
+		this.isLooping = false;
+
+
+		var url = this.url;
+
+		if (_music_cache[url] !== undefined) {
+			_clone_music(_music_cache[url], this);
+		} else {
+			_music_cache[url] = this;
+		}
+
+	};
+
+
+	Music.prototype = {
+
+		serialize: function() {
+
+			return {
+				'constructor': 'Music',
+				'arguments':   [ this.url ]
+			};
+
+		},
+
+		load: function() {
+
+			var that = this;
+
+			var url = this.url;
+			var ext = _codecs['ogg'] || _codecs['mp3'] || null;
+			if (ext !== null) {
+
+				this.buffer = new Audio(url + '.' + ext);
+				this.buffer.autobuffer = true;
+				this.buffer.preload    = true;
+				this.buffer.load();
+
+
+				this.buffer.addEventListener('ended', function() {
+					that.play();
+				}, false);
+
+
+				this.buffer.addEventListener('canplaythrough', function() {
+
+					if (that.onload instanceof Function) {
+						that.onload();
+						that.onload = null;
+					}
+
+				}, true);
+
+			}
+
+
+			setTimeout(function() {
+
+				if (that.onload instanceof Function) {
+					that.onload();
+					that.onload = null;
+				}
+
+			}, 500);
+
+		},
+
+		update: function() {
+
+			if (this.buffer.currentTime >= this.buffer.duration) {
+				this.stop();
+				this.play();
+			}
+
+		},
+
+		clone: function() {
+			return new Music(this.url);
+		},
+
+		play: function() {
+
+			if (this.buffer !== null) {
+
+				try {
+					this.buffer.currentTime = 0;
+				} catch(e) {
+				}
+
+				this.buffer.play();
+				this.isIdle = false;
+
+			}
+
+		},
+
+		pause: function() {
+
+			if (this.buffer !== null) {
+				this.buffer.pause();
+				this.isIdle = true;
+			}
+
+		},
+
+		resume: function() {
+
+			if (this.buffer !== null) {
+				this.buffer.play();
+				this.isIdle = false;
+			}
+
+		},
+
+		stop: function() {
+
+			if (this.buffer !== null) {
+
+				this.buffer.pause();
+				this.isIdle = true;
+
+				try {
+					this.buffer.currentTime = 0;
+				} catch(e) {
+				}
+
+			}
+
+		},
+
+		setVolume: function(volume) {
+
+			volume = typeof volume === 'number' ? volume : null;
+
+
+			if (
+				   volume !== null
+				&& this.buffer !== null
+			) {
+
+				volume = Math.min(Math.max(0, volume), 1);
+
+				this.buffer.volume = volume;
+				this.volume        = volume;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		}
+
+	};
+
+
+
+	/*
+	 * SOUND IMPLEMENTATION
+	 */
+
+	var _sound_cache = {};
+
+
+	var _clone_sound = function(origin, clone) {
+
+		clone.buffer = new Audio(origin.buffer.src);
+		clone.buffer.autobuffer = true;
+		clone.buffer.preload    = true;
+		clone.buffer.load();
+
+		clone.buffer.addEventListener('ended', function() {
+			clone.stop();
+		}, true);
+
+	};
+
+
+	var Sound = function(url) {
+
+		url = typeof url === 'string' ? url : null;
+
+
+		this.url    = url;
+		this.onload = null;
+		this.buffer = null;
+		this.volume = 1.0;
+		this.isIdle = true;
+
+
+		var url = this.url;
+
+		if (_sound_cache[url] !== undefined) {
+			_clone_sound(_sound_cache[url], this);
+		} else {
+			_sound_cache[url] = this;
+		}
+
+	};
+
+
+	Sound.prototype = {
+
+		serialize: function() {
+
+			return {
+				'constructor': 'Sound',
+				'arguments':   [ this.url ]
+			};
+
+		},
+
+		load: function() {
+
+			var that = this;
+
+			var url = this.url;
+			var ext = _codecs['ogg'] || _codecs['mp3'] || null;
+			if (ext !== null) {
+
+				this.buffer = new Audio(url + '.' + ext);
+				this.buffer.autobuffer = true;
+				this.buffer.preload    = true;
+				this.buffer.load();
+
+
+				this.buffer.addEventListener('ended', function() {
+					that.stop();
+				}, true);
+
+
+				this.buffer.addEventListener('canplaythrough', function() {
+
+					if (that.onload instanceof Function) {
+						that.onload();
+						that.onload = null;
+					}
+
+				}, true);
+
+			}
+
+
+			setTimeout(function() {
+
+				if (that.onload instanceof Function) {
+					that.onload();
+					that.onload = null;
+				}
+
+			}, 500);
+
+		},
+
+		clone: function() {
+			return new Sound(this.url);
+		},
+
+		play: function() {
+
+			if (this.buffer !== null) {
+
+				try {
+					this.buffer.currentTime = 0;
+				} catch(e) {
+				}
+
+				this.buffer.play();
+				this.isIdle = false;
+
+			}
+
+		},
+
+		pause: function() {
+
+			if (this.buffer !== null) {
+				this.buffer.pause();
+				this.isIdle = true;
+			}
+
+		},
+
+		resume: function() {
+
+			if (this.buffer !== null) {
+				this.buffer.play();
+				this.isIdle = false;
+			}
+
+		},
+
+		stop: function() {
+
+			if (this.buffer !== null) {
+
+				this.buffer.pause();
+				this.isIdle = true;
+
+				try {
+					this.buffer.currentTime = 0;
+				} catch(e) {
+				}
+
+			}
+
+		},
+
+		setVolume: function(volume) {
+
+			volume = typeof volume === 'number' ? volume : null;
+
+
+			if (
+				   volume !== null
+				&& this.buffer !== null
+			) {
+
+				volume = Math.min(Math.max(0, volume), 1);
+
+				this.buffer.volume = volume;
+				this.volume        = volume;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		}
+
+	};
+
+
+
+	/*
 	 * TEXTURE IMPLEMENTATION
 	 */
 
@@ -201,13 +620,12 @@
 		url = typeof url === 'string' ? url : null;
 
 
-		this.id      = _texture_id++;
-		this.url     = url;
-		this.onload  = null;
-
-		this.buffer  = null;
-		this.width   = 0;
-		this.height  = 0;
+		this.id     = _texture_id++;
+		this.url    = url;
+		this.onload = null;
+		this.buffer = null;
+		this.width  = 0;
+		this.height = 0;
 
 
 		var url = this.url;
@@ -345,7 +763,7 @@
 
 
 		// 3. Textures
-		} else if (type.match(/png/)) {
+		} else if (type === 'png') {
 
 			this.__pending[url] = true;
 
@@ -360,7 +778,7 @@
 
 
 		// 4. Fonts
-		} else if (type.match(/fnt/)) {
+		} else if (type === 'fnt') {
 
 			this.__pending[url] = true;
 
@@ -374,7 +792,35 @@
 			font.load();
 
 
-		// 5. CSS (won't affect JavaScript anyhow)
+		// 5. Music
+		} else if (type === 'msc') {
+
+			this.__pending[url] = true;
+
+			var music = new Music(url);
+			music.onload = function() {
+				that.__pending[url] = false;
+				_cache[url] = this;
+				that._progress(url, _cache);
+			};
+
+			music.load();
+
+		// 6. Sounds
+		} else if (type === 'snd') {
+
+			this.__pending[url] = true;
+
+			var sound = new Sound(url);
+			sound.onload = function() {
+				that.__pending[url] = false;
+				_cache[url] = this;
+				that._progress(url, _cache);
+			};
+
+			sound.load();
+
+		// 7. CSS (won't affect JavaScript anyhow)
 		} else if (type === 'css') {
 
 			this.__pending[url] = false;
@@ -387,7 +833,7 @@
 			document.head.appendChild(link);
 
 
-		// 6. Unknown File Types (will be loaded as text)
+		// 8. Unknown File Types (will be loaded as text)
 		} else {
 
 			this.__pending[url] = true;
@@ -430,6 +876,8 @@
 	 */
 
 	global.Font    = Font;
+	global.Music   = Music;
+	global.Sound   = Sound;
 	global.Texture = Texture;
 
 })(this.lychee, this);

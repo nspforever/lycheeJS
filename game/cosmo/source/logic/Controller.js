@@ -18,11 +18,9 @@ lychee.define('game.logic.Controller').requires([
 
 		if (data.id === this.id) {
 
-			var key   = data.key   || null;
-			var touch = data.touch || null;
-
-			if (key !== null)   this.processKey(key,     true);
-			if (touch !== null) this.processTouch(touch, true);
+			if (data.key !== null) {
+				this.process(data.key, true);
+			}
 
 		}
 
@@ -50,8 +48,7 @@ lychee.define('game.logic.Controller').requires([
 	var _service_control = function(data) {
 
 		data.id    = this.id;
-		data.key   = data.key   || null;
-		data.touch = data.touch || null;
+		data.key   = data.key || null;
 
 
 		if (this.service !== null) {
@@ -73,7 +70,7 @@ lychee.define('game.logic.Controller').requires([
 
 		this.id = id || null;
 
-		this.mode    = Class.MODE.local;
+		this.mode    = Class.MODE.offline;
 		this.service = null;
 		this.ship    = null;
 
@@ -90,8 +87,8 @@ lychee.define('game.logic.Controller').requires([
 
 
 	Class.MODE = {
-		local:  0,
-		online: 1
+		offline: 0,
+		online:  1
 	};
 
 
@@ -126,13 +123,7 @@ lychee.define('game.logic.Controller').requires([
 
 		},
 
-
-
-		/*
-		 * LOGIC INTEGRATION
-		 */
-
-		processKey: function(key, silent) {
+		process: function(key, silent) {
 
 			silent = silent === true;
 
@@ -164,58 +155,6 @@ lychee.define('game.logic.Controller').requires([
 
 				_service_control.call(this, {
 					key: key
-				});
-
-			}
-
-		},
-
-		processTouch: function(position, silent) {
-
-			silent = silent === true;
-
-
-			var processed = false;
-
-			var ship = this.ship;
-			if (ship !== null) {
-
-				var hwidth  = ship.width / 2;
-				var centerx = ship.position.x;
-
-				if (
-					   position.x > centerx - hwidth
-					&& position.x < centerx + hwidth
-				) {
-
-					ship.fire();
-
-				} else {
-
-					if (position.x > centerx) {
-						ship.right();
-					} else {
-						ship.left();
-					}
-
-				}
-
-				processed = true;
-
-			}
-
-
-			if (
-				   silent === false
-				&& processed === true
-				&& this.mode === Class.MODE.online
-			) {
-
-				_service_control.call(this, {
-					touch: {
-						x: position.x,
-						y: position.y
-					}
 				});
 
 			}
