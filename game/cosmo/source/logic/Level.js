@@ -12,6 +12,7 @@ lychee.define('game.logic.Level').requires([
 	var _config    = attachments['json'];
 
 	var _blackhole = game.entity.Blackhole;
+	var _bomb      = game.entity.Bomb;
 	var _enemy     = game.entity.Enemy;
 	var _lazer     = game.entity.Lazer;
 	var _meteor    = game.entity.Meteor;
@@ -195,6 +196,7 @@ lychee.define('game.logic.Level').requires([
 				if (this.entities[e] === entity) {
 					this.entities.splice(e, 1);
 					el--;
+					e--;
 				}
 
 			}
@@ -207,6 +209,7 @@ lychee.define('game.logic.Level').requires([
 					if (this.enemies[e] === entity) {
 						this.enemies.splice(e, 1);
 						el--;
+						e--;
 					}
 
 				}
@@ -313,6 +316,42 @@ lychee.define('game.logic.Level').requires([
 					this.destroy(active,  passive, passive.data);
 					this.destroy(passive, passive, passive.data);
 					diff -= 2;
+
+				}
+
+			} else if (
+				active instanceof _bomb
+				&& (
+					   passive instanceof _enemy
+					|| passive instanceof _meteor
+				)
+			) {
+
+				var x     = active.position.x;
+				var y     = active.position.y;
+				var rdist = 400;
+
+
+				this.destroy(active);
+				diff -= 1;
+
+
+				for (var e = 0, el = this.entities.length; e < el; e++) {
+
+					var entity   = this.entities[e];
+					var position = entity.position;
+
+					if (entity.type === 'meteor') {
+
+						var dist = Math.sqrt(Math.pow(position.x - x, 2) + Math.pow(position.y - y, 2));
+						if (dist <= rdist) {
+							this.destroy(entity, active.owner, active.owner.data);
+							diff -= 1;
+							el--;
+							e--;
+						}
+
+					}
 
 				}
 

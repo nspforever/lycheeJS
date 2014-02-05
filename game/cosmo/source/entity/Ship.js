@@ -1,5 +1,6 @@
 
 lychee.define('game.entity.Ship').requires([
+	'game.entity.Bomb',
 	'game.entity.Lazer',
 	'game.entity.Shield',
 	'game.entity.Warp'
@@ -13,6 +14,8 @@ lychee.define('game.entity.Ship').requires([
 		green: attachments["green.png"],
 		blue:  attachments["blue.png"],
 	};
+
+	var _bomb   = game.entity.Bomb;
 	var _lazer  = game.entity.Lazer;
 	var _shield = game.entity.Shield;
 	var _warp   = game.entity.Warp;
@@ -30,6 +33,7 @@ lychee.define('game.entity.Ship').requires([
 		this.warp   = new _warp();
 
 
+		this.bombs   = 2;
 		this.color   = 'red';
 		this.data    = null;
 		this.health  = 0;
@@ -152,8 +156,6 @@ lychee.define('game.entity.Ship').requires([
 			if (now < this.__timeout) return false;
 
 
-			this.stop();
-
 			var state = this.state;
 			if (
 				   state === 'default'
@@ -181,7 +183,12 @@ lychee.define('game.entity.Ship').requires([
 					var velarray = [];
 
 					for (var p = 0, pl = posarray.length; p < pl; p++) {
-						velarray.push({ x: 0, y: -400 });
+
+						velarray.push({
+							x:    0,
+							y: -400
+						});
+
 					}
 
 
@@ -191,6 +198,52 @@ lychee.define('game.entity.Ship').requires([
 						velarray,
 						this
 					);
+
+				}
+
+			}
+
+
+			this.__timeout = now + 200;
+
+		},
+
+		bomb: function() {
+
+			var now = Date.now();
+			if (now < this.__timeout) return false;
+
+
+			var state = this.state;
+			if (
+				   state === 'default'
+				|| state.substr(0, 5) === 'level'
+			) {
+
+				if (
+					   this.logic !== null
+					&& this.bombs > 0
+				) {
+
+					var posarray = [{
+						x: this.position.x,
+						y: this.position.y
+					}];
+
+					var velarray = [{
+						x:    0,
+						y: -400
+					}];
+
+					this.logic.spawn(
+						_bomb,
+						posarray,
+						velarray,
+						this
+					);
+
+
+					this.bombs--;
 
 				}
 

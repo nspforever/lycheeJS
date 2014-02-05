@@ -15,13 +15,20 @@ lychee.tag({
 });
 
 
+var settings = {
+	music: true,
+	sound: true
+};
+
+
+if (document.location.hash.match(/debug/)) {
+	lychee.debug   = true;
+	settings.music = false;
+	settings.sound = false;
+}
+
+
 lychee.build(function(lychee, global) {
-
-	var settings = {
-//		music: false,
-//		sound: false
-	};
-
 
 	new game.Main(settings);
 

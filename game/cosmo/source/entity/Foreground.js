@@ -5,7 +5,7 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 	 * HELPERS
 	 */
 
-	var _explosion = [];
+	var _explosionmatrix = [];
 
 	(function() {
 
@@ -15,13 +15,22 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			var sin = Math.sin(t * 2 * Math.PI);
 			var cos = Math.cos(t * 2 * Math.PI);
 
-			_explosion.push(sin * 200);
-			_explosion.push(cos * 200);
+			_explosionmatrix.push(sin * 200);
+			_explosionmatrix.push(cos * 200);
 
 		};
 
 	})();
 
+	var _explosionstruct = function() {
+		this.active = false;
+		this.start  = null;
+		this.x      = 0;
+		this.y      = 0;
+		this.radius = 0;
+		this.alpha  = 0.0;
+		this.matrix = _explosionmatrix.slice(0);
+	};
 
 	var _small_triangle = [
 		-35,  25,
@@ -49,7 +58,7 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 	var _translate_explosion = function(matrix, t) {
 
-		var mat = _explosion;
+		var mat = _explosionmatrix;
  		var sin = Math.sin(t * 2 * Math.PI);
 		var cos = Math.cos(t * 2 * Math.PI);
 
@@ -80,16 +89,20 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 		this.__width  = settings.width  || 0;
 		this.__height = settings.height || 0;
 
+		this.__explosion  = 0;
+		this.__explosions = [
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct(),
+			new _explosionstruct()
+		];
+
+
 		this.__clock = null;
-		this.__explosion = {
-			active: false,
-			start:  null,
-			x:      0,
-			y:      0,
-			radius: 0,
-			alpha:  1.0,
-			matrix: _explosion.slice(0)
-		};
 		this.__flash = {
 			active:   false,
 			start:    null,
@@ -134,9 +147,14 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 			if (this.__clock === null) {
 
-				if (this.__explosion.active === true && this.__explosion.start === null) {
-					this.__explosion.start = clock;
+				for (var e = 0, el = this.__explosions.length; e < el; e++) {
+
+					if (this.__explosions[e].active === true && this.__explosions[e].start === null) {
+						this.__explosions[e].start = clock;
+					}
+
 				}
+
 
 				if (this.__flash.active === true && this.__flash.start === null) {
 					this.__flash.start = clock;
@@ -157,23 +175,27 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			}
 
 
-			var explosion = this.__explosion;
-			if (
-				   explosion.active === true
-				&& explosion.start !== null
-			) {
+			for (var e = 0, el = this.__explosions.length; e < el; e++) {
 
-				var t = (this.__clock - explosion.start) / 400;
+				var explosion = this.__explosions[e];
+				if (
+					   explosion.active === true
+					&& explosion.start !== null
+				) {
 
-				if (t <= 1) {
+					var t = (this.__clock - explosion.start) / 400;
 
-					_translate_explosion(explosion.matrix, t);
-					explosion.radius = (t * 200) | 0;
-					explosion.alpha  = 1.0 - t;
+					if (t <= 1) {
 
-				} else {
+						_translate_explosion(explosion.matrix, t);
+						explosion.radius = (t * 200) | 0;
+						explosion.alpha  = 1.0 - t;
 
-					explosion.active = false;
+					} else {
+
+						explosion.active = false;
+
+					}
 
 				}
 
@@ -264,31 +286,36 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 		render: function(renderer, offsetX, offsetY) {
 
-			var explosion = this.__explosion;
-			if (explosion.active === true) {
 
-				renderer.setAlpha(explosion.alpha);
+			for (var e = 0, el = this.__explosions.length; e < el; e++) {
 
-				var matrix = explosion.matrix;
-				var x = offsetX + explosion.x;
-				var y = offsetY + explosion.y;
+				var explosion = this.__explosions[e];
+				if (explosion.active === true) {
+
+					renderer.setAlpha(explosion.alpha);
+
+					var matrix = explosion.matrix;
+					var x = offsetX + explosion.x;
+					var y = offsetY + explosion.y;
 
 
-				renderer.setAlpha(explosion.alpha);
+					renderer.setAlpha(explosion.alpha);
 
-				for (var m = 0, ml = matrix.length; m < ml; m += 4) {
+					for (var m = 0, ml = matrix.length; m < ml; m += 4) {
 
-					renderer.drawTriangle(
-						x,                      y,
-						x + matrix[m % ml],     y + matrix[m + 1 % ml],
-						x + matrix[m + 2 % ml], y + matrix[m + 3 % ml],
-						'#2793e6',
-						true
-					);
+						renderer.drawTriangle(
+							x,                      y,
+							x + matrix[m % ml],     y + matrix[m + 1 % ml],
+							x + matrix[m + 2 % ml], y + matrix[m + 3 % ml],
+							'#2793e6',
+							true
+						);
+
+					}
+
+					renderer.setAlpha(1.0);
 
 				}
-
-				renderer.setAlpha(1.0);
 
 			}
 
@@ -324,16 +351,23 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 				renderer.__ctx.globalCompositeOperation = 'destination-out';
 
 
-				// 2. Draw Explosion light
-				if (explosion.active === true) {
+				for (var e = 0, el = this.__explosions.length; e < el; e++) {
 
-					renderer.drawLight(
-						offsetX + explosion.x,
-						offsetY + explosion.y,
-						explosion.radius,
-						'#000000ff',
-						true
-					);
+					var explosion = this.__explosions[e];
+
+					// 2. Draw Explosion light
+					if (explosion.active === true) {
+
+						renderer.drawLight(
+							offsetX + explosion.x,
+							offsetY + explosion.y,
+							explosion.radius,
+							'#000000ff',
+							true
+						);
+
+					}
+
 
 				}
 
@@ -421,11 +455,15 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 
 			if (position instanceof Object) {
 
-				position.x = typeof position.x === 'number' ? position.x : this.__explosion.x;
-				position.y = typeof position.y === 'number' ? position.y : this.__explosion.y;
+				position.x = typeof position.x === 'number' ? position.x : 0;
+				position.y = typeof position.y === 'number' ? position.y : 0;
 
 
-				var explosion = this.__explosion;
+				this.__explosion++;
+				this.__explosion %= this.__explosions.length;
+
+
+				var explosion = this.__explosions[this.__explosion];
 
 
 				explosion.x     = position.x;

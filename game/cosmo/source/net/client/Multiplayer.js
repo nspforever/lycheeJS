@@ -87,6 +87,9 @@ lychee.define('game.net.client.Multiplayer').includes([
 		data.height = typeof data.height === 'number' ? data.height : null;
 
 
+console.log('Env Sync', data.width, data.height);
+
+
 		if (
 			   data.width !== null
 			&& data.height !== null
@@ -115,8 +118,10 @@ lychee.define('game.net.client.Multiplayer').includes([
 
 
 		lychee.net.client.Session.call(this, 'multiplayer', client, {
+			autolock:  true,
 			autostart: true,
-			limit:     2
+			min:       2,
+			max:       2
 		});
 
 		_update_env.call(this);

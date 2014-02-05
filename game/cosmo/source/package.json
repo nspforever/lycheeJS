@@ -21,6 +21,7 @@
 
 			"Background": [ "js", "png" ],
 			"Blackhole":  [ "js", "json", "png" ],
+			"Bomb":       [ "js", "json", "png" ],
 			"Enemy":      [ "js", "json", "png" ],
 			"Foreground": [ "js" ],
 			"Lazer":      [ "js", "json", "png" ],

@@ -89,6 +89,11 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 
 		_process_data.call(this, player1, player2);
 
+
+		if (this.game.settings.music === true) {
+			this.game.jukebox.play('music-credits');
+		}
+
 	};
 
 	var _process_failure = function(player1, player2) {
@@ -105,6 +110,11 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 		continu.visible = false;
 
 		_process_data.call(this, player1, player2 || null);
+
+
+		if (this.game.settings.music === true) {
+			this.game.jukebox.play('music-credits');
+		}
 
 	};
 
@@ -229,7 +239,13 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 				y:  156 - 32
 			});
 			entity.bind('touch', function() {
+
+				if (this.game.settings.music === true) {
+					this.game.jukebox.stop('music-credits');
+				}
+
 				this.game.changeState('menu');
+
 			}, this);
 			this.setEntity('menu', entity);
 
@@ -241,6 +257,10 @@ lychee.define('game.entity.ui.ResultLayer').requires([
 				y: 156 - 32
 			});
 			entity.bind('touch', function() {
+
+				if (this.game.settings.music === true) {
+					this.game.jukebox.stop('music-credits');
+				}
 
 				var leveldata = this._state._leveldata;
 				if (leveldata !== null) {

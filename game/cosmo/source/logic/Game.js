@@ -83,8 +83,6 @@ lychee.define('game.logic.Game').requires([
 
 	var _process_success = function() {
 
-		this.__state = 1;
-
 		var level = this.level;
 		var ship  = this.ship;
 		if (
@@ -96,6 +94,7 @@ lychee.define('game.logic.Game').requires([
 				this.jukebox.play('ship-warp');
 			}
 
+			ship.setCollision(lychee.game.Entity.COLLISION.none);
 			ship.warp.setState('warp');
 
 
@@ -124,10 +123,6 @@ lychee.define('game.logic.Game').requires([
 				}, this);
 
 			}, this);
-
-		} else {
-
-			this.__state = 2;
 
 		}
 
@@ -215,6 +210,7 @@ lychee.define('game.logic.Game').requires([
 		this.level        = null;
 		this.ship         = null;
 
+		this.__animating  = false;
 		this.__background = null;
 		this.__config     = {
 			distance: 0,
@@ -232,7 +228,6 @@ lychee.define('game.logic.Game').requires([
 			level:  null,
 			points: null
 		};
-		this.__state      = 0;
 
 
 		lychee.event.Emitter.call(this);
@@ -263,20 +258,6 @@ lychee.define('game.logic.Game').requires([
 
 					if (this.game.settings.sound === true) {
 						this.jukebox.play('ship-lazer');
-					}
-
-					var data  = null;
-					var index = this.level.ships.indexOf(owner);
-					if (index !== -1) {
-
-						data = this.level.data[index];
-
-						for (var a = 0, al = posarray.length; a < al; a++) {
-							data.points -= 10;
-						}
-
-						_process_update.apply(this, this.level.data);
-
 					}
 
 				}
@@ -330,7 +311,6 @@ lychee.define('game.logic.Game').requires([
 
 					var ship = this.ship;
 
-
 					var tween = {
 						type:     lychee.game.Entity.TWEEN.linear,
 						duration: 1000,
@@ -342,13 +322,15 @@ lychee.define('game.logic.Game').requires([
 
 					ship.position.y = env.height / 2 + 256;
 
+					ship.setCollision(lychee.game.Entity.COLLISION.none);
 					ship.setTween(tween);
 
-					this.__state = 1;
 
+					this.__animating = true;
 
 					this.loop.timeout(1000, function() {
-						this.__state = 2;
+						ship.setCollision(lychee.game.Entity.COLLISION.A);
+						this.__animating = false;
 					}, this);
 
 				}
@@ -361,8 +343,6 @@ lychee.define('game.logic.Game').requires([
 		},
 
 		leave: function() {
-
-			this.__state = 0;
 
 			this.__session.ships  = this.level.ships;
 			this.__session.level  = this.level.stage;
@@ -377,141 +357,138 @@ lychee.define('game.logic.Game').requires([
 			var ship   = this.ship;
 
 
-			// update ship and foreground
-			if (this.__state === 1) {
-
-				ship.update(clock, delta, config);
-
-			} else if (this.__state === 2) {
+			var minx   = config.minx;
+			var maxx   = config.maxx;
+			var miny   = config.miny;
+			var maxy   = config.maxy;
 
 
-
-				var minx   = config.minx;
-				var maxx   = config.maxx;
-				var miny   = config.miny;
-				var maxy   = config.maxy;
+			config.scrollx    = (delta / 1000) * ship.speedx;
+			config.scrolly    = (delta / 1000) * ship.speedy;
+			config.distance  += config.scrolly;
 
 
-				config.scrollx    = (delta / 1000) * ship.speedx;
-				config.scrolly    = (delta / 1000) * ship.speedy;
-				config.distance  += config.scrolly;
+ 			var shiphits  = 0;
+			var enemyhits = 0;
+
+			var entities = config.entities;
+			for (var e = 0; e < entities.length; e++) {
+
+				var entity   = entities[e];
+				var position = entity.position;
+				var type     = entity.type;
 
 
- 				var shiphits  = 0;
-				var enemyhits = 0;
-
-				var entities = config.entities;
-				for (var e = 0; e < entities.length; e++) {
-
-					var entity   = entities[e];
-					var position = entity.position;
-					var type     = entity.type;
+				entity.update(clock, delta, config);
 
 
-					entity.update(clock, delta, config);
+				if (type === 'ship') {
 
+					for (var e2 = 0; e2 < entities.length; e2++) {
 
-					if (type === 'ship') {
+						var oentity = entities[e2];
+						var otype   = oentity.type;
 
-						for (var e2 = 0; e2 < entities.length; e2++) {
+						if (otype === 'meteor') {
 
-							var oentity = entities[e2];
-							var otype   = oentity.type;
-
-							if (otype === 'meteor') {
-
-								if (entity.collidesWith(oentity) === true) {
-									enemyhits += level.collide(oentity, entity);
-									shiphits++;
-									entity.shield.setState('flicker');
-								}
-
+							if (entity.collidesWith(oentity) === true) {
+								enemyhits += level.collide(oentity, entity);
+								shiphits++;
+								entity.shield.setState('flicker');
 							}
 
 						}
 
-					} else if (type === 'lazer') {
+					}
+
+				} else if (
+					   type === 'lazer'
+					|| type === 'bomb'
+				) {
+
+					if (
+						   position.x < minx
+						|| position.x > maxx
+						|| position.y < miny
+						|| position.y > maxy
+					) {
+						level.destroy(entity, null);
+						continue;
+					}
+
+
+					var ownertype = entity.ownertype;
+
+					for (var e2 = 0; e2 < entities.length; e2++) {
+
+						var oentity = entities[e2];
+						var otype   = oentity.type;
+						if (ownertype === otype) continue;
+
 
 						if (
-							   position.x < minx
-							|| position.x > maxx
-							|| position.y < miny
-							|| position.y > maxy
+							   otype === 'enemy'
+							|| otype === 'meteor'
 						) {
-							level.destroy(entity, null);
-							continue;
-						}
 
+							if (entity.collidesWith(oentity) === true) {
+								enemyhits += level.collide(entity, oentity);
+							}
 
-						var ownertype = entity.ownertype;
+						} else if (
+							otype === 'ship'
+						) {
 
-						for (var e2 = 0; e2 < entities.length; e2++) {
-
-							var oentity = entities[e2];
-							var otype   = oentity.type;
-							if (ownertype === otype) continue;
-
-
-							if (
-								   otype === 'enemy'
-								|| otype === 'meteor'
-							) {
-
-								if (entity.collidesWith(oentity) === true) {
-									enemyhits += level.collide(entity, oentity);
-								}
-
-							} else if (
-								otype === 'ship'
-							) {
-
-								if (entity.collidesWith(oentity) === true) {
-									enemyhits += level.collide(entity, oentity);
-									shiphits++;
-									oentity.shield.setState('flicker');
-								}
-
+							if (entity.collidesWith(oentity) === true) {
+								enemyhits += level.collide(entity, oentity);
+								shiphits++;
+								oentity.shield.setState('flicker');
 							}
 
 						}
 
+					}
 
-					} else if (
-						   type === 'blackhole'
-						|| type === 'enemy'
-						|| type === 'meteor'
-					) {
 
-						if (position.y > maxy) {
+				} else if (
+					   type === 'blackhole'
+					|| type === 'enemy'
+					|| type === 'meteor'
+				) {
 
-							// TODO: Evaluate how to do this generically
-							// Who gets data.missed in Multiplayer Mode?
+					if (position.y > maxy) {
 
-							level.destroy(entity, null, level.data[0]);
-							continue;
-						}
+						// TODO: Evaluate how to do this generically
+						// Who gets data.missed in Multiplayer Mode?
+
+						level.destroy(entity, null, level.data[0]);
+						continue;
 
 					}
 
 				}
 
+			}
 
 
-				if (config.distance > level.distance - config.maxy) {
-					_process_success.call(this);
-				}
+
+			if (
+				this.__animating === false
+				&& config.distance > level.distance - config.maxy
+			) {
+				this.__animating = true;
+				_process_success.call(this);
+			}
 
 
-				if (enemyhits !== 0) {
-					// TODO: Evaluate if sound shall be played here
-				}
+			if (enemyhits !== 0) {
+				// TODO: Evaluate if sound shall be played here
+			}
 
-				if (shiphits > 0) {
+			if (shiphits > 0) {
 
-					if (this.game.settings.sound === true) {
-						this.jukebox.play('ship-shield');
-					}
-
+				if (this.game.settings.sound === true) {
+					this.jukebox.play('ship-shield');
 				}
 
 			}
@@ -580,14 +557,18 @@ lychee.define('game.logic.Game').requires([
 				}
 
 
-				var foreground = this.__foreground;
-				if (foreground !== null) {
+				if (lychee.debug === false) {
 
-					foreground.render(
-						renderer,
-						offsetX,
-						offsetY
-					);
+					var foreground = this.__foreground;
+					if (foreground !== null) {
+
+						foreground.render(
+							renderer,
+							offsetX,
+							offsetY
+						);
+
+					}
 
 				}
 

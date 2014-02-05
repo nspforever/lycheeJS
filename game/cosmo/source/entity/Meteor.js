@@ -15,7 +15,7 @@ lychee.define('game.entity.Meteor').includes([
 
 
 		this.health = 200;
-		this.points = this.health;
+		this.points = 50;
 		this.type   = 'meteor';
 
 
