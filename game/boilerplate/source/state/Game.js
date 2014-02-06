@@ -6,6 +6,11 @@ lychee.define('game.state.Game').requires([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _fonts = {
+		headline: attachments["headline.fnt"],
+		normal:   attachments["normal.fnt"]
+	};
+
 	var _button = game.entity.Button;
 	var _circle = game.entity.Circle;
 
@@ -43,7 +48,7 @@ lychee.define('game.state.Game').requires([
 
 
 				layer.addEntity(new _button({
-					font:   this.game.fonts.headline,
+					font:   _fonts.headline,
 					label: 'Game State active',
 					position: {
 						x: 0, y: -50
@@ -51,7 +56,7 @@ lychee.define('game.state.Game').requires([
 				}));
 
 				layer.addEntity(new _button({
-					font:  this.game.fonts.small,
+					font:  _fonts.normal,
 					label: 'Touch the circle to make Noise',
 					position: {
 						x: 0, y: 0
@@ -69,43 +74,23 @@ lychee.define('game.state.Game').requires([
 				 */
 
 				var circle = new _circle({
-					radius: 50,
 					position: {
 						x: 0,
 						y: 100
 					}
-				});
-
-				circle.bind('touch', function() {
-
-					// Shows typical State and Game Loop interaction
-					if (this.__locked === true) return;
-
-					if (this.game.settings.sound === true) {
-						this.game.jukebox.play('click');
-					}
-
-				}, this);
+				}, this.game);
 
 				layer.addEntity(circle);
 
 
 				var exit = new _button({
-					font:  this.game.fonts.small,
+					font:  _fonts.normal,
 					label: 'Exit to Menu',
 					position: {
 						x: 0,
 						y: height / 2 - 42
 					}
-				});
-
-				exit.bind('touch', function() {
-
-					if (this.__locked === false) {
-						this.game.changeState('menu');
-					}
-
-				}, this);
+				}, this.game);
 
 				layer.addEntity(exit);
 

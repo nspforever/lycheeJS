@@ -1,7 +1,5 @@
 
 lychee.define('game.Main').requires([
-	'game.Jukebox',
-	'game.entity.Font',
 	'game.state.Game',
 	'game.state.Menu',
 	'game.DeviceSpecificHacks'
@@ -13,15 +11,19 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
-			base:  './asset',
-			title: 'Game Boilerplate',
-
-			fullscreen: true,
+			jukebox: {
+				music: true,
+				sound: true
+			},
 
 			renderer: {
 				id:     'game',
 				width:  640,
 				height: 480
+			},
+
+			viewport: {
+				fullscreen: true
 			}
 
 		}, data);
@@ -43,74 +45,63 @@ lychee.define('game.Main').requires([
 
 
 			/*
-			 * PRELOADING EXAMPLE
+			 * PRELOADING:
+			 *
+			 * Normally, every Entity has its required
+			 * assets attached to it, so you don't need
+			 * to preload. If you still want to, here's
+			 * how...
+			 *
 			 */
 
-			/*
-
-			var base = this.settings.base;
+/*
 
 			var urls = [
-				base + '/img/example.png'
+				'./asset/img/example.png'
 			];
 
 
 			this.preloader = new lychee.Preloader({
-				timeout: Infinity
+				timeout: 5000
 			});
 
-			this.preloader.bind('ready', function(assets) {
+			this.preloader.bind('ready', function(assets, mappings) {
 
-				// console.log(urls[0], assets[urls[0]]);
+				console.log(urls[0], assets[urls[0]]);
 
 				this.assets = assets;
 				this.init();
 
 			}, this);
 
-			this.preloader.bind('error', function(urls) {
+			this.preloader.bind('error', function(assets, mappings) {
+
 				if (lychee.debug === true) {
-					console.warn('Preloader error for these urls: ', urls);
+					console.warn('Preloader error for these assets: ', assets);
 				}
+
 			}, this);
 
 			this.preloader.load(urls);
 
-			*/
+*/
 
 		},
 
-		reset: function(state) {
+		reshape: function(state) {
 
 			game.DeviceSpecificHacks.call(this);
 
-			// This will initially reset the viewport
-			// based on the DeviceSpecificHacks
-			this.reshape();
-
-
-			if (state === true) {
-
-				// This will leave the current state and
-				// pass in empty data (for level interaction)
-				this.resetState(null, null);
-
-			}
+			lychee.game.Main.prototype.reshape.call(this);
 
 		},
 
 		init: function() {
 
 			lychee.game.Main.prototype.init.call(this);
-			this.reset(false);
 
+			this.reshape();
 
-			this.fonts = {};
-			this.fonts.headline = new game.entity.Font('headline');
-			this.fonts.normal   = new game.entity.Font('normal');
-			this.fonts.small    = new game.entity.Font('small');
-
-			this.jukebox = new game.Jukebox(this);
 
 			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));

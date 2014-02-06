@@ -7,6 +7,12 @@ lychee.define('game.state.Menu').requires([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _fonts = {
+		headline: attachments["headline.fnt"],
+		normal:   attachments["normal.fnt"]
+	};
+
+
 	var Class = function(game) {
 
 		lychee.game.State.call(this, game);
@@ -74,7 +80,7 @@ lychee.define('game.state.Menu').requires([
 
 				entity = new lychee.ui.Button({
 					label: this.game.settings.title,
-					font:  this.game.fonts.headline,
+					font:  _fonts.headline,
 					position: {
 						x: 0,
 						y: -1 * height / 2 + 64
@@ -96,7 +102,7 @@ lychee.define('game.state.Menu').requires([
 
 				entity = new lychee.ui.Button({
 					label: 'New Game',
-					font:  this.game.fonts.normal,
+					font:  _fonts.normal,
 					position: {
 						x: 0,
 						y: -24
@@ -112,7 +118,7 @@ lychee.define('game.state.Menu').requires([
 
 				entity = new lychee.ui.Button({
 					label: 'Settings',
-					font:  this.game.fonts.normal,
+					font:  _fonts.normal,
 					position: {
 						x: 0,
 						y: 24
@@ -152,7 +158,7 @@ lychee.define('game.state.Menu').requires([
 
 				entity = new lychee.ui.Button({
 					label: 'Settings',
-					font:  this.game.fonts.headline,
+					font:  _fonts.headline,
 					position: {
 						x: 0,
 						y: -1 * height / 2 + 64
@@ -184,8 +190,8 @@ lychee.define('game.state.Menu').requires([
 
 
 				entity = new lychee.ui.Button({
-					label: 'Fullscreen: ' + ((this.game.settings.fullscreen === true) ? 'On': 'Off'),
-					font:  this.game.fonts.normal,
+					label: 'Fullscreen: ' + ((this.game.viewport.fullscreen === true) ? 'On': 'Off'),
+					font:  _fonts.normal,
 					position: {
 						x: 0,
 						y: -24
@@ -194,12 +200,12 @@ lychee.define('game.state.Menu').requires([
 
 				entity.bind('#touch', function(entity) {
 
-					var s = this.game.settings;
-					s.fullscreen = !s.fullscreen;
+					var viewport   = this.game.viewport;
+					var fullscreen = !viewport.fullscreen;
 
-					entity.setLabel('Fullscreen: ' + ((s.fullscreen === true) ? 'On': 'Off'));
+					entity.setLabel('Fullscreen: ' + ((fullscreen === true) ? 'On': 'Off'));
 
-					this.game.reset(true);
+					viewport.setFullscreen(fullscreen);
 
 				}, this);
 
@@ -207,8 +213,8 @@ lychee.define('game.state.Menu').requires([
 
 
 				entity = new lychee.ui.Button({
-					label: 'Music: ' + ((this.game.settings.music === true) ? 'On': 'Off'),
-					font:  this.game.fonts.normal,
+					label: 'Music: ' + ((this.game.jukebox.music === true) ? 'On': 'Off'),
+					font:  _fonts.normal,
 					position: {
 						x: 0,
 						y: 24
@@ -217,10 +223,12 @@ lychee.define('game.state.Menu').requires([
 
 				entity.bind('#touch', function(entity) {
 
-					var s = this.game.settings;
-					s.music = !s.music;
+					var jukebox = this.game.jukebox;
+					var music   = !jukebox.music;
 
-					entity.setLabel('Music: ' + ((s.music === true) ? 'On': 'Off'));
+					entity.setLabel('Music: ' + ((music === true) ? 'On': 'Off'));
+
+					jukebox.setMusic(music);
 
 				}, this);
 
@@ -228,8 +236,8 @@ lychee.define('game.state.Menu').requires([
 
 
 				entity = new lychee.ui.Button({
-					label: 'Sound: ' + ((this.game.settings.sound === true) ? 'On': 'Off'),
-					font:  this.game.fonts.normal,
+					label: 'Sound: ' + ((this.game.jukebox.sound === true) ? 'On': 'Off'),
+					font:  _fonts.normal,
 					position: {
 						x: 0,
 						y: 72
@@ -238,10 +246,12 @@ lychee.define('game.state.Menu').requires([
 
 				entity.bind('#touch', function(entity) {
 
-					var s = this.game.settings;
-					s.sound = !s.sound;
+					var jukebox = this.game.jukebox;
+					var sound   = !jukebox.sound;
 
-					entity.setLabel('Sound: ' + ((s.sound === true) ? 'On': 'Off'));
+					entity.setLabel('Sound: ' + ((sound === true) ? 'On': 'Off'));
+
+					jukebox.setSound(sound);
 
 				}, this);
 
