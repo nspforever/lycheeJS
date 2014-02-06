@@ -39,7 +39,6 @@
 
 				"Input":    [ "js" ],
 				"Renderer": [ "js" ],
-				"Track":    [ "js" ],
 				"Viewport": [ "js" ]
 
 			},

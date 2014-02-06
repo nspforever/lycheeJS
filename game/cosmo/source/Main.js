@@ -16,10 +16,11 @@ lychee.define('game.Main').requires([
 			client: null,
 
 			input: {
-				fireKey:      true,
-				fireModifier: false,
-				fireTouch:    true,
-				fireSwipe:    false
+				delay:       0,
+				key:         true,
+				keymodifier: false,
+				touch:       true,
+				swipe:       false
 			},
 
 			jukebox: {

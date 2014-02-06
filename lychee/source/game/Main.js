@@ -87,11 +87,11 @@ lychee.define('lychee.game.Main').requires([
 	var _defaults = {
 
 		input: {
-			delay:        0,
-			fireKey:      false,
-			fireModifier: false,
-			fireTouch:    true,
-			fireSwipe:    false
+			delay:       0,
+			key:         false,
+			keymodifier: false,
+			touch:       true,
+			swipe:       false
 		},
 
 		jukebox: {
@@ -217,7 +217,11 @@ lychee.define('lychee.game.Main').requires([
 				var rd       = this.defaults.renderer;
 
 
-				if (settings.viewport.fullscreen === true) {
+				var viewport = this.viewport;
+				if (
+					   viewport !== null
+					&& viewport.fullscreen === true
+				) {
 					rs.width  = env.screen.width;
 					rs.height = env.screen.height;
 				} else {

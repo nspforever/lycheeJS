@@ -6,6 +6,12 @@ lychee.define('game.state.Game').requires([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _fonts = {
+		headline: attachments["headline.fnt"],
+		normal:   attachments["normal.fnt"]
+	};
+
+
 	var Class = function(game) {
 
 		lychee.game.State.call(this, game);
@@ -267,13 +273,13 @@ lychee.define('game.state.Game').requires([
 				renderer.drawText(
 					100, 20,
 					this.__score.player + '',
-					this.game.fonts.normal
+					_fonts.headline
 				);
 
 				renderer.drawText(
 					this.__width - 100, 20,
 					this.__score.enemy + '',
-					this.game.fonts.normal
+					_fonts.headline
 				);
 
 

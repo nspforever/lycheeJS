@@ -1,6 +1,5 @@
 
 lychee.define('game.Main').requires([
-	'game.entity.Font',
 	'game.state.Game',
 	'game.state.Menu',
 	'game.DeviceSpecificHacks'
@@ -12,16 +11,16 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
-			title: 'Pong Game',
-
-			fullscreen: true,
-
 			input: {
-				delay:        0,
-				fireKey:      false,
-				fireModifier: false,
-				fireTouch:    true,
-				fireSwipe:    false
+				delay:       0,
+				key:         false,
+				keymodifier: false,
+				touch:       true,
+				swipe:       false
+			},
+
+			viewport: {
+				fullscreen: true
 			}
 
 		}, data);
@@ -29,42 +28,26 @@ lychee.define('game.Main').requires([
 
 		lychee.game.Main.call(this, settings);
 
-		this.init();
+		this.load();
 
 	};
 
 
 	Class.prototype = {
 
-		reset: function(state) {
+		reshape: function(orientation, rotation, width, height) {
 
 			game.DeviceSpecificHacks.call(this);
 
-			// This will initially reset the viewport
-			// based on the DeviceSpecificHacks
-			this.reshape();
-
-
-			if (state === true) {
-
-				// This will leave the current state and
-				// pass in empty data (for level interaction)
-				this.resetState(null, null);
-
-			}
+			lychee.game.Main.prototype.reshape.call(this, orientation, rotation, width, height);
 
 		},
 
 		init: function() {
 
 			lychee.game.Main.prototype.init.call(this);
-			this.reset(false);
 
-
-			this.fonts = {};
-			this.fonts.headline = new game.entity.Font('headline');
-			this.fonts.normal   = new game.entity.Font('normal');
-			this.fonts.small    = new game.entity.Font('small');
+			this.reshape();
 
 
 			this.setState('game', new game.state.Game(this));

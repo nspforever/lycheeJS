@@ -4,8 +4,8 @@ lychee.define('game.entity.Paddle').includes([
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _textures = {
-		player: attachments['blue.png'],
-		enemy:  attachments['red.png']
+		player: attachments['player.png'],
+		enemy:  attachments['enemy.png']
 	};
 
 

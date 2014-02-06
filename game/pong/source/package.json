@@ -4,29 +4,18 @@
 	"tree": {
 
 		"entity": {
-			"lycheeJS": [ "js", "png" ],
-
-			"Ball": [ "js", "png" ],
-			"Font": [
-				"js",
-				"headline.fnt",
-				"normal.fnt",
-				"small.fnt"
-			],
-			"Paddle": [
-				"js",
-				"blue.png",
-				"red.png"
-			]
+			"Ball":     [ "js", "png" ],
+			"Paddle":   [ "js", "enemy.png", "player.png" ],
+			"lycheeJS": [ "js", "png" ]
 		},
 
 		"state": {
-			"Game": [ "js" ],
-			"Menu": [ "js" ]
+			"Game": [ "js", "headline.fnt", "normal.fnt" ],
+			"Menu": [ "js", "headline.fnt", "normal.fnt" ]
 		},
 
 		"DeviceSpecificHacks": [ "js" ],
-		"Main": [ "js", "css" ]
+		"Main":                [ "js", "css" ]
 
 	}
 }

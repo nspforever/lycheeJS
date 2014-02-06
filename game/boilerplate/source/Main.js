@@ -11,6 +11,14 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
+			input: {
+				delay:       0,
+				key:         false,
+				keymodifier: false,
+				touch:       true,
+				swipe:       true
+			},
+
 			jukebox: {
 				music: true,
 				sound: true
@@ -88,11 +96,11 @@ lychee.define('game.Main').requires([
 
 		},
 
-		reshape: function(state) {
+		reshape: function(orientation, rotation, width, height) {
 
 			game.DeviceSpecificHacks.call(this);
 
-			lychee.game.Main.prototype.reshape.call(this);
+			lychee.game.Main.prototype.reshape.call(this, orientation, rotation, width, height);
 
 		},
 

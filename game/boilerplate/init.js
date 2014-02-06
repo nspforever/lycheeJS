@@ -11,13 +11,9 @@ lychee.rebase({
 
 
 // Tags are required to determine which libraries to load
-(function(lychee, global) {
-
-	lychee.tag({
-		platform: [ 'nodejs-webgl', 'webgl', 'html' ]
-	});
-
-})(lychee, typeof global !== 'undefined' ? global : this);
+lychee.tag({
+	platform: [ 'nodejs-webgl', 'webgl', 'html' ]
+});
 
 
 lychee.build(function(lychee, global) {

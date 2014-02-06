@@ -7,21 +7,15 @@ lychee.define('game.DeviceSpecificHacks').exports(function(lychee, game, global,
 
 		if (typeof global.navigator !== 'undefined') {
 
-			if (global.navigator.appName === 'V8GL') {
+			if (global.navigator.userAgent.match(/iPad/)) {
 
-				settings.fullscreen = true;
-				settings.music = false;
-				settings.sound = false;
-
-			} else if (global.navigator.userAgent.match(/iPad/)) {
-
-				settings.fullscreen = true;
-				settings.music = false;
-				settings.sound = true;
+				settings.viewport.fullscreen = true;
+				settings.jukebox.music = false;
+				settings.jukebox.sound = true;
 
 			} else if (global.navigator.userAgent.match(/Android/)) {
 
-				settings.fullscreen = true;
+				settings.viewport.fullscreen = true;
 
 			}
 

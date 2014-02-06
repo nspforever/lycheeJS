@@ -10,8 +10,7 @@ lychee.rebase({
 
 
 lychee.tag({
-	// TODO: Change tags to platform: [ 'webgl', 'html' ]
-	platform: [ 'html' ]
+	platform: [ 'nodejs-webgl', 'webgl', 'html' ]
 });
 
 
@@ -23,14 +22,14 @@ var settings = {
 
 if (document.location.hash.match(/debug/)) {
 	lychee.debug   = true;
-	settings.music = false;
-	settings.sound = false;
+//	settings.music = false;
+//	settings.sound = false;
 }
 
 
 lychee.build(function(lychee, global) {
 
-	new game.Main(settings);
+global._MAIN = new game.Main(settings);
 
 }, typeof global !== 'undefined' ? global : this);
 

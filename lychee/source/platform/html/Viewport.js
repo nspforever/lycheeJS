@@ -412,7 +412,10 @@ lychee.define('Viewport').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function() {
+	var Class = function(data) {
+
+		var settings = lychee.extend({}, data);
+
 
 		this.fullscreen = false;
 		this.width      = global.innerWidth;
@@ -427,6 +430,11 @@ lychee.define('Viewport').tags({
 
 		_instances.push(this);
 
+
+		this.setFullscreen(settings.fullscreen);
+
+		settings = null;
+
 	};
 
 
@@ -435,6 +443,21 @@ lychee.define('Viewport').tags({
 		/*
 		 * PUBLIC API
 		 */
+
+		serialize: function() {
+
+			var settings = {};
+
+			if (this.fullscreen !== false) settings.fullscreen = this.fullscreen;
+
+
+			return {
+				'constructor': 'lychee.Viewport',
+				'arguments':   [ settings ],
+				'blob':        null
+			};
+
+		},
 
 		setFullscreen: function(fullscreen) {
 

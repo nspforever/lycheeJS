@@ -206,7 +206,7 @@ lychee.define('Input').tags({
 
 	var _process_key = function(code, ctrl, alt, shift) {
 
-		if (this.__fireKey === false) return false;
+		if (this.key === false) return false;
 
 
 		// 1. Validate key event
@@ -225,14 +225,14 @@ lychee.define('Input').tags({
 
 		// 2. Only fire after the enforced delay
 		var delta = Date.now() - this.__clock.key;
-		if (delta < this.__delay) {
-			return true; // Don't fire native event
+		if (delta < this.delay) {
+			return true;
 		}
 
 
 		// 3. Check for current key being a modifier
 		if (
-			this.__fireModifiers === false
+			   this.keymodifier === false
 			&& (code === 16   || code === 17   ||  code === 18)
 			&& (ctrl === true ||  alt === true || shift === true)
 		) {
@@ -310,8 +310,8 @@ lychee.define('Input').tags({
 	var _process_touch = function(id, x, y) {
 
 		if (
-			   this.__fireTouch === false
-			&& this.__fireSwipe === true
+			   this.touch === false
+			&& this.swipe === true
 		) {
 
 			if (this.__swipes[id] === null) {
@@ -320,15 +320,17 @@ lychee.define('Input').tags({
 
 			return true;
 
-		} else if (this.__fireTouch === false) {
+		} else if (this.touch === false) {
+
 			return false;
+
 		}
 
 
 		// 1. Only fire after the enforced delay
 		var delta = Date.now() - this.__clock.touch;
-		if (delta < this.__delay) {
-			return true; // Don't fire native event
+		if (delta < this.delay) {
+			return true;
 		}
 
 
@@ -352,12 +354,13 @@ lychee.define('Input').tags({
 
 	var _process_swipe = function(id, state, x, y) {
 
-		if (this.__fireSwipe === false) return false;
+		if (this.swipe === false) return false;
+
 
 		// 1. Only fire after the enforced delay
 		var delta = Date.now() - this.__clock.swipe;
-		if (delta < this.__delay) {
-			return true; // Don't fire native event
+		if (delta < this.delay) {
+			return true;
 		}
 
 
@@ -428,26 +431,37 @@ lychee.define('Input').tags({
 
 		var settings = lychee.extend({}, data);
 
-		settings.fireKey      = !!settings.fireKey;
-		settings.fireModifier = !!settings.fireModifier;
-		settings.fireTouch    = !!settings.fireTouch;
-		settings.fireSwipe    = !!settings.fireSwipe;
-		settings.delay        = typeof settings.delay === 'number' ? settings.delay : 0;
+
+		this.delay       = 0;
+		this.key         = false;
+		this.keymodifier = false;
+		this.touch       = false;
+		this.swipe       = false;
+
+		this.__clock  = {
+			key:   Date.now(),
+			touch: Date.now(),
+			swipe: Date.now()
+		};
+		this.__swipes = {
+			0: null, 1: null,
+			2: null, 3: null,
+			4: null, 5: null,
+			6: null, 7: null,
+			8: null, 9: null
+		};
 
 
-		this.__fireKey      = settings.fireKey;
-		this.__fireModifier = settings.fireModifier;
-		this.__fireTouch    = settings.fireTouch;
-		this.__fireSwipe    = settings.fireSwipe;
-		this.__delay        = settings.delay;
-
-		this.reset();
+		this.setDelay(settings.delay);
+		this.setKey(settings.key);
+		this.setKeyModifier(settings.keymodifier);
+		this.setTouch(settings.touch);
+		this.setSwipe(settings.swipe);
 
 
 		lychee.event.Emitter.call(this);
 
 		_instances.push(this);
-
 
 		settings = null;
 
@@ -576,23 +590,100 @@ lychee.define('Input').tags({
 		 * PUBLIC API
 		 */
 
-		reset: function() {
+		serialize: function() {
 
-			this.__swipes = null; // GC hint
-			this.__swipes = {
-				0: null, 1: null,
-				2: null, 3: null,
-				4: null, 5: null,
-				6: null, 7: null,
-				8: null, 9: null
+			var settings = {};
+
+			if (this.delay !== 0)           settings.delay       = this.delay;
+			if (this.key !== false)         settings.key         = this.key;
+			if (this.keymodifier !== false) settings.keymodifier = this.keymodifier;
+			if (this.touch !== false)       settings.touch       = this.touch;
+			if (this.swipe !== false)       settings.swipe       = this.swipe;
+
+
+			return {
+				'constructor': 'lychee.Input',
+				'arguments':   [ settings ],
+				'blob':        null
 			};
 
-			this.__clock = null; // GC hint
-			this.__clock = {
-				key:   Date.now(),
-				touch: Date.now(),
-				swipe: Date.now()
-			};
+		},
+
+		setDelay: function(delay) {
+
+			delay = typeof delay === 'number' ? delay : null;
+
+
+			if (delay !== null) {
+
+				this.delay = delay;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setKey: function(key) {
+
+			if (key === true || key === false) {
+
+				this.key = key;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setKeyModifier: function(keymodifier) {
+
+			if (keymodifier === true || keymodifier === false) {
+
+				this.keymodifier = keymodifier;
+
+				return true;
+
+			}
+
+
+			return false
+
+		},
+
+		setTouch: function(touch) {
+
+			if (touch === true || touch === false) {
+
+				this.touch = touch;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setSwipe: function(swipe) {
+
+			if (swipe === true || swipe === false) {
+
+				this.swipe = swipe;
+
+				return true;
+
+			}
+
+
+			return false;
 
 		}
 
