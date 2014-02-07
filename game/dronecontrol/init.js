@@ -10,17 +10,13 @@ lychee.rebase({
 
 
 lychee.tag({
-	platform: [ 'webgl', 'html' ]
+	platform: [ 'nodejs-webgl', 'webgl', 'html' ]
 });
 
 
 lychee.build(function(lychee, global) {
 
-	var settings = {
-	};
-
-
-	new game.Main(settings);
+	new game.Main();
 
 }, typeof global !== 'undefined' ? global : this);
 

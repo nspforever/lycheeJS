@@ -105,7 +105,7 @@ lychee.define('game.state.Game').requires([
 
 			this.__locked = true;
 
-			this.loop.timeout(1000, function() {
+			this.loop.setTimeout(1000, function() {
 				this.__locked = false;
 			}, this);
 

@@ -32,7 +32,7 @@ lychee.define('sorbet.data.Queue').requires([
 			update: 2
 		});
 
-		loop.interval(1000, _listeners.interval, this);
+		loop.setInterval(1000, _listeners.interval, this);
 
 	})();
 

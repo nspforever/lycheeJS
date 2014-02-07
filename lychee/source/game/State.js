@@ -252,7 +252,7 @@ lychee.define('lychee.game.State').requires([
 
 		},
 
-		reshape: function(orientation, rotation, width, height) {
+		reshape: function() {
 
 			var renderer = this.renderer;
 			if (renderer !== null) {

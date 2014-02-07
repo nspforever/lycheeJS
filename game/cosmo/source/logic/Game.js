@@ -104,7 +104,7 @@ lychee.define('game.logic.Game').requires([
 			ship.warp.setState('warp');
 
 
-			this.loop.timeout(1000, function() {
+			this.loop.setTimeout(1000, function() {
 
 				var foreground = this.__foreground;
 				if (foreground !== null) {
@@ -124,7 +124,7 @@ lychee.define('game.logic.Game').requires([
 				});
 
 
-				this.loop.timeout(1000, function() {
+				this.loop.setTimeout(1000, function() {
 					this.level.trigger('success', this.level.data);
 				}, this);
 
@@ -175,7 +175,7 @@ lychee.define('game.logic.Game').requires([
 		}
 
 
-		this.loop.timeout(1000, function() {
+		this.loop.setTimeout(1000, function() {
 
 			var state = this.state;
 			if (state.substr(0, 7) === 'upgrade') {
@@ -330,7 +330,7 @@ lychee.define('game.logic.Game').requires([
 
 					this.__animating = true;
 
-					this.loop.timeout(1000, function() {
+					this.loop.setTimeout(1000, function() {
 						ship.setCollision(lychee.game.Entity.COLLISION.A);
 						this.__animating = false;
 					}, this);

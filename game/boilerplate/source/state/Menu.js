@@ -58,7 +58,7 @@ lychee.define('game.state.Menu').requires([
 					}
 				});
 
-				layer.addEntity(root);
+				layer.setEntity('root', root);
 
 
 
@@ -75,12 +75,12 @@ lychee.define('game.state.Menu').requires([
 					}
 				});
 
-				root.addEntity(welcome);
+				root.setEntity('welcome', welcome);
 
 
 				entity = new lychee.ui.Button({
-					label: this.game.settings.title,
-					font:  _fonts.headline,
+					label:    this.game.settings.title,
+					font:     _fonts.headline,
 					position: {
 						x: 0,
 						y: -1 * height / 2 + 64
@@ -129,7 +129,7 @@ lychee.define('game.state.Menu').requires([
 
 					var position = this.__cache;
 
-					position.x = -1 * width;
+					position.x = -1/3 * root.width;
 					position.y = 0;
 
 					root.setPosition(position);
@@ -153,7 +153,7 @@ lychee.define('game.state.Menu').requires([
 					}
 				});
 
-				root.addEntity(settings);
+				root.setEntity('settings', settings);
 
 
 				entity = new lychee.ui.Button({
@@ -259,6 +259,54 @@ lychee.define('game.state.Menu').requires([
 
 
 				this.setLayer('ui', layer);
+
+			}
+
+		},
+
+		reshape: function(orientation, rotation, width, height) {
+
+			lychee.game.State.prototype.reshape.call(this);
+
+
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				var entity = null;
+				var width  = renderer.getEnvironment().width;
+				var height = renderer.getEnvironment().height;
+
+
+				var root = this.queryLayer('ui', 'root');
+
+				root.width  = width * 3;
+				root.height = height;
+
+
+				var welcome = this.queryLayer('ui', 'root > welcome');
+
+				welcome.width  = width;
+				welcome.height = height;
+				welcome.position.x =
+
+				welcome.entities[0].position.y = -1 * height / 2 + 64;
+				welcome.entities[1].position.y =      height / 2 - 32;
+
+
+				var settings = this.queryLayer('ui', 'root > settings');
+
+				settings.width      = width;
+				settings.height     = height;
+				settings.position.x = width;
+
+				settings.entities[0].position.y = -1 * height / 2 + 64;
+				settings.entities[1].position.y =      height / 2 - 32;
+
+console.log('reshape!');
+
+				root.setPosition({ x: 0 });
+
+global._ROOT = root;
 
 			}
 

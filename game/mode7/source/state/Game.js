@@ -72,7 +72,7 @@ lychee.define('game.state.Game').requires([
 				var start = null;
 				var position = camera.position;
 
-				var handle = this.loop.interval(1000 / 60, function(clock, delta, step) {
+				var handle = this.loop.setInterval(1000 / 60, function(clock, delta, step) {
 
 					if (start === null) start = clock;
 
@@ -87,8 +87,7 @@ lychee.define('game.state.Game').requires([
 						this.__autopilot = true;
 						this.__offset    = offset;
 
-						handle.clear();
-
+						this.loop.removeInterval(handle);
 
 					} else {
 						position.y = y;

@@ -16,9 +16,11 @@ lychee.define('game.Main').requires([
 			fullscreen: true,
 
 			input: {
-				fireKey:   false,
-				fireTouch: true,
-				fireSwipe: true
+				delay:       0,
+				key:         false,
+				keymodifier: false,
+				touch:       true,
+				swipe:       true
 			},
 
 			// Is configured by ./config.json

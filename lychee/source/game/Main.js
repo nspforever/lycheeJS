@@ -97,12 +97,12 @@ lychee.define('lychee.game.Main').requires([
 		jukebox: {
 			channels: 8,
 			music:    true,
-			sound:    false
+			sound:    true
 		},
 
 		loop: {
-			render: 60,
-			update: 60
+			render: 40,
+			update: 40
 		},
 
 		renderer: {
@@ -414,6 +414,10 @@ lychee.define('lychee.game.Main').requires([
 
 				delete this.__states[id];
 
+				if (this.__state === this.__states[id]) {
+					this.changeState(null);
+				}
+
 				return true;
 
 			}
@@ -425,25 +429,34 @@ lychee.define('lychee.game.Main').requires([
 
 		changeState: function(id, data) {
 
-			data = data || null;
+			id   = typeof id === 'string' ? id   : null;
+			data = data instanceof Object ? data : null;
 
 
-			var oldState = this.__state;
-			var newState = this.__states[id] || null;
-			if (newState === null) {
-				return false;
+			var oldstate = this.__state;
+			var newstate = this.__states[id] || null;
+
+			if (newstate !== null) {
+
+				if (oldstate !== null) {
+					oldstate.leave();
+				}
+
+				if (newstate !== null) {
+					newstate.enter(data);
+				}
+
+				this.__state = newstate;
+
+			} else {
+
+				if (oldstate !== null) {
+					oldstate.leave();
+				}
+
+				this.__state = null;
+
 			}
-
-
-			if (oldState !== null) {
-				oldState.leave && oldState.leave();
-			}
-
-			if (newState !== null) {
-				newState.enter && newState.enter(data);
-			}
-
-			this.__state = newState;
 
 
 			return true;

@@ -61,7 +61,7 @@ lychee.define('game.state.Menu').requires([
 				}
 			});
 
-			this.loop.timeout(500, function() {
+			this.loop.setTimeout(500, function() {
 				this.__locked = false;
 			}, this);
 
@@ -143,7 +143,7 @@ lychee.define('game.state.Menu').requires([
 
 			root.trigger('tween', []);
 
-			this.loop.timeout(500, function() {
+			this.loop.setTimeout(500, function() {
 				this.__locked = false;
 			}, this);
 
@@ -537,7 +537,7 @@ lychee.define('game.state.Menu').requires([
 
 		enter: function(data) {
 
-			this.loop.timeout(1000, function() {
+			this.loop.setTimeout(1000, function() {
 				this.game.jukebox.play(_music);
 			}, this);
 

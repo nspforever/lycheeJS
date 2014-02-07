@@ -11,6 +11,8 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
+			title: 'Game Boilerplate',
+
 			input: {
 				delay:       0,
 				key:         false,
@@ -31,7 +33,7 @@ lychee.define('game.Main').requires([
 			},
 
 			viewport: {
-				fullscreen: true
+				fullscreen: false
 			}
 
 		}, data);

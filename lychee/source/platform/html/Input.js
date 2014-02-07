@@ -236,7 +236,7 @@ lychee.define('Input').tags({
 			&& (code === 16   || code === 17   ||  code === 18)
 			&& (ctrl === true ||  alt === true || shift === true)
 		) {
-			return true; // Don't fire native event
+			return true;
 		}
 
 
