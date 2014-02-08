@@ -106,8 +106,8 @@ lychee.define('lychee.game.Main').requires([
 		},
 
 		renderer: {
-			width:      1024,
-			height:     768,
+			width:      null,
+			height:     null,
 			id:         'game',
 			background: '#222222'
 		},
@@ -150,6 +150,10 @@ lychee.define('lychee.game.Main').requires([
 
 	Class.prototype = {
 
+		/*
+		 * ENTITY API
+		 */
+
 		deserialize: function(blob) {
 
 			for (var id in blob.states) {
@@ -188,53 +192,72 @@ lychee.define('lychee.game.Main').requires([
 
 		},
 
-		load: function() {
 
-			_load_client.call(this, this.settings.server || null);
+
+		/*
+		 * LOOP INTEGRATION
+		 */
+
+		render: function(t, dt) {
+
+			if (this.__state !== null) {
+				this.__state.render && this.__state.render(t, dt);
+			}
 
 		},
 
-		reshape: function(orientation, rotation, width, height) {
+		update: function(t, dt) {
+
+			if (this.__state !== null) {
+				this.__state.update && this.__state.update(t, dt);
+			}
+
+		},
+
+
+
+		/*
+		 * VIEWPORT INTEGRATION
+		 */
+
+		show: function() {
+
+			var loop = this.loop;
+			if (loop !== null) {
+				loop.resume();
+			}
+
+			var state = this.getState();
+			if (state !== null) {
+				state.show();
+			}
+
+		},
+
+		hide: function() {
+
+			var loop = this.loop;
+			if (loop !== null) {
+				loop.pause();
+			}
+
+			var state = this.getState();
+			if (state !== null) {
+				state.hide();
+			}
+
+		},
+
+		reshape: function(orientation, rotation) {
 
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var env = renderer.getEnvironment();
-
-				if (
-					orientation !== null
-					&& rotation !== null
-					&& typeof width === 'number'
-					&& typeof height === 'number'
-				) {
-					env.screen.width  = width;
-					env.screen.height = height;
-				}
-
-
 				var settings = this.settings;
-				var rs       = this.settings.renderer;
-				var rd       = this.defaults.renderer;
-
-
-				var viewport = this.viewport;
-				if (
-					   viewport !== null
-					&& viewport.fullscreen === true
-				) {
-					rs.width  = env.screen.width;
-					rs.height = env.screen.height;
-				} else {
-					rs.width  = rd.width;
-					rs.height = rd.height;
+				if (settings.renderer !== null) {
+					renderer.setWidth(settings.renderer.width);
+					renderer.setHeight(settings.renderer.height);
 				}
-
-
-				renderer.reset(
-					rs.width,
-					rs.height,
-					true
-				);
 
 			}
 
@@ -243,9 +266,24 @@ lychee.define('lychee.game.Main').requires([
 
 				var state = this.__states[id];
 
-				state.reshape(orientation, rotation, width, height);
+				state.reshape(
+					orientation,
+					rotation
+				);
 
 			}
+
+		},
+
+
+
+		/*
+		 * INITIALIZATION
+		 */
+
+		load: function() {
+
+			_load_client.call(this, this.settings.server || null);
 
 		},
 
@@ -286,53 +324,27 @@ lychee.define('lychee.game.Main').requires([
 			}
 
 			if (settings.renderer !== null) {
-				var rs = settings.renderer;
-				this.renderer = new lychee.Renderer(rs.id);
-				this.renderer.reset(rs.width, rs.height);
-				this.renderer.setBackground(rs.background);
-			} else {
-				// reshape() functionality is not influenced
-				settings.renderer = {};
+				this.renderer = new lychee.Renderer(settings.renderer);
 			}
-
-
-			this.viewport = new lychee.Viewport();
-			this.viewport.bind('reshape', this.reshape, this);
-			this.viewport.bind('hide',    this.stop,    this);
-			this.viewport.bind('show',    this.start,   this);
-
 
 			if (settings.viewport !== null) {
-				var vs = settings.viewport;
-				this.viewport.setFullscreen(vs.fullscreen);
-			}
 
-		},
+				this.viewport = new lychee.Viewport();
+				this.viewport.bind('reshape', this.reshape, this);
+				this.viewport.bind('hide',    this.hide,    this);
+				this.viewport.bind('show',    this.show,    this);
 
-		start: function() {
-			this.loop.start();
-		},
-
-		stop: function() {
-			this.loop.stop();
-		},
-
-		resetState: function(leavedata, enterdata) {
-
-			leavedata = leavedata instanceof Object ? leavedata : null;
-			enterdata = enterdata instanceof Object ? enterdata : null;
-
-
-			var state = this.getState();
-			if (state !== null) {
-
-				state.leave(leavedata);
-				state.reset();
-				state.enter(enterdata);
+				this.viewport.setFullscreen(settings.viewport.fullscreen);
 
 			}
 
 		},
+
+
+
+		/*
+		 * STATE MANAGEMENT
+		 */
 
 		resetStates: function() {
 
@@ -348,6 +360,23 @@ lychee.define('lychee.game.Main').requires([
 				if (state === current) continue;
 
 				state.reset();
+
+			}
+
+		},
+
+		resetState: function(leavedata, enterdata) {
+
+			leavedata = leavedata instanceof Object ? leavedata : null;
+			enterdata = enterdata instanceof Object ? enterdata : null;
+
+
+			var state = this.getState();
+			if (state !== null) {
+
+				state.leave(leavedata);
+				state.reset();
+				state.enter(enterdata);
 
 			}
 
@@ -375,19 +404,6 @@ lychee.define('lychee.game.Main').requires([
 
 		},
 
-		isState: function(id) {
-
-			id = typeof id === 'string' ? id : null;
-
-			if (id !== null) {
-				return this.__state === this.__states[id];
-			}
-
-
-			return false;
-
-		},
-
 		getState: function(id) {
 
 			id = typeof id === 'string' ? id : null;
@@ -399,6 +415,20 @@ lychee.define('lychee.game.Main').requires([
 
 
 			return this.__state || null;
+
+		},
+
+		isState: function(id) {
+
+			id = typeof id === 'string' ? id : null;
+
+
+			if (id !== null) {
+				return this.__state === this.__states[id];
+			}
+
+
+			return false;
 
 		},
 
@@ -460,22 +490,6 @@ lychee.define('lychee.game.Main').requires([
 
 
 			return true;
-
-		},
-
-		render: function(t, dt) {
-
-			if (this.__state !== null) {
-				this.__state.render && this.__state.render(t, dt);
-			}
-
-		},
-
-		update: function(t, dt) {
-
-			if (this.__state !== null) {
-				this.__state.update && this.__state.update(t, dt);
-			}
 
 		}
 

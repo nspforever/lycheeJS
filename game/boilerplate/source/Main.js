@@ -28,8 +28,8 @@ lychee.define('game.Main').requires([
 
 			renderer: {
 				id:     'game',
-				width:  640,
-				height: 480
+				width:  null,
+				height: null
 			},
 
 			viewport: {
@@ -98,11 +98,11 @@ lychee.define('game.Main').requires([
 
 		},
 
-		reshape: function(orientation, rotation, width, height) {
+		reshape: function(orientation, rotation) {
 
 			game.DeviceSpecificHacks.call(this);
 
-			lychee.game.Main.prototype.reshape.call(this, orientation, rotation, width, height);
+			lychee.game.Main.prototype.reshape.call(this, orientation, rotation);
 
 		},
 
@@ -116,8 +116,6 @@ lychee.define('game.Main').requires([
 			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));
 			this.changeState('menu');
-
-			this.start();
 
 		}
 

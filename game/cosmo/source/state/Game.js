@@ -102,9 +102,8 @@ lychee.define('game.state.Game').requires([
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var env    = renderer.getEnvironment();
-				var width  = env.width;
-				var height = env.height;
+				var width  = renderer.width;
+				var height = renderer.height;
 
 
 				this.__hud.setPosition({
@@ -129,23 +128,24 @@ lychee.define('game.state.Game').requires([
 			data.player  = typeof data.player === 'string' ? data.player   : 'local:1337';
 
 
-			if (
-				   this.renderer !== null
-				&& this.logic !== null
-			) {
+			var renderer = this.renderer;
+			if (renderer !== null) {
 
-				var env = this.renderer.getEnvironment();
+				data.width  = typeof data.width === 'number'  ? data.width  : renderer.width;
+				data.height = typeof data.height === 'number' ? data.height : renderer.height;
 
-				data.width  = typeof data.width === 'number'  ? data.width  : env.width;
-				data.height = typeof data.height === 'number' ? data.height : env.height;
+			}
 
+
+			var logic = this.logic;
+			if (logic !== null) {
 
 				if (lychee.debug === true) {
 					console.log('game.state.Game: Creating level ', data);
 				}
 
 
-				var level = this.logic.createLevel(data);
+				var level = logic.createLevel(data);
 
 
 				if (data.type === 'singleplayer') {
@@ -195,9 +195,9 @@ lychee.define('game.state.Game').requires([
 				this._leveldata = data;
 
 
-				this.logic.setLevel(level);
-				this.logic.setShip(this.controller.ship);
-				this.logic.enter();
+				logic.setLevel(level);
+				logic.setShip(this.controller.ship);
+				logic.enter();
 
 			}
 
@@ -255,13 +255,6 @@ lychee.define('game.state.Game').requires([
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var layer;
-
-				var env = renderer.getEnvironment();
-				var offsetX = env.width / 2;
-				var offsetY = env.height / 2;
-
-
 				renderer.clear();
 
 
@@ -314,10 +307,8 @@ lychee.define('game.state.Game').requires([
 				var renderer = this.renderer;
 				if (renderer !== null) {
 
-					var env = renderer.getEnvironment();
-
-					position.x -= env.width / 2;
-					position.y -= env.height / 2;
+					position.x -= renderer.width / 2;
+					position.y -= renderer.height / 2;
 
 				}
 

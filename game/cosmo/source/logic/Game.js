@@ -90,12 +90,17 @@ lychee.define('game.logic.Game').requires([
 
 	var _process_success = function() {
 
-		var level = this.level;
-		var ship  = this.ship;
+		var renderer = this.renderer;
+		var level    = this.level;
+		var ship     = this.ship;
 		if (
-			   level !== null
+			   renderer !== null
+			&& level !== null
 			&& ship !== null
 		) {
+
+			var height = renderer.height;
+
 
 			this.game.jukebox.play(_sounds.warp);
 
@@ -112,23 +117,26 @@ lychee.define('game.logic.Game').requires([
 				}
 
 
-				var env = this.renderer.getEnvironment();
 
 				ship.shield.setState('flicker');
 				ship.setTween({
 					type:     lychee.game.Entity.TWEEN.linear,
 					duration: 500,
 					position: {
-						y: -1/2 * env.height - 256
+						y: -1/2 * height - 256
 					}
 				});
 
 
 				this.loop.setTimeout(1000, function() {
-					this.level.trigger('success', this.level.data);
-				}, this);
+					this.trigger('success', this.data);
+				}, level);
 
 			}, this);
+
+		} else if (level !== null) {
+
+			level.trigger('success', level.data);
 
 		}
 
@@ -291,17 +299,18 @@ lychee.define('game.logic.Game').requires([
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var env = renderer.getEnvironment();
+				var width  = renderer.width;
+				var height = renderer.height;
 
 				this.__background = new _background({
-					width:  env.width,
-					height: env.height
+					width:  width,
+					height: height
 				});
 
 				this.__foreground = new _foreground({
-					buffer: renderer.createBuffer(env.width, env.height),
-					width:  env.width,
-					height: env.height
+					buffer: renderer.createBuffer(width, height),
+					width:  width,
+					height: height
 				});
 
 				this.__foreground.setFlash(3000);
@@ -321,7 +330,7 @@ lychee.define('game.logic.Game').requires([
 						}
 					};
 
-					ship.position.y = env.height / 2 + 256;
+					ship.position.y = height / 2 + 256;
 
 					ship.setBombs(3);
 					ship.setCollision(lychee.game.Entity.COLLISION.none);
@@ -521,9 +530,8 @@ lychee.define('game.logic.Game').requires([
 				&& level !== null
 			) {
 
-				var env      = renderer.getEnvironment();
-				var offsetX  = env.width / 2;
-				var offsetY  = env.height / 2;
+				var offsetX  = renderer.width  / 2;
+				var offsetY  = renderer.height / 2;
 
 				var entities = level.entities;
 				var ships    = level.ships;

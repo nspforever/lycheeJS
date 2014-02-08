@@ -213,7 +213,10 @@ lychee.define('lychee.game.Sprite').includes([
 
 		setAnimation: function(settings) {
 
-			if (settings instanceof Object) {
+			settings = settings instanceof Object ? settings : null;
+
+
+			if (settings !== null) {
 
 				var duration = typeof settings.duration === 'number' ? settings.duration : 1000;
 				var frame    = typeof settings.frame === 'number'    ? settings.frame    : 0;
@@ -241,8 +244,10 @@ lychee.define('lychee.game.Sprite').includes([
 		},
 
 		clearAnimation: function() {
+
 			this.__animation.active = false;
 			this.frame = 0;
+
 		},
 
 		setState: function(id) {
@@ -339,9 +344,12 @@ lychee.define('lychee.game.Sprite').includes([
 
 		setMap: function(map) {
 
+			map = map instanceof Object ? map : null;
+
+
 			var valid = false;
 
-			if (map instanceof Object) {
+			if (map !== null) {
 
 				for (var stateId in map) {
 

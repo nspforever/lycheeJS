@@ -183,6 +183,7 @@ lychee.define('lychee.game.Jukebox').exports(function(lychee, global) {
 
 			channels = typeof channels === 'number' ? channels : null;
 
+
 			if (channels !== null) {
 
 				this.channels = channels;

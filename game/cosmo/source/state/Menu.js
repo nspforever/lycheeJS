@@ -25,7 +25,7 @@ lychee.define('game.state.Menu').requires([
 		var root  = layer.getEntity('root');
 		if (root !== null) {
 
-			var width = this.renderer.getEnvironment().width;
+			var width = this.renderer.width;
 			var posx  = root.position.x;
 
 			if (direction < 0) {
@@ -79,7 +79,7 @@ lychee.define('game.state.Menu').requires([
 		var root  = layer.getEntity('root');
 		if (root !== null) {
 
-			var height = this.renderer.getEnvironment().height;
+			var height = this.renderer.height;
 			var posy   = root.position.y;
 
 			if (direction < 0) {
@@ -164,9 +164,8 @@ lychee.define('game.state.Menu').requires([
 
 		this.music = _music;
 
-		this.__background = null;
-		this.__cache      = { x: 0, y: 0 };
-		this.__locked     = false;
+		this.__cache  = { x: 0, y: 0 };
+		this.__locked = false;
 
 
 		this.reset();
@@ -185,9 +184,8 @@ lychee.define('game.state.Menu').requires([
 			if (renderer !== null) {
 
 				var entity = null;
-				var env    = renderer.getEnvironment();
-				var width  = env.width;
-				var height = env.height;
+				var width  = renderer.width;
+				var height = renderer.height;
 
 
 				this.removeLayer('ui');
@@ -195,10 +193,12 @@ lychee.define('game.state.Menu').requires([
 
 				var layer = new lychee.game.Layer();
 
-				this.__background = new game.entity.Background({
+				entity = new game.entity.Background({
 					width:  width,
 					height: height
 				});
+
+				layer.setEntity('background', entity);
 
 
 				if (
@@ -560,7 +560,7 @@ lychee.define('game.state.Menu').requires([
 			lychee.game.State.prototype.update.call(this, clock, delta);
 
 
-			var background = this.__background;
+			var background = this.queryLayer('ui', 'background');
 			if (background !== null) {
 
 				var origin = background.origin;
@@ -568,37 +568,6 @@ lychee.define('game.state.Menu').requires([
 				background.setOrigin({
 					y: origin.y + 10 * (delta / 1000)
 				});
-
-			}
-
-		},
-
-		render: function(clock, delta) {
-
-			var renderer = this.renderer;
-			if (renderer !== null) {
-
-				renderer.clear();
-
-				var background = this.__background;
-				if (background !== null) {
-
-					var env = renderer.getEnvironment();
-
-					var offsetX = env.width / 2;
-					var offsetY = env.height / 2;
-
-					background.render(
-						renderer,
-						offsetX,
-						offsetY
-					);
-
-				}
-
-				lychee.game.State.prototype.render.call(this, clock, delta, true);
-
-				renderer.flush();
 
 			}
 

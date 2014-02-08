@@ -18,11 +18,6 @@ lychee.define('game.state.Menu').requires([
 		lychee.game.State.call(this, game);
 
 
-		this.__cache = {
-			x: 0, y: 0
-		};
-
-
 		this.reset();
 
 	};
@@ -39,8 +34,8 @@ lychee.define('game.state.Menu').requires([
 			if (renderer !== null) {
 
 				var entity = null;
-				var width  = renderer.getEnvironment().width;
-				var height = renderer.getEnvironment().height;
+				var width  = renderer.width;
+				var height = renderer.height;
 
 
 				this.removeLayer('ui');
@@ -50,7 +45,7 @@ lychee.define('game.state.Menu').requires([
 
 
 				var root = new lychee.ui.Layer({
-					width:  width * 3,
+					width:  width * 2,
 					height: height,
 					position: {
 						x: 0,
@@ -70,7 +65,7 @@ lychee.define('game.state.Menu').requires([
 					width:  width,
 					height: height,
 					position: {
-						x: 0,
+						x: -1/2 * width,
 						y: 0
 					}
 				});
@@ -126,15 +121,8 @@ lychee.define('game.state.Menu').requires([
 				});
 
 				entity.bind('touch', function() {
-
-					var position = this.__cache;
-
-					position.x = -1/3 * root.width;
-					position.y = 0;
-
-					root.setPosition(position);
-
-				}, this);
+					this.setPosition({ x: -1/4 * this.width });
+				}, root);
 
 				welcome.addEntity(entity);
 
@@ -148,7 +136,7 @@ lychee.define('game.state.Menu').requires([
 					width:  width,
 					height: height,
 					position: {
-						x: width,
+						x: 1/2 * width,
 						y: 0
 					}
 				});
@@ -166,15 +154,8 @@ lychee.define('game.state.Menu').requires([
 				});
 
 				entity.bind('touch', function() {
-
-					var position = this.__cache;
-
-					position.x = 0;
-					position.y = 0;
-
-					root.setPosition(position);
-
-				}, this);
+					this.setPosition({ x: 1/4 * this.width });
+				}, root);
 
 				settings.addEntity(entity);
 
@@ -264,7 +245,7 @@ lychee.define('game.state.Menu').requires([
 
 		},
 
-		reshape: function(orientation, rotation, width, height) {
+		reshape: function(orientation, rotation) {
 
 			lychee.game.State.prototype.reshape.call(this);
 
@@ -273,13 +254,13 @@ lychee.define('game.state.Menu').requires([
 			if (renderer !== null) {
 
 				var entity = null;
-				var width  = renderer.getEnvironment().width;
-				var height = renderer.getEnvironment().height;
+				var width  = renderer.width;
+				var height = renderer.height;
 
 
 				var root = this.queryLayer('ui', 'root');
 
-				root.width  = width * 3;
+				root.width  = width * 2;
 				root.height = height;
 
 
@@ -287,7 +268,7 @@ lychee.define('game.state.Menu').requires([
 
 				welcome.width  = width;
 				welcome.height = height;
-				welcome.position.x =
+				welcome.position.x = root.width * 1/4;
 
 				welcome.entities[0].position.y = -1 * height / 2 + 64;
 				welcome.entities[1].position.y =      height / 2 - 32;
@@ -297,17 +278,26 @@ lychee.define('game.state.Menu').requires([
 
 				settings.width      = width;
 				settings.height     = height;
-				settings.position.x = width;
+				settings.position.x = root.width * 3/4;
 
 				settings.entities[0].position.y = -1 * height / 2 + 64;
 				settings.entities[1].position.y =      height / 2 - 32;
 
-console.log('reshape!');
 
-				root.setPosition({ x: 0 });
+				root.setPosition({ x: 1/2 * width });
 
-global._ROOT = root;
+			}
 
+		},
+
+		enter: function(data) {
+
+			lychee.game.State.prototype.enter.call(this);
+
+
+			var root = this.queryLayer('ui', 'root');
+			if (root !== null) {
+				root.setPosition({ x: 1/4 * root.width });
 			}
 
 		}

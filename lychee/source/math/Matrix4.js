@@ -496,7 +496,7 @@ lychee.define('lychee.math.Matrix4').exports(function(lychee, global) {
 			var x0 = upy * z2 - upz * z1;
 			var x1 = upz * z0 - upx * z2;
 			var x2 = upx * z1 - upy * z0;
- 
+
 			len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2);
 			if (len === 0) {
 

@@ -72,10 +72,8 @@ lychee.define('game.net.client.Multiplayer').includes([
 		var renderer = this.game.renderer;
 		if (renderer !== null) {
 
-			var env = this.game.renderer.getEnvironment();
-
-			this.env.width  = env.width;
-			this.env.height = env.height;
+			this.env.width  = renderer.width;
+			this.env.height = renderer.height;
 
 		}
 
@@ -156,11 +154,9 @@ console.log('Env Sync', data.width, data.height);
 			var renderer = this.game.renderer;
 			if (renderer !== null) {
 
-				var env = renderer.getEnvironment();
-
 				this.multicast({
-					width:  env.width,
-					height: env.height
+					width:  renderer.width,
+					height: renderer.height
 				},{
 					id:    this.id,
 					event: 'syncenv'

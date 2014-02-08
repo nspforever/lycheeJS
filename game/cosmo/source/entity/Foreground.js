@@ -334,7 +334,7 @@ lychee.define('game.entity.Foreground').exports(function(lychee, game, global, a
 			var buffer = this.__buffer;
 			if (buffer !== null) {
 
-				renderer.clearBuffer(buffer);
+				renderer.clear(buffer);
 
 				renderer.setBuffer(buffer);
 

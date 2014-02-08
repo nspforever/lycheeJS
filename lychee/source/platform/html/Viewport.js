@@ -273,132 +273,121 @@ lychee.define('Viewport').tags({
 	var _process_reshape = function(width, height) {
 
 		if (
-			   width === this.__width
-			&& height === this.__height
+			   width === this.width
+			&& height === this.height
 		) {
 			return;
 		}
 
 
-		this.width    = width;
-		this.height   = height;
-
-		this.__width  = width;
-		this.__height = height;
+		this.width  = width;
+		this.height = height;
 
 
 
-		//    TOP
-		//  _______
-		// |       |
-		// |       |
-		// |       |
-		// |       |
-		// |       |
-		// [X][X][X] <- buttons
-		//
-		//  BOTTOM
+		/*
+		 *    TOP
+		 *  _______
+		 * |       |
+		 * |       |
+		 * |       |
+		 * |       |
+		 * |       |
+		 * [X][X][X]
+		 *
+		 *  BOTTOM
+		 */
 
 		if (this.__orientation === 0) {
 
 			if (width > height) {
 				this.trigger('reshape', [
 					'landscape',
-					'landscape',
-					this.__width,
-					this.__height
+					'landscape'
 				]);
 			} else {
 				this.trigger('reshape', [
 					'portrait',
-					'portrait',
-					this.__width,
-					this.__height
+					'portrait'
 				]);
 			}
 
 
 
-		//  BOTTOM
-		//
-		// [X][X][X] <- buttons
-		// |       |
-		// |       |
-		// |       |
-		// |       |
-		// |_______|
-		//
-		//    TOP
+		/*
+		 *  BOTTOM
+		 *
+		 * [X][X][X]
+		 * |       |
+		 * |       |
+		 * |       |
+		 * |       |
+		 * |_______|
+		 *
+		 *    TOP
+		 */
 
 		} else if (this.__orientation === 180) {
 
 			if (width > height) {
 				this.trigger('reshape', [
 					'landscape',
-					'landscape',
-					this.__width,
-					this.__height
+					'landscape'
 				]);
 			} else {
 				this.trigger('reshape', [
 					'portrait',
-					'portrait',
-					this.__width,
-					this.__height
+					'portrait'
 				]);
 			}
 
 
 
-		//    ____________    B
-		// T |            [x] O
-		// O |            [x] T
-		// P |____________[x] T
-		//                    O
-		//                    M
+		/*
+		 *    ____________    B
+		 * T |            [x] O
+		 * O |            [x] T
+		 * P |____________[x] T
+		 *                    O
+		 *                    M
+		 */
 
 		} else if (this.__orientation === 90) {
 
 			if (width > height) {
 				this.trigger('reshape', [
 					'portrait',
-					'landscape',
-					this.__width,
-					this.__height
+					'landscape'
 				]);
 			} else {
 				this.trigger('reshape', [
 					'landscape',
-					'portrait',
-					this.__width,
-					this.__height
+					'portrait'
 				]);
 			}
 
 
 
-		// B    ____________
-		// O [x]            | T
-		// T [x]            | O
-		// T [x]____________| P
-		// O
-		// M
+		/*
+		 * B    ____________
+		 * O [x]            | T
+		 * T [x]            | O
+		 * T [x]____________| P
+		 * O
+		 * M
+		 */
 
 		} else if (this.__orientation === -90) {
 
 			if (width > height) {
 				this.trigger('reshape', [
 					'portrait',
-					'landscape',
-					this.__width,
-					this.__height
+					'landscape'
 				]);
 			} else {
 				this.trigger('reshape', [
 					'landscape',
-					'portrait',
-					this.__width,
-					this.__height
+					'portrait'
 				]);
 			}
 
@@ -422,8 +411,6 @@ lychee.define('Viewport').tags({
 		this.height     = global.innerHeight;
 
 		this.__orientation = typeof global.orientation === 'number' ? global.orientation : 0;
-		this.__width       = global.innerWidth;
-		this.__height      = global.innerHeight;
 
 
 		lychee.event.Emitter.call(this);
@@ -441,12 +428,15 @@ lychee.define('Viewport').tags({
 	Class.prototype = {
 
 		/*
-		 * PUBLIC API
+		 * ENTITY API
 		 */
+
+		// deserialize: function(blob) {},
 
 		serialize: function() {
 
 			var settings = {};
+
 
 			if (this.fullscreen !== false) settings.fullscreen = this.fullscreen;
 
@@ -458,6 +448,12 @@ lychee.define('Viewport').tags({
 			};
 
 		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
 
 		setFullscreen: function(fullscreen) {
 

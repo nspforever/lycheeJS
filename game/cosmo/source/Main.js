@@ -30,8 +30,8 @@ lychee.define('game.Main').requires([
 
 			renderer: {
 				id:     'game',
-				width:  800,
-				height: 600
+				width:  null,
+				height: null
 			},
 
 			viewport: {
@@ -50,61 +50,6 @@ lychee.define('game.Main').requires([
 
 	Class.prototype = {
 
-		reshape: function(orientation, rotation, width, height) {
-
-			var resetstates = false;
-
-/*
-			var renderer = this.renderer;
-			if (
-				   width !== undefined
-				&& height !== undefined
-				&& renderer !== null
-			) {
-
-				var env = renderer.getEnvironment();
-
-				if (
-					this.settings.fullscreen === true
-					&& (
-						   env.width !== width
-						|| env.height !== height
-					)
-				) {
-
-					resetstates = true;
-
-				}
-
-			}
-*/
-
-			lychee.game.Main.prototype.reshape.call(this, orientation, rotation, width, height);
-
-
-			if (resetstates === true) {
-				this.resetStates();
-			}
-
-		},
-
-		reset: function(state) {
-
-			// This will initially reset the viewport
-			// based on the DeviceSpecificHacks
-			this.reshape();
-
-
-			if (state === true) {
-
-				// This will leave the current state and
-				// pass in empty data (for level interaction)
-				this.resetState(null, null);
-
-			}
-
-		},
-
 		init: function() {
 
 			// Overwrite client with game.Client
@@ -112,7 +57,6 @@ lychee.define('game.Main').requires([
 			this.settings.client = null;
 
 			lychee.game.Main.prototype.init.call(this);
-			this.reset(false);
 
 
 			this.client   = null;
@@ -131,14 +75,7 @@ lychee.define('game.Main').requires([
 			this.setState('menu', new game.state.Menu(this));
 			this.changeState('menu');
 
-
-			this.start();
-
-		},
-
-		// TODO: hide/show integration
-		start: function() {},
-		stop:  function() {}
+		}
 
 	};
 

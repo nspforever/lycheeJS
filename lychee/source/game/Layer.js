@@ -277,9 +277,12 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 
 		setMap: function(map) {
 
-			var all = true;
+			map = map instanceof Object ? map : null;
 
-			if (map instanceof Object) {
+
+			var valid = true;
+
+			if (map !== null) {
 
 				this.__map = {};
 
@@ -290,19 +293,22 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 
 						var result = this.setEntity(id, entity, true);
 						if (result === false) {
-							all = false;
+							valid = false;
 						}
 
 					} else {
-						all = false;
+						valid = false;
 					}
 
 				}
 
+
+				return valid;
+
 			}
 
 
-			return all;
+			return false;
 
 		},
 

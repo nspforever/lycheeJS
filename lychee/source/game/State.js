@@ -243,10 +243,8 @@ lychee.define('lychee.game.State').requires([
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var env = renderer.getEnvironment();
-
-				this.__layerOffsetX = env.width  / 2;
-				this.__layerOffsetY = env.height / 2;
+				this.__layerOffsetX = renderer.width  / 2;
+				this.__layerOffsetY = renderer.height / 2;
 
 			}
 
@@ -257,10 +255,8 @@ lychee.define('lychee.game.State').requires([
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var env = renderer.getEnvironment();
-
-				this.__layerOffsetX = env.width  / 2;
-				this.__layerOffsetY = env.height / 2;
+				this.__layerOffsetX = renderer.width  / 2;
+				this.__layerOffsetY = renderer.height / 2;
 
 			}
 
@@ -277,19 +273,9 @@ lychee.define('lychee.game.State').requires([
 				input.bind('swipe', this.processSwipe, this);
 			}
 
-			var renderer = this.renderer;
-			if (renderer !== null) {
-				renderer.start();
-			}
-
 		},
 
 		leave: function() {
-
-			var renderer = this.renderer;
-			if (renderer !== null) {
-				renderer.stop();
-			}
 
 			var input = this.input;
 			if (input !== null) {
@@ -300,6 +286,12 @@ lychee.define('lychee.game.State').requires([
 
 			this.trigger('leave');
 
+		},
+
+		show: function() {
+		},
+
+		hide: function() {
 		},
 
 		render: function(clock, delta, force) {
@@ -493,15 +485,14 @@ lychee.define('lychee.game.State').requires([
 
 			if (entity !== undefined && entity !== null) {
 
-				if (this.renderer !== null) {
+				var renderer = this.renderer;
+				if (renderer !== null) {
 
-					var env = this.renderer.getEnvironment();
+					position.x -= renderer.offset.x;
+					position.y -= renderer.offset.y;
 
-					position.x -= env.offset.x;
-					position.y -= env.offset.y;
-
-					position.x -= env.width / 2;
-					position.y -= env.height / 2;
+					position.x -= renderer.width  / 2;
+					position.y -= renderer.height / 2;
 
 				}
 
@@ -556,15 +547,14 @@ lychee.define('lychee.game.State').requires([
 
 		processTouch: function(id, position, delta) {
 
-			if (this.renderer !== null) {
+			var renderer = this.renderer;
+			if (renderer !== null) {
 
-				var env = this.renderer.getEnvironment();
+				position.x -= renderer.offset.x;
+				position.y -= renderer.offset.y;
 
-				position.x -= env.offset.x;
-				position.y -= env.offset.y;
-
-				position.x -= env.width / 2;
-				position.y -= env.height / 2;
+				position.x -= renderer.width  / 2;
+				position.y -= renderer.height / 2;
 
 			}
 
@@ -649,15 +639,14 @@ lychee.define('lychee.game.State').requires([
 			delta    = typeof delta === 'number'  ? delta    : 0;
 
 
-			if (this.renderer !== null) {
+			var renderer = this.renderer;
+			if (renderer !== null) {
 
-				var env = this.renderer.getEnvironment();
+				position.x += renderer.width  / 2;
+				position.y += renderer.height / 2;
 
-				position.x += env.width / 2;
-				position.y += env.height / 2;
-
-				position.x += env.offset.x;
-				position.y += env.offset.y;
+				position.x += renderer.offset.x;
+				position.y += renderer.offset.y;
 
 			}
 

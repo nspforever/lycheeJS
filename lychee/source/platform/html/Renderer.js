@@ -39,10 +39,21 @@ lychee.define('Renderer').tags({
 
 	var _is_color = function(color) {
 
-		return !!(
-			   typeof color === 'string'
-			&& color.match(/(#[AaBbCcDdEeFf0-9]{6})/)
-		);
+		if (typeof color === 'string') {
+
+			if (
+				   color.match(/(#[AaBbCcDdEeFf0-9]{6})/)
+				|| color.match(/(#[AaBbCcDdEeFf0-9]{8})/)
+			) {
+
+				return true;
+
+			}
+
+		}
+
+
+		return false;
 
 	};
 
@@ -84,22 +95,6 @@ lychee.define('Renderer').tags({
 
 	};
 
-	var _update_environment = function() {
-
-		var env = this.__environment;
-
-
-		env.screen.width  = global.innerWidth;
-		env.screen.height = global.innerHeight;
-
-		env.offset.x = this.__canvas.offsetLeft;
-		env.offset.y = this.__canvas.offsetTop;
-
-		env.width  = this.__width;
-		env.height = this.__height;
-
-	};
-
 
 
 	/*
@@ -125,39 +120,35 @@ lychee.define('Renderer').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(id) {
-
-		id = typeof id === 'string' ? id : null;
+	var _id = 0;
 
 
-		this.__id     = id;
-		this.__canvas = global.document.createElement('canvas');
-		this.__ctx    = this.__canvas.getContext('2d');
+	var Class = function(data) {
 
-		this.__environment = {
-			width:  null,
-			height: null,
-			screen: {},
-			offset: {}
-		};
-
-		this.__cache      = {};
-		this.__state      = 0;
-		this.__alpha      = 1;
-		this.__background = null;
-		this.__width      = 0;
-		this.__height     = 0;
+		var settings = lychee.extend({}, data);
 
 
-		if (this.__id !== null) {
-			this.__canvas.id = this.__id;
-		}
+		this.alpha      = 1.0;
+		this.background = '#000000';
+		this.id         = 'lychee-Renderer-' + _id++;
+		this.width      = null;
+		this.height     = null;
+		this.offset     = { x: 0, y: 0 };
+
+		this.__canvas           = global.document.createElement('canvas');
+		this.__canvas.className = 'lychee-Renderer-canvas';
+		this.__ctx              = this.__canvas.getContext('2d');
+		global.document.body.appendChild(this.__canvas);
 
 
-		if (!this.__canvas.parentNode) {
-			this.__canvas.className = 'lychee-Renderer-canvas';
-			global.document.body.appendChild(this.__canvas);
-		}
+		this.setAlpha(settings.alpha);
+		this.setBackground(settings.background);
+		this.setId(settings.id);
+		this.setWidth(settings.width);
+		this.setHeight(settings.height);
+
+
+		settings = null;
 
 	};
 
@@ -166,68 +157,28 @@ lychee.define('Renderer').tags({
 	Class.prototype = {
 
 		/*
-		 * STATE AND ENVIRONMENT MANAGEMENT
+		 * ENTITY API
 		 */
 
-		reset: function(width, height, resetCache) {
+		// deserialize: function(blob) {},
 
-			width      = typeof width === 'number'  ? width  : this.__width;
-			height     = typeof height === 'number' ? height : this.__height;
-			resetCache = resetCache === true;
+		serialize: function() {
 
-			if (resetCache === true) {
-				this.__cache = {};
-			}
+			var settings = {};
 
 
-			this.__width  = width;
-			this.__height = height;
+			if (this.alpha !== 1.0)                           settings.alpha      = this.alpha;
+			if (this.background !== '#000000')                settings.background = this.background;
+			if (this.id.substr(0, 16) !== 'lychee-Renderer-') settings.id         = this.id;
+			if (this.width !== null)                          settings.width      = this.width;
+			if (this.height !== null)                         settings.height     = this.height;
 
 
-			var canvas = this.__canvas;
-
-			canvas.width  = width;
-			canvas.height = height;
-
-			canvas.style.width  = width  + 'px';
-			canvas.style.height = height + 'px';
-
-
-			_update_environment.call(this);
-
-		},
-
-		start: function() {
-			this.__state = 1;
-		},
-
-		stop: function() {
-			this.__state = 0;
-		},
-
-		clear: function() {
-
-			if (this.__state !== 1) return;
-
-			// Some mobile devices have weird issues on rotations with clearRect()
-			// Seems to be if the renderbuffer got bigger after rotation
-			// this.__ctx.clearRect(0, 0, this.__canvas.width, this.__canvas.height);
-
-			// fillRect() renders correctly
-
-			var ctx = this.__ctx;
-			var canvas = this.__canvas;
-
-			ctx.fillStyle = this.__background;
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-		},
-
-		flush: function(command) {
-
-			if (this.__state !== 1 || typeof command !== 'number') return;
-
-			// TODO: Implement flush commands
+			return {
+				'constructor': 'lychee.Renderer',
+				'arguments':   [ settings ],
+				'blob':        null
+			};
 
 		},
 
@@ -237,36 +188,110 @@ lychee.define('Renderer').tags({
 		 * SETTERS AND GETTERS
 		 */
 
-		isRunning: function() {
-			return this.__state === 1;
-		},
-
-		getEnvironment: function() {
-			return this.__environment;
-		},
-
 		setAlpha: function(alpha) {
 
 			alpha = typeof alpha === 'number' ? alpha : null;
+
 
 			if (
 				   alpha !== null
 				&& alpha >= 0
 				&& alpha <= 1
 			) {
-
-				this.__alpha = alpha;
-
+				this.alpha = alpha;
 			}
 
 		},
 
 		setBackground: function(color) {
 
-			color = _is_color(color) === true ? color : '#000000';
+			color = _is_color(color) === true ? color : null;
 
-			this.__background = color;
-			this.__canvas.style.backgroundColor = color;
+
+			if (color !== null) {
+				this.background = color;
+				this.__canvas.style.backgroundColor = color;
+			}
+
+		},
+
+		setId: function(id) {
+
+			id = typeof id === 'string' ? id : null;
+
+
+			if (id !== null) {
+				this.id = id;
+				this.__canvas.id = id;
+			}
+
+		},
+
+		setWidth: function(width) {
+
+			width = typeof width === 'number' ? width : null;
+
+
+			if (width !== null) {
+				this.width = width;
+			} else {
+				this.width = global.innerWidth;
+			}
+
+
+			this.__canvas.width       = this.width;
+			this.__canvas.style.width = this.width + 'px';
+			this.offset.x             = this.__canvas.offsetLeft;
+
+		},
+
+		setHeight: function(height) {
+
+			height = typeof height === 'number' ? height : null;
+
+
+			if (height !== null) {
+				this.height = height;
+			} else {
+				this.height = global.innerHeight;
+			}
+
+
+			this.__canvas.height       = this.height;
+			this.__canvas.style.height = this.height + 'px';
+			this.offset.y              = this.__canvas.offsetTop;
+
+		},
+
+
+
+		/*
+		 * BUFFER INTEGRATION
+		 */
+
+		clear: function(buffer) {
+
+			buffer = buffer instanceof _buffer ? buffer : null;
+
+
+			if (buffer !== null) {
+
+				var ctx = buffer.__ctx;
+
+				ctx.clearRect(0, 0, buffer.width, buffer.height);
+
+			} else {
+
+				var ctx = this.__ctx;
+
+				ctx.fillStyle = this.background;
+				ctx.fillRect(0, 0, this.width, this.height);
+
+			}
+
+		},
+
+		flush: function() {
 
 		},
 
@@ -274,17 +299,12 @@ lychee.define('Renderer').tags({
 			return new _buffer(width, height);
 		},
 
-		clearBuffer: function(buffer) {
-
-			if (buffer instanceof _buffer) {
-				buffer.__ctx.clearRect(0, 0, buffer.width, buffer.height);
-			}
-
-		},
-
 		setBuffer: function(buffer) {
 
-			if (buffer instanceof _buffer) {
+			buffer = buffer instanceof _buffer ? buffer : null;
+
+
+			if (buffer !== null) {
 				this.__ctx = buffer.__ctx;
 			} else {
 				this.__ctx = this.__canvas.getContext('2d');
@@ -300,8 +320,6 @@ lychee.define('Renderer').tags({
 
 		drawArc: function(x, y, start, end, radius, color, background, lineWidth) {
 
-			if (this.__state !== 1) return;
-
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
@@ -311,7 +329,7 @@ lychee.define('Renderer').tags({
 			var pi2 = Math.PI * 2;
 
 
-			ctx.globalAlpha = this.__alpha;
+			ctx.globalAlpha = this.alpha;
 			ctx.beginPath();
 
 			ctx.arc(
@@ -337,8 +355,6 @@ lychee.define('Renderer').tags({
 
 		drawBox: function(x1, y1, x2, y2, color, background, lineWidth) {
 
-			if (this.__state !== 1) return;
-
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
@@ -347,7 +363,7 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
-			ctx.globalAlpha = this.__alpha;
+			ctx.globalAlpha = this.alpha;
 
 			if (background === false) {
 				ctx.lineWidth   = lineWidth;
@@ -362,12 +378,15 @@ lychee.define('Renderer').tags({
 
 		drawBuffer: function(x1, y1, buffer) {
 
-			if (buffer instanceof _buffer) {
+			buffer = buffer instanceof _buffer ? buffer : null;
+
+
+			if (buffer !== null) {
 
 				var ctx = this.__ctx;
 
 
-				ctx.globalAlpha = this.__alpha;
+				ctx.globalAlpha = this.alpha;
 				ctx.drawImage(buffer.__buffer, x1, y1);
 
 			}
@@ -375,8 +394,6 @@ lychee.define('Renderer').tags({
 		},
 
 		drawCircle: function(x, y, radius, color, background, lineWidth) {
-
-			if (this.__state !== 1) return;
 
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
@@ -386,7 +403,7 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
-			ctx.globalAlpha = this.__alpha;
+			ctx.globalAlpha = this.alpha;
 			ctx.beginPath();
 
 			ctx.arc(
@@ -413,9 +430,7 @@ lychee.define('Renderer').tags({
 
 		drawLight: function(x, y, radius, color, background, lineWidth) {
 
-			if (this.__state !== 1) return;
-
-			color      = _hex_to_rgba(color);
+			color      = _is_color(color) ? _hex_to_rgba(color) : 'rgba(255,255,255,1.0)';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
 
@@ -429,7 +444,7 @@ lychee.define('Renderer').tags({
 			gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
 
-			ctx.globalAlpha = this.__alpha;
+			ctx.globalAlpha = this.alpha;
 			ctx.beginPath();
 
 			ctx.arc(
@@ -456,8 +471,6 @@ lychee.define('Renderer').tags({
 
 		drawLine: function(x1, y1, x2, y2, color, lineWidth) {
 
-			if (this.__state !== 1) return;
-
 			color     = _is_color(color) === true ? color : '#000000';
 			lineWidth = typeof lineWidth === 'number' ? lineWidth : 1;
 
@@ -465,7 +478,7 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
-			ctx.globalAlpha = this.__alpha;
+			ctx.globalAlpha = this.alpha;
 			ctx.beginPath();
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
@@ -480,8 +493,6 @@ lychee.define('Renderer').tags({
 
 		drawTriangle: function(x1, y1, x2, y2, x3, y3, color, background, lineWidth) {
 
-			if (this.__state !== 1) return;
-
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
 			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
@@ -490,7 +501,7 @@ lychee.define('Renderer').tags({
 			var ctx = this.__ctx;
 
 
-			ctx.globalAlpha = this.__alpha;
+			ctx.globalAlpha = this.alpha;
 			ctx.beginPath();
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
@@ -512,8 +523,6 @@ lychee.define('Renderer').tags({
 
 		// points, x1, y1, [ ... x(a), y(a) ... ], [ color, background, lineWidth ]
 		drawPolygon: function(points, x1, y1) {
-
-			if (this.__state !== 1) return;
 
 			var l = arguments.length;
 
@@ -550,7 +559,7 @@ lychee.define('Renderer').tags({
 				var ctx = this.__ctx;
 
 
-				ctx.globalAlpha = this.__alpha;
+				ctx.globalAlpha = this.alpha;
 				ctx.beginPath();
 				ctx.moveTo(x1, y1);
 
@@ -582,8 +591,6 @@ lychee.define('Renderer').tags({
 
 		drawSprite: function(x1, y1, texture, map) {
 
-			if (this.__state !== 1) return;
-
 			texture = texture instanceof Texture ? texture : null;
 			map     = map instanceof Object      ? map     : null;
 
@@ -593,7 +600,7 @@ lychee.define('Renderer').tags({
 				var ctx = this.__ctx;
 
 
-				ctx.globalAlpha = this.__alpha;
+				ctx.globalAlpha = this.alpha;
 
 				if (map === null) {
 
@@ -639,8 +646,6 @@ lychee.define('Renderer').tags({
 
 		drawText: function(x1, y1, text, font, center) {
 
-			if (this.__state !== 1) return;
-
 			font   = font instanceof Font ? font : null;
 			center = center === true;
 
@@ -679,7 +684,7 @@ lychee.define('Renderer').tags({
 					var ctx = this.__ctx;
 
 
-					ctx.globalAlpha = this.__alpha;
+					ctx.globalAlpha = this.alpha;
 
 					for (t = 0, l = text.length; t < l; t++) {
 

@@ -174,7 +174,10 @@ lychee.define('lychee.game.Background').includes([
 
 		setOrigin: function(origin) {
 
-			if (origin instanceof Object) {
+			origin = origin instanceof Object ? origin : null;
+
+
+			if (origin !== null) {
 
 				this.origin.x = typeof origin.x === 'number' ? origin.x : this.origin.x;
 				this.origin.y = typeof origin.y === 'number' ? origin.y : this.origin.y;

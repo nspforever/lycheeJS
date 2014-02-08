@@ -170,7 +170,6 @@ lychee.define('lychee.ui.Entity').includes([
 			) {
 
 				var t = (this.__clock - tween.start) / tween.duration;
-
 				if (t <= 1) {
 
 					var type = tween.type;

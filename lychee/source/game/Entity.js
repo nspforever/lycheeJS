@@ -214,7 +214,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 			) {
 
 				var t = (this.__clock - tween.start) / tween.duration;
-
 				if (t <= 1) {
 
 					var type = tween.type;
@@ -493,7 +492,10 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		setPosition: function(position) {
 
-			if (position instanceof Object) {
+			position = position instanceof Object ? position : null;
+
+
+			if (position !== null) {
 
 				this.position.x = typeof position.x === 'number' ? position.x : this.position.x;
 				this.position.y = typeof position.y === 'number' ? position.y : this.position.y;
@@ -510,7 +512,10 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		setTween: function(settings) {
 
-			if (settings instanceof Object) {
+			settings = settings instanceof Object ? settings : null;
+
+
+			if (settings !== null) {
 
 				var tween = this.__tween;
 
@@ -546,7 +551,10 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		setVelocity: function(velocity) {
 
-			if (velocity instanceof Object) {
+			velocity = velocity instanceof Object ? velocity : null;
+
+
+			if (velocity !== null) {
 
 				this.velocity.x = typeof velocity.x === 'number' ? velocity.x : this.velocity.x;
 				this.velocity.y = typeof velocity.y === 'number' ? velocity.y : this.velocity.y;
