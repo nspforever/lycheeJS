@@ -244,18 +244,6 @@ lychee.define('lychee.game.State').requires([
 
 		},
 
-		reset: function() {
-
-			var renderer = this.renderer;
-			if (renderer !== null) {
-
-				this.__layerOffsetX = renderer.width  / 2;
-				this.__layerOffsetY = renderer.height / 2;
-
-			}
-
-		},
-
 		reshape: function() {
 
 			var renderer = this.renderer;

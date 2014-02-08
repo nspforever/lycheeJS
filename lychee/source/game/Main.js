@@ -346,42 +346,6 @@ lychee.define('lychee.game.Main').requires([
 		 * STATE MANAGEMENT
 		 */
 
-		resetStates: function() {
-
-			var current = this.getState();
-			if (current !== null) {
-				this.resetState();
-			}
-
-
-			for (var id in this.__states) {
-
-				var state = this.__states[id];
-				if (state === current) continue;
-
-				state.reset();
-
-			}
-
-		},
-
-		resetState: function(leavedata, enterdata) {
-
-			leavedata = leavedata instanceof Object ? leavedata : null;
-			enterdata = enterdata instanceof Object ? enterdata : null;
-
-
-			var state = this.getState();
-			if (state !== null) {
-
-				state.leave(leavedata);
-				state.reset();
-				state.enter(enterdata);
-
-			}
-
-		},
-
 		setState: function(id, state) {
 
 			id = typeof id === 'string' ? id : null;
