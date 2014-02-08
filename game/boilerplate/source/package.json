@@ -10,7 +10,7 @@
 		},
 
 		"state": {
-			"Game": [ "js", "headline.fnt", "normal.fnt" ],
+			"Game": [ "js", "json", "headline.fnt", "normal.fnt" ],
 			"Menu": [ "js", "json", "headline.fnt", "normal.fnt" ]
 		},
 

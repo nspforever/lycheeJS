@@ -63,9 +63,6 @@ lychee.define('game.entity.Button').includes([
 			var position = this.position;
 
 
-			lychee.ui.Button.prototype.render.call(this, renderer, offsetX, offsetY);
-
-
 			var background = this.background;
 			if (background !== null) {
 
@@ -76,15 +73,18 @@ lychee.define('game.entity.Button').includes([
 
 
 				renderer.drawBox(
-					cx - this.width  / 2,
-					cy - this.height / 2,
-					cx + this.width  / 2,
-					cy + this.height / 2,
+					cx - this.width  / 2 - 4,
+					cy - this.height / 2 - 4,
+					cx + this.width  / 2 + 4,
+					cy + this.height / 2 + 4,
 					background,
 					true
 				);
 
 			}
+
+
+			lychee.ui.Button.prototype.render.call(this, renderer, offsetX, offsetY);
 
 		},
 

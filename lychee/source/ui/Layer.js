@@ -56,23 +56,33 @@ lychee.define('lychee.ui.Layer').includes([
 
 			var entities = [];
 			for (var e = 0, el = blob.entities.length; e < el; e++) {
-
-				var entity = lychee.deserialize(blob.entities[e]);
-
-				entities.push(entity);
-
+				entities.push(lychee.deserialize(blob.entities[e]));
 			}
 
-			var map = [];
+			var map = {};
 			for (var id in blob.map) {
-				var index  = blob.map[id];
-				map[index] = id;
+
+				var index = blob.map[id];
+				if (typeof index === 'number') {
+					map[id] = index;
+				}
+
 			}
 
 			for (var e = 0, el = entities.length; e < el; e++) {
 
-				if (typeof map[e] === 'number') {
-					this.setEntity(map[e], entities[e]);
+				var id = null;
+				for (var mid in map) {
+
+					if (map[mid] === e) {
+						id = mid;
+					}
+
+				}
+
+
+				if (id !== null) {
+					this.setEntity(id, entities[e]);
 				} else {
 					this.addEntity(entities[e]);
 				}

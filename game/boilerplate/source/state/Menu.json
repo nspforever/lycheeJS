@@ -120,12 +120,28 @@
 											"arguments": [ "./source/state/Menu.normal.fnt" ]
 										}
 									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Debug: Off",
+										"position": {
+											"x": 0,
+											"y": 120
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.normal.fnt" ]
+										}
+									}
 								}],
 								"map": {
 									"title": 0,
 									"fullscreen": 1,
 									"music": 2,
-									"sound": 3
+									"sound": 3,
+									"debug": 4
 								}
 							}
 						}],

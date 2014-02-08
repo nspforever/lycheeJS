@@ -20,7 +20,6 @@ lychee.define('game.state.Menu').requires([
 
 
 		this.deserialize(_blob);
-
 		this.reshape();
 
 	};
@@ -86,6 +85,17 @@ lychee.define('game.state.Menu').requires([
 
 				entity.setLabel('Sound: ' + ((sound === true) ? 'On': 'Off'));
 				jukebox.setSound(sound);
+
+			}, this);
+
+			entity = this.queryLayer('ui', 'root > settings > debug');
+			entity.setLabel('Debug: ' + ((lychee.debug === true) ? 'On': 'Off'));
+			entity.bind('#touch', function(entity) {
+
+				var debug = !lychee.debug;
+
+				entity.setLabel('Debug: ' + ((debug === true) ? 'On': 'Off'));
+				lychee.debug = debug;
 
 			}, this);
 
