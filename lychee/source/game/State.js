@@ -206,9 +206,15 @@ lychee.define('lychee.game.State').requires([
 
 		deserialize: function(blob) {
 
+			var env = lychee.getEnvironment();
+
+			lychee.setEnvironment(this);
+
 			for (var id in blob.layers) {
 				this.setLayer(id, lychee.deserialize(blob.layers[id]));
 			}
+
+			lychee.setEnvironment(env);
 
 		},
 

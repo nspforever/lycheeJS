@@ -26,7 +26,7 @@ if (typeof global !== 'undefined') {
 	 * HELPERS
 	 */
 
-	var _resolve_constructor = function(identifier, scope) {
+	var _resolve = function(identifier, scope) {
 
 		var pointer = scope;
 
@@ -345,25 +345,41 @@ if (typeof global !== 'undefined') {
 
 	lychee.deserialize = function(data) {
 
-		if (data == null) {
-			return null;
-		}
+		data = data instanceof Object ? data : null;
 
 
-		if (data instanceof Object) {
+		if (data !== null) {
 
 			if (
 				typeof data.constructor === 'string'
 				&& data.arguments instanceof Array
 			) {
 
-				var construct = _resolve_constructor(data.constructor, global);
+				var construct = _resolve(data.constructor, global);
 				if (typeof construct === 'function') {
 
 					var bindargs = [].splice.call(data.arguments, 0);
 					bindargs.reverse();
 					bindargs.push(construct);
 					bindargs.reverse();
+
+
+					for (var b = 0, bl = bindargs.length; b < bl; b++) {
+
+						var value = bindargs[b];
+						if (
+							   typeof value === 'string'
+							&& value.substr(0, 6) === '#this.'
+						) {
+
+							var resolved = _resolve(value.substr(6), _environment);
+							if (resolved !== null) {
+								bindargs[b] = resolved;
+							}
+
+						}
+
+					}
 
 
 					var instance = new (
