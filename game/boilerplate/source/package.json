@@ -11,7 +11,7 @@
 
 		"state": {
 			"Game": [ "js", "headline.fnt", "normal.fnt" ],
-			"Menu": [ "js", "headline.fnt", "normal.fnt" ]
+			"Menu": [ "js", "json", "headline.fnt", "normal.fnt" ]
 		},
 
 		"DeviceSpecificHacks": [ "js" ],

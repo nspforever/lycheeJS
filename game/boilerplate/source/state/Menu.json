@@ -1,0 +1,148 @@
+{
+	"layers": {
+		"ui": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "lychee.ui.Layer",
+					"arguments": [{}],
+					"blob": {
+						"entities": [{
+							"constructor": "lychee.ui.Layer",
+							"arguments": [{}],
+							"blob": {
+								"entities": [{
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Title"
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.headline.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "New Game",
+										"position": {
+											"x": 0,
+											"y": -24
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.normal.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Settings",
+										"position": {
+											"x": 0,
+											"y": 24
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.normal.fnt" ]
+										}
+									}
+								}],
+								"map": {
+									"title": 0,
+									"newgame": 1,
+									"settings": 2
+								}
+							}
+						}, {
+							"constructor": "lychee.ui.Layer",
+							"arguments": [{}],
+							"blob": {
+								"entities": [{
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Settings"
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.headline.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Fullscreen: Off",
+										"position": {
+											"x": 0,
+											"y": -24
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.normal.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Music: On",
+										"position": {
+											"x": 0,
+											"y": 24
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.normal.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Sound: On",
+										"position": {
+											"x": 0,
+											"y": 72
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.normal.fnt" ]
+										}
+									}
+								}],
+								"map": {
+									"title": 0,
+									"fullscreen": 1,
+									"music": 2,
+									"sound": 3
+								}
+							}
+						}],
+						"map": {
+							"welcome": 0,
+							"settings": 1
+						}
+					}
+				}, {
+					"constructor": "game.entity.lycheeJS",
+					"arguments": [{}]
+				}],
+				"map": {
+					"root": 0,
+					"lycheeJS": 1
+				}
+			}
+		}
+	}
+}
