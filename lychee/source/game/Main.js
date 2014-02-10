@@ -5,6 +5,7 @@ lychee.define('lychee.game.Main').requires([
 	'lychee.Viewport',
 	'lychee.game.Jukebox',
 	'lychee.game.Loop',
+	'lychee.game.State',
 	'lychee.net.Client'
 ]).includes([
 	'lychee.event.Emitter'

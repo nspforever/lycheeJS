@@ -1,0 +1,33 @@
+{
+
+	"width":  512,
+	"height": 312,
+
+	"states": {
+		"default":              { "animation": false },
+		"singleplayer":         { "animation": false },
+		"singleplayer-details": { "animation": false },
+		"multiplayer":          { "animation": false },
+		"multiplayer-details":  { "animation": false },
+		"multiplayer-disabled": { "animation": false },
+		"settings":             { "animation": false },
+		"settings-details":     { "animation": false },
+		"highscores":           { "animation": false },
+		"highscores-details":   { "animation": false }
+	},
+
+	"map": {
+		"default":              [ { "x":    0, "y":    0, "w": 512, "h": 312 } ],
+		"singleplayer":         [ { "x":    0, "y":  312, "w": 512, "h": 312 } ],
+		"singleplayer-details": [ { "x":  512, "y":  312, "w": 512, "h": 312 } ],
+		"multiplayer":          [ { "x":    0, "y":  624, "w": 512, "h": 312 } ],
+		"multiplayer-details":  [ { "x":  512, "y":  624, "w": 512, "h": 312 } ],
+		"multiplayer-disabled": [ { "x": 1024, "y":  624, "w": 512, "h": 312 } ],
+		"settings":             [ { "x":    0, "y":  936, "w": 512, "h": 312 } ],
+		"settings-details":     [ { "x":  512, "y":  936, "w": 512, "h": 312 } ],
+		"highscores":           [ { "x":    0, "y": 1248, "w": 512, "h": 312 } ],
+		"highscores-details":   [ { "x":  512, "y": 1248, "w": 512, "h": 312 } ],
+		"highscores-disabled":  [ { "x": 1024, "y": 1248, "w": 512, "h": 312 } ]
+	}
+
+} 

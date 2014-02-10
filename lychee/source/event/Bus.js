@@ -43,13 +43,33 @@ lychee.define('lychee.event.Bus').requires([
 		 * PUBLIC API
 		 */
 
-		addChannel: function(type, emitters) {
+		setChannel: function(type, emitters) {
 
-			type     = typeof type === 'string'                                      ? type     : null;
-			emitters = Object.prototype.toString.call(emitters) === '[object Array]' ? emitters : null;
+			type     = typeof type === 'string'  ? type     : null;
+			emitters = emitters instanceof Array ? emitters : null;
+
 
 			if (type !== null && type.charAt(0) === '@') {
 				return false;
+			}
+
+
+			if (
+				   type !== null
+				&& emitters !== null
+			) {
+
+				var channel = [];
+
+				for (var e = 0, el = emitters.length; e < el; e++) {
+
+					var emitter = emitters[e];
+					if (lychee.interfaceof(lychee.event.Emitter, emitter) === true) {
+
+					}
+
+				}
+
 			}
 
 
@@ -109,6 +129,7 @@ lychee.define('lychee.event.Bus').requires([
 
 			type = typeof type === 'string'                ? type : null;
 			root = typeof root.getEmitterId === 'function' ? root : null;
+
 
 			if (
 				   type !== null

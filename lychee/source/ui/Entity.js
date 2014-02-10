@@ -26,10 +26,11 @@ lychee.define('lychee.ui.Entity').includes([
 		this.depth  = 0;
 		this.radius = typeof settings.radius === 'number' ? settings.radius : 0;
 
-		this.shape    = Class.SHAPE.rectangle;
-		this.state    = _default_state;
-		this.position = { x: 0, y: 0 };
-		this.visible  = true;
+		this.collision = 1; // Used for event flow, NOT modifiable
+		this.shape     = Class.SHAPE.rectangle;
+		this.state     = _default_state;
+		this.position  = { x: 0, y: 0 };
+		this.visible   = true;
 
 		this.__clock  = null;
 		this.__states = _default_states;
@@ -355,6 +356,52 @@ lychee.define('lychee.ui.Entity').includes([
 				this.visible = visible;
 
 				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		isAtPosition: function(point) {
+
+			if (
+				   point instanceof Object
+				&& typeof point.x === 'number'
+				&& typeof point.y === 'number'
+			) {
+
+				var x = point.x;
+				var y = point.y;
+				var px = this.position.x;
+				var py = this.position.y;
+
+				var shape = this.shape;
+				if (shape === Class.SHAPE.circle) {
+
+					var dist = Math.sqrt(
+						  (x - px) * (x - px)
+						+ (y - py) * (y - py)
+					);
+
+					if (dist < this.radius) {
+						return true;
+					}
+
+				} else if (shape === Class.SHAPE.rectangle) {
+
+					var hw = this.width  / 2;
+					var hh = this.height / 2;
+
+					if (
+						   x >= px - hw && x <= px + hw
+						&& y >= py - hh && y <= py + hh
+					) {
+						return true;
+					}
+
+				}
 
 			}
 

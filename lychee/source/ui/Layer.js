@@ -3,28 +3,72 @@ lychee.define('lychee.ui.Layer').includes([
 	'lychee.ui.Entity'
 ]).exports(function(lychee, global) {
 
+	/*
+	 * HELPERS
+	 */
+
+	var _process_touch = function(id, position, delta) {
+
+		var triggered = null;
+		var args      = [ id, {
+			x: position.x + this.offset.x,
+			y: position.y + this.offset.y
+		}, delta ];
+
+
+		for (var e = this.entities.length - 1; e >= 0; e--) {
+
+			var entity = this.entities[e];
+			if (
+				   typeof entity.trigger === 'function'
+				&& entity.isAtPosition(args[1]) === true
+			) {
+
+				var result = entity.trigger('touch', args);
+				if (result === true) {
+					triggered = entity;
+					break;
+				} else if (result !== false) {
+					triggered = result;
+					break;
+				}
+
+			}
+
+		}
+
+
+		return triggered;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
 
 
 		this.entities = [];
-		this.offset   = { x: 0, y: 0, z: 0 };
+		this.offset   = { x: 0, y: 0 };
 		this.overflow = true;
 		this.visible  = true;
 
-		this.__buffer = null;
-		this.__map    = {};
+		this.__buffer  = null;
+		this.__map     = {};
+		this.__isDirty = false;
 
 
 		this.setEntities(settings.entities);
-		this.setMap(settings.map);
 		this.setOffset(settings.offset);
 		this.setOverflow(settings.overflow);
 		this.setVisible(settings.visible);
 
 		delete settings.entities;
-		delete settings.map;
 		delete settings.offset;
 		delete settings.overflow;
 		delete settings.visible;
@@ -34,6 +78,9 @@ lychee.define('lychee.ui.Layer').includes([
 
 		settings = null;
 
+
+		this.bind('touch', _process_touch, this);
+
 	};
 
 
@@ -42,15 +89,6 @@ lychee.define('lychee.ui.Layer').includes([
 		/*
 		 * ENTITY API
 		 */
-
-		reset: function() {
-
-			this.entities = [];
-			this.visible  = true;
-
-			this.__map = {};
-
-		},
 
 		deserialize: function(blob) {
 
@@ -174,14 +212,15 @@ lychee.define('lychee.ui.Layer').includes([
 
 
 			var buffer = this.__buffer;
-			if (buffer === null) {
+			if (buffer === null || this.__isDirty === true) {
 
 				buffer = renderer.createBuffer(
 					this.width,
 					this.height
 				);
 
-				this.__buffer = buffer;
+				this.__buffer  = buffer;
+				this.__isDirty = false;
 
 			}
 
@@ -213,12 +252,15 @@ lychee.define('lychee.ui.Layer').includes([
 			var overflow = this.overflow;
 			if (overflow === false) {
 
-				ox = this.width / 2;
-				oy = this.height / 2;
+				ox = this.width  / 2 + this.offset.x;
+				oy = this.height / 2 + this.offset.y;
 
-				renderer.clearBuffer(buffer);
+				renderer.clear(buffer);
 				renderer.setBuffer(buffer);
 
+			} else {
+				ox = position.x + offsetX + this.offset.x;
+				oy = position.y + offsetY + this.offset.y;
 			}
 
 
@@ -408,44 +450,12 @@ lychee.define('lychee.ui.Layer').includes([
 
 		},
 
-		setMap: function(map) {
-
-			var all = true;
-
-			if (map instanceof Object) {
-
-				this.__map = {};
-
-				for (var id in map) {
-
-					var entity = this.entities[map[id]] || null;
-					if (entity !== null) {
-
-						var result = this.setEntity(id, entity, true);
-						if (result === false) {
-							all = false;
-						}
-
-					} else {
-						all = false;
-					}
-
-				}
-
-			}
-
-
-			return all;
-
-		},
-
 		setOffset: function(offset) {
 
 			if (offset instanceof Object) {
 
 				this.offset.x = typeof offset.x === 'number' ? offset.x : this.offset.x;
 				this.offset.y = typeof offset.y === 'number' ? offset.y : this.offset.y;
-				this.offset.z = typeof offset.z === 'number' ? offset.z : this.offset.z;
 
 				return true;
 

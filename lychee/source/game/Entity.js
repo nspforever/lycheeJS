@@ -345,6 +345,48 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 		 * CUSTOM API
 		 */
 
+		isAtPosition: function(position) {
+
+			if (
+				   position instanceof Object
+				&& typeof position.x === 'number'
+				&& typeof position.y === 'number'
+			) {
+
+				var x = position.x;
+				var y = position.y;
+
+				var shape = this.shape;
+				if (shape === Class.SHAPE.circle) {
+
+					var dist = Math.sqrt(x * x + y * y);
+					if (dist < this.radius) {
+						return true;
+					}
+
+				} else if (shape === Class.SHAPE.rectangle) {
+
+					var maxx = this.width  / 2;
+					var maxy = this.height / 2;
+					var minx = -1 * maxx;
+					var miny = -1 * maxy;
+
+					if (
+						   x >= minx && x <= maxx
+						&& y >= miny && y <= maxy
+					) {
+						return true;
+					}
+
+				}
+
+			}
+
+
+			return false;
+
+		},
+
 		collidesWith: function(entity) {
 
 			if (

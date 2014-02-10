@@ -1,0 +1,245 @@
+{
+	"layers": {
+		"background": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.game.Background",
+					"arguments": [{}]
+				}],
+				"map": {
+					"background": 0
+				}
+			}
+		},
+		"tiles": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{
+				"visible": true
+			}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.menu.TileLayer",
+					"arguments": [{
+						"tilewidth": 800,
+						"tileheight": 600
+					}],
+					"blob": {
+						"entities": [{
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "singleplayer"
+							}]
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "singleplayer-details"
+							}]
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "multiplayer"
+							}]
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "multiplayer-details"
+							}]
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "settings"
+							}]
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "settings-details"
+							}],
+							"blob": {
+								"entities": [{
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Fullscreen:Off",
+										"position": {
+											"x": 0,
+											"y": -96
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Touch:     Off",
+										"position": {
+											"x": 0,
+											"y": -48
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Music:      On",
+										"position": {
+											"x": 0,
+											"y": 0
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Sound:      On",
+										"position": {
+											"x": 0,
+											"y": 48
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Debug:     Off",
+										"position": {
+											"x": 0,
+											"y": 96
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.fnt" ]
+										}
+									}
+								}],
+								"map": {
+									"fullscreen": 0,
+									"touch": 1,
+									"music": 2,
+									"sound": 3,
+									"debug": 4
+								}
+							}
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "highscores"
+							}]
+						}, {
+							"constructor": "game.entity.menu.Layer",
+							"arguments": [{
+								"state": "highscores-details"
+							}]
+						}],
+						"tiles": [{
+							"x": 0,
+							"y": 0
+						}, {
+							"x": 0,
+							"y": 1
+						}, {
+							"x": 1,
+							"y": 0
+						}, {
+							"x": 1,
+							"y": 1
+						}, {
+							"x": 2,
+							"y": 0
+						}, {
+							"x": 2,
+							"y": 1
+						}, {
+							"x": 3,
+							"y": 0
+						}, {
+							"x": 3,
+							"y": 1
+						}],
+						"map": {
+							"multiplayer": 2,
+							"multiplayer-details": 3,
+							"settings-details": 5,
+							"highscores": 6,
+							"highscores-details": 7
+						}
+					}
+				}],
+				"map": {
+					"root": 0
+				}
+			}
+		},
+		"ui": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.menu.Button",
+					"arguments": [{
+						"state": "arrow-top",
+						"position": {
+							"x": 0,
+							"y": -220
+						}
+					}]
+				}, {
+
+					"constructor": "game.entity.menu.Button",
+					"arguments": [{
+						"state": "arrow-right",
+						"position": {
+							"x": 320,
+							"y": 0
+						}
+					}]
+				}, {
+					"constructor": "game.entity.menu.Button",
+					"arguments": [{
+						"state": "arrow-bottom",
+						"position": {
+							"x": 0,
+							"y": 220
+						}
+					}]
+				}, {
+					"constructor": "game.entity.menu.Button",
+					"arguments": [{
+						"state": "arrow-left",
+						"position": {
+							"x": -320,
+							"y": 0
+						}
+					}]
+				}],
+				"map": {
+					"arrow-top": 0,
+					"arrow-right": 1,
+					"arrow-bottom": 2,
+					"arrow-left": 3
+				}
+			}
+		}
+	}
+}

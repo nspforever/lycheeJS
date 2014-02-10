@@ -3,25 +3,12 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 
 	var Class = function() {
 
-		this.___emitterId = null;
-		this.___events    = {};
+		this.___events = {};
 
 	};
 
 
 	Class.prototype = {
-
-		getEmitterId: function() {
-			return this.___emitterId;
-		},
-
-		setEmitterId: function(id) {
-
-			id = typeof id === 'number' ? id : null;
-
-			this.___emitterId = id;
-
-		},
 
 		bind: function(type, callback, scope, once) {
 
@@ -74,6 +61,8 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 
 			if (this.___events[type] !== undefined) {
 
+				var value = undefined;
+
 				for (var e = 0, el = this.___events[type].length; e < el; e++) {
 
 					var args  = [];
@@ -96,13 +85,15 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 					}
 
 
-					entry.callback.apply(entry.scope, args);
+					var result = entry.callback.apply(entry.scope, args);
+					if (result !== undefined) {
+						value = result;
+					}
 
 
 					if (entry.once === true) {
 
-						var result = this.unbind(type, entry.callback, entry.scope);
-						if (result === true) {
+						if (this.unbind(type, entry.callback, entry.scope) === true) {
 							el--;
 							e--;
 						}
@@ -112,7 +103,11 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 				}
 
 
-				return true;
+				if (value !== undefined) {
+					return value;
+				} else {
+					return true;
+				}
 
 			}
 

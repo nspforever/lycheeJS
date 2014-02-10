@@ -1,5 +1,52 @@
 
-lychee.define('lychee.game.Layer').exports(function(lychee, global) {
+lychee.define('lychee.game.Layer').includes([
+	'lychee.event.Emitter'
+]).exports(function(lychee, global) {
+
+	/*
+	 * HELPERS
+	 */
+
+	var _process_touch = function(id, position, delta) {
+
+		var triggered = null;
+		var args      = [ id, {
+			x: position.x + this.offset.x,
+			y: position.y + this.offset.y
+		}, delta ];
+
+
+		for (var e = this.entities.length - 1; e >= 0; e--) {
+
+			var entity = this.entities[e];
+			if (
+				   typeof entity.trigger === 'function'
+				&& entity.isAtPosition(args[1]) === true
+			) {
+
+				var result = entity.trigger('touch', args);
+				if (result === true) {
+					triggered = entity;
+					break;
+				} else if (result !== false) {
+					triggered = result;
+					break;
+				}
+
+			}
+
+		}
+
+
+		return triggered;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(data) {
 
@@ -7,17 +54,25 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 
 
 		this.entities = [];
+		this.offset   = { x: 0, y: 0 };
+		this.position = { x: 0, y: 0 };
 		this.visible  = true;
 
 		this.__map = {};
 
 
 		this.setEntities(settings.entities);
-		this.setMap(settings.map);
+		this.setOffset(settings.offset);
+		this.setPosition(settings.position);
 		this.setVisible(settings.visible);
 
 
+		lychee.event.Emitter.call(this);
+
 		settings = null;
+
+
+		this.bind('touch', _process_touch, this);
 
 	};
 
@@ -27,15 +82,6 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 		/*
 		 * ENTITY API
 		 */
-
-		reset: function() {
-
-			this.entities = [];
-			this.visible  = true;
-
-			this.__map = {};
-
-		},
 
 		deserialize: function(blob) {
 
@@ -83,6 +129,20 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 			var blob     = {};
 
 
+			if (
+				   this.offset.x !== 0
+				|| this.offset.y !== 0
+				|| this.offset.z !== 0
+			) {
+
+				settings.offset = {};
+
+				if (this.offset.x !== 0) settings.offset.x = this.offset.x;
+				if (this.offset.y !== 0) settings.offset.y = this.offset.y;
+				if (this.offset.z !== 0) settings.offset.z = this.offset.z;
+
+			}
+
 			if (this.visible !== true) settings.visible = this.visible;
 
 
@@ -125,6 +185,39 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 				'arguments':   [ settings ],
 				'blob':        blob
 			};
+
+		},
+
+		update: function(clock, delta) {
+
+			var entities = this.entities;
+			for (var e = 0, el = entities.length; e < el; e++) {
+				entities[e].update(clock, delta);
+			}
+
+		},
+
+		render: function(renderer, offsetX, offsetY) {
+
+			if (this.visible === false) return;
+
+			var position = this.position;
+
+
+			var ox = position.x + offsetX + this.offset.x;
+			var oy = position.y + offsetY + this.offset.y;
+
+
+			var entities = this.entities;
+			for (var e = 0, el = entities.length; e < el; e++) {
+
+				renderer.renderEntity(
+					entities[e],
+					ox,
+					oy
+				);
+
+			}
 
 		},
 
@@ -286,35 +379,30 @@ lychee.define('lychee.game.Layer').exports(function(lychee, global) {
 
 		},
 
-		setMap: function(map) {
+		setOffset: function(offset) {
 
-			map = map instanceof Object ? map : null;
+			if (offset instanceof Object) {
 
+				this.offset.x = typeof offset.x === 'number' ? offset.x : this.offset.x;
+				this.offset.y = typeof offset.y === 'number' ? offset.y : this.offset.y;
 
-			var valid = true;
+				return true;
 
-			if (map !== null) {
-
-				this.__map = {};
-
-				for (var id in map) {
-
-					var entity = this.entities[map[id]] || null;
-					if (entity !== null) {
-
-						var result = this.setEntity(id, entity, true);
-						if (result === false) {
-							valid = false;
-						}
-
-					} else {
-						valid = false;
-					}
-
-				}
+			}
 
 
-				return valid;
+			return false;
+
+		},
+
+		setPosition: function(position) {
+
+			if (position instanceof Object) {
+
+				this.position.x = typeof position.x === 'number' ? position.x : this.position.x;
+				this.position.y = typeof position.y === 'number' ? position.y : this.position.y;
+
+				return true;
 
 			}
 

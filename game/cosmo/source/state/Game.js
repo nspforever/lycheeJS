@@ -74,7 +74,7 @@ lychee.define('game.state.Game').requires([
 		this.__result   = new _result({}, game);
 
 
-		this.reset();
+//		this.deserialize();
 
 	};
 
@@ -86,9 +86,6 @@ lychee.define('game.state.Game').requires([
 		 */
 
 		reset: function() {
-
-			lychee.game.State.prototype.reset.call(this);
-
 
 			this.removeLayer('ui');
 

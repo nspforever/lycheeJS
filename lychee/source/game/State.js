@@ -1,64 +1,15 @@
 
 lychee.define('lychee.game.State').requires([
-	'lychee.game.Entity',
-	'lychee.game.Layer'
+	'lychee.game.Layer',
+	'lychee.ui.Layer'
 ]).includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
-
-	var _layer = lychee.game.Layer;
-	var _shape = lychee.game.Entity.SHAPE;
 
 
 	/*
 	 * HELPERS
 	 */
-
-	var _is_entity_at_position = function(entity, targetX, targetY) {
-
-		var result = false;
-
-		var position = entity.position;
-		var shape    = entity.shape;
-		if (shape === _shape.circle) {
-
-			var dx = position.x - targetX;
-			var dy = position.y - targetY;
-
-
-			var distance = Math.sqrt(dx * dx + dy * dy);
-			if (distance < entity.radius) {
-				result = true;
-			}
-
-		} else if (shape === _shape.rectangle) {
-
-			var x1 = position.x - entity.width / 2;
-			var x2 = position.x + entity.width / 2;
-			var y1 = position.y - entity.height / 2;
-			var y2 = position.y + entity.height / 2;
-
-
-			if (
-				   targetX >= x1
-				&& targetX <= x2
-				&& targetY >= y1
-				&& targetY <= y2
-			) {
-				result = true;
-			}
-
-		}
-
-
-		if (entity.visible === false) {
-			result = false;
-		}
-
-
-		return result;
-
-	};
 
 	var _processSwipe_recursive = function(search, entity, offset, offsetX, offsetY) {
 
@@ -176,8 +127,6 @@ lychee.define('lychee.game.State').requires([
 
 
 		this.__layers        = {};
-		this.__layerOffsetX  = 0;
-		this.__layerOffsetY  = 0;
 		this.__focusEntity   = null;
 
 		this.__touchEntities = [];
@@ -249,8 +198,14 @@ lychee.define('lychee.game.State').requires([
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				this.__layerOffsetX = renderer.width  / 2;
-				this.__layerOffsetY = renderer.height / 2;
+				var position = {
+					x: 1/2 * renderer.width,
+					y: 1/2 * renderer.height
+				};
+
+				for (var id in this.__layers) {
+					this.__layers[id].setPosition(position);
+				}
 
 			}
 
@@ -288,56 +243,48 @@ lychee.define('lychee.game.State').requires([
 		hide: function() {
 		},
 
-		render: function(clock, delta, force) {
+		update: function(clock, delta) {
 
-			force = force === true;
+			for (var id in this.__layers) {
 
+				var layer = this.__layers[id];
+				if (layer.visible === false) continue;
 
-			var renderer = this.renderer;
-			if (renderer !== null) {
-
-				var offsetX = this.__layerOffsetX;
-				var offsetY = this.__layerOffsetY;
-
-
-				force === false && renderer.clear();
-
-				for (var layerId in this.__layers) {
-
-					var layer = this.__layers[layerId];
-					if (layer.visible === false) continue;
-
-
-					var entities = layer.entities;
-					for (var e = 0, el = entities.length; e < el; e++) {
-
-						renderer.renderEntity(
-							entities[e],
-							offsetX,
-							offsetY
-						);
-
-					}
-
-				}
-
-				force === false && renderer.flush();
+				layer.update(clock, delta);
 
 			}
 
 		},
 
-		update: function(clock, delta) {
+		render: function(clock, delta, custom) {
 
-			for (var layerId in this.__layers) {
-
-				var layer = this.__layers[layerId];
-				if (layer.visible === false) continue;
+			custom = custom === true;
 
 
-				var entities = layer.entities;
-				for (var e = 0, el = entities.length; e < el; e++) {
-					entities[e].update(clock, delta);
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				if (custom === false) {
+					renderer.clear();
+				}
+
+
+				for (var id in this.__layers) {
+
+					var layer = this.__layers[id];
+					if (layer.visible === false) continue;
+
+					layer.render(
+						renderer,
+						0,
+						0
+					);
+
+				}
+
+
+				if (custom === false) {
+					renderer.flush();
 				}
 
 			}
@@ -355,14 +302,18 @@ lychee.define('lychee.game.State').requires([
 			id = typeof id === 'string' ? id : null;
 
 
-			if (
-				   id !== null
-				&& layer instanceof _layer
-			) {
+			if (id !== null) {
 
-				this.__layers[id] = layer;
+				if (
+					   lychee.interfaceof(lychee.game.Layer, layer) === true
+					|| lychee.interfaceof(lychee.ui.Layer, layer) === true
+				) {
 
-				return true;
+					this.__layers[id] = layer;
+
+					return true;
+
+				}
 
 			}
 
@@ -470,7 +421,53 @@ lychee.define('lychee.game.State').requires([
 
 		},
 
-		processSwipe: function(id, type, position, delta, swipe) {
+		processTouch: function(id, position, delta) {
+
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				position.x -= renderer.width  / 2;
+				position.y -= renderer.height / 2;
+
+			}
+
+
+			var triggered = null;
+			var args      = [ id, {
+				x: position.x,
+				y: position.y
+			}, delta ];
+
+
+			for (var id in this.__layers) {
+
+				var layer = this.__layers[id];
+
+				var result = layer.trigger('touch', args);
+
+
+				if (result === true) {
+					triggered = layer;
+					break;
+				} else if (result !== false) {
+
+					triggered = result;
+
+					if (triggered !== null) {
+						break;
+					}
+
+				}
+
+			}
+
+
+			console.log(triggered);
+
+
+		},
+
+		processSwipe__OLD: function(id, type, position, delta, swipe) {
 
 			var entity = this.__touchEntities[id];
 			var layer  = this.__touchLayers[id];
@@ -539,7 +536,7 @@ lychee.define('lychee.game.State').requires([
 
 		},
 
-		processTouch: function(id, position, delta) {
+		processTouch__OLD: function(id, position, delta) {
 
 			var renderer = this.renderer;
 			if (renderer !== null) {

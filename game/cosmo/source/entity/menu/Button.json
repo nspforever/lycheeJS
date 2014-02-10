@@ -1,0 +1,32 @@
+{
+
+	"width":  512,
+	"height": 312,
+
+	"states": {
+		"arrow-top":       { "animation": false },
+		"arrow-right":     { "animation": false },
+		"arrow-bottom":    { "animation": false },
+		"arrow-left":      { "animation": false },
+		"button-menu":     { "animation": false },
+		"button-continue": { "animation": false },
+
+		"button-restart":  { "animation": false },
+		"button-cancel":   { "animation": false },
+		"button-okay":     { "animation": false }
+	},
+
+	"map": {
+		"arrow-top":       [ { "x":    0, "y":    0, "w": 128, "h": 128, "width": 128, "height": 128 } ],
+		"arrow-right":     [ { "x":  128, "y":    0, "w": 128, "h": 128, "width": 128, "height": 128 } ],
+		"arrow-bottom":    [ { "x":  256, "y":    0, "w": 128, "h": 128, "width": 128, "height": 128 } ],
+		"arrow-left":      [ { "x":  384, "y":    0, "w": 128, "h": 128, "width": 128, "height": 128 } ],
+		"button-menu":     [ { "x":    0, "y":  128, "w": 256, "h":  64, "width": 256, "height":  64 } ],
+		"button-continue": [ { "x":  256, "y":  128, "w": 256, "h":  64, "width": 256, "height":  64 } ],
+
+		"button-restart":  [ { "x":  256, "y":  192, "w": 256, "h":  64, "width": 256, "height":  64 } ],
+		"button-cancel":   [ { "x":    0, "y":  256, "w": 256, "h":  64, "width": 256, "height":  64 } ],
+		"button-okay":     [ { "x":  256, "y":  256, "w": 256, "h":  64, "width": 256, "height":  64 } ]
+	}
+
+} 

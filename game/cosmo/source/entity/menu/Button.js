@@ -1,14 +1,10 @@
 
-lychee.define('game.entity.Background').includes([
-	'lychee.game.Background'
+lychee.define('game.entity.menu.Button').includes([
+	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _config  = attachments["json"];
 	var _texture = attachments["png"];
-	var _config  = {
-		repeat: true,
-		states: { 'default': 0 },
-		map:    { 'default': [{ x: 0, y: 0, w: 512, h: 512 }] }
-	};
 
 
 	var Class = function(settings) {
@@ -18,13 +14,16 @@ lychee.define('game.entity.Background').includes([
 		}
 
 
-		settings.repeat  = _config.repeat;
-		settings.states  = _config.states;
 		settings.texture = _texture;
 		settings.map     = _config.map;
+		settings.states  = _config.states;
+
+		settings.width  = _config.width;
+		settings.height = _config.height;
+		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
 
 
-		lychee.game.Background.call(this, settings);
+		lychee.ui.Sprite.call(this, settings);
 
 		settings = null;
 
