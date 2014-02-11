@@ -480,6 +480,7 @@ if (typeof global !== 'undefined') {
 			for (var method in template.prototype) {
 
 				if (typeof template.prototype[method] !== typeof instance[method]) {
+					console.log(method, 'differs!');
 					valid = false;
 					break;
 				}

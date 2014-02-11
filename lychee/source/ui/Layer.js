@@ -1,20 +1,56 @@
 
 lychee.define('lychee.ui.Layer').includes([
 	'lychee.ui.Entity'
+]).requires([
+	'lychee.base.Entity'
 ]).exports(function(lychee, global) {
 
 	/*
 	 * HELPERS
 	 */
 
+	var _refresh_layer = function() {
+
+		var hwidth  = this.width  / 2;
+		var hheight = this.height / 2;
+
+
+		for (var e = 0, el = this.entities.length; e < el; e++) {
+
+			var entity = this.entities[e];
+			var boundx = Math.abs(entity.position.x + this.offset.x);
+			var boundy = Math.abs(entity.position.y + this.offset.y);
+
+			if (entity.shape === lychee.ui.Entity.SHAPE.circle) {
+				boundx += entity.radius;
+				boundy += entity.radius;
+			} else if (entity.shape === lychee.ui.Entity.SHAPE.rectangle) {
+				boundx += entity.width  / 2;
+				boundy += entity.height / 2;
+			}
+
+			hwidth  = Math.max(hwidth,  boundx);
+			hheight = Math.max(hheight, boundy);
+
+		}
+
+
+		this.width  = hwidth  * 2;
+		this.height = hheight * 2;
+
+	};
+
 	var _process_touch = function(id, position, delta) {
+
+console.group('lychee.ui.Layer ' + this.serialize().constructor);
 
 		var triggered = null;
 		var args      = [ id, {
-			x: position.x + this.offset.x,
-			y: position.y + this.offset.y
+			x: position.x - this.offset.x,
+			y: position.y - this.offset.y
 		}, delta ];
 
+console.log(args[1].x, args[1].y);
 
 		for (var e = this.entities.length - 1; e >= 0; e--) {
 
@@ -38,6 +74,10 @@ lychee.define('lychee.ui.Layer').includes([
 		}
 
 
+console.log(triggered);
+console.groupEnd();
+
+
 		return triggered;
 
 	};
@@ -55,22 +95,17 @@ lychee.define('lychee.ui.Layer').includes([
 
 		this.entities = [];
 		this.offset   = { x: 0, y: 0 };
-		this.overflow = true;
 		this.visible  = true;
 
-		this.__buffer  = null;
-		this.__map     = {};
-		this.__isDirty = false;
+		this.__map    = {};
 
 
 		this.setEntities(settings.entities);
 		this.setOffset(settings.offset);
-		this.setOverflow(settings.overflow);
 		this.setVisible(settings.visible);
 
 		delete settings.entities;
 		delete settings.offset;
-		delete settings.overflow;
 		delete settings.visible;
 
 
@@ -78,6 +113,11 @@ lychee.define('lychee.ui.Layer').includes([
 
 		settings = null;
 
+
+
+		/*
+		 * INITIALIZATION
+		 */
 
 		this.bind('touch', _process_touch, this);
 
@@ -152,8 +192,7 @@ lychee.define('lychee.ui.Layer').includes([
 
 			}
 
-			if (this.overflow !== true) settings.overflow = this.overflow;
-			if (this.visible !== true)  settings.visible  = this.visible;
+			if (this.visible !== true)   settings.visible  = this.visible;
 
 
 			var entities = [];
@@ -211,30 +250,35 @@ lychee.define('lychee.ui.Layer').includes([
 			if (this.visible === false) return;
 
 
-			var buffer = this.__buffer;
-			if (buffer === null || this.__isDirty === true) {
+			var position = this.position;
+			var offset   = this.offset;
 
-				buffer = renderer.createBuffer(
-					this.width,
-					this.height
+
+			var ox = position.x + offsetX + offset.x;
+			var oy = position.y + offsetY + offset.y;
+
+
+			var entities = this.entities;
+			for (var e = 0, el = entities.length; e < el; e++) {
+
+				entities[e].render(
+					renderer,
+					ox,
+					oy
 				);
-
-				this.__buffer  = buffer;
-				this.__isDirty = false;
 
 			}
 
 
-			var position = this.position;
-
-			var ox = position.x + offsetX;
-			var oy = position.y + offsetY;
-
-
 			if (lychee.debug === true) {
 
-				var hwidth  = this.width / 2;
-				var hheight = this.height / 2;
+				ox = position.x + offsetX;
+				oy = position.y + offsetY;
+
+
+				var hwidth   = this.width  / 2;
+				var hheight  = this.height / 2;
+
 
 				renderer.drawBox(
 					ox - hwidth,
@@ -244,46 +288,6 @@ lychee.define('lychee.ui.Layer').includes([
 					'#ff00ff',
 					false,
 					1
-				);
-
-			}
-
-
-			var overflow = this.overflow;
-			if (overflow === false) {
-
-				ox = this.width  / 2 + this.offset.x;
-				oy = this.height / 2 + this.offset.y;
-
-				renderer.clear(buffer);
-				renderer.setBuffer(buffer);
-
-			} else {
-				ox = position.x + offsetX + this.offset.x;
-				oy = position.y + offsetY + this.offset.y;
-			}
-
-
-			var entities = this.entities;
-			for (var e = 0, el = entities.length; e < el; e++) {
-
-				renderer.renderEntity(
-					entities[e],
-					ox,
-					oy
-				);
-
-			}
-
-
-			if (overflow === false) {
-
-				renderer.setBuffer(null);
-
-				renderer.drawBuffer(
-					position.x + offsetX - hwidth,
-					position.y + offsetY - hheight,
-					buffer
 				);
 
 			}
@@ -298,7 +302,7 @@ lychee.define('lychee.ui.Layer').includes([
 
 		addEntity: function(entity) {
 
-			entity = (entity != null && typeof entity.update === 'function') ? entity : null;
+			entity = lychee.interfaceof(lychee.base.Entity, entity) ? entity : null;
 
 
 			if (entity !== null) {
@@ -319,6 +323,8 @@ lychee.define('lychee.ui.Layer').includes([
 
 					this.entities.push(entity);
 
+					_refresh_layer.call(this);
+
 					return true;
 
 				}
@@ -330,11 +336,10 @@ lychee.define('lychee.ui.Layer').includes([
 
 		},
 
-		setEntity: function(id, entity, force) {
+		setEntity: function(id, entity) {
 
-			id     = typeof id === 'string'                                  ? id     : null;
-			entity = (entity != null && typeof entity.update === 'function') ? entity : null;
-			force  = force === true;
+			id     = typeof id === 'string'                         ? id     : null;
+			entity = lychee.interfaceof(lychee.base.Entity, entity) ? entity : null;
 
 
 			if (
@@ -347,10 +352,6 @@ lychee.define('lychee.ui.Layer').includes([
 
 				var result = this.addEntity(entity);
 				if (result === true) {
-
-					return true;
-
-				} else if (force === true) {
 
 					return true;
 
@@ -388,7 +389,7 @@ lychee.define('lychee.ui.Layer').includes([
 
 		removeEntity: function(entity) {
 
-			entity = (entity != null && typeof entity.update === 'function') ? entity : null;
+			entity = lychee.interfaceof(lychee.base.Entity, entity) ? entity : null;
 
 
 			if (entity !== null) {
@@ -414,6 +415,11 @@ lychee.define('lychee.ui.Layer').includes([
 						found = true;
 					}
 
+				}
+
+
+				if (found === true) {
+					_refresh_layer.call(this);
 				}
 
 
@@ -456,21 +462,6 @@ lychee.define('lychee.ui.Layer').includes([
 
 				this.offset.x = typeof offset.x === 'number' ? offset.x : this.offset.x;
 				this.offset.y = typeof offset.y === 'number' ? offset.y : this.offset.y;
-
-				return true;
-
-			}
-
-
-			return false;
-
-		},
-
-		setOverflow: function(overflow) {
-
-			if (overflow === true || overflow === false) {
-
-				this.overflow = overflow;
 
 				return true;
 

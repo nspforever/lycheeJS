@@ -5,6 +5,16 @@
 
 		"entity": {
 
+			"game": {
+				"Background": [ "js", "png" ]
+			},
+
+			"menu": {
+				"Button":     [ "js", "json", "png" ],
+				"Layer":      [ "js", "json", "png" ],
+				"TileLayer":  [ "js" ]
+			},
+
 			"ui": {
 
 				"game": {
@@ -26,7 +36,6 @@
 
 			},
 
-			"Background": [ "js", "png" ],
 			"Blackhole":  [ "js", "json", "png" ],
 			"Bomb":       [ "js", "json", "png" ],
 			"Enemy":      [ "js", "json", "png" ],
@@ -70,7 +79,7 @@
 
 		"state": {
 			"Game": [ "js", "msc" ],
-			"Menu": [ "js", "msc" ]
+			"Menu": [ "js", "json", "msc", "fnt" ]
 		},
 
 		"Controller": [ "js" ],

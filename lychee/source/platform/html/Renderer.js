@@ -114,6 +114,23 @@ lychee.define('Renderer').tags({
 
 	};
 
+	_buffer.prototype = {
+
+		clear: function() {
+
+			this.__ctx.clearRect(0, 0, this.width, this.height);
+
+		},
+
+		resize: function(width, height) {
+
+			this.__buffer.width  = this.width;
+			this.__buffer.height = this.height;
+
+		}
+
+	};
+
 
 
 	/*
@@ -276,9 +293,7 @@ lychee.define('Renderer').tags({
 
 			if (buffer !== null) {
 
-				var ctx = buffer.__ctx;
-
-				ctx.clearRect(0, 0, buffer.width, buffer.height);
+				buffer.clear();
 
 			} else {
 
@@ -388,6 +403,21 @@ lychee.define('Renderer').tags({
 
 				ctx.globalAlpha = this.alpha;
 				ctx.drawImage(buffer.__buffer, x1, y1);
+
+
+				if (lychee.debug === true) {
+
+					this.drawBox(
+						x1,
+						y1,
+						x1 + buffer.width,
+						y1 + buffer.height,
+						'#00ff00',
+						false,
+						1
+					);
+
+				}
 
 			}
 

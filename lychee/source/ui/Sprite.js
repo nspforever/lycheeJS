@@ -93,7 +93,7 @@ lychee.define('lychee.ui.Sprite').includes([
 						if (frame.h !== 0) sframe.h = frame.h;
 
 
-						settings.map.push(sframe);
+						settings.map[stateId].push(sframe);
 
 					}
 

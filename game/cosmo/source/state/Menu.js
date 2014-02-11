@@ -37,6 +37,9 @@ lychee.define('game.state.Menu').requires([
 			var entity = null;
 
 
+console.log(this.__layers);
+return;
+
 
 			entity = this.queryLayer('ui', 'arrow-top');
 			entity.bind('touch', function() {
@@ -79,14 +82,23 @@ lychee.define('game.state.Menu').requires([
 			}, this);
 
 
+
+entity = this.queryLayer('tiles', 'root > singleplayer');
+entity.bind('touch', function() {
+	console.log('CLICKED SINGLEPLAYER');
+});
+
+entity = this.queryLayer('tiles', 'root > multiplayer');
+entity.bind('touch', function() {
+	console.log('CLICKED MULTIPLAYER');
+});
+
+
 			entity = this.queryLayer('tiles', 'root > settings-details > fullscreen');
 			entity.bind('#touch', function(entity) {
 				console.log('test!');
 				self.setLabel('test');
 			}, this);
-
-// TODO: Remove this
-console.log(this.__layers);
 
 		},
 
@@ -114,8 +126,8 @@ console.log(this.__layers);
 
 
 				entity = this.queryLayer('tiles', 'root');
-				entity.setTileWidth(renderer.width);
-				entity.setTileHeight(renderer.height);
+				entity.setTileWidth(renderer.width / 2);
+				entity.setTileHeight(renderer.height / 2);
 
 			}
 
@@ -124,6 +136,19 @@ console.log(this.__layers);
 		enter: function(data) {
 
 			lychee.game.State.prototype.enter.call(this);
+
+
+// this.removeLayer('test');
+this.removeLayer('background');
+this.removeLayer('tiles');
+this.removeLayer('ui');
+
+
+this.queryLayer('test', 'one > two > button').bind('touch', function() {
+
+	console.log('TEST touched!');
+
+}, this);
 
 		},
 

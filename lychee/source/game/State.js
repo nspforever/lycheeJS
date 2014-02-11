@@ -442,19 +442,20 @@ lychee.define('lychee.game.State').requires([
 			for (var id in this.__layers) {
 
 				var layer = this.__layers[id];
+				if (layer instanceof lychee.ui.Layer) {
 
-				var result = layer.trigger('touch', args);
-
-
-				if (result === true) {
-					triggered = layer;
-					break;
-				} else if (result !== false) {
-
-					triggered = result;
-
-					if (triggered !== null) {
+					var result = layer.trigger('touch', args);
+					if (result === true) {
+						triggered = layer;
 						break;
+					} else if (result !== false) {
+
+						triggered = result;
+
+						if (triggered !== null) {
+							break;
+						}
+
 					}
 
 				}
