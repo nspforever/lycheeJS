@@ -1,7 +1,7 @@
 {
 	"layers": {
 		"ui": {
-			"constructor": "lychee.game.Layer",
+			"constructor": "lychee.ui.Layer",
 			"arguments": [{}],
 			"blob": {
 				"entities": [{
@@ -150,13 +150,22 @@
 							"settings": 1
 						}
 					}
-				}, {
+				}],
+				"map": {
+					"root": 0
+				}
+			}
+		},
+		"background": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
 					"constructor": "game.entity.lycheeJS",
 					"arguments": [{}]
 				}],
 				"map": {
-					"root": 0,
-					"lycheeJS": 1
+					"lycheeJS": 0
 				}
 			}
 		}

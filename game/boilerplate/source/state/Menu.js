@@ -103,9 +103,6 @@ lychee.define('game.state.Menu').requires([
 
 		reshape: function(orientation, rotation) {
 
-			lychee.game.State.prototype.reshape.call(this, orientation, rotation);
-
-
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
@@ -120,7 +117,7 @@ lychee.define('game.state.Menu').requires([
 				root.height = height;
 
 
-				entity = this.queryLayer('ui', 'lycheeJS');
+				entity = this.queryLayer('background', 'lycheeJS');
 				entity.position.y = 1/2 * height - 32;
 
 
@@ -144,9 +141,13 @@ lychee.define('game.state.Menu').requires([
 				entity.position.y = -1/2 * height + 64;
 
 
+				this.getLayer('ui').reshape();
 				root.setPosition({ x: 1/2 * width });
 
 			}
+
+
+			lychee.game.State.prototype.reshape.call(this, orientation, rotation);
 
 		},
 
@@ -155,9 +156,15 @@ lychee.define('game.state.Menu').requires([
 			lychee.game.State.prototype.enter.call(this);
 
 
-			var root = this.queryLayer('ui', 'root');
-			if (root !== null) {
-				root.setPosition({ x: 1/4 * root.width });
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				var width = renderer.width;
+				var root  = this.queryLayer('ui', 'root');
+				if (root !== null) {
+					root.setPosition({ x: 1/2 * width });
+				}
+
 			}
 
 		}

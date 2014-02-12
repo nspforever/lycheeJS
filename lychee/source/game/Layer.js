@@ -1,85 +1,23 @@
 
-lychee.define('lychee.game.Layer').includes([
-	'lychee.event.Emitter'
-]).requires([
-	'lychee.base.Entity'
+lychee.define('lychee.game.Layer').requires([
+	'lychee.game.Entity'
 ]).exports(function(lychee, global) {
 
 	/*
 	 * HELPERS
 	 */
 
-	var _refresh_layer = function() {
+	var _validate_entity = function(entity) {
 
-		var hwidth  = this.width  / 2;
-		var hheight = this.height / 2;
+		if (
+			   typeof entity.update === 'function'
+			&& typeof entity.render === 'function'
+			&& typeof entity.shape === 'number'
+		) {
 
-
-		for (var e = 0, el = this.entities.length; e < el; e++) {
-
-			var entity = this.entities[e];
-			var boundx = Math.abs(entity.position.x + this.offset.x);
-			var boundy = Math.abs(entity.position.y + this.offset.y);
-
-			if (entity.shape === lychee.ui.Entity.SHAPE.circle) {
-				boundx += entity.radius;
-				boundy += entity.radius;
-			} else if (entity.shape === lychee.ui.Entity.SHAPE.rectangle) {
-				boundx += entity.width  / 2;
-				boundy += entity.height / 2;
-			}
-
-			hwidth  = Math.max(hwidth,  boundx);
-			hheight = Math.max(hheight, boundy);
+			return true;
 
 		}
-
-
-		this.width  = hwidth  * 2;
-		this.height = hheight * 2;
-
-	};
-
-	var _process_touch = function(id, position, delta) {
-
-console.group('lychee.game.Layer ' + this.serialize().constructor);
-
-
-		var triggered = null;
-		var args      = [ id, {
-			x: position.x - this.offset.x,
-			y: position.y - this.offset.y
-		}, delta ];
-
-console.log(args[1].x, args[1].y);
-
-		for (var e = this.entities.length - 1; e >= 0; e--) {
-
-			var entity = this.entities[e];
-			if (
-				   typeof entity.trigger === 'function'
-				&& entity.isAtPosition(args[1]) === true
-			) {
-
-				var result = entity.trigger('touch', args);
-				if (result === true) {
-					triggered = entity;
-					break;
-				} else if (result !== false) {
-					triggered = result;
-					break;
-				}
-
-			}
-
-		}
-
-
-console.log(triggered);
-console.groupEnd();
-
-
-		return triggered;
 
 	};
 
@@ -108,12 +46,7 @@ console.groupEnd();
 		this.setVisible(settings.visible);
 
 
-		lychee.event.Emitter.call(this);
-
 		settings = null;
-
-
-		this.bind('touch', _process_touch, this);
 
 	};
 
@@ -288,9 +221,40 @@ console.groupEnd();
 		 * CUSTOM API
 		 */
 
+		reshape: function() {
+
+			var hwidth  = this.width  / 2;
+			var hheight = this.height / 2;
+
+
+			for (var e = 0, el = this.entities.length; e < el; e++) {
+
+				var entity = this.entities[e];
+				var boundx = Math.abs(entity.position.x + this.offset.x);
+				var boundy = Math.abs(entity.position.y + this.offset.y);
+
+				if (entity.shape === lychee.game.Entity.SHAPE.circle) {
+					boundx += entity.radius;
+					boundy += entity.radius;
+				} else if (entity.shape === lychee.game.Entity.SHAPE.rectangle) {
+					boundx += entity.width  / 2;
+					boundy += entity.height / 2;
+				}
+
+				hwidth  = Math.max(hwidth,  boundx);
+				hheight = Math.max(hheight, boundy);
+
+			}
+
+
+			this.width  = hwidth  * 2;
+			this.height = hheight * 2;
+
+		},
+
 		addEntity: function(entity) {
 
-			entity = lychee.interfaceof(lychee.base.Entity) ? entity : null;
+			entity = _validate_entity(entity) === true ? entity : null;
 
 
 			if (entity !== null) {
@@ -310,8 +274,7 @@ console.groupEnd();
 				if (found === false) {
 
 					this.entities.push(entity);
-
-					_refresh_layer.call(this);
+					this.reshape();
 
 					return true;
 
@@ -326,8 +289,8 @@ console.groupEnd();
 
 		setEntity: function(id, entity) {
 
-			id     = typeof id === 'string'                 ? id     : null;
-			entity = lychee.interfaceof(lychee.base.Entity) ? entity : null;
+			id     = typeof id === 'string'            ? id     : null;
+			entity = _validate_entity(entity) === true ? entity : null;
 
 
 			if (
@@ -377,7 +340,7 @@ console.groupEnd();
 
 		removeEntity: function(entity) {
 
-			entity = lychee.interfaceof(lychee.base.Entity) ? entity : null;
+			entity = _validate_entity(entity) === true ? entity : null;
 
 
 			if (entity !== null) {
@@ -407,7 +370,7 @@ console.groupEnd();
 
 
 				if (found === true) {
-					_refresh_layer.call(this);
+					this.reshape();
 				}
 
 

@@ -1,7 +1,7 @@
 {
 	"layers": {
 		"ui": {
-			"constructor": "lychee.game.Layer",
+			"constructor": "lychee.ui.Layer",
 			"arguments": [{}],
 			"blob": {
 				"entities": [{

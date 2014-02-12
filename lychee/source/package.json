@@ -68,10 +68,6 @@
 
 		},
 
-		"base": {
-			"Entity": [ "js" ]
-		},
-
 		"data": {
 			"BitON": [ "js" ],
 			"PO":    [ "js" ]

@@ -11,40 +11,40 @@ lychee.define('lychee.game.State').requires([
 	 * HELPERS
 	 */
 
-	var _processSwipe_recursive = function(search, entity, offset, offsetX, offsetY) {
+	var _trace_entity_offset = function(entity, layer, offsetX, offsetY) {
 
 		if (offsetX === undefined || offsetY === undefined) {
 
-			offset.x = 0;
-			offset.y = 0;
-			offsetX  = 0;
-			offsetY  = 0;
+			this.x  = 0;
+			this.y  = 0;
+			offsetX = layer.position.x;
+			offsetY = layer.position.y;
 
 		}
 
 
-		if (search === entity) {
+		if (layer === entity) {
 
-			offset.x = offsetX;
-			offset.y = offsetY;
+			this.x = offsetX;
+			this.y = offsetY;
 
 			return true;
 
+		} else if (layer.entities !== undefined) {
 
-		} else if (entity.entities !== undefined) {
-
-			var entities = entity.entities;
+			var entities = layer.entities;
 			for (var e = entities.length - 1; e >= 0; e--) {
 
-				var position = entities[e].position;
+				var dx = layer.offset.x + entities[e].position.x;
+				var dy = layer.offset.y + entities[e].position.y;
 
-				var result = _processSwipe_recursive.call(
+
+				var result = _trace_entity_offset.call(
 					this,
-					search,
+					entity,
 					entities[e],
-					offset,
-					offsetX + position.x,
-					offsetY + position.y
+					offsetX + dx,
+					offsetY + dy
 				);
 
 				if (result === true) {
@@ -57,57 +57,6 @@ lychee.define('lychee.game.State').requires([
 
 
 		return false;
-
-	};
-
-	var _processTouch_recursive = function(entity, originX, originY, args) {
-
-		var triggered = null;
-		var position  = entity.position;
-
-
-		if (_is_entity_at_position(entity, originX, originY) === true) {
-
-			if (typeof entity.trigger === 'function') {
-
-				args[1].x = originX - position.x;
-				args[1].y = originY - position.y;
-
-				var result = entity.trigger('touch', args);
-				if (result === true && triggered === null) {
-					triggered = entity;
-				}
-
-			}
-
-		}
-
-
-		if (entity.entities !== undefined) {
-
-			var entities = entity.entities;
-			for (var e = entities.length - 1; e >= 0; e--) {
-
-				var result = _processTouch_recursive.call(
-					this,
-					entities[e],
-					originX - position.x,
-					originY - position.y,
-					args
-				);
-
-
-				if (result !== null) {
-					triggered = result;
-					break;
-				}
-
-			}
-
-		}
-
-
-		return triggered;
 
 	};
 
@@ -126,20 +75,22 @@ lychee.define('lychee.game.State').requires([
 		this.renderer = game.renderer || null;
 
 
-		this.__layers        = {};
-		this.__focusEntity   = null;
+		this.__layers = {};
+		this.__focus  = null;
 
-		this.__touchEntities = [];
-		this.__touchLayers   = [];
-		this.__touchOffsets  = [];
 
-		for (var i = 0; i < 10; i++) {
-			this.__touchEntities.push(null);
-			this.__touchLayers.push(null);
-			this.__touchOffsets.push({
-				x: 0, y: 0
-			});
-		}
+		this.__touches = [
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } },
+			{ entity: null, layer: null, offset: { x: 0, y: 0 } }
+		];
 
 
 		lychee.event.Emitter.call(this);
@@ -403,17 +354,17 @@ lychee.define('lychee.game.State').requires([
 
 		processKey: function(key, name, delta) {
 
-			if (this.__focusEntity !== null) {
+			var focus = this.__focus;
+			if (focus !== null) {
 
-				var result = this.__focusEntity.trigger('key', [ key, name, delta ]);
+				var result = focus.trigger('key', [ key, name, delta ]);
 				if (
-					key === 'return'
-					&& result === true
+					   result === true
+					&& key === 'return'
+					&& focus.state === 'default'
 				) {
 
-					if (this.__focusEntity.state === 'default') {
-						this.__focusEntity = null;
-					}
+					this.__focus = null;
 
 				}
 
@@ -423,165 +374,37 @@ lychee.define('lychee.game.State').requires([
 
 		processTouch: function(id, position, delta) {
 
-			var renderer = this.renderer;
-			if (renderer !== null) {
-
-				position.x -= renderer.width  / 2;
-				position.y -= renderer.height / 2;
-
-			}
-
-
-			var triggered = null;
-			var args      = [ id, {
-				x: position.x,
-				y: position.y
-			}, delta ];
-
-
-			for (var id in this.__layers) {
-
-				var layer = this.__layers[id];
-				if (layer instanceof lychee.ui.Layer) {
-
-					var result = layer.trigger('touch', args);
-					if (result === true) {
-						triggered = layer;
-						break;
-					} else if (result !== false) {
-
-						triggered = result;
-
-						if (triggered !== null) {
-							break;
-						}
-
-					}
-
-				}
-
-			}
-
-
-			console.log(triggered);
-
-
-		},
-
-		processSwipe__OLD: function(id, type, position, delta, swipe) {
-
-			var entity = this.__touchEntities[id];
-			var layer  = this.__touchLayers[id];
-			var offset = this.__touchOffsets[id];
-
-
-			if (entity !== undefined && entity !== null) {
-
-				var renderer = this.renderer;
-				if (renderer !== null) {
-
-					position.x -= renderer.offset.x;
-					position.y -= renderer.offset.y;
-
-					position.x -= renderer.width  / 2;
-					position.y -= renderer.height / 2;
-
-				}
-
-
-				if (type === 'start') {
-
-					_processSwipe_recursive.call(
-						this,
-						entity,
-						layer,
-						offset
-					);
-
-
-					position.x -= offset.x;
-					position.y -= offset.y;
-
-
-					var result = entity.trigger('swipe', [
-						id, type, position, delta, swipe
-					]);
-
-					if (result === false) {
-						this.__touchEntities[id] = null;
-					}
-
-				} else if (type === 'move') {
-
-					position.x -= offset.x;
-					position.y -= offset.y;
-
-					entity.trigger('swipe', [
-						id, type, position, delta, swipe
-					]);
-
-				} else if (type === 'end') {
-
-					position.x -= offset.x;
-					position.y -= offset.y;
-
-					entity.trigger('swipe', [
-						id, type, position, delta, swipe
-					]);
-
-					this.__touchEntities[id] = null;
-
-				}
-
-			}
-
-		},
-
-		processTouch__OLD: function(id, position, delta) {
-
-			var renderer = this.renderer;
-			if (renderer !== null) {
-
-				position.x -= renderer.offset.x;
-				position.y -= renderer.offset.y;
-
-				position.x -= renderer.width  / 2;
-				position.y -= renderer.height / 2;
-
-			}
-
-
 			var args = [ id, {
 				x: position.x,
 				y: position.y
 			}, delta ];
 
 
-			var oldFocusEntity = this.__focusEntity;
-			var newFocusEntity = null;
+			var renderer = this.renderer;
+			if (renderer !== null) {
+
+				args[1].x -= renderer.offset.x;
+				args[1].y -= renderer.offset.y;
+
+			}
 
 
-			for (var layerId in this.__layers) {
+			var touch_layer  = null;
+			var touch_entity = null;
 
-				var layer = this.__layers[layerId];
+			for (var lid in this.__layers) {
 
-				var entities = layer.entities;
+				var layer = this.__layers[lid];
+				if (layer instanceof lychee.ui.Layer) {
 
-				for (var e = entities.length - 1; e >= 0; e--) {
+					var result = layer.trigger('touch', args);
+					if (
+						   result !== true
+						&& result !== false
+					) {
 
-					var triggered = _processTouch_recursive.call(
-						this,
-						entities[e],
-						position.x,
-						position.y,
-						args
-					);
-
-					if (triggered !== null) {
-
-						this.__touchEntities[id] = triggered;
-						this.__touchLayers[id]   = layer;
-						newFocusEntity           = triggered;
+						touch_entity = result;
+						touch_layer  = layer;
 
 						break;
 
@@ -592,37 +415,116 @@ lychee.define('lychee.game.State').requires([
 			}
 
 
+			var old_focus = this.__focus;
+			var new_focus = touch_entity;
+
 			// 1. Reset Touch trace data if no Entity was touched
-			if (newFocusEntity === null) {
-				this.__touchEntities[id] = null;
-				this.__touchLayers[id]   = null;
+			if (new_focus === null) {
+				this.__touches[id].entity = null;
+				this.__touches[id].layer  = null;
 			}
 
 
 			// 2. Change Focus State Interaction
-			if (newFocusEntity !== oldFocusEntity) {
+			if (new_focus !== old_focus) {
 
-				if (oldFocusEntity !== null) {
+				if (old_focus !== null) {
 
-					if (oldFocusEntity.state !== 'default') {
-						oldFocusEntity.trigger('blur');
+					if (old_focus.state !== 'default') {
+						old_focus.trigger('blur');
 					}
 
 				}
 
-				if (newFocusEntity !== null) {
+				if (new_focus !== null) {
 
-					if (newFocusEntity.state === 'default') {
-						newFocusEntity.trigger('focus');
+					if (new_focus.state === 'default') {
+						new_focus.trigger('focus');
 					}
 
 				}
 
-				this.__focusEntity = newFocusEntity;
+				this.__focus = new_focus;
+
+
+				var touch = this.__touches[id];
+
+				touch.entity   = new_focus;
+				touch.layer    = touch_layer;
+
+				_trace_entity_offset.call(
+					touch.offset,
+					touch.entity,
+					touch.layer
+				);
 
 			}
 
 		},
+
+		processSwipe: function(id, type, position, delta, swipe) {
+
+			var touch = this.__touches[id];
+			if (touch.entity !== null) {
+
+				var args = [ id, type, position, delta, swipe ];
+
+				var renderer = this.renderer;
+				if (renderer !== null) {
+
+					args[2].x -= renderer.offset.x;
+					args[2].y -= renderer.offset.y;
+
+				}
+
+
+				if (type === 'start') {
+
+					_trace_entity_offset.call(
+						touch.offset,
+						touch.entity,
+						touch.layer
+					);
+
+
+					args[2].x -= touch.offset.x;
+					args[2].y -= touch.offset.y;
+
+					var result = touch.entity.trigger('swipe', args);
+					if (result === false) {
+						touch.entity = null;
+						touch.layer  = null;
+					}
+
+				} else if (type === 'move') {
+
+					args[2].x -= touch.offset.x;
+					args[2].y -= touch.offset.y;
+
+					var result = touch.entity.trigger('swipe', args);
+					if (result === false) {
+						touch.entity = null;
+						touch.layer  = null;
+					}
+
+				} else if (type === 'end') {
+
+					args[2].x -= touch.offset.x;
+					args[2].y -= touch.offset.y;
+
+					var result = touch.entity.trigger('swipe', args);
+					if (result === false) {
+						touch.entity = null;
+						touch.layer  = null;
+					}
+
+				}
+
+			}
+
+		},
+
+		// TODO: Remove legacy API simulateTouch(), not necessary anymore
 
 		simulateTouch: function(id, position, delta) {
 
