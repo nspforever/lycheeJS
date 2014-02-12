@@ -34,8 +34,10 @@ lychee.define('game.Main').requires([
 				height: null
 			},
 
+			touchcontrols: false,
+
 			viewport: {
-				fullscreen: true
+				fullscreen: false
 			}
 
 		}, data);
@@ -70,6 +72,7 @@ lychee.define('game.Main').requires([
 			if (clientsettings !== null) {
 				this.client = new game.net.Client(clientsettings, this);
 			}
+
 
 //			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));

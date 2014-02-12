@@ -34,6 +34,8 @@ lychee.define('lychee.ui.Layer').includes([
 		for (var e = this.entities.length - 1; e >= 0; e--) {
 
 			var entity = this.entities[e];
+			if (entity.visible === false) continue;
+
 			if (
 				   typeof entity.trigger === 'function'
 				&& entity.isAtPosition(args[1]) === true
@@ -470,6 +472,8 @@ lychee.define('lychee.ui.Layer').includes([
 
 				this.offset.x = typeof offset.x === 'number' ? offset.x : this.offset.x;
 				this.offset.y = typeof offset.y === 'number' ? offset.y : this.offset.y;
+
+				this.reshape();
 
 				return true;
 

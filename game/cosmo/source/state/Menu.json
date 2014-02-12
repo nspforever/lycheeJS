@@ -1,67 +1,5 @@
 {
 	"layers": {
-		"test": {
-			"constructor": "lychee.game.Layer",
-			"arguments": [{
-				"offset": {
-					"x": 0,
-					"y": 0
-				}
-			}],
-			"blob": {
-				"entities": [{
-					"constructor": "lychee.ui.Layer",
-					"arguments": [{
-						"width": 400,
-						"height": 400,
-						"position": {
-							"x": 0,
-							"y": 0
-						},
-						"offset": {
-							"x": 150,
-							"y": 0
-						}
-					}],
-					"blob": {
-						"entities": [{
-							"constructor": "lychee.ui.Layer",
-							"arguments": [{
-								"width": 200,
-								"height": 200,
-								"position": {
-									"x": 0,
-									"y": 0
-								}
-							}],
-							"blob": {
-								"entities": [{
-									"constructor": "lychee.ui.Button",
-									"arguments": [{
-										"label": "TEST"
-									}],
-									"blob": {
-										"font": {
-											"constructor": "Font",
-											"arguments": [ "./source/state/Menu.fnt" ]
-										}
-									}
-								}],
-								"map": {
-									"button": 0
-								}
-							}
-						}],
-						"map": {
-							"two": 0
-						}
-					}
-				}],
-				"map": {
-					"one": 0
-				}
-			}
-		},
 		"background": {
 			"constructor": "lychee.game.Layer",
 			"arguments": [{}],
@@ -76,9 +14,9 @@
 			}
 		},
 		"tiles": {
-			"constructor": "lychee.game.Layer",
+			"constructor": "lychee.ui.Layer",
 			"arguments": [{
-				"visible": true
+				"visible": false
 			}],
 			"blob": {
 				"entities": [{
@@ -244,6 +182,7 @@
 							"singleplayer-details": 1,
 							"multiplayer": 2,
 							"multiplayer-details": 3,
+							"settings": 4,
 							"settings-details": 5,
 							"highscores": 6,
 							"highscores-details": 7
@@ -256,7 +195,7 @@
 			}
 		},
 		"ui": {
-			"constructor": "lychee.game.Layer",
+			"constructor": "lychee.ui.Layer",
 			"arguments": [{}],
 			"blob": {
 				"entities": [{

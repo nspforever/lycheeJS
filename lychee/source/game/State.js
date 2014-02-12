@@ -395,12 +395,15 @@ lychee.define('lychee.game.State').requires([
 			for (var lid in this.__layers) {
 
 				var layer = this.__layers[lid];
+				if (layer.visible === false) continue;
+
 				if (layer instanceof lychee.ui.Layer) {
 
 					var result = layer.trigger('touch', args);
 					if (
 						   result !== true
 						&& result !== false
+						&& result !== null
 					) {
 
 						touch_entity = result;
@@ -444,8 +447,14 @@ lychee.define('lychee.game.State').requires([
 
 				}
 
+
 				this.__focus = new_focus;
 
+			}
+
+
+			// 3. Prepare UI Swipe event
+			if (touch_entity !== null) {
 
 				var touch = this.__touches[id];
 
@@ -466,6 +475,9 @@ lychee.define('lychee.game.State').requires([
 
 			var touch = this.__touches[id];
 			if (touch.entity !== null) {
+
+				if (touch.layer.visible === false) return;
+
 
 				var args = [ id, type, position, delta, swipe ];
 

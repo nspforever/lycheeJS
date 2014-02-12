@@ -1,6 +1,7 @@
 
 lychee.define('game.entity.menu.Layer').includes([
-	'lychee.ui.Layer',
+	'lychee.ui.Layer'
+]).requires([
 	'lychee.ui.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
@@ -18,16 +19,20 @@ lychee.define('game.entity.menu.Layer').includes([
 		lychee.ui.Layer.call(this, settings);
 
 
-		settings.texture = _texture;
-		settings.map     = _config.map;
-		settings.states  = _config.states;
 
-		settings.width  = _config.width;
-		settings.height = _config.height;
-		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
+		/*
+		 * INITIALIZATION
+		 */
 
+		this.addEntity(new lychee.ui.Sprite({
+			texture: _texture,
+			map:     _config.map,
+			state:   settings.state || 'default',
+			states:  _config.states,
+			width:   _config.width,
+			height:  _config.height
+		}));
 
-		lychee.ui.Sprite.call(this, settings);
 
 		settings = null;
 
@@ -36,13 +41,6 @@ lychee.define('game.entity.menu.Layer').includes([
 
 	Class.prototype = {
 
-		deserialize: function(blob) {
-
-			lychee.ui.Sprite.prototype.deserialize.call(this, blob);
-			lychee.ui.Layer.prototype.deserialize.call(this, blob);
-
-		},
-
 		serialize: function() {
 
 			var data = lychee.ui.Layer.prototype.serialize.call(this);
@@ -50,22 +48,6 @@ lychee.define('game.entity.menu.Layer').includes([
 
 
 			return data;
-
-		},
-
-		update: function(clock, delta) {
-
-			lychee.ui.Sprite.prototype.update.call(this, clock, delta);
-			lychee.ui.Layer.prototype.update.call(this, clock, delta);
-
-		},
-
-		render: function(renderer, offsetX, offsetY) {
-
-			if (this.visible === false) return;
-
-			lychee.ui.Sprite.prototype.render.call(this, renderer, offsetX, offsetY);
-			lychee.ui.Layer.prototype.render.call(this, renderer, offsetX, offsetY);
 
 		}
 

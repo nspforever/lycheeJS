@@ -38,8 +38,8 @@ lychee.define('game.entity.menu.TileLayer').includes([
 		var tileheight = this.tileheight;
 
 
-		var width  = 0;
-		var height = 0;
+		var boundx = 0;
+		var boundy = 0;
 
 		for (var e = 0, el = this.entities.length; e < el; e++) {
 
@@ -52,32 +52,21 @@ lychee.define('game.entity.menu.TileLayer').includes([
 					y: tile.y * tileheight
 				});
 
-
-				width  = Math.max(width,  tile.x * tilewidth  + tilewidth);
-				height = Math.max(height, tile.y * tileheight + tileheight);
+				boundx = Math.max(boundx, tile.x);
+				boundy = Math.max(boundy, tile.y);
 
 			}
 
 		}
 
 
+		this.bound.x = boundx;
+		this.bound.y = boundy;
 
-		this.width  = width;
-		this.height = height;
-
-
-		this.__isDirty = true;
-
-
-		var ox = -1 * this.tile.x * this.tilewidth;
-		var oy = -1 * this.tile.y * this.tileheight;
-
-// TODO: Remove this
-console.log('root layer offset', ox, oy);
 
 		this.setOffset({
-			x: ox,
-			y: oy
+			x: -1 * this.tile.x * this.tilewidth,
+			y: -1 * this.tile.y * this.tileheight
 		});
 
 	};
@@ -95,6 +84,7 @@ console.log('root layer offset', ox, oy);
 		}
 
 
+		this.bound      = { x: 0, y: 0 };
 		this.tile       = { x: 0, y: 0 };
 		this.tilewidth  = 0;
 		this.tileheight = 0;
