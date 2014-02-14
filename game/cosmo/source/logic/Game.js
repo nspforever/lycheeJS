@@ -1,6 +1,6 @@
 
 lychee.define('game.logic.Game').requires([
-	'game.entity.Background',
+	'game.entity.game.Background',
 	'game.entity.Foreground',
 	'game.logic.Level',
 	'lychee.game.Layer'

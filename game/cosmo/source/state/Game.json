@@ -1,0 +1,93 @@
+{
+	"layers": {
+		"background": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.game.Background",
+					"arguments": [{}]
+				}],
+				"map": {
+					"background": 0
+				}
+			}
+		},
+		"game": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+				}]
+			}
+		},
+		"foreground": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.game.Foreground",
+					"arguments": [{}]
+				}],
+				"map": {
+					"foreground": 0
+				}
+			}
+		},
+		"ui": {
+			"constructor": "lychee.ui.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.menu.Layer",
+					"arguments": [{}],
+					"blob": {
+						"entities": [{
+							"constructor": "lychee.ui.Button",
+							"arguments": [{
+								"label": "STAGE CLEAR",
+								"position": {
+									"x": 0,
+									"y": -124
+								}
+							}],
+							"blob": {
+								"font": {
+									"constructor": "Font",
+									"arguments": [ "./source/state/Menu.fnt" ]
+								}
+							}
+						}, {
+							"constructor": "game.entity.menu.Button",
+							"arguments": [{
+								"state": "button-continue",
+								"position": {
+									"x": 128,
+									"y": 64
+								}
+							}]
+						}, {
+							"constructor": "game.entity.menu.Button",
+							"arguments": [{
+								"state": "button-menu",
+								"position": {
+									"x": -128,
+									"y": 64
+								}
+							}]
+						}],
+						"map": {
+							"headline": 0,
+							"button-continue": 1,
+							"button-menu": 2
+						}
+					}
+				}],
+				"map": {
+					"stage-clear": 0,
+					"game-over": 1
+				}
+			}
+		}
+	}
+}

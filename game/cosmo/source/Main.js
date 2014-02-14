@@ -1,8 +1,8 @@
 
 lychee.define('game.Main').requires([
 	'game.net.Client',
-//	'game.logic.Game',
-//	'game.state.Game',
+	'game.logic.Game',
+	'game.state.Game',
 	'game.state.Menu'
 ]).includes([
 	'lychee.game.Main'
@@ -67,14 +67,14 @@ lychee.define('game.Main').requires([
 				multiplayer: null
 			};
 
-//			this.logic = new game.logic.Game(this);
+			this.logic = new game.logic.Game(this);
 
 			if (clientsettings !== null) {
 				this.client = new game.net.Client(clientsettings, this);
 			}
 
 
-//			this.setState('game', new game.state.Game(this));
+			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));
 			this.changeState('menu');
 

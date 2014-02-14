@@ -7,42 +7,6 @@ lychee.define('game.net.client.Multiplayer').includes([
 	 * HELPERS
 	 */
 
-	var _plug_service = function() {
-
-		this.game.services.multiplayer = this;
-
-
-		var state = this.game.getState('menu');
-		if (state !== null) {
-
-			var entity = state.queryLayer('ui', 'root > multiplayer');
-			if (entity !== null) {
-				entity.setState('multiplayer');
-			}
-
-		}
-
-	};
-
-	var _unplug_service = function() {
-
-		this.game.services.multiplayer = null;
-
-
-		// TODO: Tween back to menu main if user is in multiplayer layer
-
-		var state = this.game.getState('menu');
-		if (state !== null) {
-
-			var entity = state.queryLayer('ui', 'root > multiplayer');
-			if (entity !== null) {
-				entity.setState('multiplayer-disabled');
-			}
-
-		}
-
-	};
-
 	var _on_start = function(data) {
 
 		if (this.game.isState('menu') === true) {
@@ -129,9 +93,6 @@ console.log('Env Sync', data.width, data.height);
 		/*
 		 * INITIALIZATION
 		 */
-
-		this.bind('plug',   _plug_service,   this);
-		this.bind('unplug', _unplug_service, this);
 
 		this.bind('start',   _on_start,   this);
 		this.bind('stop',    _on_stop,    this);

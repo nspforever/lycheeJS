@@ -9,7 +9,7 @@ lychee.define('game.logic.Level').requires([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _config    = attachments['json'];
+	var _config    = attachments["json"];
 
 	var _blackhole = game.entity.Blackhole;
 	var _bomb      = game.entity.Bomb;

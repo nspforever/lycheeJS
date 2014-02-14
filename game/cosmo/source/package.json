@@ -40,12 +40,12 @@
 		"net": {
 
 			"client": {
-				"Highscore":   [ "js" ],
+				"Highscores":  [ "js" ],
 				"Multiplayer": [ "js" ]
 			},
 
 			"remote": {
-				"Highscore":   [ "js" ],
+				"Highscores":  [ "js" ],
 				"Multiplayer": [ "js" ]
 			},
 

@@ -1,14 +1,14 @@
 
 lychee.define('game.net.Client').requires([
 	'lychee.data.BitON',
-	'game.net.client.Highscore',
+	'game.net.client.Highscores',
 	'game.net.client.Multiplayer'
 ]).includes([
 	'lychee.net.Client'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _BitON       = lychee.data.BitON;
-	var _highscore   = game.net.client.Highscore;
+	var _highscores  = game.net.client.Highscores;
 	var _multiplayer = game.net.client.Multiplayer;
 
 
@@ -16,6 +16,10 @@ lychee.define('game.net.Client').requires([
 
 		// required by services due to renderer
 		this.game = game;
+
+		this.services = {};
+		this.services.highscores  = new _highscores(this);
+		this.services.multiplayer = new _multiplayer(this);
 
 
 		lychee.net.Client.call(this, {
@@ -26,11 +30,8 @@ lychee.define('game.net.Client').requires([
 
 		this.bind('connect', function() {
 
-			var highscore   = new _highscore(this);
-			var multiplayer = new _multiplayer(this);
-
-			this.plug(highscore);
-			this.plug(multiplayer);
+			this.plug(this.services.highscores);
+			this.plug(this.services.multiplayer);
 
 		}, this);
 

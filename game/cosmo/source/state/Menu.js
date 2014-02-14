@@ -10,8 +10,9 @@ lychee.define('game.state.Menu').requires([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _blob = attachments["json"];
-	var _font = attachments["fnt"];
+	var _blob  = attachments["json"];
+	var _font  = attachments["fnt"];
+	var _music = attachments["msc"];
 
 
 
@@ -81,7 +82,8 @@ lychee.define('game.state.Menu').requires([
 			lychee.game.State.prototype.deserialize.call(this, blob);
 
 
-			var entity = null;
+			var entity  = null;
+			var service = null;
 
 
 			entity = this.queryLayer('ui', 'arrow-top');
@@ -137,6 +139,19 @@ lychee.define('game.state.Menu').requires([
 					touchcontrols: this.game.settings.touchcontrols
 				});
 
+			}, this);
+
+			entity = this.queryLayer('tiles', 'root > multiplayer > background');
+			entity.setState('multiplayer-disabled');
+
+			service = this.game.client.services.multiplayer;
+			service.bind('plug', function() {
+				this.queryLayer('tiles', 'root > multiplayer > background').setState('multiplayer');
+			}, this);
+
+			service = this.game.client.services.multiplayer;
+			service.bind('unplug', function() {
+				this.queryLayer('tiles', 'root > multiplayer > background').setState('multiplayer-disabled');
 			}, this);
 
 			entity = this.queryLayer('tiles', 'root > multiplayer-details > keypad');
@@ -211,6 +226,19 @@ lychee.define('game.state.Menu').requires([
 
 			}, this);
 
+			entity = this.queryLayer('tiles', 'root > highscores > background');
+			entity.setState('highscores-disabled');
+
+			service = this.game.client.services.highscores;
+			service.bind('plug', function() {
+				this.queryLayer('tiles', 'root > highscores > background').setState('highscores');
+			}, this);
+
+			service = this.game.client.services.highscores;
+			service.bind('unplug', function() {
+				this.queryLayer('tiles', 'root > highscores > background').setState('highscores-disabled');
+			}, this);
+
 		},
 
 		reshape: function(orientation, rotation) {
@@ -245,11 +273,20 @@ lychee.define('game.state.Menu').requires([
 			lychee.game.State.prototype.enter.call(this);
 
 
+			this.game.jukebox.play(_music);
+
+
 			var root = this.queryLayer('tiles', 'root');
 			if (root !== null) {
 				root.setTile({ x: 0 });
 				_refresh_arrows.call(this, root);
 			}
+
+		},
+
+		leave: function() {
+
+			this.game.jukebox.stop(_music);
 
 		},
 

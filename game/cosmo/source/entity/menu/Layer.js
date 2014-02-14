@@ -24,7 +24,7 @@ lychee.define('game.entity.menu.Layer').includes([
 		 * INITIALIZATION
 		 */
 
-		this.addEntity(new lychee.ui.Sprite({
+		this.setEntity('background', new lychee.ui.Sprite({
 			texture: _texture,
 			map:     _config.map,
 			state:   settings.state || 'default',

@@ -7,7 +7,7 @@ lychee.define('game.state.Game').requires([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _music = attachments['msc'];
+	var _music = attachments["msc"];
 
 	var _controller = game.logic.Controller;
 	var _hud        = game.entity.ui.game.HUD;

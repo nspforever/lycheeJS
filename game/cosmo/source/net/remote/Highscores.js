@@ -1,5 +1,5 @@
 
-lychee.define('game.net.remote.Highscore').includes([
+lychee.define('game.net.remote.Highscores').includes([
 	'lychee.net.Service'
 ]).exports(function(lychee, game, global, attachments) {
 
@@ -34,7 +34,7 @@ lychee.define('game.net.remote.Highscore').includes([
 
 	var Class = function(remote) {
 
-		lychee.net.Service.call(this, 'highscore', remote, lychee.net.Service.TYPE.remote);
+		lychee.net.Service.call(this, 'highscores', remote, lychee.net.Service.TYPE.remote);
 
 	};
 

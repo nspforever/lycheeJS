@@ -146,6 +146,7 @@ lychee.define('game.entity.menu.TileLayer').includes([
 
 			tile = tile instanceof Object ? tile : null;
 
+
 			if (tile !== null) {
 
 				tile.x = typeof tile.x === 'number' ? tile.x : this.tile.x;

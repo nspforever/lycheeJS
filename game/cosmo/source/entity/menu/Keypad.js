@@ -3,7 +3,7 @@ lychee.define('game.entity.menu.Keypad').includes([
 	'lychee.ui.Layer'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _config = attachments['json'];
+	var _config = attachments["json"];
 
 
 	/*
@@ -111,7 +111,6 @@ lychee.define('game.entity.menu.Keypad').includes([
 
 
 		this.setCode(settings.code);
-		this.setCode('1234');
 
 		settings = null;
 

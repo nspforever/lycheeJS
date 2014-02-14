@@ -1,14 +1,14 @@
 
 lychee.define('game.net.Server').requires([
 	'lychee.data.BitON',
-	'game.net.remote.Highscore',
+	'game.net.remote.Highscores',
 	'game.net.remote.Multiplayer'
 ]).includes([
 	'lychee.net.Server'
 ]).exports(function(lychee, game, global, attachments) {
 
 	var _BitON       = lychee.data.BitON;
-	var _highscore   = game.net.remote.Highscore;
+	var _highscores  = game.net.remote.Highscores;
 	var _multiplayer = game.net.remote.Multiplayer;
 
 
@@ -24,7 +24,7 @@ lychee.define('game.net.Server').requires([
 
 			console.log('(Cosmo) game.Server: New Remote (' + remote.id + ')');
 
-			remote.register('highscore',   _highscore);
+			remote.register('highscores',  _highscores);
 			remote.register('multiplayer', _multiplayer);
 			remote.accept();
 

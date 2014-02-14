@@ -15,9 +15,7 @@
 		},
 		"tiles": {
 			"constructor": "lychee.ui.Layer",
-			"arguments": [{
-				"visible": false
-			}],
+			"arguments": [{}],
 			"blob": {
 				"entities": [{
 					"constructor": "game.entity.menu.TileLayer",
@@ -234,7 +232,6 @@
 						}
 					}]
 				}, {
-
 					"constructor": "game.entity.menu.Button",
 					"arguments": [{
 						"state": "arrow-right",
