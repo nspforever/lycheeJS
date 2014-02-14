@@ -3,6 +3,7 @@ lychee.define('game.state.Menu').requires([
 	'lychee.ui.Button',
 	'game.entity.game.Background',
 	'game.entity.menu.Button',
+	'game.entity.menu.Keypad',
 	'game.entity.menu.Layer',
 	'game.entity.menu.TileLayer'
 ]).includes([
@@ -137,6 +138,20 @@ lychee.define('game.state.Menu').requires([
 				});
 
 			}, this);
+
+			entity = this.queryLayer('tiles', 'root > multiplayer-details > keypad');
+			entity.bind('code', function(code) {
+
+				console.log(code);
+/*
+				this.game.changeState('game', {
+					type: 'singleplayer',
+					touchcontrols: this.game.settings.touchcontrols
+				});
+*/
+			}, this);
+
+
 
 			entity = this.queryLayer('tiles', 'root > settings-details > fullscreen');
 			entity.setLabel('Fullscreen:' + ((this.game.viewport.fullscreen === true) ? ' On': 'Off'));

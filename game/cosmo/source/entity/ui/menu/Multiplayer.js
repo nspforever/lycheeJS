@@ -99,35 +99,6 @@ lychee.define('game.entity.ui.menu.Multiplayer').requires([
 			var height = this.height;
 
 
-			var background = new game.entity.ui.menu.Background({
-				state: 'default'
-			});
-
-			this.addEntity(background);
-
-
-			entity = new lychee.ui.Button({
-				label:    'Enter Code',
-				font:     background.font,
-				position: {
-					x:  0,
-					y: -1/2 * height + 32
-				}
-			});
-
-			this.setEntity('headline', entity);
-
-			entity = new lychee.ui.Button({
-				label:    '_ _ _ _',
-				font:     background.font,
-				position: {
-					x:  0,
-					y: -1/2 * height + 64 + 20
-				}
-			});
-
-			this.addEntity(entity);
-
 			entity = new lychee.ui.Button({
 				label:    '* * * *',
 				font:     background.font,

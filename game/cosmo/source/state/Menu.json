@@ -45,7 +45,33 @@
 							"constructor": "game.entity.menu.Layer",
 							"arguments": [{
 								"state": "multiplayer-details"
-							}]
+							}],
+							"blob": {
+								"entities": [{
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Enter Code",
+										"position": {
+											"x": 0,
+											"y": -124
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Menu.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "game.entity.menu.Keypad",
+									"arguments": [{
+										"code": "****"
+									}]
+								}],
+								"map": {
+									"keypad": 1
+								}
+							}
 						}, {
 							"constructor": "game.entity.menu.Layer",
 							"arguments": [{

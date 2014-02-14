@@ -11,6 +11,7 @@
 
 			"menu": {
 				"Button":     [ "js", "json", "png" ],
+				"Keypad":     [ "js", "json" ],
 				"Layer":      [ "js", "json", "png" ],
 				"TileLayer":  [ "js" ]
 			},
@@ -18,21 +19,9 @@
 			"ui": {
 
 				"game": {
-
 					"HUD":    [ "js", "json", "png", "fnt" ],
 					"Result": [ "js", "json", "png", "fnt", "msc" ]
-				},
-
-				"menu": {
-					"Background":  [ "js", "json", "png", "fnt" ],
-					"Highscore":   [ "js" ],
-					"Multiplayer": [ "js" ],
-					"Settings":    [ "js" ],
-					"Title":       [ "js", "png" ]
-				},
-
-				"Arrow":  [ "js", "json", "png" ],
-				"Button": [ "js", "json", "png" ]
+				}
 
 			},
 

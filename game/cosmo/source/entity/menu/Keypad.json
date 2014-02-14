@@ -1,0 +1,121 @@
+{
+	"constructor": "game.entity.menu.Keypad",
+	"arguments": [{
+		"width": 312,
+		"height": 256,
+		"position": {
+			"x": 0,
+			"y": 0
+		}
+	}],
+	"blob": {
+		"entities": [{
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "* * * *",
+				"position": {
+					"x": 0,
+					"y": -72
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "_      ",
+				"position": {
+					"x": 0,
+					"y": -68
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "1",
+				"position": {
+					"x": -68,
+					"y": -24
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "2",
+				"position": {
+					"x": 0,
+					"y": -24
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "3",
+				"position": {
+					"x": 68,
+					"y": -24
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "4",
+				"position": {
+					"x": -68,
+					"y": 18
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "5",
+				"position": {
+					"x": 0,
+					"y": 18
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "6",
+				"position": {
+					"x": 68,
+					"y": 18
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "7",
+				"position": {
+					"x": -68,
+					"y": 60
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "8",
+				"position": {
+					"x": 0,
+					"y": 60
+				}
+			}]
+		}, {
+			"constructor": "lychee.ui.Button",
+			"arguments": [{
+				"label": "9",
+				"position": {
+					"x": 68,
+					"y": 60
+				}
+			}]
+		}],
+		"font": {
+			"constructor": "Font",
+			"arguments": [ "./source/state/Menu.fnt" ]
+		},
+		"map": {
+			"label": 0,
+			"cursor": 1
+		}
+	}
+}
