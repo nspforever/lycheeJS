@@ -10,7 +10,8 @@ lychee.define('lychee.game.Layer').requires([
 	var _validate_entity = function(entity) {
 
 		if (
-			   typeof entity.update === 'function'
+			entity instanceof Object
+			&& typeof entity.update === 'function'
 			&& typeof entity.render === 'function'
 			&& typeof entity.shape === 'number'
 		) {

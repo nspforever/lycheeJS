@@ -10,7 +10,8 @@ lychee.define('lychee.ui.Layer').includes([
 	var _validate_entity = function(entity) {
 
 		if (
-			   typeof entity.shape === 'number'
+			entity instanceof Object
+			&& typeof entity.shape === 'number'
 			&& typeof entity.update === 'function'
 			&& typeof entity.render === 'function'
 			&& typeof entity.isAtPosition === 'function'

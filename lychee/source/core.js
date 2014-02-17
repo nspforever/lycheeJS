@@ -403,6 +403,12 @@ if (typeof global !== 'undefined') {
 
 					return instance;
 
+				} else {
+
+					if (lychee.debug === true) {
+						console.warn('lychee.deserialize: Require ' + data.constructor + ' to deserialize it.');
+					}
+
 				}
 
 			}
@@ -480,7 +486,6 @@ if (typeof global !== 'undefined') {
 			for (var method in template.prototype) {
 
 				if (typeof template.prototype[method] !== typeof instance[method]) {
-					console.log(method, 'differs!');
 					valid = false;
 					break;
 				}
@@ -501,7 +506,7 @@ if (typeof global !== 'undefined') {
 	if (typeof lychee.build !== 'function') {
 
 		lychee.build = function(callback, scope) {
-			console.error("lychee.build: You need to include the lychee.Builder to build the dependency tree.");
+			console.error("lychee.build: Require lychee.Builder to build the dependency tree.");
 		};
 
 	}
