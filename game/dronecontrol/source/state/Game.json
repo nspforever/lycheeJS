@@ -1,0 +1,279 @@
+{
+	"layers": {
+		"background": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.lycheeJS",
+					"arguments": [{}]
+				}],
+				"map": {
+					"lycheeJS": 0
+				}
+			}
+		},
+		"ui": {
+			"constructor": "lychee.ui.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+   				"constructor": "lychee.ui.Layer",
+					"arguments": [{
+						"width": 192,
+						"height": 480
+					}],
+					"blob": {
+						"entities": [{
+							"constructor": "lychee.ui.Joystick",
+							"arguments": [{
+								"width": 128,
+								"height": 128,
+								"position": {
+									"x": 0,
+									"y": 176
+								}
+							}]
+						}, {
+							"constructor": "lychee.ui.Layer",
+							"arguments": [{}],
+							"blob": {
+								"entities": [{
+									"constructor": "lychee.ui.Label",
+									"arguments": [{
+										"label": "CONTROL",
+										"position": {
+											"x": 0,
+											"y": -176
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Takeoff",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": -96
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Land",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": -48
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Stop",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": 48
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}],
+								"map": {
+									"takeoff": 1,
+									"land": 2,
+									"stop": 3
+								}
+							} 
+						}],
+						"map": {
+							"joystick": 0,
+							"commands": 1
+						}
+					}
+				}, {
+					"constructor": "lychee.ui.Layer",
+					"arguments": [{
+						"width": 192,
+						"height": 480
+					}],
+					"blob": {
+						"entities": [{
+							"constructor": "lychee.ui.Joystick",
+							"arguments": [{
+								"width": 128,
+								"height": 128,
+								"position": {
+									"x": 0,
+									"y": 176
+								}
+							}]
+						}, {
+							"constructor": "lychee.ui.Layer",
+							"arguments": [{}],
+							"blob": {
+								"entities": [{
+									"constructor": "lychee.ui.Label",
+									"arguments": [{
+										"label": " FLIPS ",
+										"position": {
+											"x": 0,
+											"y": -176
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Ahead",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": -96
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Right",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": -48
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Behind",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": 0
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}, {
+									"constructor": "lychee.ui.Button",
+									"arguments": [{
+										"label": "Left",
+										"width": 216,
+										"height": 48,
+										"position": {
+											"x": 0,
+											"y": 48
+										}
+									}],
+									"blob": {
+										"font": {
+											"constructor": "Font",
+											"arguments": [ "./source/state/Game.fnt" ]
+										}
+									}
+								}],
+								"map": {
+									"flip-ahead": 1,
+									"flip-behind": 2,
+									"flip-left": 3,
+									"flip-right": 4
+								}
+							} 
+						}],
+						"map": {
+							"joystick": 0,
+							"commands": 1
+						}
+					}
+				}, {
+					"constructor": "lychee.ui.Layer",
+					"arguments": [{
+						"width": 512,
+						"height": 128
+					}],
+					"blob": {
+						"entities": [{
+							"constructor": "lychee.ui.Select",
+							"arguments": [{
+								"options": [
+									"192.168.1.1",
+									"192.168.1.2",
+									"192.168.1.3",
+									"192.168.1.4",
+									"192.168.1.5",
+									"192.168.1.6",
+									"192.168.1.7",
+									"192.168.1.8"
+								]
+							}],
+							"blob": {
+								"font": {
+									"constructor": "Font",
+									"arguments": [ "./source/state/Game.fnt" ]
+								}
+							}
+						}],
+						"map": {
+							"ip": 0
+						}
+					}
+				}],
+				"map": {
+					"sidebar-left": 0,
+					"sidebar-right": 1,
+					"settings": 2
+				}
+			}
+		}
+	}
+}

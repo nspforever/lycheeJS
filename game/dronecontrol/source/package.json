@@ -1,72 +1,48 @@
 {
 	"tags": {
 
-		"platform": {
-
-			"nodejs": "platform/nodejs"
-
-		}
-
 	},
 
 	"tree": {
 
-		"platform": {
-
-			"nodejs": {
-
-				"ar": {
-
-					"command": {
-						"CONFIG": [ "js" ],
-						"PCMD":   [ "js" ],
-						"REF":    [ "js" ],
-						"Socket": [ "js" ]
-					},
-
-					"data": {
-						"Buffer":  [ "js" ],
-						"NAVDATA": [ "js" ],
-						"VIDEO":   [ "js" ]
-					},
-
-					"navdata": {
-						"Socket": [ "js" ]
-					},
-
-					"video": {
-						"Socket": [ "js" ]
-					},
-
-					"Drone": [ "js" ]
-
-				}
-
-			}
-
-		},
-
 		"entity": {
-
-			"ui": {
-				"Menu":         [ "js" ],
-				"Navdata":      [ "js" ],
-				"SidebarLeft":  [ "js" ],
-				"SidebarRight": [ "js" ],
-				"Video":        [ "js" ]
-			},
-
-			"Font": [ "js", "normal.fnt" ]
-
+			"lycheeJS": [ "js", "png" ]
 		},
 
 		"net": {
-			"Controller": [ "js" ],
-			"Server":     [ "js" ]
+
+			"client": {
+				"Control": [ "js" ]
+			},
+
+			"drone": {
+
+				"data": {
+					"CONFIG":  [ "js" ],
+					"NAVDATA": [ "js" ],
+					"REF":     [ "js" ],
+					"STATE":   [ "js" ]
+				},
+
+				"socket": {
+					"Command": [ "js" ],
+					"Navdata": [ "js" ]
+				}
+
+			},
+
+			"remote": {
+				"Control": [ "js" ]
+			},
+
+			"Client": [ "js" ],
+			"Drone":  [ "js" ],
+			"Server": [ "js" ]
+
 		},
 
 		"state": {
-			"Game": [ "js" ]
+			"Game": [ "js", "json", "fnt" ]
 		},
 
 		"Main": [ "js", "css" ]

@@ -1,7 +1,6 @@
 
 lychee.define('game.Main').requires([
-	'game.net.Controller',
-	'game.entity.Font',
+	'game.net.Client',
 	'game.state.Game'
 ]).includes([
 	'lychee.game.Main'
@@ -11,7 +10,8 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
-			title: 'Drone Control',
+			// Is configured by sorbet/module/Server
+			client: null,
 
 			fullscreen: true,
 
@@ -23,13 +23,10 @@ lychee.define('game.Main').requires([
 				swipe:       true
 			},
 
-			// Is configured by ./config.json
-			drones: null,
-
 			renderer: {
 				id:     'game',
-				width:  640,
-				height: 480
+				width:  null,
+				height: null
 			}
 
 		}, data);
@@ -44,67 +41,22 @@ lychee.define('game.Main').requires([
 
 	Class.prototype = {
 
-		reset: function(state) {
-
-			this.reshape();
-
-
-			if (state === true) {
-				this.resetState(null, null);
-			}
-
-		},
-
-		load: function() {
-
-			var preloader = new lychee.Preloader();
-
-
-			preloader.bind('ready', function(assets, mappings) {
-
-				var url = Object.keys(assets)[0];
-				var settings = assets[url];
-				if (settings !== null) {
-					this.settings.drones = settings.drones;
-				}
-
-				preloader.unbind('ready');
-				preloader.unbind('error');
-
-				lychee.game.Main.prototype.load.call(this);
-
-			}, this);
-
-			preloader.bind('error', function(assets, mappings) {
-
-				preloader.unbind('ready');
-				preloader.unbind('error');
-
-				lychee.game.Main.prototype.load.call(this);
-
-			}, this);
-
-			preloader.load('./config.json');
-
-		},
-
 		init: function() {
 
+			// Overwrite client with game.Client
+			var clientsettings   = this.settings.client;
+			this.settings.client = null;
+
 			lychee.game.Main.prototype.init.call(this);
-			this.reset(false);
 
 
-			this.fonts = {};
-			this.fonts.normal = new game.entity.Font('normal');
+			if (clientsettings !== null) {
+				this.client = new game.net.Client(clientsettings, this);
+			}
 
-			this.controller = new game.net.Controller(this);
-			this.controller.setIP('192.168.1.1');
 
 			this.setState('game', new game.state.Game(this));
 			this.changeState('game');
-
-
-			this.start();
 
 		}
 
