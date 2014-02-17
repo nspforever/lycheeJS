@@ -139,8 +139,8 @@ lychee.define('lychee.ui.Select').includes([
 
 
 			var font    = this.font;
-			var hwidth  = this.width / 2;
-			var hheight = this.height / 2;
+			var hwidth  = (this.width  - 2) / 2;
+			var hheight = (this.height - 2) / 2;
 
 
 			var state = this.state;

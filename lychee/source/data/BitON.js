@@ -631,7 +631,7 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 
 
 	/*
-	 * PUBLIC API
+	 * IMPLEMENTATION
 	 */
 
 	var Module = {};

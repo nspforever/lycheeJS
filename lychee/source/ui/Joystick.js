@@ -157,7 +157,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				x,
 				y + hheight,
 				'#575757',
-				2
+				4
 			);
 
 			renderer.drawLine(
@@ -175,7 +175,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				x + hwidth,
 				y,
 				'#575757',
-				2
+				4
 			);
 
 
@@ -230,7 +230,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				x + drag.x,
 				y,
 				color,
-				2
+				4
 			);
 
 			renderer.drawLine(
@@ -239,7 +239,7 @@ lychee.define('lychee.ui.Joystick').includes([
 				x,
 				y + drag.y,
 				color,
-				2
+				4
 			);
 
 

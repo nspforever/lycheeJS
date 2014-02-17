@@ -11,6 +11,13 @@ lychee.define('lychee.ui.Button').includes([
 		this.label = null;
 		this.font  = null;
 
+		this.__pulse = {
+			active:   false,
+			duration: 300,
+			start:    null,
+			alpha:    0.0
+		};
+
 
 		this.setFont(settings.font);
 		this.setLabel(settings.label);
@@ -19,12 +26,27 @@ lychee.define('lychee.ui.Button').includes([
 		delete settings.label;
 
 
-		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
-		settings.width  = this.width;
-		settings.height = this.height;
+		settings.shape = lychee.ui.Entity.SHAPE.rectangle;
 
 
 		lychee.ui.Entity.call(this, settings);
+
+
+
+		/*
+		 * INITIALIZATION
+		 */
+
+		this.bind('touch', function() {}, this);
+
+		this.bind('focus', function() {
+			this.setState('active');
+		}, this);
+
+		this.bind('blur', function() {
+			this.setState('default');
+		}, this);
+
 
 		settings = null;
 
@@ -65,6 +87,30 @@ lychee.define('lychee.ui.Button').includes([
 
 		},
 
+		update: function(clock, delta) {
+
+			var pulse = this.__pulse;
+			if (pulse.active === true) {
+
+				if (pulse.start === null) {
+					pulse.start = clock;
+				}
+
+				var t = (clock - pulse.start) / pulse.duration;
+				if (t <= 1) {
+					pulse.alpha = (1 - t) * 0.6;
+				} else {
+					pulse.alpha  = 0.0;
+					pulse.active = false;
+				}
+
+			}
+
+
+			lychee.ui.Entity.prototype.update.call(this, clock, delta);
+
+		},
+
 		render: function(renderer, offsetX, offsetY) {
 
 			if (this.visible === false) return;
@@ -74,6 +120,45 @@ lychee.define('lychee.ui.Button').includes([
 
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
+
+			var color  = this.state === 'active' ? '#33b5e5' : '#0099cc';
+			var color2 = this.state === 'active' ? '#0099cc' : '#575757';
+
+
+			var hwidth  = (this.width  - 2) / 2;
+			var hheight = (this.height - 2) / 2;
+
+
+
+			renderer.drawBox(
+				x - hwidth,
+				y - hheight,
+				x + hwidth,
+				y + hheight,
+				color2,
+				false,
+				2
+			);
+
+
+			var pulse = this.__pulse;
+			if (pulse.active === true) {
+
+				renderer.setAlpha(pulse.alpha);
+
+				renderer.drawBox(
+					x - hwidth,
+					y - hheight,
+					x + hwidth,
+					y + hheight,
+					color,
+					true,
+					2
+				);
+
+				renderer.setAlpha(1.0);
+
+			}
 
 
 			var label = this.label;
@@ -108,11 +193,6 @@ lychee.define('lychee.ui.Button').includes([
 
 				this.font = font;
 
-				// refresh the layout
-				if (this.label !== null) {
-					this.setLabel(this.label);
-				}
-
 				return true;
 
 			}
@@ -129,25 +209,33 @@ lychee.define('lychee.ui.Button').includes([
 
 			if (label !== null) {
 
-				var font = this.font;
-				if (font !== null) {
+				this.label = label;
 
-					var width   = 0;
-					var height  = 0;
-					var kerning = font.kerning;
+				return true;
 
-					for (var l = 0, ll = label.length; l < ll; l++) {
-						var chr = font.get(label[l]);
-						width += chr.real + kerning;
-						height = Math.max(height, chr.height);
-					}
+			}
 
-					this.width  = width;
-					this.height = height;
+
+			return false;
+
+		},
+
+		setState: function(id) {
+
+			var result = lychee.ui.Entity.prototype.setState.call(this, id);
+			if (result === true) {
+
+				var pulse = this.__pulse;
+
+
+				if (id === 'active') {
+
+					pulse.alpha  = 0.6;
+					pulse.start  = null;
+					pulse.active = true;
 
 				}
 
-				this.label = label;
 
 				return true;
 

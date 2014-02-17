@@ -122,6 +122,7 @@
 			"Entity":    [ "js" ],
 			"Input":     [ "js" ],
 			"Joystick":  [ "js" ],
+			"Label":     [ "js" ],
 			"Layer":     [ "js" ],
 			"Select":    [ "js" ],
 			"Slider":    [ "js" ],

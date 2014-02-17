@@ -250,7 +250,7 @@ lychee.define('lychee.ui.Sprite').includes([
 
 		setState: function(id) {
 
-			var result = lychee.game.Entity.prototype.setState.call(this, id);
+			var result = lychee.ui.Entity.prototype.setState.call(this, id);
 			if (result === true) {
 
 				var map = this.__map[this.state] || null;
