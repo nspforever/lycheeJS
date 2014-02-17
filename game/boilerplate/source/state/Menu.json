@@ -13,7 +13,7 @@
 							"arguments": [{}],
 							"blob": {
 								"entities": [{
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Title"
 									}],
@@ -24,7 +24,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "New Game",
 										"position": {
@@ -39,7 +39,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Settings",
 										"position": {
@@ -65,7 +65,7 @@
 							"arguments": [{}],
 							"blob": {
 								"entities": [{
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Settings"
 									}],
@@ -76,7 +76,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Fullscreen: Off",
 										"position": {
@@ -91,7 +91,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Music: On",
 										"position": {
@@ -106,7 +106,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Sound: On",
 										"position": {
@@ -121,7 +121,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Debug: Off",
 										"position": {

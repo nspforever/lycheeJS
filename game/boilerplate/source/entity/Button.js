@@ -10,12 +10,9 @@ lychee.define('game.entity.Button').includes([
 
 		this.game = game || null;
 
-		this.background = null;
 
-
-		this.setBackground(settings.background);
-
-		delete settings.background;
+		settings.width  = 192;
+		settings.height = 48;
 
 
 		lychee.ui.Button.call(this, settings);
@@ -30,7 +27,9 @@ lychee.define('game.entity.Button').includes([
 
 		this.bind('touch', function() {
 
-			this.game.changeState('menu');
+			this.game.loop.setTimeout(500, function() {
+				this.changeState('menu');
+			}, this.game);
 
 		}, this);
 
@@ -51,67 +50,7 @@ lychee.define('game.entity.Button').includes([
 			var settings = data['arguments'][0];
 
 
-			if (this.background !== null) settings.background = this.background;
-
-
 			return data;
-
-		},
-
-		render: function(renderer, offsetX, offsetY) {
-
-			var position = this.position;
-
-
-			var background = this.background;
-			if (background !== null) {
-
-				var position = this.position;
-
-				var cx = position.x + offsetX;
-				var cy = position.y + offsetY;
-
-
-				renderer.drawBox(
-					cx - this.width  / 2 - 4,
-					cy - this.height / 2 - 4,
-					cx + this.width  / 2 + 4,
-					cy + this.height / 2 + 4,
-					background,
-					true
-				);
-
-			}
-
-
-			lychee.ui.Button.prototype.render.call(this, renderer, offsetX, offsetY);
-
-		},
-
-
-
-		/*
-		 * CUSTOM API
-		 */
-
-		setBackground: function(background) {
-
-			background = typeof background === 'string' ? background : null;
-
-
-			if (
-				   background !== null
-				&& background.match(/(#[AaBbCcDdEeFf0-9]{6})/)
-			) {
-
-				this.background = background;
-
-				return true;
-
-			}
-
-
-			return false;
 
 		}
 

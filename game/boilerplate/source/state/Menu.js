@@ -2,7 +2,7 @@
 lychee.define('game.state.Menu').requires([
 	'game.entity.lycheeJS',
 	'lychee.ui.Layer',
-	'lychee.ui.Button'
+	'lychee.ui.Label'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {

@@ -5,7 +5,7 @@
 			"arguments": [{}],
 			"blob": {
 				"entities": [{
-					"constructor": "lychee.ui.Button",
+					"constructor": "lychee.ui.Label",
 					"arguments": [{
 						"label": "Game State active",
 						"position": {
@@ -20,7 +20,7 @@
 						}
 					}
 				}, {
-					"constructor": "lychee.ui.Button",
+					"constructor": "lychee.ui.Label",
 					"arguments": [{
 						"label": "Touch the circle to make Noise",
 						"position": {
@@ -41,8 +41,7 @@
 						"position": {
 							"x": 0,
 							"y": 0
-						},
-						"background": "#888888"
+						}
 					}, "#this.game"],
 					"blob": {
 						"font": {

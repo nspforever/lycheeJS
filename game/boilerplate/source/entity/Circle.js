@@ -15,8 +15,7 @@ lychee.define('game.entity.Circle').includes([
 
 		this.color = '#888888';
 
-		this.__clock = null;
-		this.__colorfade = {
+		this.__pulse = {
 			duration: 500,
 			color:    '#888888',
 			radius:   0,
@@ -79,23 +78,19 @@ lychee.define('game.entity.Circle').includes([
 
 		update: function(clock, delta) {
 
-			var colorfade = this.__colorfade;
-			if (colorfade.active === true) {
+			var pulse = this.__pulse;
+			if (pulse.active === true) {
 
-				if (colorfade.start === null) {
-					colorfade.start = clock;
+				if (pulse.start === null) {
+					pulse.start = clock;
 				}
 
-				var t = (clock - colorfade.start) / colorfade.duration;
+				var t = (clock - pulse.start) / pulse.duration;
 				if (t <= 1) {
-
-					colorfade.radius = t * this.radius;
-
+					pulse.radius = t * this.radius;
 				} else {
-
-					this.color = colorfade.color;
-					colorfade.active = false;
-
+					this.color = pulse.color;
+					pulse.active = false;
 				}
 
 			}
@@ -119,14 +114,14 @@ lychee.define('game.entity.Circle').includes([
 			);
 
 
-			var colorfade = this.__colorfade;
-			if (colorfade.active === true) {
+			var pulse = this.__pulse;
+			if (pulse.active === true) {
 
 				renderer.drawCircle(
 					offsetX + position.x,
 					offsetY + position.y,
-					colorfade.radius,
-					colorfade.color,
+					pulse.radius,
+					pulse.color,
 					true
 				);
 
@@ -150,13 +145,13 @@ lychee.define('game.entity.Circle').includes([
 
 				if (fade === true) {
 
-					var colorfade = this.__colorfade;
+					var pulse = this.__pulse;
 
-					colorfade.duration = 250;
-					colorfade.color    = color;
-					colorfade.radius   = 0;
-					colorfade.start    = null;
-					colorfade.active   = true;
+					pulse.duration = 250;
+					pulse.color    = color;
+					pulse.radius   = 0;
+					pulse.start    = null;
+					pulse.active   = true;
 
 				} else {
 
