@@ -61,12 +61,6 @@ lychee.define('game.Main').requires([
 			lychee.game.Main.prototype.init.call(this);
 
 
-			this.client   = null;
-			this.services = {
-				highscore:   null,
-				multiplayer: null
-			};
-
 			this.logic = new game.logic.Game(this);
 
 			if (clientsettings !== null) {

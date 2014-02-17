@@ -22,7 +22,7 @@ lychee.define('game.net.Server').requires([
 
 		this.bind('connect', function(remote) {
 
-			console.log('(Cosmo) game.Server: New Remote (' + remote.id + ')');
+			console.log('(Cosmo) game.net.Server: New Remote (' + remote.id + ')');
 
 			remote.register('highscores',  _highscores);
 			remote.register('multiplayer', _multiplayer);
@@ -37,7 +37,7 @@ lychee.define('game.net.Server').requires([
 
 		listen: function(port, host) {
 
-			console.log('(Cosmo) game.Server: Listening on ' + host + ':' + port);
+			console.log('(Cosmo) game.net.Server: Listening on ' + host + ':' + port);
 
 			lychee.net.Server.prototype.listen.call(this, port, host);
 

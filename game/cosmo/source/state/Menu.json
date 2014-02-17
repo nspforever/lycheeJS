@@ -46,7 +46,7 @@
 							}],
 							"blob": {
 								"entities": [{
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Enter Code",
 										"position": {
@@ -82,7 +82,7 @@
 							}],
 							"blob": {
 								"entities": [{
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Fullscreen:Off",
 										"position": {
@@ -97,7 +97,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Touch:     Off",
 										"position": {
@@ -112,7 +112,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Music:      On",
 										"position": {
@@ -127,7 +127,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Sound:      On",
 										"position": {
@@ -142,7 +142,7 @@
 										}
 									}
 								}, {
-									"constructor": "lychee.ui.Button",
+									"constructor": "lychee.ui.Label",
 									"arguments": [{
 										"label": "Debug:     Off",
 										"position": {

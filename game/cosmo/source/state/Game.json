@@ -43,7 +43,7 @@
 					"arguments": [{}],
 					"blob": {
 						"entities": [{
-							"constructor": "lychee.ui.Button",
+							"constructor": "lychee.ui.Label",
 							"arguments": [{
 								"label": "STAGE CLEAR",
 								"position": {

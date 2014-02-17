@@ -71,8 +71,7 @@
 			"Menu": [ "js", "json", "msc", "fnt" ]
 		},
 
-		"Controller": [ "js" ],
-		"Main":       [ "js", "css" ]
+		"Main": [ "js", "css" ]
 
 	}
 
