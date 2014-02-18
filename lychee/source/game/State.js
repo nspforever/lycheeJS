@@ -473,6 +473,13 @@ lychee.define('lychee.game.State').requires([
 				touch.entity   = new_focus;
 				touch.layer    = touch_layer;
 
+
+				// TODO: Fix intelligent reshape() calls for resizing entities on touch events
+				this.loop.setTimeout(300, function() {
+					this.reshape();
+				}, touch.layer);
+
+
 				_trace_entity_offset.call(
 					touch.offset,
 					touch.entity,

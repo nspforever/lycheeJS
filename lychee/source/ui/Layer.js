@@ -162,14 +162,12 @@ lychee.define('lychee.ui.Layer').includes([
 			if (
 				   this.offset.x !== 0
 				|| this.offset.y !== 0
-				|| this.offset.z !== 0
 			) {
 
 				settings.offset = {};
 
 				if (this.offset.x !== 0) settings.offset.x = this.offset.x;
 				if (this.offset.y !== 0) settings.offset.y = this.offset.y;
-				if (this.offset.z !== 0) settings.offset.z = this.offset.z;
 
 			}
 
@@ -290,6 +288,11 @@ lychee.define('lychee.ui.Layer').includes([
 			for (var e = 0, el = this.entities.length; e < el; e++) {
 
 				var entity = this.entities[e];
+				if (typeof entity.reshape === 'function') {
+					entity.reshape();
+				}
+
+
 				var boundx = Math.abs(entity.position.x + this.offset.x);
 				var boundy = Math.abs(entity.position.y + this.offset.y);
 

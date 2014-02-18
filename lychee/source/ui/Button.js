@@ -13,7 +13,7 @@ lychee.define('lychee.ui.Button').includes([
 
 		this.__pulse = {
 			active:   false,
-			duration: 300,
+			duration: 250,
 			start:    null,
 			alpha:    0.0
 		};
@@ -26,7 +26,9 @@ lychee.define('lychee.ui.Button').includes([
 		delete settings.label;
 
 
-		settings.shape = lychee.ui.Entity.SHAPE.rectangle;
+		settings.width  = typeof settings.width === 'number'  ? settings.width  : 128;
+		settings.height = typeof settings.height === 'number' ? settings.height : 64;
+		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
 
 
 		lychee.ui.Entity.call(this, settings);
@@ -152,8 +154,7 @@ lychee.define('lychee.ui.Button').includes([
 					x + hwidth,
 					y + hheight,
 					color,
-					true,
-					2
+					true
 				);
 
 				renderer.setAlpha(1.0);
