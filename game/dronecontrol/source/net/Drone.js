@@ -26,7 +26,7 @@ lychee.define('game.net.Drone').requires([
 
 	var _loop = new lychee.game.Loop({
 		render: 0,
-		update: 1
+		update: lychee.debug === true ? 1 : 30
 	});
 
 	_loop.bind('update', function(clock, delta) {
@@ -36,6 +36,33 @@ lychee.define('game.net.Drone').requires([
 		}
 
 	}, this);
+
+
+	var _validate_state = function(state) {
+
+		if (state instanceof Object) {
+
+			for (var prop in state) {
+
+				if (
+					   typeof state[prop] !== 'number'
+					|| state[prop] < -1.0
+					|| state[prop] > 1.0
+				) {
+					return false;
+				}
+
+			}
+
+
+			return true;
+
+		}
+
+
+		return false;
+
+	};
 
 
 
@@ -112,20 +139,29 @@ lychee.define('game.net.Drone').requires([
 	};
 
 
-	Class.FLIGHTANIMATION = {
-		'turn':         6,
-		'turn-down':    7,
-		'yaw-shake':    8,
-		'roll-dance':  10,
-		'pitch-dance': 11,
-		'yaw-dance':    9,
+	Class.DANCE = {
+		roll:    10,
+		pitch:   11,
+		yaw:      9,
 
-		'wave':        13,
+		shake:    8,
+		wave:    13,
 
-		'flip-ahead':  16,
-		'flip-behind': 17,
-		'flip-left':   18,
-		'flip-right':  19
+		turn:     6,
+		turndown: 7
+	};
+
+
+	Class.FLIP = {
+		ahead:  16,
+		behind: 17,
+		left:   18,
+		right:  19
+	};
+
+
+	Class.LED = {
+
 	};
 
 
@@ -151,7 +187,7 @@ lychee.define('game.net.Drone').requires([
 			for (var i = 0, il = _instances.length; i < il; i++) {
 
 				if (_instances[i] === this) {
-					_instances[i].splice(i, 1);
+					_instances.splice(i, 1);
 					il--;
 					i--;
 				}
@@ -229,15 +265,17 @@ lychee.define('game.net.Drone').requires([
 
 		},
 
-		roll: function(speed) {
+		setDance: function(dance, duration) {
 
-			if (
-				typeof speed === 'number'
-				&& speed >= -1.0
-				&& speed <=  1.0
-			) {
-				this.__state.roll = speed;
+			duration = typeof duration === 'number' ? duration : 3000;
+
+
+			if (lychee.enumof(Class.DANCE, dance) === true) {
+
+				this.__config['control:flight_anim'] = [ dance, duration ];
+
 				return true;
+
 			}
 
 
@@ -245,15 +283,17 @@ lychee.define('game.net.Drone').requires([
 
 		},
 
-		pitch: function(speed) {
+		setFlip: function(flip, duration) {
 
-			if (
-				typeof speed === 'number'
-				&& speed >= -1.0
-				&& speed <=  1.0
-			) {
-				this.__state.pitch = speed;
+			duration = typeof duration === 'number' ? duration : 700;
+
+
+			if (lychee.enumof(Class.FLIP, flip) === true) {
+
+				this.__config['control:flight_anim'] = [ flip, duration ];
+
 				return true;
+
 			}
 
 
@@ -261,51 +301,14 @@ lychee.define('game.net.Drone').requires([
 
 		},
 
-		yaw: function(speed) {
+		setState: function(state) {
 
-			if (
-				typeof speed === 'number'
-				&& speed >= -1.0
-				&& speed <=  1.0
-			) {
-				this.__state.yaw = speed;
-				return true;
-			}
+			if (_validate_state(state) === true) {
 
-
-			return false;
-
-		},
-
-		heave: function(speed) {
-
-			if (
-				typeof speed === 'number'
-				&& speed >= -1.0
-				&& speed <=  1.0
-			) {
-				this.__state.heave = speed;
-				return true;
-			}
-
-
-			return false;
-
-		},
-
-		animateFlight: function(animation, duration) {
-
-			duration = typeof duration === 'number' ? duration : null;
-
-
-			if (
-				   _validate_enum(Class.FLIGHTANIMATION, animation) === true
-				&& duration !== null
-			) {
-
-				var value = Class.FLIGHTANIMATION[animation];
-
-				this.__config['control:flight_anim'] = [ value, duration ];
+				this.__state.roll  = typeof state.roll === 'number'  ? state.roll  : this.__state.roll;
+				this.__state.pitch = typeof state.pitch === 'number' ? state.pitch : this.__state.pitch;
+				this.__state.yaw   = typeof state.yaw === 'number'   ? state.yaw   : this.__state.yaw;
+				this.__state.heave = typeof state.heave === 'number' ? state.heave : this.__state.heave;
 
 				return true;
 
@@ -323,7 +326,7 @@ lychee.define('game.net.Drone').requires([
 
 
 			if (
-				   _validate_enum(Class.LEDANIMATION, animation) === true
+				   lychee.enumof(Class.LEDANIMATION, animation) === true
 				&& duration !== null
 			) {
 

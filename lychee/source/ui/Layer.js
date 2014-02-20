@@ -27,8 +27,8 @@ lychee.define('lychee.ui.Layer').includes([
 
 		var triggered = null;
 		var args      = [ id, {
-			x: position.x - this.position.x - this.offset.x,
-			y: position.y - this.position.y - this.offset.y
+			x: position.x - this.offset.x,
+			y: position.y - this.offset.y
 		}, delta ];
 
 
@@ -41,6 +41,9 @@ lychee.define('lychee.ui.Layer').includes([
 				   typeof entity.trigger === 'function'
 				&& entity.isAtPosition(args[1]) === true
 			) {
+
+				args[1].x -= entity.position.x;
+				args[1].y -= entity.position.y;
 
 				var result = entity.trigger('touch', args);
 				if (result === true) {

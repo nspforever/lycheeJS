@@ -16,6 +16,12 @@ lychee.define('lychee.ui.Input').includes([
 
 		this.__buffer  = null;
 		this.__drag    = null;
+		this.__pulse   = {
+			active:   false,
+			duration: 250,
+			start:    null,
+			alpha:    0.0
+		};
 		this.__value   = '';
 		this.__isDirty = false;
 
@@ -34,8 +40,8 @@ lychee.define('lychee.ui.Input').includes([
 
 
 		settings.shape  = lychee.ui.Entity.SHAPE.rectangle;
-		settings.width  = typeof settings.width === 'number' ? settings.width : 140;
-		settings.height = 24;
+		settings.width  = typeof settings.width === 'number'  ? settings.width  : 128;
+		settings.height = typeof settings.height === 'number' ? settings.height : 64;
 
 
 		lychee.ui.Entity.call(this, settings);
@@ -222,8 +228,6 @@ lychee.define('lychee.ui.Input').includes([
 			var blob     = data['blob'] = (data['blob'] || {});
 
 
-			if (this.width !== 140) settings.width = this.width;
-
 			if (this.max !== Infinity)         settings.max   = this.max;
 			if (this.min !== 0)                settings.min   = this.min;
 			if (this.type !== Class.TYPE.text) settings.type  = this.type;
@@ -234,6 +238,30 @@ lychee.define('lychee.ui.Input').includes([
 
 
 			return data;
+
+		},
+
+		update: function(clock, delta) {
+
+			var pulse = this.__pulse;
+			if (pulse.active === true) {
+
+				if (pulse.start === null) {
+					pulse.start = clock;
+				}
+
+				var t = (clock - pulse.start) / pulse.duration;
+				if (t <= 1) {
+					pulse.alpha = (1 - t) * 0.6;
+				} else {
+					pulse.alpha  = 0.0;
+					pulse.active = false;
+				}
+
+			}
+
+
+			lychee.ui.Entity.prototype.update.call(this, clock, delta);
 
 		},
 
@@ -257,30 +285,21 @@ lychee.define('lychee.ui.Input').includes([
 
 			if (this.__isDirty === true) {
 
-				renderer.clearBuffer(buffer);
+				renderer.clear(buffer);
 				renderer.setBuffer(buffer);
 
 
 				var font = this.font;
 				if (font !== null) {
 
-					var kerning   = font.kerning;
-					var textwidth = 0;
-
 					var text = this.__value;
-					for (var t = 0, tl = text.length; t < tl; t++) {
-						var chr = font.get(text[t]);
-						textwidth += chr.real + kerning;
-					}
+					var dim  = font.measure(text);
 
-
-					var bwidth = buffer.width;
-
-					if (textwidth > bwidth) {
+					if (dim.width > buffer.width) {
 
 						renderer.drawText(
-							bwidth - textwidth,
-							0,
+							buffer.width - dim.width,
+							dim.height / 2,
 							text,
 							font,
 							false
@@ -290,7 +309,7 @@ lychee.define('lychee.ui.Input').includes([
 
 						renderer.drawText(
 							0,
-							0,
+							dim.height / 2,
 							text,
 							font,
 							false
@@ -314,11 +333,18 @@ lychee.define('lychee.ui.Input').includes([
 			var x = position.x + offsetX;
 			var y = position.y + offsetY;
 
-			var color = this.state === 'active' ? '#0099cc' : '#575757';
+			var color  = this.state === 'active' ? '#33b5e5' : '#0099cc';
+			var color2 = this.state === 'active' ? '#0099cc' : '#575757';
 
 
 			var hwidth  = this.width / 2;
 			var hheight = this.height / 2;
+
+			var x1 = x - hwidth;
+			var y1 = y - hheight;
+			var x2 = x + hwidth;
+			var y2 = y + hheight;
+
 
 			renderer.drawLine(
 				x - hwidth,

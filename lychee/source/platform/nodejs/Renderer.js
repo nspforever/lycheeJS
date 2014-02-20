@@ -19,13 +19,21 @@ lychee.define('Renderer').tags({
 	 * HELPERS
 	 */
 
+	var _color_cache = {};
+
 	var _is_color = function(color) {
 
-		if (
-			   typeof color === 'string'
-			&& color.match(/(#[AaBbCcDdEeFf0-9]{6})/)
-		) {
-			return true;
+		if (typeof color === 'string') {
+
+			if (
+				   color.match(/(#[AaBbCcDdEeFf0-9]{6})/)
+				|| color.match(/(#[AaBbCcDdEeFf0-9]{8})/)
+			) {
+
+				return true;
+
+			}
+
 		}
 
 
@@ -33,21 +41,114 @@ lychee.define('Renderer').tags({
 
 	};
 
-	var _update_environment = function() {
+	var _hex_to_rgba = function(hex) {
 
-		var env = this.__environment;
+		if (_color_cache[hex] !== undefined) {
+			return _color_cache[hex];
+		}
+
+		var rgba = [ 0, 0, 0, 255 ];
+
+		if (typeof hex === 'string') {
+
+			if (hex.length === 7) {
+
+				rgba[0] = parseInt(hex[1] + hex[2], 16);
+				rgba[1] = parseInt(hex[3] + hex[4], 16);
+				rgba[2] = parseInt(hex[5] + hex[6], 16);
+				rgba[3] = 255;
+
+			} else if (hex.length === 9) {
+
+ 				rgba[0] = parseInt(hex[1] + hex[2], 16);
+				rgba[1] = parseInt(hex[3] + hex[4], 16);
+				rgba[2] = parseInt(hex[5] + hex[6], 16);
+				rgba[3] = parseInt(hex[7] + hex[8], 16);
+
+			}
+
+		}
 
 
-		// TODO: Determine rows and columns of TTY
+		var color = 'rgba(' + rgba[0] + ',' + rgba[1] + ',' + rgba[2] + ',' + (rgba[3] / 255) + ')';
 
-		env.screen.width  = 0;
-		env.screen.height = 0;
+		_color_cache[hex] = color;
 
-		env.offset.x = 0;
-		env.offset.y = 0;
 
-		env.width  = this.__width;
-		env.height = this.__height;
+		return color;
+
+	};
+
+	var _draw_ctx = function(x, y, value) {
+
+		if (
+			   x >= 0 && x < this[0].length
+			&& y >= 0 && y < this.length
+		) {
+
+			this[y][x] = value;
+
+		}
+
+	};
+
+
+
+	/*
+	 * STRUCTS
+	 */
+
+	var _buffer = function(width, height) {
+
+		this.width  = typeof width === 'number'  ? width  : 1;
+		this.height = typeof height === 'number' ? height : 1;
+
+
+		this.__ctx = [];
+
+
+		this.resize();
+
+	};
+
+	_buffer.prototype = {
+
+		clear: function() {
+
+			var ctx    = this.__ctx;
+			var width  = this.width;
+			var height = this.height;
+
+			for (var y = 0; y < this.height; y++) {
+
+				for (var x = 0; x < this.width; x++) {
+					this.__ctx[y][x] = ' ';
+				}
+
+			}
+
+		},
+
+		resize: function(width, height) {
+
+			this.__ctx.length = 0;
+
+			// TODO: Remove this
+			// this.__ctx = [];
+
+
+			for (var y = 0; y < this.height; y++) {
+
+				var line = new Array(this.width);
+				for (var x = 0; x < this.width; x++) {
+					line[x] = ' ';
+				}
+
+				this.__ctx.push(line);
+
+			}
+
+		}
 
 	};
 
@@ -57,28 +158,34 @@ lychee.define('Renderer').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var Class = function(id) {
-
-		id = typeof id === 'string' ? id : null;
+	var _id = 0;
 
 
-		this.__id     = id;
-		this.__ctx    = this.createBuffer(0, 0);
-		this.__buffer = this.__ctx;
+	var Class = function(data) {
 
-		this.__environment = {
-			width:  null,
-			height: null,
-			screen: {},
-			offset: {}
-		};
+		var settings = lychee.extend({}, data);
 
-		this.__cache      = {};
-		this.__state      = 0;
-		this.__alpha      = 1;
-		this.__background = null;
-		this.__width      = 0;
-		this.__height     = 0;
+
+		this.alpha      = 1.0;
+		this.background = '#000000';
+		this.id         = 'lychee-Renderer-' + _id++;
+		this.width      = null;
+		this.height     = null;
+		this.offset     = { x: 0, y: 0 };
+
+
+		this.__buffer = this.createBuffer(0, 0);
+		this.__ctx    = this.__buffer.__ctx;
+
+
+		this.setAlpha(settings.alpha);
+		this.setBackground(settings.background);
+		this.setId(settings.id);
+		this.setWidth(settings.width);
+		this.setHeight(settings.height);
+
+
+		settings = null;
 
 	};
 
@@ -86,53 +193,28 @@ lychee.define('Renderer').tags({
 	Class.prototype = {
 
 		/*
-		 * STATE AND ENVIRONMENT MANAGEMENT
+		 * ENTITY API
 		 */
 
-		reset: function(width, height, resetCache) {
+		// deserialize: function(blob) {},
 
-			width      = typeof width === 'number'  ? width  : this.__width;
-			height     = typeof height === 'number' ? height : this.__height;
-			resetCache = resetCache === true;
+		serialize: function() {
 
-			if (resetCache === true) {
-				this.__cache = {};
-			}
+			var settings = {};
 
 
-			this.__width  = width;
-			this.__height = height;
+			if (this.alpha !== 1.0)                           settings.alpha      = this.alpha;
+			if (this.background !== '#000000')                settings.background = this.background;
+			if (this.id.substr(0, 16) !== 'lychee-Renderer-') settings.id         = this.id;
+			if (this.width !== null)                          settings.width      = this.width;
+			if (this.height !== null)                         settings.height     = this.height;
 
 
-			var buffer = this.__buffer;
-
-			buffer.width  = width;
-			buffer.height = height;
-
-			this.clearBuffer(buffer);
-
-
-			_update_environment.call(this);
-
-		},
-
-		start: function() {
-			this.__state = 1;
-		},
-
-		stop: function() {
-			this.__state = 0;
-		},
-
-		clear: function() {
-
-			if (this.__state !== 1) return;
-
-		},
-
-		flush: function(command) {
-
-			if (this.__state !== 1 || typeof command !== 'number') return;
+			return {
+				'constructor': 'lychee.Renderer',
+				'arguments':   [ settings ],
+				'blob':        null
+			};
 
 		},
 
@@ -142,78 +224,137 @@ lychee.define('Renderer').tags({
 		 * SETTERS AND GETTERS
 		 */
 
-		isRunning: function() {
-			return this.__state === 1;
-		},
-
-		getEnvironment: function() {
-			return this.__environment;
-		},
-
 		setAlpha: function(alpha) {
 
 			alpha = typeof alpha === 'number' ? alpha : null;
+
 
 			if (
 				   alpha !== null
 				&& alpha >= 0
 				&& alpha <= 1
 			) {
-
+				this.alpha = alpha;
 			}
 
 		},
 
 		setBackground: function(color) {
 
-			color = _is_color(color) === true ? color : '#000000';
+			color = _is_color(color) === true ? color : null;
 
-			this.__background = color;
+
+			if (color !== null) {
+				this.background = color;
+			}
+
+		},
+
+		setId: function(id) {
+
+			id = typeof id === 'string' ? id : null;
+
+
+			if (id !== null) {
+				this.id = id;
+			}
+
+		},
+
+		setWidth: function(width) {
+
+			width = typeof width === 'number' ? width : null;
+
+
+			if (width !== null) {
+				this.width = width;
+			} else {
+				this.width = process.stdout.columns - 1;
+			}
+
+
+			this.__buffer.width = this.width;
+			this.__buffer.resize();
+
+			this.offset.x = 0;
+
+		},
+
+		setHeight: function(height) {
+
+			height = typeof height === 'number' ? height : null;
+
+
+			if (height !== null) {
+				this.height = height;
+			} else {
+				this.height = process.stdout.rows - 1;
+			}
+
+
+			this.__buffer.height = this.height;
+			this.__buffer.resize();
+
+			this.offset.y = 0;
+
+		},
+
+
+
+		/*
+		 * BUFFER INTEGRATION
+		 */
+
+		clear: function(buffer) {
+
+			buffer = buffer instanceof _buffer ? buffer : null;
+
+
+			if (buffer !== null) {
+
+				buffer.clear();
+
+			} else {
+
+				process.stdout.write('\u001B[2J\u001B[0;0f');
+
+				this.__buffer.clear();
+
+			}
+
+		},
+
+		flush: function() {
+
+			var ctx = this.__ctx;
+
+			var line = ctx[0];
+			var info = this.width + 'x' + this.height;
+
+			for (var i = 0; i < info.length; i++) {
+				line[i] = info[i];
+			}
+
+
+			for (var y = 0; y < this.height; y++) {
+				process.stdout.write(ctx[y].join('') + '\n');
+			}
 
 		},
 
 		createBuffer: function(width, height) {
-
-			width  = typeof width === 'number'  ? width  : 1;
-			height = typeof height === 'number' ? height : 1;
-
-
-			var buffer = {
-				data:   [],
-				width:  width,
-				height: height
-			};
-
-
-			return buffer;
-
-		},
-
-		clearBuffer: function(buffer) {
-
-			var data = [];
-
-			for (var x = 0, x < buffer.width; x++) {
-
-				data[x] = [];
-
-				for (var y = 0, y < buffer.height; y++) {
-					data[x][y] = ' ';
-				}
-
-			}
-
-
-			buffer.data = data;
-
+			return new _buffer(width, height);
 		},
 
 		setBuffer: function(buffer) {
 
-			if (buffer === null) {
-				this.__ctx = this.__buffer;
+			buffer = buffer instanceof _buffer ? buffer : null;
+
+
+			if (buffer !== null) {
+				this.__ctx = buffer.__ctx;
 			} else {
-				this.__ctx = buffer;
+				this.__ctx = this.__buffer.__ctx;
 			}
 
 		},
@@ -225,8 +366,6 @@ lychee.define('Renderer').tags({
 		 */
 
 		drawArc: function(x, y, start, end, radius, color, background, lineWidth) {
-
-			if (this.__state !== 1) return;
 
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
@@ -243,7 +382,12 @@ lychee.define('Renderer').tags({
 
 		drawBox: function(x1, y1, x2, y2, color, background, lineWidth) {
 
-			if (this.__state !== 1) return;
+			if (this.alpha < 0.5) return;
+
+			x1 = x1 | 0;
+			y1 = y1 | 0;
+			x2 = x2 | 0;
+			y2 = y2 | 0;
 
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
@@ -255,44 +399,70 @@ lychee.define('Renderer').tags({
 			var y = 0;
 
 
-			// top - right - bottom - left
-
-			y = y1;
-			for (x = x1; x < x2; x++) ctx.data[x][y] = '-';
-
-			x = x2;
-			for (y = y1; y < y2; y++) ctx.data[x][y] = '|';
-
-			y = y2;
-			for (x = x1; x < x2; x++) ctx.data[x][y] = '-';
-
-			x = x1;
-			for (y = y1; y < y2; y++) ctx.data[x][y] = '|';
-
-
 			if (background === true) {
 
-				for (x = x1; x < x2; x++) {
+				for (x = x1 + 1; x < x2; x++) {
 
-					for (y = y1; y < y2; y++) {
-						ctx.data[x][y] = '+';
+					for (y = y1 + 1; y < y2; y++) {
+						_draw_ctx.call(ctx, x, y, '+');
 					}
 
 				}
 
 			}
 
+
+			// top - right - bottom - left
+
+			y = y1;
+			for (x = x1 + 1; x < x2; x++) _draw_ctx.call(ctx, x, y, '-');
+
+			x = x2;
+			for (y = y1 + 1; y < y2; y++) _draw_ctx.call(ctx, x, y, '|');
+
+			y = y2;
+			for (x = x1 + 1; x < x2; x++) _draw_ctx.call(ctx, x, y, '-');
+
+			x = x1;
+			for (y = y1 + 1; y < y2; y++) _draw_ctx.call(ctx, x, y, '|');
+
 		},
 
 		drawBuffer: function(x1, y1, buffer) {
 
-			var x2 = Math.min(x1 + buffer.width,  this.__ctx.width);
-			var y2 = Math.min(y1 + buffer.height, this.__ctx.height);
+			buffer = buffer instanceof _buffer ? buffer : null;
 
-			for (var x = x1; x < x2; x++) {
+
+			if (buffer !== null) {
+
+				var ctx = this.__ctx;
+
+
+				var x2 = Math.min(x1 + buffer.width,  this.__buffer.width);
+				var y2 = Math.min(y1 + buffer.height, this.__buffer.height);
+
 
 				for (var y = y1; y < y2; y++) {
-					this.__ctx.data[x][y] = buffer[x - x1][y - y1];
+
+					for (var x = x1; x < x2; x++) {
+						this.__ctx[y][x] = buffer.__ctx[y - y1][x - x1];
+					}
+
+				}
+
+
+				if (lychee.debug === true) {
+
+					this.drawBox(
+						x1,
+						y1,
+						x1 + buffer.width,
+						y1 + buffer.height,
+						'#00ff00',
+						false,
+						1
+					);
+
 				}
 
 			}
@@ -300,8 +470,6 @@ lychee.define('Renderer').tags({
 		},
 
 		drawCircle: function(x, y, radius, color, background, lineWidth) {
-
-			if (this.__state !== 1) return;
 
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
@@ -315,9 +483,21 @@ lychee.define('Renderer').tags({
 
 		},
 
-		drawLine: function(x1, y1, x2, y2, color, lineWidth) {
+		drawLight: function(x, y, radius, color, background, lineWidth) {
 
-			if (this.__state !== 1) return;
+			color      = _is_color(color) ? _hex_to_rgba(color) : 'rgba(255,255,255,1.0)';
+			background = background === true;
+			lineWidth  = typeof lineWidth === 'number' ? lineWidth : 1;
+
+
+			var ctx = this.__ctx;
+
+
+			// TODO: Implement light-drawing ASCII art algorithm
+
+		},
+
+		drawLine: function(x1, y1, x2, y2, color, lineWidth) {
 
 			color     = _is_color(color) === true ? color : '#000000';
 			lineWidth = typeof lineWidth === 'number' ? lineWidth : 1;
@@ -331,8 +511,6 @@ lychee.define('Renderer').tags({
 		},
 
 		drawTriangle: function(x1, y1, x2, y2, x3, y3, color, background, lineWidth) {
-
-			if (this.__state !== 1) return;
 
 			color      = _is_color(color) === true ? color : '#000000';
 			background = background === true;
@@ -348,8 +526,6 @@ lychee.define('Renderer').tags({
 
 		// points, x1, y1, [ ... x(a), y(a) ... ], [ color, background, lineWidth ]
 		drawPolygon: function(points, x1, y1) {
-
-			if (this.__state !== 1) return;
 
 			var l = arguments.length;
 
@@ -394,8 +570,6 @@ lychee.define('Renderer').tags({
 
 		drawSprite: function(x1, y1, texture, map) {
 
-			if (this.__state !== 1) return;
-
 			texture = texture instanceof Texture ? texture : null;
 			map     = map instanceof Object      ? map     : null;
 
@@ -428,54 +602,46 @@ lychee.define('Renderer').tags({
 
 		drawText: function(x1, y1, text, font, center) {
 
-			if (this.__state !== 1) return;
-
 			font   = font instanceof Font ? font : null;
 			center = center === true;
 
 
 			if (font !== null) {
 
-				var baseline = font.baseline;
-				var kerning  = font.kerning;
-
-				var chr, t, l;
-
 				if (center === true) {
 
-					var textwidth  = 0;
-					var textheight = 0;
+					var dim = font.measure(text);
 
-					for (t = 0, l = text.length; t < l; t++) {
-						chr = font.get(text[t]);
-						textwidth += chr.real + kerning;
-						textheight = Math.max(textheight, chr.height);
-					}
-
-					x1 -= textwidth / 2;
-					y1 -= (textheight - baseline) / 2;
+					x1 -= dim.realwidth / 2;
+					y1 -= (dim.realheight - font.baseline) / 2;
 
 				}
 
 
-				y1 -= baseline / 2;
+				y1 -= font.baseline / 2;
 
 
+				x1 = x1 | 0;
+				y1 = y1 | 0;
+
+
+				var ctx = this.__ctx;
 				var margin  = 0;
 				var texture = font.texture;
 				if (texture !== null) {
 
 					for (t = 0, l = text.length; t < l; t++) {
 
-						var chr = font.get(text[t]);
+						var chr = font.measure(text[t]);
 
 						var x = x1 + margin - font.spacing;
 						var y = y1;
 
-						this.__ctx.data[x][y] = text[t];
+
+						_draw_ctx.call(ctx, x, y, text[t]);
 
 
-						margin += chr.real + font.kerning;
+						margin += chr.realwidth + font.kerning;
 
 					}
 

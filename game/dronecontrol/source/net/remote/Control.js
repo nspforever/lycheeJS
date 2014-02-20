@@ -76,6 +76,27 @@ lychee.define('game.net.remote.Control').requires([
 
 	};
 
+	var _on_dance = function(data) {
+
+		var drone = _drones[data.ip] || null;
+		if (drone !== null) {
+
+			if (drone.owner !== this) return false;
+
+
+			if (lychee.enumof(Class.DANCE, data.dance) === true) {
+
+				drone.setDance(
+					data.dance,
+					data.duration
+				);
+
+			}
+
+		}
+
+	};
+
 	var _on_flip = function(data) {
 
 		var drone = _drones[data.ip] || null;
@@ -84,25 +105,10 @@ lychee.define('game.net.remote.Control').requires([
 			if (drone.owner !== this) return false;
 
 
-			data.animation = null;
+			if (lychee.enumof(Class.FLIP, data.flip) === true) {
 
-
-			var flip = data.flip;
-			if (flip === Class.FLIP.ahead) {
-				data.animation = 'flip-ahead';
-			} else if (flip === Class.FLIP.right) {
-				data.animation = 'flip-right';
-			} else if (flip === Class.FLIP.behind) {
-				data.animation = 'flip-behind';
-			} else if (flip === Class.FLIP.left) {
-				data.animation = 'flip-left';
-			}
-
-
-			if (data.animation !== null) {
-
-				drone.animateFlight(
-					data.animation,
+				drone.setFlip(
+					data.flip,
 					data.duration
 				);
 
@@ -122,12 +128,7 @@ lychee.define('game.net.remote.Control').requires([
 
 			var state = data.state || null;
 			if (state instanceof Object) {
-
-				drone.roll(state.roll);
-				drone.pitch(state.pitch);
-				drone.yaw(state.yaw);
-				drone.heave(state.heave);
-
+				drone.setState(data.state);
 			}
 
 		}
@@ -151,6 +152,7 @@ lychee.define('game.net.remote.Control').requires([
 		 */
 
 		this.bind('command', _on_command, this);
+		this.bind('dance',   _on_dance,   this);
 		this.bind('flip',    _on_flip,    this);
 		this.bind('state',   _on_state,   this);
 
@@ -172,6 +174,34 @@ lychee.define('game.net.remote.Control').requires([
 
 		}, this);
 
+	};
+
+
+	Class.COMMAND = {
+		takeoff: 0,
+		land:    1,
+		stop:    2
+	};
+
+
+	Class.DANCE = {
+		roll:    10,
+		pitch:   11,
+		yaw:      9,
+
+		shake:    8,
+		wave:    13,
+
+		turn:     6,
+		turndown: 7
+	};
+
+
+	Class.FLIP = {
+		ahead:  16,
+		behind: 17,
+		left:   18,
+		right:  19
 	};
 
 

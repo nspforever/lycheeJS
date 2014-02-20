@@ -682,29 +682,17 @@ lychee.define('Renderer').tags({
 
 			if (font !== null) {
 
-				var baseline = font.baseline;
-				var kerning  = font.kerning;
-
-				var chr, t, l;
-
 				if (center === true) {
 
-					var textwidth  = 0;
-					var textheight = 0;
+					var dim = font.measure(text);
 
-					for (t = 0, l = text.length; t < l; t++) {
-						chr = font.get(text[t]);
-						textwidth += chr.real + kerning;
-						textheight = Math.max(textheight, chr.height);
-					}
-
-					x1 -= textwidth / 2;
-					y1 -= (textheight - baseline) / 2;
+					x1 -= dim.realwidth / 2;
+					y1 -= (dim.realheight - font.baseline) / 2;
 
 				}
 
 
-				y1 -= baseline / 2;
+				y1 -= font.baseline / 2;
 
 
 				var margin  = 0;
@@ -718,14 +706,14 @@ lychee.define('Renderer').tags({
 
 					for (t = 0, l = text.length; t < l; t++) {
 
-						var chr = font.get(text[t]);
+						var chr = font.measure(text[t]);
 
 						if (lychee.debug === true) {
 
 							this.drawBox(
 								x1 + margin,
 								y1,
-								x1 + margin + chr.real,
+								x1 + margin + chr.realwidth,
 								y1 + chr.height,
 								'#00ff00',
 								false,
@@ -746,7 +734,7 @@ lychee.define('Renderer').tags({
 							chr.height
 						);
 
-						margin += chr.real + font.kerning;
+						margin += chr.realwidth + font.kerning;
 
 					}
 

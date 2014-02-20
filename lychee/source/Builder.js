@@ -579,7 +579,6 @@
 					ids.push(subprefix);
 				break;
 
-
 				case '[object Object]':
 					_get_identifiers(node, subprefix, ids);
 				break;

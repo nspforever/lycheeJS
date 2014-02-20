@@ -17,7 +17,7 @@ lychee.define('game.Main').requires([
 
 			input: {
 				delay:       0,
-				key:         false,
+				key:         true,
 				keymodifier: false,
 				touch:       true,
 				swipe:       true

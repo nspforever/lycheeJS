@@ -387,16 +387,20 @@ lychee.define('lychee.game.State').requires([
 		processTouch: function(id, position, delta) {
 
 			var args = [ id, {
-				x: position.x,
-				y: position.y
+				x: 0,
+				y: 0
 			}, delta ];
+
+
+			var x = position.x;
+			var y = position.y;
 
 
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				args[1].x -= renderer.offset.x;
-				args[1].y -= renderer.offset.y;
+				x -= renderer.offset.x;
+				y -= renderer.offset.y;
 
 			}
 
@@ -410,6 +414,10 @@ lychee.define('lychee.game.State').requires([
 				if (layer.visible === false) continue;
 
 				if (layer instanceof lychee.ui.Layer) {
+
+					args[1].x = x - layer.position.x;
+					args[1].y = y - layer.position.y;
+
 
 					var result = layer.trigger('touch', args);
 					if (

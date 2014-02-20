@@ -132,18 +132,10 @@ lychee.define('lychee.ui.Label').includes([
 				var font = this.font;
 				if (font !== null) {
 
-					var width   = 0;
-					var height  = 0;
-					var kerning = font.kerning;
+					var dim = font.measure(label);
 
-					for (var l = 0, ll = label.length; l < ll; l++) {
-						var chr = font.get(label[l]);
-						width += chr.real + kerning;
-						height = Math.max(height, chr.height);
-					}
-
-					this.width  = width;
-					this.height = height;
+					this.width  = dim.realwidth;
+					this.height = dim.realheight;
 
 				}
 

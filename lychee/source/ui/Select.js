@@ -51,15 +51,17 @@ lychee.define('lychee.ui.Select').includes([
 
 		this.bind('touch', function(id, position, delta) {
 
+			if (this.options.length === 0) return;
+
+
 			if (this.state === 'active') {
 
-
-				var lineh = this.height / (1 + this.options.length);
-				var y     = (position.y - lineh / 2);
 				var index = -1;
 
+				var elh = this.height / (1 + this.options.length);
+				var y   = (position.y + this.height / 2 - elh);
 				if (y > 0) {
-					index = (y / lineh) | 0;
+					index = (y / elh) | 0;
 				}
 
 
@@ -260,8 +262,8 @@ lychee.define('lychee.ui.Select').includes([
 
 			} else if (state === 'active') {
 
-				var lineh = this.height / (1 + this.options.length);
-				var y1    = y - this.height / 2;
+				var elh = this.height / (1 + this.options.length);
+				var y1  = y - this.height / 2;
 
 
 				if (font !== null) {
@@ -270,7 +272,7 @@ lychee.define('lychee.ui.Select').includes([
 
 					renderer.drawText(
 						x,
-						y1 + lineh / 2,
+						y1 + elh / 2,
 						this.value,
 						font,
 						true
@@ -284,20 +286,24 @@ lychee.define('lychee.ui.Select').includes([
 
 						if (options[o] === this.value) {
 
+							renderer.setAlpha(0.6);
+
 							renderer.drawBox(
 								x  - hwidth,
-								y1 + (o + 1) * lineh,
+								y1 + (o + 1) * elh,
 								x  + hwidth,
-								y1 + (o + 1) * lineh + lineh,
+								y1 + (o + 1) * elh + elh,
 								color,
 								true
 							);
+
+							renderer.setAlpha(1.0);
 
 						}
 
 						renderer.drawText(
 							x,
-							y1 + (o + 1) * lineh + lineh / 2,
+							y1 + (o + 1) * elh + elh / 2,
 							options[o],
 							font,
 							true
@@ -327,8 +333,8 @@ lychee.define('lychee.ui.Select').includes([
 
 				if (id === 'default') {
 
-					var ol    = 1 + this.options.length;
-					var lineh = this.height / ol;
+					var ol  = 1 + this.options.length;
+					var elh = this.height / ol;
 
 
 					pulse.alpha  = 0.0;
@@ -336,14 +342,14 @@ lychee.define('lychee.ui.Select').includes([
 					pulse.active = true;
 
 					pulse.position.from = this.position.y;
-					pulse.position.to   = this.position.y - (ol - 1) * lineh / 2;
+					pulse.position.to   = this.position.y - (ol - 1) * elh / 2;
 					pulse.height.from   = this.height;
-					pulse.height.to     = lineh;
+					pulse.height.to     = elh;
 
 				} else if (id === 'active') {
 
-					var ol    = 1 + this.options.length;
-					var lineh = this.height;
+					var ol  = 1 + this.options.length;
+					var elh = this.height;
 
 
 					pulse.alpha  = 0.6;
@@ -351,9 +357,9 @@ lychee.define('lychee.ui.Select').includes([
 					pulse.active = true;
 
 					pulse.position.from = this.position.y;
-					pulse.position.to   = this.position.y + (ol - 1) * lineh / 2;
+					pulse.position.to   = this.position.y + (ol - 1) * elh / 2;
 					pulse.height.from   = this.height;
-					pulse.height.to     = ol * lineh;
+					pulse.height.to     = ol * elh;
 
 				}
 

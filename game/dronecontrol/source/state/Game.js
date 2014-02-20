@@ -6,7 +6,11 @@ lychee.define('game.state.Game').requires([
 	'lychee.ui.Joystick',
 	'lychee.ui.Label',
 	'lychee.ui.Select',
-	'game.net.client.Control'
+	'game.net.client.Control',
+
+// TODO: Remove this
+	'lychee.ui.Input',
+	'lychee.ui.Switch'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
@@ -154,7 +158,10 @@ lychee.define('game.state.Game').requires([
 			entity = this.queryLayer('ui', 'settings > ip');
 			entity.bind('change', function(value) {
 
-console.log('CHANGED IP', value)
+				var service = this.game.client.services.control;
+				if (service !== null) {
+					service.setIp(value);
+				}
 
 			}, this);
 

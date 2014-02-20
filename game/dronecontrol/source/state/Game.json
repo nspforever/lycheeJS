@@ -57,7 +57,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Takeoff",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -74,7 +74,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Land",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -91,7 +91,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Stop",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -157,7 +157,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Ahead",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -174,7 +174,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Right",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -191,7 +191,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Behind",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -208,7 +208,7 @@
 									"constructor": "lychee.ui.Button",
 									"arguments": [{
 										"label": "Left",
-										"width": 216,
+										"width": 240,
 										"height": 48,
 										"position": {
 											"x": 0,
@@ -245,6 +245,12 @@
 						"entities": [{
 							"constructor": "lychee.ui.Select",
 							"arguments": [{
+								"width": 384,
+								"height": 48,
+								"position": {
+									"x": 0,
+									"y": 0
+								},
 								"options": [
 									"192.168.1.1",
 									"192.168.1.2",

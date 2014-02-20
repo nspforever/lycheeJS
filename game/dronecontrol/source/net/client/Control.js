@@ -44,11 +44,24 @@ lychee.define('game.net.client.Control').includes([
 	};
 
 
+	Class.DANCE = {
+		roll:    10,
+		pitch:   11,
+		yaw:      9,
+
+		shake:    8,
+		wave:    13,
+
+		turn:     6,
+		turndown: 7
+	};
+
+
 	Class.FLIP = {
-		ahead:  0,
-		right:  1,
-		behind: 2,
-		left:   3
+		ahead:  16,
+		behind: 17,
+		left:   18,
+		right:  19
 	};
 
 
@@ -70,6 +83,34 @@ lychee.define('game.net.client.Control').includes([
 					}, {
 						id:    this.id,
 						event: 'command'
+					});
+
+					return true;
+
+				}
+
+			}
+
+
+			return false;
+
+		},
+
+		setDance: function(dance, duration) {
+
+			duration = typeof duration === 'number' ? duration : 3000;
+
+
+			if (lychee.enumof(Class.DANCE, dance) === true) {
+
+				if (this.tunnel !== null) {
+
+					this.tunnel.send({
+						ip:    this.ip,
+						dance: dance
+					}, {
+						id:    this.id,
+						event: 'dance'
 					});
 
 					return true;

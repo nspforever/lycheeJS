@@ -36,7 +36,7 @@ lychee.define('lychee.ui.Joystick').includes([
 		var settings = lychee.extend({}, data);
 
 
-		this.value  = { x: 0, y: 0 };
+		this.value = { x: 0, y: 0 };
 
 		this.__drag  = { x: 0, y: 0 };
 		this.__pulse = {

@@ -86,28 +86,60 @@
 
 			for (var c = 0, cl = this.charset.length; c < cl; c++) {
 
+				var id = this.charset[c];
+
 				var chr = {
-					id:     this.charset[c],
-					width:  data.map[c] + this.spacing * 2,
-					height: this.lineheight,
-					real:   data.map[c],
-					x:      offset - this.spacing,
-					y:      0
+					width:      data.map[c] + this.spacing * 2,
+					height:     this.lineheight,
+					realwidth:  data.map[c],
+					realheight: this.lineheight,
+					x:          offset - this.spacing,
+					y:          0
 				};
 
 				offset += chr.width;
 
 
-				this.__buffer[chr.id] = chr;
+				this.__buffer[id] = chr;
 
 			}
 
 		}
 
 
+		this.measure('');
+
+
 		if (this.onload instanceof Function) {
 			this.onload();
 		}
+
+	};
+
+	var _measure_font_text = function(text) {
+
+		var width = 0;
+
+		for (var t = 0, tl = text.length; t < tl; t++) {
+
+			var chr = this.measure(text[t]);
+			if (chr !== null) {
+				width += chr.realwidth + this.kerning;
+			}
+
+		}
+
+
+		// TODO: Embedded Font ligatures will set x and y value based on settings.map
+
+		return {
+			width:      width,
+			height:     this.lineheight,
+			realwidth:  width,
+			realheight: this.lineheight,
+			x:          0,
+			y:          0
+		};
 
 	};
 
@@ -171,16 +203,24 @@
 
 		},
 
-		get: function(character) {
+		measure: function(text) {
 
-			character = typeof character === 'string' ? character : null;
+			text = typeof text === 'string' ? text : null;
 
-			if (character !== null) {
-				return this.__buffer[character] || null;
+
+			if (text !== null) {
+
+				var data = this.__buffer[text] || null;
+				if (data === null) {
+					data = this.__buffer[text] = _measure_font_text.call(this, text);
+				}
+
+				return data;
+
 			}
 
 
-			return null;
+			return this.__buffer[''];
 
 		},
 

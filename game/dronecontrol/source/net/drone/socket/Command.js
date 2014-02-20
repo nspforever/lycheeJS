@@ -61,9 +61,9 @@ lychee.define('game.net.drone.socket.Command').tags({
 				var buffer   = new Buffer(commands);
 
 
-//				if (lychee.debug === true) {
-//					console.log('game.ar.command.Socket: ' + JSON.stringify(commands));
-//				}
+				if (lychee.debug === true) {
+					console.log(this.__buffer.join('\n'));
+				}
 
 
 				this.__socket.send(

@@ -4,10 +4,10 @@
 
 		"platform": {
 
-			"html":   "platform/html",
-			"nodejs": "platform/nodejs",
-			"v8gl":   "platform/v8gl",
-			"webgl":  "platform/webgl"
+			"html":         "platform/html",
+			"webgl":        "platform/webgl",
+			"nodejs":       "platform/nodejs",
+			"nodejs-webgl": "platform/nodejs-webgl"
 
 		}
 
@@ -32,6 +32,7 @@
 			"nodejs": {
 
 				"net": {
+					"Client":   [ "js" ],
 					"Protocol": [ "js" ],
 					"Remote":   [ "js" ],
 					"Server":   [ "js" ]
@@ -39,19 +40,6 @@
 
 				"Input":    [ "js" ],
 				"Renderer": [ "js" ],
-				"Viewport": [ "js" ]
-
-			},
-
-			"v8gl": {
-
-				"game": {
-					"Loop": [ "js" ]
-				},
-
-				"Input":    [ "js" ],
-				"Renderer": [ "js" ],
-				"Track":    [ "js" ],
 				"Viewport": [ "js" ]
 
 			},

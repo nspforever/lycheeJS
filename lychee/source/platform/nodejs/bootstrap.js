@@ -39,32 +39,58 @@
 
 		if (data.map instanceof Array) {
 
-			var offset = this.spacing;
-
 			for (var c = 0, cl = this.charset.length; c < cl; c++) {
 
+				var id = this.charset[c];
+
 				var chr = {
-					id:     this.charset[c],
-					width:  1,
-					height: this.lineheight,
-					real:   1,
-					x:      offset - this.spacing,
-					y:      0
+					width:      1,
+					height:     this.lineheight,
+					realwidth:  1,
+					realheight: this.lineheight,
+					x:          0,
+					y:          0
 				};
 
-				offset += chr.width;
 
-
-				this.__buffer[chr.id] = chr;
+				this.__buffer[id] = chr;
 
 			}
 
 		}
 
 
+		this.measure('');
+
+
 		if (this.onload instanceof Function) {
 			this.onload();
 		}
+
+	};
+
+	var _measure_font_text = function(text) {
+
+		var width = 0;
+
+		for (var t = 0, tl = text.length; t < tl; t++) {
+
+			var chr = this.measure(text[t]);
+			if (chr !== null) {
+				width += chr.realwidth + this.kerning;
+			}
+
+		}
+
+
+		return {
+			width:      width,
+			height:     this.lineheight,
+			realwidth:  width,
+			realheight: this.lineheight,
+			x:          0,
+			y:          0
+		};
 
 	};
 
@@ -101,7 +127,7 @@
 		this.charset    = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 		this.spacing    = 0;
 		this.kerning    = 0;
-		this.lineheight = 0;
+		this.lineheight = 1;
 
 		this.__buffer   = {};
 
@@ -120,19 +146,32 @@
 	Font.prototype = {
 
 		serialize: function() {
-			return this.url || null;
+
+			return {
+				'constructor': 'Font',
+				'arguments':   [ this.url ]
+			};
+
 		},
 
-		get: function(character) {
+		measure: function(text) {
 
-			character = typeof character === 'string' ? character : null;
+			text = typeof text === 'string' ? text : null;
 
-			if (character !== null) {
-				return this.__buffer[character] || null;
+
+			if (text !== null) {
+
+				var data = this.__buffer[text] || null;
+				if (data === null) {
+					data = this.__buffer[text] = _measure_font_text.call(this, text);
+				}
+
+				return data;
+
 			}
 
 
-			return null;
+			return this.__buffer[''];
 
 		},
 
@@ -225,7 +264,12 @@
 	Texture.prototype = {
 
 		serialize: function() {
-			return this.url || null;
+
+			return {
+				'constructor': 'Texture',
+				'arguments':   [ this.url ]
+			};
+
 		},
 
 		load: function() {
@@ -243,18 +287,40 @@
 				if (!err) {
 
 					that.buffer = raw;
+//					that.buffer = new Buffer(raw, 'binary').toString('base64');
 					that.width  = 0;
 					that.height = 0;
 
 				}
 
-				if (data === null) {
 
-					if (lychee.debug === true) {
-						console.error('bootstrap.js: Texture at ' + url + ' is invalid.');
+				var url = that.url;
+				var is_embedded = url.substr(0, 10) === 'data:image';
+				if (is_embedded === false) {
+
+					var tmp = url.split('.');
+					var ext = tmp[tmp.length - 1];
+
+					if (ext !== 'png') {
+
+						if (lychee.debug === true) {
+							console.error('bootstrap.js: Texture at ' + that.url + ' is invalid. It is NOT a PNG file.');
+						}
+
 					}
 
 				}
+
+
+				var is_power_of_two = (this.width & (this.width - 1)) === 0 && (this.height & (this.height - 1)) === 0;
+				if (is_power_of_two === false && is_embedded === false) {
+
+					if (lychee.debug === true) {
+						console.warn('bootstrap.js: Texture at ' + that.url + ' is NOT power-of-two. Mipmaps cannot be generated.');
+					}
+
+				}
+
 
 				if (that.onload instanceof Function) {
 					that.onload();
