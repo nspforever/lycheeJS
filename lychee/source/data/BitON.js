@@ -155,6 +155,7 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 			this.__pointer   += captured;
 			this.__remaining -= captured;
 
+
 			if (this.__remaining === 0) {
 
 				this.__buffer    += CHAR_TABLE[this.__value];
@@ -293,47 +294,66 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 
 			} else if (data < 16) {
 
-				stream.write(1, 3);
+				stream.write(1, 4);
 				stream.write(data, 4);
 
 			} else if (data < 256) {
 
-				stream.write(2, 3);
+				stream.write(2, 4);
 				stream.write(data, 8);
 
 			} else if (data < 4096) {
 
-				stream.write(3, 3);
+				stream.write(3, 4);
 				stream.write(data >>  8 & 0xff, 4);
-				stream.write(data >>  0 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
 
 			} else if (data < 65536) {
 
-				stream.write(4, 3);
+				stream.write(4, 4);
 				stream.write(data >>  8 & 0xff, 8);
-				stream.write(data >>  0 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
 
 			} else if (data < 1048576) {
 
-				stream.write(5, 3);
+				stream.write(5, 4);
 				stream.write(data >> 16 & 0xff, 4);
 				stream.write(data >>  8 & 0xff, 8);
-				stream.write(data >>  0 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
 
 			} else if (data < 16777216) {
 
-				stream.write(6, 3);
+				stream.write(6, 4);
 				stream.write(data >> 16 & 0xff, 8);
 				stream.write(data >>  8 & 0xff, 8);
-				stream.write(data >>  0 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
 
-			} else {
+			} else if (data < 4294967297) {
 
-				stream.write(7, 3);
+				stream.write(7, 4);
 				stream.write(data >> 24 & 0xff, 8);
 				stream.write(data >> 16 & 0xff, 8);
 				stream.write(data >>  8 & 0xff, 8);
-				stream.write(data >>  0 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
+
+			} else if (data < 1099511627776) {
+
+				stream.write(8, 4);
+				stream.write(data >> 32 & 0xff, 8);
+				stream.write(data >> 24 & 0xff, 8);
+				stream.write(data >> 16 & 0xff, 8);
+				stream.write(data >>  8 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
+
+			} else if (data < 281474976710656) {
+
+				stream.write(9, 4);
+				stream.write(data >> 40 & 0xff, 8);
+				stream.write(data >> 32 & 0xff, 8);
+				stream.write(data >> 24 & 0xff, 8);
+				stream.write(data >> 16 & 0xff, 8);
+				stream.write(data >>  8 & 0xff, 8);
+				stream.write(data       & 0xff, 8);
 
 			}
 
@@ -364,14 +384,14 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 				stream.write(l >> 24 & 0xff, 8);
 				stream.write(l >> 16 & 0xff, 8);
 				stream.write(l >>  8 & 0xff, 8);
-				stream.write(l >>  0 & 0xff, 8);
+				stream.write(l       & 0xff, 8);
 
 			} else if (l > 255) {
 
 				stream.write(30, 5);
 
-				stream.write(l >> 8 & 0xff, 8);
-				stream.write(l >> 0 & 0xff, 8);
+				stream.write(l >>  8 & 0xff, 8);
+				stream.write(l       & 0xff, 8);
 
 			} else if (l > 28) {
 
@@ -470,7 +490,7 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 			// 1: Integer, 2: Float
 			} else if (type === 1 || type === 2) {
 
-				var tmp = stream.read(3);
+				var tmp = stream.read(4);
 				if (tmp === 0) {
 
 					value = stream.read(1);
@@ -486,31 +506,48 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 				} else if (tmp === 3) {
 
 					value = (stream.read(4) <<  8)
-						  + (stream.read(8) <<  0);
+						  +  stream.read(8);
 
 				} else if (tmp === 4) {
 
 					value = (stream.read(8) <<  8)
-						  + (stream.read(8) <<  0);
+						  +  stream.read(8);
 
 				} else if (tmp === 5) {
 
 					value = (stream.read(4) << 16)
 						  + (stream.read(8) <<  8)
-						  + (stream.read(8) <<  0);
+						  +  stream.read(8);
 
 				} else if (tmp === 6) {
 
 					value = (stream.read(8) << 16)
 						  + (stream.read(8) <<  8)
-						  + (stream.read(8) <<  0);
+						  +  stream.read(8);
 
 				} else if (tmp === 7) {
 
 					value = (stream.read(8) << 24)
 						  + (stream.read(8) << 16)
 						  + (stream.read(8) <<  8)
-						  + (stream.read(8) <<  0);
+						  +  stream.read(8);
+
+				} else if (tmp === 8) {
+
+					value = (stream.read(8) << 32)
+						  + (stream.read(8) << 24)
+						  + (stream.read(8) << 16)
+						  + (stream.read(8) <<  8)
+						  +  stream.read(8);
+
+				} else if (tmp === 9) {
+
+					value = (stream.read(8) << 40)
+						  + (stream.read(8) << 32)
+						  + (stream.read(8) << 24)
+						  + (stream.read(8) << 16)
+						  + (stream.read(8) <<  8)
+						  +  stream.read(8);
 
 				}
 
@@ -539,12 +576,12 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 					size = (stream.read(8) << 24)
 					     + (stream.read(8) << 16)
 					     + (stream.read(8) <<  8)
-					     + (stream.read(8) <<  0);
+					     +  stream.read(8);
 
 				} else if (size === 30) {
 
 					size = (stream.read(8) <<  8)
-					     + (stream.read(8) <<  0);
+					     +  stream.read(8);
 
 				} else if (size === 29) {
 
