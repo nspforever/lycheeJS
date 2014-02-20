@@ -13,8 +13,8 @@ lychee.define('game.net.Server').requires([
 	var Class = function() {
 
 		lychee.net.Server.call(this, {
-//			encoder: _BitON.encode,
-//			decoder: _BitON.decode
+			encoder: _BitON.encode,
+			decoder: _BitON.decode
 		});
 
 

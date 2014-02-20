@@ -19,9 +19,17 @@ lychee.define('game.net.Client').requires([
 
 
 		lychee.net.Client.call(this, {
-//			encoder:   settings.encoder || _BitON.encode,
-//			decoder:   settings.decoder || _BitON.decode
+			encoder: _BitON.encode,
+			decoder: _BitON.decode
 		});
+
+
+var data = {
+	stamp: Date.now()
+};
+
+var blob = _BitON.encode(data);
+console.log(blob, _BitON.decode(blob));
 
 
 		this.bind('connect', function() {
