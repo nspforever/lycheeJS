@@ -141,10 +141,6 @@ lychee.define('lychee.net.Server').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var _encoder = function(blob) { return blob; };
-	var _decoder = function(blob) { return blob; };
-
-
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
@@ -152,8 +148,8 @@ lychee.define('lychee.net.Server').tags({
 
 		this.remotes = [];
 
-		this.__encoder = settings.encoder instanceof Function ? settings.encoder : _encoder;
-		this.__decoder = settings.decoder instanceof Function ? settings.decoder : _decoder;
+		this.__encoder = settings.encoder instanceof Function ? settings.encoder : JSON.stringify;
+		this.__decoder = settings.decoder instanceof Function ? settings.decoder : JSON.parse;
 		this.__socket  = null;
 
 
@@ -168,7 +164,7 @@ lychee.define('lychee.net.Server').tags({
 
 		listen: function(port, host) {
 
-			if (this.__socket !== null) return;
+			if (this.__socket !== null) return false;
 
 
 			port = typeof port === 'number' ? port : 1337;

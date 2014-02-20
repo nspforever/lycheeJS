@@ -54,7 +54,7 @@ lychee.define('game.Main').requires([
 
 		init: function() {
 
-			// Overwrite client with game.Client
+			// Overwrite client with game.net.Client
 			var clientsettings   = this.settings.client;
 			this.settings.client = null;
 

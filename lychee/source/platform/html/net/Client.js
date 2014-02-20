@@ -249,17 +249,17 @@ lychee.define('lychee.net.Client').tags({
 	 * IMPLEMENTATION
 	 */
 
-	var _encoder = function(blob) { return blob; };
-	var _decoder = function(blob) { return blob; };
-
-
 	var Class = function(data) {
 
 		var settings = lychee.extend({}, data);
 
 
-		this.__encoder = settings.encoder instanceof Function ? settings.encoder : _encoder;
-		this.__decoder = settings.decoder instanceof Function ? settings.decoder : _decoder;
+		this.port = 1337;
+		this.host = 'localhost';
+
+
+		this.__encoder = settings.encoder instanceof Function ? settings.encoder : JSON.stringify;
+		this.__decoder = settings.decoder instanceof Function ? settings.decoder : JSON.parse;
 		this.__socket  = null;
 		this.__services  = {
 			waiting: [], // Waiting Services need to be verified from Remote
@@ -281,11 +281,11 @@ lychee.define('lychee.net.Client').tags({
 
 		listen: function(port, host) {
 
-			if (this.__socket !== null) return;
+			if (this.__socket !== null) return false;
 
 
-			port = typeof port === 'number' ? port : 1337;
-			host = typeof host === 'string' ? host : 'localhost';
+			this.port = typeof port === 'number' ? port : this.port;
+			this.host = typeof host === 'string' ? host : this.host;
 
 
 			if (this.__isRunning === true) {
@@ -294,11 +294,11 @@ lychee.define('lychee.net.Client').tags({
 
 
 			if (lychee.debug === true) {
-				console.log('lychee.net.Client: Listening on ' + host + ':' + port);
+				console.log('lychee.net.Client: Listening on ' + this.host + ':' + this.port);
 			}
 
 
-			var url = 'ws://' + host + ':' + port;
+			var url = 'ws://' + this.host + ':' + this.port;
 
 			this.__socket = new WebSocket(url);
 
@@ -319,7 +319,6 @@ lychee.define('lychee.net.Client').tags({
 				that.trigger('connect');
 
 			};
-
 
 			this.__socket.onmessage = function(event) {
 
@@ -405,6 +404,17 @@ lychee.define('lychee.net.Client').tags({
 
 
 			return true;
+
+		},
+
+		connect: function() {
+
+			if (this.__isRunning === false) {
+				return this.listen(this.port, this.host);
+			}
+
+
+			return false;
 
 		},
 

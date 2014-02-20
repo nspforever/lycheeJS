@@ -19,6 +19,9 @@ lychee.define('game.state.Game').requires([
 		lychee.game.State.call(this, game);
 
 
+		this.intervalId = null;
+
+
 		this.deserialize(_blob);
 		this.reshape();
 
@@ -31,6 +34,31 @@ lychee.define('game.state.Game').requires([
 
 			lychee.game.State.prototype.deserialize.call(this, blob);
 
+
+			var entity = null;
+
+
+			var client = this.client;
+			if (client !== null) {
+
+				entity = this.queryLayer('ui', 'statistics');
+
+
+				var service = client.services.ping;
+				if (service !== null) {
+
+					service.bind('unplug', function() {
+						this.setLabel('Ping: - ms / - ms');
+					}, entity);
+
+					service.bind('statistics', function(ping, pong) {
+						this.setLabel('Ping: ' + ping + ' ms / ' + pong + ' ms');
+					}, entity);
+
+				}
+
+			}
+
 		},
 
 		reshape: function(orientation, rotation) {
@@ -38,10 +66,12 @@ lychee.define('game.state.Game').requires([
 			lychee.game.State.prototype.reshape.call(this, orientation, rotation);
 
 
+			var entity = null;
+
+
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
-				var entity = null;
 				var width  = renderer.width;
 				var height = renderer.height;
 
@@ -63,9 +93,36 @@ lychee.define('game.state.Game').requires([
 				circle.setColor('#888888', true);
 			}
 
+
+			var loop = this.loop;
+			if (loop !== null) {
+
+				this.intervalId = loop.setInterval(1000, function() {
+
+					var client = this.client;
+					if (client !== null) {
+
+						var service = this.client.services.ping;
+						if (service !== null) {
+							service.ping();
+						}
+
+					}
+
+				}, this);
+
+			}
+
+
 		},
 
 		leave: function() {
+
+			var loop = this.loop;
+			if (loop !== null) {
+				loop.removeInterval(this.intervalId);
+			}
+
 
 			lychee.game.State.prototype.leave.call(this);
 

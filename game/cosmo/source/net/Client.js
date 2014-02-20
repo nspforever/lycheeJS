@@ -33,11 +33,18 @@ lychee.define('game.net.Client').requires([
 			this.plug(this.services.highscores);
 			this.plug(this.services.multiplayer);
 
+
+			if (lychee.debug === true) {
+				console.log('(Cosmo) game.net.Client: Remote connected');
+			}
+
 		}, this);
 
 		this.bind('disconnect', function(code, reason) {
 
-			console.log('Client disconnected!', code, reason);
+			if (lychee.debug === true) {
+				console.log('(Cosmo) game.net.Client: Remote disconnected (' + code + ' | ' + reason + ')');
+			}
 
 		}, this);
 

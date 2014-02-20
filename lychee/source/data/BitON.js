@@ -313,14 +313,14 @@ lychee.define('lychee.data.BitON').exports(function(lychee, global) {
 				stream.write(data >>  8 & 0xff, 8);
 				stream.write(data >>  0 & 0xff, 8);
 
-			} else if (value < 1048576) {
+			} else if (data < 1048576) {
 
 				stream.write(5, 3);
 				stream.write(data >> 16 & 0xff, 4);
 				stream.write(data >>  8 & 0xff, 8);
 				stream.write(data >>  0 & 0xff, 8);
 
-			} else if (value < 16777216) {
+			} else if (data < 16777216) {
 
 				stream.write(6, 3);
 				stream.write(data >> 16 & 0xff, 8);

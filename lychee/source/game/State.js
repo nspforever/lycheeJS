@@ -67,6 +67,7 @@ lychee.define('lychee.game.State').requires([
 	var Class = function(game) {
 
 		this.game     = game          || null;
+		this.client   = game.client   || null;
 		this.input    = game.input    || null;
 		this.jukebox  = game.jukebox  || null;
 		this.loop     = game.loop     || null;

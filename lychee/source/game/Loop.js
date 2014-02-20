@@ -248,7 +248,10 @@ lychee.define('lychee.game.Loop').includes([
 			id = typeof id === 'number' ? id : null;
 
 
-			if (this.__timeouts[id] !== undefined) {
+			if (
+				   id !== null
+				&& this.__timeouts[id] !== undefined
+			) {
 
 				delete this.__timeouts[id];
 
@@ -293,7 +296,10 @@ lychee.define('lychee.game.Loop').includes([
 			id = typeof id === 'number' ? id : null;
 
 
-			if (this.__intervals[id] !== undefined) {
+			if (
+				   id !== null
+				&& this.__intervals[id] !== undefined
+			) {
 
 				delete this.__intervals[id];
 

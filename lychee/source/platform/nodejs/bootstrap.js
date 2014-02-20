@@ -162,7 +162,7 @@
 			if (text !== null) {
 
 				var data = this.__buffer[text] || null;
-				if (data === null) {
+				if (data === null && text.length > 1) {
 					data = this.__buffer[text] = _measure_font_text.call(this, text);
 				}
 

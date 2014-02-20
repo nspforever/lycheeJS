@@ -1,5 +1,6 @@
 
 lychee.define('game.Main').requires([
+	'game.net.Client',
 	'game.state.Game',
 	'game.state.Menu',
 	'game.DeviceSpecificHacks'
@@ -12,6 +13,9 @@ lychee.define('game.Main').requires([
 		var settings = lychee.extend({
 
 			title: 'Game Boilerplate',
+
+			// Is configured by sorbet/module/Server
+			client: null,
 
 			input: {
 				delay:       0,
@@ -50,21 +54,23 @@ lychee.define('game.Main').requires([
 
 		load: function() {
 
-			// Nothing to load, so initialize
-			this.init();
+
+			// 1. Initialize Client via Sorbet Gateway
+			lychee.game.Main.prototype.load.call(this);
+
 
 
 			/*
-			 * PRELOADING:
+			 * 2. MANUAL preloading:
 			 *
-			 * Normally, every Entity has its required
+			 * Usually, every Entity has its required
 			 * assets attached to it, so you don't need
 			 * to preload. If you still want to, here's
 			 * how...
 			 *
 			 */
 
-/*
+			/*
 
 			var urls = [
 				'./asset/img/example.png'
@@ -94,7 +100,7 @@ lychee.define('game.Main').requires([
 
 			this.preloader.load(urls);
 
-*/
+			*/
 
 		},
 
@@ -108,14 +114,23 @@ lychee.define('game.Main').requires([
 
 		init: function() {
 
+			// Overwrite client with game.net.Client
+			var clientsettings   = this.settings.client;
+			this.settings.client = null;
+
 			lychee.game.Main.prototype.init.call(this);
 
 			this.reshape();
 
 
+			if (clientsettings !== null) {
+				this.client = new game.net.Client(clientsettings, this);
+			}
+
+
 			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));
-			this.changeState('menu');
+			this.changeState('game');
 
 		}
 
