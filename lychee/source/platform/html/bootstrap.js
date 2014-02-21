@@ -53,21 +53,6 @@
 
 
 	/*
-	 * DATE IMPLEMENTATION
-	 */
-
-	Date.prototype.serialize = function() {
-
-		return {
-			'constructor': 'Date',
-			'arguments':   [ this.toString() ]
-		};
-
-	};
-
-
-
-	/*
 	 * FONT IMPLEMENTATION
 	 */
 
