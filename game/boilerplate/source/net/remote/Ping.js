@@ -13,8 +13,8 @@ lychee.define('game.net.remote.Ping').includes([
 
 			this.tunnel.send({
 				pingstart: data.pingstart,
-				pingstop:  new Date(),
-				pongstart: new Date()
+				pingstop:  Date.now(),
+				pongstart: Date.now()
 			}, {
 				id:    this.id,
 				event: 'pong'

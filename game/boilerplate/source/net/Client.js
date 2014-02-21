@@ -24,14 +24,6 @@ lychee.define('game.net.Client').requires([
 		});
 
 
-var data = {
-	stamp: Date.now()
-};
-
-var blob = _BitON.encode(data);
-console.log(blob, _BitON.decode(blob));
-
-
 		this.bind('connect', function() {
 
 			this.plug(this.services.ping);
