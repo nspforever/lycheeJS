@@ -1,0 +1,67 @@
+{
+	"layers": {
+		"game": {
+			"constructor": "lychee.game.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "game.entity.Ball",
+					"arguments": [{
+						"position": {
+							"x": 0,
+							"y": 0
+						}
+					}]
+				}, {
+					"constructor": "game.entity.Paddle",
+					"arguments": [{
+						"state": "player",
+						"position": {
+							"x": -128,
+							"y": 0
+						}
+					}]
+				}, {
+					"constructor": "game.entity.Paddle",
+					"arguments": [{
+						"state": "enemy",
+						"position": {
+							"x": 128,
+							"y": 0
+						}
+					}]
+				}],
+				"map": {
+					"ball":   0,
+					"player": 1,
+					"enemy":  2
+				}
+			}
+		},
+		"ui": {
+			"constructor": "lychee.ui.Layer",
+			"arguments": [{}],
+			"blob": {
+				"entities": [{
+					"constructor": "lychee.ui.Label",
+					"arguments": [{
+						"label": "0 - 0",
+						"position": {
+							"x": 0,
+							"y": -64
+						}
+					}],
+					"blob": {
+						"font": {
+							"constructor": "Font",
+							"arguments": [ "./source/state/Game.headline.fnt" ]
+						}
+					}
+				}],
+				"map": {
+					"score": 0
+				}
+			}
+		}
+	}
+}

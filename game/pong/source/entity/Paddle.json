@@ -1,0 +1,24 @@
+{
+	"width": 24,
+	"height": 104,
+	"collision": 1,
+	"shape": 2,
+	"texture": null,
+
+	"states": {
+		"player": { "animation": false },
+		"enemy":  { "animation": false }
+	},
+
+	"map": {
+
+		"player": [
+			{ "x":    0, "y":    0, "w": 24, "h": 104 }
+		],
+		"enemy": [
+			{ "x":    0, "y":    0, "w": 24, "h": 104 }
+		]
+
+	}
+
+}

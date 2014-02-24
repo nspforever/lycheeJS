@@ -3,19 +3,16 @@ lychee.define('game.entity.Ball').includes([
 	'lychee.game.Sprite'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var _texture = attachments['png'];
+	var _config  = attachments["json"];
+	var _texture = attachments["png"];
 
 
-	var Class = function() {
+	var Class = function(data) {
 
-		var settings = {
-			radius:    11,
-			collision: lychee.game.Entity.COLLISION.A,
-			shape:     lychee.game.Entity.SHAPE.circle,
+		var settings = lychee.extend({}, _config, data);
 
-			texture:   _texture,
-			map:       null
-		};
+
+		settings.texture = _texture;
 
 
 		lychee.game.Sprite.call(this, settings);

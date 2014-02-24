@@ -4,14 +4,14 @@
 	"tree": {
 
 		"entity": {
-			"Ball":     [ "js", "png" ],
-			"Paddle":   [ "js", "enemy.png", "player.png" ],
+			"Ball":     [ "js", "json", "png" ],
+			"Paddle":   [ "js", "json", "enemy.png", "player.png" ],
 			"lycheeJS": [ "js", "png" ]
 		},
 
 		"state": {
-			"Game": [ "js", "headline.fnt", "normal.fnt" ],
-			"Menu": [ "js", "headline.fnt", "normal.fnt" ]
+			"Game": [ "js", "json", "headline.fnt", "normal.fnt" ],
+			"Menu": [ "js", "json", "headline.fnt", "normal.fnt" ]
 		},
 
 		"DeviceSpecificHacks": [ "js" ],

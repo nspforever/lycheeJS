@@ -5,7 +5,6 @@
 		"platform": {
 
 			"html":         "platform/html",
-			"webgl":        "platform/webgl",
 			"nodejs":       "platform/nodejs",
 			"nodejs-webgl": "platform/nodejs-webgl"
 

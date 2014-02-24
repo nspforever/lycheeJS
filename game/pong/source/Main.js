@@ -11,6 +11,8 @@ lychee.define('game.Main').requires([
 
 		var settings = lychee.extend({
 
+			title: 'Pong Game (Tutorial)',
+
 			input: {
 				delay:       0,
 				key:         false,
@@ -53,8 +55,6 @@ lychee.define('game.Main').requires([
 			this.setState('game', new game.state.Game(this));
 			this.setState('menu', new game.state.Menu(this));
 			this.changeState('menu');
-
-			this.start();
 
 		}
 

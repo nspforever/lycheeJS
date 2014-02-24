@@ -2,11 +2,12 @@
 lychee.define('game.state.Menu').requires([
 	'game.entity.lycheeJS',
 	'lychee.ui.Layer',
-	'lychee.ui.Button'
+	'lychee.ui.Label'
 ]).includes([
 	'lychee.game.State'
 ]).exports(function(lychee, game, global, attachments) {
 
+	var _blob  = attachments["json"];
 	var _fonts = {
 		headline: attachments["headline.fnt"],
 		normal:   attachments["normal.fnt"]
@@ -18,247 +19,151 @@ lychee.define('game.state.Menu').requires([
 		lychee.game.State.call(this, game);
 
 
-		this.__cache = {
-			x: 0, y: 0
-		};
-
-
-		this.reset();
+		this.deserialize(_blob);
+		this.reshape();
 
 	};
 
 
 	Class.prototype = {
 
-		reset: function() {
+		deserialize: function(blob) {
 
-			lychee.game.State.prototype.reset.call(this);
+			lychee.game.State.prototype.deserialize.call(this, blob);
 
+
+			var root   = this.queryLayer('ui', 'root');
+			var entity = null;
+
+
+			this.queryLayer('ui', 'root > welcome > title').setLabel(this.game.settings.title);
+
+			this.queryLayer('ui', 'root > welcome > newgame').bind('touch', function() {
+				this.game.changeState('game');
+			}, this);
+
+
+			this.queryLayer('ui', 'root > welcome > settings').bind('touch', function() {
+				this.setPosition({ x: -1/4 * this.width });
+			}, root);
+
+			this.queryLayer('ui', 'root > settings > title').bind('touch', function() {
+				this.setPosition({ x: 1/4 * this.width });
+			}, root);
+
+
+			entity = this.queryLayer('ui', 'root > settings > fullscreen');
+			entity.setLabel('Fullscreen: ' + ((this.game.viewport.fullscreen === true) ? 'On': 'Off'));
+			entity.bind('#touch', function(entity) {
+
+				var viewport   = this.game.viewport;
+				var fullscreen = !viewport.fullscreen;
+
+				entity.setLabel('Fullscreen: ' + ((fullscreen === true) ? 'On': 'Off'));
+				viewport.setFullscreen(fullscreen);
+
+			}, this);
+
+			entity = this.queryLayer('ui', 'root > settings > music');
+			entity.setLabel('Music: ' + ((this.game.jukebox.music === true) ? 'On': 'Off'));
+			entity.bind('#touch', function(entity) {
+
+				var jukebox = this.game.jukebox;
+				var music   = !jukebox.music;
+
+				entity.setLabel('Music: ' + ((music === true) ? 'On': 'Off'));
+				jukebox.setMusic(music);
+
+			}, this);
+
+			entity = this.queryLayer('ui', 'root > settings > sound');
+			entity.setLabel('Sound: ' + ((this.game.jukebox.sound === true) ? 'On': 'Off'));
+			entity.bind('#touch', function(entity) {
+
+				var jukebox = this.game.jukebox;
+				var sound   = !jukebox.sound;
+
+				entity.setLabel('Sound: ' + ((sound === true) ? 'On': 'Off'));
+				jukebox.setSound(sound);
+
+			}, this);
+
+			entity = this.queryLayer('ui', 'root > settings > debug');
+			entity.setLabel('Debug: ' + ((lychee.debug === true) ? 'On': 'Off'));
+			entity.bind('#touch', function(entity) {
+
+				var debug = !lychee.debug;
+
+				entity.setLabel('Debug: ' + ((debug === true) ? 'On': 'Off'));
+				lychee.debug = debug;
+
+			}, this);
+
+		},
+
+		reshape: function(orientation, rotation) {
 
 			var renderer = this.renderer;
 			if (renderer !== null) {
 
 				var entity = null;
-				var width  = renderer.getEnvironment().width;
-				var height = renderer.getEnvironment().height;
+				var width  = renderer.width;
+				var height = renderer.height;
 
 
-				this.removeLayer('ui');
+				var root = this.queryLayer('ui', 'root');
 
+				root.width  = width * 2;
+				root.height = height;
 
-				var layer = new lychee.game.Layer();
 
+				entity = this.queryLayer('background', 'lycheeJS');
+				entity.position.y = 1/2 * height - 32;
 
-				var root = new lychee.ui.Layer({
-					width:  width * 3,
-					height: height,
-					position: {
-						x: 0,
-						y: 0
-					}
-				});
 
-				layer.addEntity(root);
+				entity = this.queryLayer('ui', 'root > welcome');
+				entity.width      = width;
+				entity.height     = height;
+				entity.position.x = -1/2 * width;
 
 
+				entity = this.queryLayer('ui', 'root > welcome > title');
+				entity.position.y = -1/2 * height + 64;
 
-				/*
-				 * WELCOME MENU
-				 */
 
-				var welcome = new lychee.ui.Layer({
-					width:  width,
-					height: height,
-					position: {
-						x: 0,
-						y: 0
-					}
-				});
+				entity = this.queryLayer('ui', 'root > settings');
+				entity.width      = width;
+				entity.height     = height;
+				entity.position.x = 1/2 * width;
 
-				root.addEntity(welcome);
 
+				entity = this.queryLayer('ui', 'root > settings > title');
+				entity.position.y = -1/2 * height + 64;
 
-				entity = new lychee.ui.Button({
-					label: this.game.settings.title,
-					font:  _fonts.headline,
-					position: {
-						x: 0,
-						y: -1 * height / 2 + 64
-					}
-				});
 
-				welcome.addEntity(entity);
+				this.getLayer('ui').reshape();
+				root.setPosition({ x: 1/2 * width });
 
+			}
 
-				entity = new game.entity.lycheeJS({
-					position: {
-						x: 0,
-						y: height / 2 - 32
-					}
-				});
 
-				welcome.addEntity(entity);
+			lychee.game.State.prototype.reshape.call(this, orientation, rotation);
 
+		},
 
-				entity = new lychee.ui.Button({
-					label: 'New Game',
-					font:  _fonts.normal,
-					position: {
-						x: 0,
-						y: -24
-					}
-				});
+		enter: function(data) {
 
-				entity.bind('touch', function() {
-					this.game.changeState('game');
-				}, this);
+			lychee.game.State.prototype.enter.call(this);
 
-				welcome.addEntity(entity);
 
+			var renderer = this.renderer;
+			if (renderer !== null) {
 
-				entity = new lychee.ui.Button({
-					label: 'Settings',
-					font:  _fonts.normal,
-					position: {
-						x: 0,
-						y: 24
-					}
-				});
-
-				entity.bind('touch', function() {
-
-					var position = this.__cache;
-
-					position.x = -1 * width;
-					position.y = 0;
-
-					root.setPosition(position);
-
-				}, this);
-
-				welcome.addEntity(entity);
-
-
-
-				/*
-				 * SETTINGS MENU
-				 */
-
-				var settings = new lychee.ui.Layer({
-					width:  width,
-					height: height,
-					position: {
-						x: width,
-						y: 0
-					}
-				});
-
-				root.addEntity(settings);
-
-
-				entity = new lychee.ui.Button({
-					label: 'Settings',
-					font:  _fonts.headline,
-					position: {
-						x: 0,
-						y: -1 * height / 2 + 64
-					}
-				});
-
-				entity.bind('touch', function() {
-
-					var position = this.__cache;
-
-					position.x = 0;
-					position.y = 0;
-
-					root.setPosition(position);
-
-				}, this);
-
-				settings.addEntity(entity);
-
-
-				entity = new game.entity.lycheeJS({
-					position: {
-						x: 0,
-						y: height / 2 - 32
-					}
-				});
-
-				settings.addEntity(entity);
-
-
-				entity = new lychee.ui.Button({
-					label: 'Fullscreen: ' + ((this.game.viewport.fullscreen === true) ? 'On': 'Off'),
-					font:  _fonts.normal,
-					position: {
-						x: 0,
-						y: -24
-					}
-				});
-
-				entity.bind('#touch', function(entity) {
-
-					var viewport   = this.game.viewport;
-					var fullscreen = !viewport.fullscreen;
-
-					entity.setLabel('Fullscreen: ' + ((fullscreen === true) ? 'On': 'Off'));
-
-					viewport.setFullscreen(fullscreen);
-
-				}, this);
-
-				settings.addEntity(entity);
-
-
-				entity = new lychee.ui.Button({
-					label: 'Music: ' + ((this.game.jukebox.music === true) ? 'On': 'Off'),
-					font:  _fonts.normal,
-					position: {
-						x: 0,
-						y: 24
-					}
-				});
-
-				entity.bind('#touch', function(entity) {
-
-					var jukebox = this.game.jukebox;
-					var music   = !jukebox.music;
-
-					entity.setLabel('Music: ' + ((music === true) ? 'On': 'Off'));
-
-					jukebox.setMusic(music);
-
-				}, this);
-
-				settings.addEntity(entity);
-
-
-				entity = new lychee.ui.Button({
-					label: 'Sound: ' + ((this.game.jukebox.sound === true) ? 'On': 'Off'),
-					font:  _fonts.normal,
-					position: {
-						x: 0,
-						y: 72
-					}
-				});
-
-				entity.bind('#touch', function(entity) {
-
-					var jukebox = this.game.jukebox;
-					var sound   = !jukebox.sound;
-
-					entity.setLabel('Sound: ' + ((sound === true) ? 'On': 'Off'));
-
-					jukebox.setSound(sound);
-
-				}, this);
-
-				settings.addEntity(entity);
-
-
-				this.setLayer('ui', layer);
+				var width = renderer.width;
+				var root  = this.queryLayer('ui', 'root');
+				if (root !== null) {
+					root.setPosition({ x: 1/2 * width });
+				}
 
 			}
 

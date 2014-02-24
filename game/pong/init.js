@@ -11,31 +11,14 @@ lychee.rebase({
 
 
 // Tags are required to determine which libraries to load
-(function(lychee, global) {
-
-	var platform = [ 'webgl', 'html' ];
-
-	if (global.navigator && global.navigator.appName === 'V8GL') {
-		platform = [ 'v8gl' ];
-	}
-
-	lychee.tag({
-		platform: platform
-	});
-
-})(lychee, typeof global !== 'undefined' ? global : this);
+lychee.tag({
+	platform: [ 'nodejs-webgl', 'webgl', 'html' ]
+});
 
 
 lychee.build(function(lychee, global) {
 
-	var settings = {
-		base: './asset',
-		music: true,
-		sound: true
-	};
-
-
-	new game.Main(settings);
+	new game.Main();
 
 }, typeof global !== 'undefined' ? global : this);
 
