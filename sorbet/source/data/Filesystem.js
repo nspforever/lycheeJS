@@ -250,6 +250,29 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		},
 
+		write: function(url, data, callback, scope) {
+
+			var encoding = 'binary';
+
+			if (typeof data === 'string') {
+				encoding = 'utf8';
+			} else {
+				encoding = 'binary';
+			}
+
+
+			fs.writeFile(url, data, encoding, function(err) {
+
+				if (err) {
+					callback.call(scope, false);
+				} else {
+					callback.call(scope, true);
+				}
+
+			});
+
+		},
+
 		info: function(path) {
 
 			var resolved = this.resolve(path);
@@ -279,6 +302,12 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 
 			return null;
+
+		},
+
+		touch: function(url) {
+
+console.log('TODO: // touch url ' + url);
 
 		},
 
@@ -318,6 +347,28 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		isFile: function(path) {
 			return this.__cache[path] === Class.TYPE.file;
+		},
+
+		toAbs: function(path) {
+
+			var tmp = path.split('/');
+
+			for (var t = 0, tl = tmp.length; t < tl; t++) {
+
+				if (tmp[t] === '.') {
+					tmp.splice(t, 1);
+					tl--;
+					t--;
+				} else if (tmp[t] === '..') {
+					tmp.splice(t - 1, 2);
+					tl -= 2;
+					t  -= 2;
+				}
+
+			}
+
+			return tmp.join('/');
+
 		}
 
 	};

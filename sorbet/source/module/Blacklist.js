@@ -1,9 +1,6 @@
 
 lychee.define('sorbet.module.Blacklist').exports(function(lychee, sorbet, global, attachments) {
 
-	var fs = require('fs');
-
-
 	/*
 	 * HELPERS
 	 */

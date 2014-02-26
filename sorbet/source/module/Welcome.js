@@ -3,8 +3,6 @@ lychee.define('sorbet.module.Welcome').requires([
 	'sorbet.data.Template'
 ]).exports(function(lychee, game, global, attachments) {
 
-	var fs = require('fs');
-
 	var _template = new sorbet.data.Template(attachments['html']);
 
 

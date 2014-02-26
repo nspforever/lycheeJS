@@ -88,6 +88,26 @@ lychee.define('sorbet.data.Queue').requires([
 
 	Class.prototype = {
 
+		destroy: function() {
+
+			var found = false;
+
+			for (var i = 0, il = _instances.length; i < il; i++) {
+
+				if (_instances[i] === this) {
+					_instances.splice(i, 1);
+					found = true;
+					il--;
+					i--;
+				}
+
+			}
+
+
+			return found;
+
+		},
+
 		add: function(data) {
 
 			data = data instanceof Object ? data : null;
@@ -109,6 +129,13 @@ lychee.define('sorbet.data.Queue').requires([
 		flush: function() {
 
 			this.__flush = true;
+
+			if (this.__buffer.length > 0) {
+				return true;
+			}
+
+
+			return false;
 
 		}
 

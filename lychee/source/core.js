@@ -56,7 +56,7 @@ if (typeof global !== 'undefined') {
 	 */
 
 	lychee.debug   = false;
-	lychee.dynamic = true;
+	lychee.type    = 'source';
 	lychee.VERSION = 0.8;
 
 
@@ -544,9 +544,38 @@ if (typeof global !== 'undefined') {
 
 	lychee.DefinitionBlock.prototype = {
 
-		toUniqueString: function() {
+		toString: function() {
 
-			var uid = this.toString();
+			var str = 'lychee.define(' + this._space + '.' + this._name + ')';
+
+			if (Object.keys(this._tags).length > 0) {
+				str += '.tags(' + JSON.stringify(this._tags, null, '\t') + ')';
+			}
+
+			if (this._supports !== null) {
+				str += '.supports(' + this._supports.toString() + ')'
+			}
+
+			if (this._requires.length > 0) {
+				str += '.requires(' + JSON.stringify(this._requires, null, '\t') + ')';
+			}
+
+			if (this._includes.length > 0) {
+				str += '.includes(' + JSON.stringify(this._includes, null, '\t') + ')';
+			}
+
+			if (this._exports !== null) {
+				str += '.exports(' + this._exports.toString() + ');';
+			}
+
+
+			return str;
+
+		},
+
+		toUIDString: function() {
+
+			var uid = this._space + '.' + this._name;
 
 			var tags = [];
 			for (var id in this._tags) {
@@ -561,10 +590,6 @@ if (typeof global !== 'undefined') {
 
 			return uid;
 
-		},
-
-		toString: function() {
-			return this._space + '.' + this._name;
 		},
 
 		tags: function(tags) {
@@ -675,10 +700,14 @@ if (typeof global !== 'undefined') {
 			this._exports = exports;
 
 
-			var id = this.toString();
+			var id = this._space + '.' + this._name;
 			if (_environment.tree[id] == null) {
 
-				if (lychee.dynamic === true) {
+				if (lychee.type === 'build') {
+
+					_environment.tree[id] = this;
+
+				} else {
 
 					if (
 						   this._supports === null
@@ -689,16 +718,12 @@ if (typeof global !== 'undefined') {
 
 					}
 
-				} else {
-
-					_environment.tree[id] = this;
-
 				}
 
 			}
 
 
-			var uid = this.toUniqueString();
+			var uid = this.toUIDString();
 			if (_environment.unique[uid] == null) {
 				_environment.unique[uid] = this;
 			}

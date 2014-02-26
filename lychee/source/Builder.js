@@ -351,7 +351,7 @@
 
 		if (config !== null) {
 
-			var tree     = config.tree;
+			var tree     = config.source;
 			var all      = _get_identifiers(tree, '');
 			var filtered = {};
 
@@ -822,9 +822,13 @@
 			}
 
 
-			if (this.mode === lychee.Builder.MODE.normal) {
+			if (lychee.type === 'build') {
 
-				for (var o = 0, l = order.length; o < l; o++) {
+				// TODO: Asset integration
+
+			} else if (lychee.type === 'source') {
+
+				for (var o = 0, ol = order.length; o < ol; o++) {
 					_export_definitionblock.call(this, this.__tree[order[o]]);
 				}
 
@@ -837,7 +841,16 @@
 			}
 
 
-			if (this.__callback !== null) {
+			if (lychee.type === 'build') {
+
+				this.__callback.call(
+					this.__scope,
+					this.__scope.lychee,
+					this.__scope,
+					order
+				);
+
+			} else {
 
 				this.__callback.call(
 					this.__scope,
@@ -861,7 +874,6 @@
 	lychee.Builder = function() {
 
 		this.clock = 0;
-		this.mode  = 0;
 
 		this.__attachments = {};
 		this.__candidates  = {};
@@ -893,12 +905,6 @@
 		this.__preloader.bind('ready', _load_asset,   this);
 		this.__preloader.bind('error', _unload_asset, this);
 
-	};
-
-
-	lychee.Builder.MODE = {
-		normal:     0,
-		simulation: 1
 	};
 
 
@@ -959,21 +965,6 @@
 				_load_definitionblock.call(this, id, null);
 			}
 
-		},
-
-		setMode: function(mode) {
-
-			if (lychee.enumof(lychee.Builder.MODE, mode) === true) {
-
-				this.mode = mode;
-
-				return true;
-
-			}
-
-
-			return false;
-
 		}
 
 	};
@@ -984,17 +975,12 @@
 	}
 
 
-	lychee.build = function(callback, scope, environment, mode) {
+	lychee.build = function(callback, scope, environment) {
 
-		environment = environment instanceof Object                     ? environment : lychee.getEnvironment();
-		mode        = lychee.enumof(lychee.Builder.MODE, mode) === true ? mode        : null;
+		environment = environment instanceof Object ? environment : lychee.getEnvironment();
 
 
 		var builder = new lychee.Builder();
-
-		if (mode !== null) {
-			builder.setMode(mode);
-		}
 
 
 		var result = builder.build(environment, callback, scope);

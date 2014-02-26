@@ -124,7 +124,8 @@ lychee.define('sorbet.data.VHost').requires([
 					'init': [
 						this.fs.isFile(absroot + '/init.js'),
 						this.fs.isFile(absroot + '/init-server.js')
-					]
+					],
+					'vhost': this
 				});
 
 			}
