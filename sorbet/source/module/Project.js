@@ -18,13 +18,11 @@ lychee.define('sorbet.module.Project').requires([
 
 	var _build_project = function(project) {
 
-		var id = project.root[0];
-
 		var root = project.root[0];
-		var host = null;
+		var host = project.vhost;
 
 
-		project.vhost.fs.read(project.package[0], function(raw, mtime) {
+		host.fs.read(project.package[0], function(raw, mtime) {
 
 			var data = JSON.parse(raw);
 			if (data.build instanceof Object) {
@@ -36,12 +34,12 @@ lychee.define('sorbet.module.Project').requires([
 				var tasks = _get_build_tasks(data.build);
 				if (tasks.length > 0) {
 
-					this.data[id] = [];
+					this.data[root] = [];
 
 					for (var t = 0, tl = tasks.length; t < tl; t++) {
 
 						tasks[t].project = project;
-						this.data[id].push(tasks[t]);
+						this.data[root].push(tasks[t]);
 
 					}
 
@@ -49,15 +47,16 @@ lychee.define('sorbet.module.Project').requires([
 
 			}
 
+
 			var result = this.queue.flush();
 			if (result === false) {
 
 				this.queue.destroy();
 				this.queue = new sorbet.data.Queue();
 
-				for (var id in this.data) {
+				for (var uid in this.data) {
 
-					var data = this.data[id];
+					var data = this.data[uid];
 					for (var d = 0, dl = data.length; d < dl; d++) {
 						this.queue.add(data[d]);
 					}
@@ -69,17 +68,6 @@ lychee.define('sorbet.module.Project').requires([
 			}
 
 		}, this);
-
-
-/*
-
-		// TODO: automatic rebases
-		lychee.rebase({
-			lychee: _environment.bases.lychee,
-			game:   project.resolvedroot + '/source'
-		});
-
-*/
 
 	};
 
@@ -94,10 +82,15 @@ lychee.define('sorbet.module.Project').requires([
 
 		var fs = data.project.vhost.fs;
 
-		var resolvedsource = fs.resolve(root + '/source/' + data.source + '.js');
+		var resolvedsource = fs.resolve(fs.toAbs(root + '/source/' + data.source + '.js'));
 		if (resolvedsource !== null) {
 
-			fs.touch(root + '/build/' + data.build + '.js');
+			var tmp = fs.toAbs(root + '/' + data.build).split('/');
+			tmp.pop();
+
+			var directory = tmp.join('/');
+
+			fs.mkdir(directory);
 
 
 			var sandbox     = lychee.createSandbox();
@@ -107,8 +100,6 @@ lychee.define('sorbet.module.Project').requires([
 
 
 			lychee.debug = data.debug === true;
-// TODO: Remove this
-lychee.debug = true;
 			lychee.type  = 'build';
 
 
@@ -142,6 +133,9 @@ lychee.debug = true;
 
 			lychee.build(function(lychee, global, order) {
 
+				var file = fs.toAbs(root + '/' + data.build + '.js');
+
+
 				var code = '';
 
 				for (var o = 0, ol = order.length; o < ol; o++) {
@@ -154,23 +148,30 @@ lychee.debug = true;
 				lychee.type  = 'source';
 				lychee.setEnvironment(null);
 
-console.log('FUCKING READY!', environment.tags, order);
-console.log('\n\n\n\n\n\n\n');
-console.log(code);
 
+				fs.write(file, code, function(result) {
 
-				that.queue.flush();
+					if (result === true) {
+
+						if (lychee.debug === true) {
+							console.log('sorbet.module.Project: Build succeeded for "' + data.source + '" at ' + file);
+						}
+
+					} else {
+
+						if (lychee.debug === true) {
+							console.error('sorbet.module.Project: Build failed for "' + data.source + '" at ' + file);
+						}
+
+					}
+
+					this.queue.flush();
+
+				}, that);
 
 			}, sandbox);
 
 		}
-
-
-return;
-
-
-
-
 
 	};
 

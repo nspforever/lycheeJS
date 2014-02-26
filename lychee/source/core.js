@@ -546,7 +546,7 @@ if (typeof global !== 'undefined') {
 
 		toString: function() {
 
-			var str = 'lychee.define(' + this._space + '.' + this._name + ')';
+			var str = 'lychee.define(' + JSON.stringify(this._space + '.' + this._name) + ')';
 
 			if (Object.keys(this._tags).length > 0) {
 				str += '.tags(' + JSON.stringify(this._tags, null, '\t') + ')';

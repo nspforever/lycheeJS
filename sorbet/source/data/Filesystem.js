@@ -1,8 +1,46 @@
 
 lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global, attachments) {
 
-	var fs = require('fs');
+	var _fs   = require('fs');
+	var _path = require('path');
 
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _mkdir_p = function(path, mode) {
+
+		path = _path.resolve(path);
+
+		if (mode === undefined) {
+			mode = 0777 & (~process.umask());
+		}
+
+
+		try {
+
+			if (!_fs.statSync(path).isDirectory()) {
+				throw new Error(path + ' exists and is not a directory');
+			}
+
+		} catch(err) {
+
+			if (err.code === 'ENOENT') {
+				_mkdir_p(_path.dirname(path), mode);
+				_fs.mkdirSync(path, mode);
+			}
+
+		}
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function(root) {
 
@@ -104,7 +142,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 			var that = this;
 
 
-			fs.readdir(directory, function(err, list) {
+			_fs.readdir(directory, function(err, list) {
 
 				if (!err) {
 
@@ -113,7 +151,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 						list.forEach(function(file) {
 
-							fs.stat(directory + '/' + file, function(err, stat) {
+							_fs.stat(directory + '/' + file, function(err, stat) {
 
 								if (stat) {
 
@@ -228,13 +266,13 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		read: function(url, callback, scope) {
 
-			fs.readFile(url, function(err, data) {
+			_fs.readFile(url, function(err, data) {
 
 				if (err) {
 					callback.call(scope, null);
 				} else {
 
-					fs.stat(url, function(err, stat) {
+					_fs.stat(url, function(err, stat) {
 
 						if (err) {
 							callback.call(scope, null);
@@ -261,7 +299,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 			}
 
 
-			fs.writeFile(url, data, encoding, function(err) {
+			_fs.writeFile(url, data, encoding, function(err) {
 
 				if (err) {
 					callback.call(scope, false);
@@ -282,7 +320,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 				try {
 
-					raw = fs.statSync(path);
+					raw = _fs.statSync(path);
 
 				} catch(e) {
 				}
@@ -305,9 +343,34 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		},
 
-		touch: function(url) {
+		touch: function(path) {
 
-console.log('TODO: // touch url ' + url);
+			var tmp  = path.split('/');
+			var file = tmp.pop();
+			var path = tmp.join('/');
+
+console.log(path, file);
+
+		},
+
+		mkdir: function(path) {
+
+			if (this.isDirectory(path) === false) {
+
+				var result = _mkdir_p(path);
+				if (result === true) {
+
+					this.__cache[directory] = Class.TYPE.directory;
+					this.refresh();
+
+					return true;
+
+				}
+
+			}
+
+
+			return false;
 
 		},
 
