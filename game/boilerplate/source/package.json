@@ -1,7 +1,17 @@
 {
-	"tags": {},
 
-	"tree": {
+	"tags": {
+
+	},
+
+	"build": {
+
+		"game":       [ "Main", false, { "game": "./source", "lychee": "../../lychee/source" }, { "platform": [ "html" ] } ],
+		"game-debug": [ "Main", true,  { "game": "./source", "lychee": "../../lychee/source" }, { "platform": [ "html" ] } ]
+
+	},
+
+	"source": {
 
 		"entity": {
 			"Button":   [ "js" ],

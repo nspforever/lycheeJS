@@ -12,7 +12,23 @@
 
 	},
 
-	"tree": {
+	"build": {
+
+		"platform": {
+
+			"html": {
+				"lychee": [ null, false, { "lychee": "./source" }, { "platform": [ "html" ] } ]
+			},
+
+			"nodejs": {
+				"lychee": [ null, false, { "lychee": "./source" }, { "platform": [ "nodejs" ] } ]
+			}
+
+		}
+
+	},
+
+	"source": {
 
 		"platform": {
 
