@@ -53,6 +53,31 @@
 
 
 	/*
+	 * BUFFER IMPLEMENTATION
+	 */
+
+	var Buffer = function(length) {
+
+		this.length = length;
+
+	};
+
+	Buffer.byteLength = function() {
+	};
+
+	Buffer.prototype = {
+
+		copy: function() {
+		},
+
+		toString: function() {
+		}
+
+	};
+
+
+
+	/*
 	 * FONT IMPLEMENTATION
 	 */
 

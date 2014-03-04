@@ -192,7 +192,7 @@ lychee.define('Input').tags({
 
 			if (methods.length === 0) methods.push("NONE");
 
-			console.log('lychee.Input: Supported input methods are ' + methods.join(', '));
+			console.log('lychee.Input: Supported methods are ' + methods.join(', '));
 
 		}
 
@@ -295,7 +295,7 @@ lychee.define('Input').tags({
 			// bind('!')   and bind('shift-1');
 
 			handled = this.trigger('key', [ key, name, delta ]) || handled;
-			handled = this.trigger(name, [ delta ])             || handled;
+			handled = this.trigger(name,  [ delta ])            || handled;
 
 		}
 
@@ -586,9 +586,35 @@ lychee.define('Input').tags({
 
 	Class.prototype = {
 
+		destroy: function() {
+
+			var found = false;
+
+			for (var i = 0, il = _instances.length; i < il; i++) {
+
+				if (_instances[i] === this) {
+					_instances.splice(i, 1);
+					found = true;
+					il--;
+					i--;
+				}
+
+			}
+
+			this.unbind();
+
+
+			return found;
+
+		},
+
+
+
 		/*
-		 * PUBLIC API
+		 * ENTITY API
 		 */
+
+		// deserialize: function(blob) {},
 
 		serialize: function() {
 
@@ -608,6 +634,12 @@ lychee.define('Input').tags({
 			};
 
 		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
 
 		setDelay: function(delay) {
 

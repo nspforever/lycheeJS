@@ -4,10 +4,49 @@ lychee.define('sorbet.module.Project').requires([
 	'sorbet.data.Project'
 ]).exports(function(lychee, sorbet, global, attachments) {
 
-	var fs = require('fs');
-
 	var _environment = lychee.getEnvironment();
+	var _fs          = require('fs');
 	var _project     = sorbet.data.Project;
+
+
+
+	/*
+	 * BOOTSTRAP INJECTION
+	 */
+
+	var _bootstrap = {};
+	(function() {
+
+		var lychee_path = '../lychee/source';
+
+
+		var data = JSON.parse(_fs.readFileSync(lychee_path + '/package.json'));
+		if (data !== null) {
+
+			var platform = data.tags.platform || null;
+			if (platform !== null) {
+
+				for (var type in platform) {
+
+					try {
+
+						var url  = lychee_path + '/' + platform[type] + '/bootstrap.js';
+						var code = _fs.readFileSync(url).toString();
+
+						_bootstrap[type] = code;
+
+					} catch(e) {
+					}
+
+				}
+
+			}
+
+		}
+
+	})();
+
+
 
 	// TODO: database integration
 
@@ -137,6 +176,22 @@ lychee.define('sorbet.module.Project').requires([
 
 
 				var code = '';
+
+				var platform = environment.tags.platform || null;
+				if (platform !== null) {
+
+					for (var p = 0, pl = platform.length; p < pl; p++) {
+
+						var type = platform[p];
+						if (typeof _bootstrap[type] === 'string') {
+							code += _bootstrap[type] + '\n';
+							break;
+						}
+
+					}
+
+				}
+
 
 				for (var o = 0, ol = order.length; o < ol; o++) {
 					code += environment.tree[order[o]].toString();

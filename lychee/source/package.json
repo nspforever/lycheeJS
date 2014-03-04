@@ -14,17 +14,8 @@
 
 	"build": {
 
-		"platform": {
-
-			"html": {
-				"lychee": [ null, false, { "lychee": "./source" }, { "platform": [ "html" ] } ]
-			},
-
-			"nodejs": {
-				"lychee": [ null, false, { "lychee": "./source" }, { "platform": [ "nodejs" ] } ]
-			}
-
-		}
+		"lychee.html":   [ "lychee.game.Main", false, { "lychee": "./source" }, { "platform": [ "html"   ] } ],
+		"lychee.nodejs": [ "lychee.game.Main", false, { "lychee": "./source" }, { "platform": [ "nodejs" ] } ]
 
 	},
 
@@ -35,7 +26,9 @@
 			"html": {
 
 				"net": {
-					"Client": [ "js" ]
+					"Client": [ "js" ],
+					"Remote": [ "js" ],
+					"Server": [ "js" ]
 				},
 
 				"Input":    [ "js" ],
@@ -48,7 +41,6 @@
 
 				"net": {
 					"Client":   [ "js" ],
-					"Protocol": [ "js" ],
 					"Remote":   [ "js" ],
 					"Server":   [ "js" ]
 				},
@@ -103,7 +95,8 @@
 
 		"net": {
 
-			"Service": [ "js" ],
+			"Protocol": [ "js" ],
+			"Service":  [ "js" ],
 
 			"client": {
 				"Chat":        [ "js" ],

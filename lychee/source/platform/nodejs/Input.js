@@ -66,7 +66,7 @@ lychee.define('Input').tags({
 
 
 		if (lychee.debug === true) {
-			console.log('lychee.Input: Supported input methods are Keyboard');
+			console.log('lychee.Input: Supported methods are Keyboard');
 		}
 
 	})();
@@ -79,12 +79,12 @@ lychee.define('Input').tags({
 
 	var _process_key = function(key, ctrl, alt, shift) {
 
-		if (this.__fireKey === false) return;
+		if (this.key === false) return false;
 
 
 		// 2. Only fire after the enforced delay
 		var delta = Date.now() - this.__clock.key;
-		if (delta < this.__delay) {
+		if (delta < this.delay) {
 			return;
 		}
 
@@ -96,10 +96,10 @@ lychee.define('Input').tags({
 		 *
 		 */
 		if (
-			this.__fireModifier === false
+			   this.keymodifier === false
 			&& (key === 'ctrl' || key === 'meta' || key === 'shift')
 		) {
-			return;
+			return true;
 		}
 
 
@@ -112,17 +112,23 @@ lychee.define('Input').tags({
 		name += key.toLowerCase();
 
 
-		if (lychee.debug === true) {
-			console.log('lychee.Input:', key, name, delta);
+
+		var handled = false;
+
+		if (key !== null) {
+
+			// allow bind('key') and bind('ctrl-a');
+
+			this.trigger('key', [ key, name, delta ]) || handled;
+			this.trigger(name,  [ delta ])            || handled;
+
 		}
 
 
-		// allow bind('key') and bind('ctrl-a');
-		this.trigger('key', [ key, name, delta ]);
-		this.trigger(name, [ delta ]);
-
-
 		this.__clock.key = Date.now();
+
+
+		return handled;
 
 	};
 
@@ -136,24 +142,30 @@ lychee.define('Input').tags({
 
 		var settings = lychee.extend({}, data);
 
-		settings.fireKey      = !!settings.fireKey;
-		settings.fireModifier = !!settings.fireModifier;
-		settings.delay        = typeof settings.delay === 'number' ? settings.delay : 0;
+
+		this.delay       = 0;
+		this.key         = false;
+		this.keymodifier = false;
+		this.touch       = false;
+		this.swipe       = false;
+
+		this.__clock  = {
+			key:   Date.now(),
+			touch: Date.now(),
+			swipe: Date.now()
+		};
 
 
-		this.__fireKey      = settings.fireKey;
-		this.__fireModifier = settings.fireModifier;
-		this.__fireTouch    = false;
-		this.__fireSwipe    = false;
-		this.__delay        = settings.delay;
-
-		this.reset();
+		this.setDelay(settings.delay);
+		this.setKey(settings.key);
+		this.setKeyModifier(settings.keymodifier);
+		this.setTouch(settings.touch);
+		this.setSwipe(settings.swipe);
 
 
 		lychee.event.Emitter.call(this);
 
 		_instances.push(this);
-
 
 		settings = null;
 
@@ -162,19 +174,115 @@ lychee.define('Input').tags({
 
 	Class.prototype = {
 
+		destroy: function() {
+
+			var found = false;
+
+			for (var i = 0, il = _instances.length; i < il; i++) {
+
+				if (_instances[i] === this) {
+					_instances.splice(i, 1);
+					found = true;
+					il--;
+					i--;
+				}
+
+			}
+
+			this.unbind();
+
+
+			return found;
+
+		},
+
+
+
 		/*
-		 * PUBLIC API
+		 * ENTITY API
 		 */
 
-		reset: function() {
+		// deserialize: function(blob) {},
 
-			this.__clock = null; // GC hint
-			this.__clock = {
-				key:   Date.now(),
-				touch: Date.now(),
-				swipe: Date.now()
+		serialize: function() {
+
+			var settings = {};
+
+			if (this.delay !== 0)           settings.delay       = this.delay;
+			if (this.key !== false)         settings.key         = this.key;
+			if (this.keymodifier !== false) settings.keymodifier = this.keymodifier;
+			if (this.touch !== false)       settings.touch       = this.touch;
+			if (this.swipe !== false)       settings.swipe       = this.swipe;
+
+
+			return {
+				'constructor': 'lychee.Input',
+				'arguments':   [ settings ],
+				'blob':        null
 			};
 
+		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
+
+		setDelay: function(delay) {
+
+			delay = typeof delay === 'number' ? delay : null;
+
+
+			if (delay !== null) {
+
+				this.delay = delay;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setKey: function(key) {
+
+			if (key === true || key === false) {
+
+				this.key = key;
+
+				return true;
+
+			}
+
+
+			return false;
+
+		},
+
+		setKeyModifier: function(keymodifier) {
+
+			if (keymodifier === true || keymodifier === false) {
+
+				this.keymodifier = keymodifier;
+
+				return true;
+
+			}
+
+
+			return false
+
+		},
+
+		setTouch: function(touch) {
+			return false;
+		},
+
+		setSwipe: function(swipe) {
+			return false;
 		}
 
 	};

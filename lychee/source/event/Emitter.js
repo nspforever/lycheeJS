@@ -1,6 +1,50 @@
 
 lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 
+	/*
+	 * HELPERS
+	 */
+
+	var _unbind = function(type, callback, scope) {
+
+		if (this.___events[type] !== undefined) {
+
+			var found = false;
+
+			for (var e = 0, el = this.___events[type].length; e < el; e++) {
+
+				var entry = this.___events[type][e];
+
+				if (
+					(callback === null || entry.callback === callback)
+					&& (scope === null || entry.scope === scope)
+				) {
+
+					found = true;
+
+					this.___events[type].splice(e, 1);
+					el--;
+
+				}
+
+			}
+
+
+			return found;
+
+		}
+
+
+		return false;
+
+	};
+
+
+
+	/*
+	 * IMPLEMENTATION
+	 */
+
 	var Class = function() {
 
 		this.___events = {};
@@ -123,40 +167,27 @@ lychee.define('lychee.event.Emitter').exports(function(lychee, global) {
 			scope    = scope !== undefined          ? scope    : null;
 
 
-			if (type === null) {
-				return false;
-			}
+			var found = false;
 
+			if (type !== null) {
 
-			if (this.___events[type] !== undefined) {
+				found = _unbind.call(this, type, callback, scope);
 
-				var found = false;
+			} else {
 
-				for (var e = 0, el = this.___events[type].length; e < el; e++) {
+				for (var type in this.___events) {
 
-					var entry = this.___events[type][e];
-
-					if (
-						(callback === null || entry.callback === callback)
-						&& (scope === null || entry.scope === scope)
-					) {
-
+					var result = _unbind.call(this, type, callback, scope);
+					if (result === true) {
 						found = true;
-
-						this.___events[type].splice(e, 1);
-						el--;
-
 					}
 
 				}
 
-
-				return found;
-
 			}
 
 
-			return false;
+			return found;
 
 		}
 

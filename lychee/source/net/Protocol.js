@@ -1,14 +1,21 @@
 
-lychee.define('lychee.net.Protocol').tags({
-	platform: 'nodejs'
-}).supports(function(lychee, global) {
+lychee.define('lychee.net.Protocol').supports(function(lychee, global) {
 
 	if (
 		   typeof Buffer !== 'undefined'
 		&& typeof Buffer.byteLength === 'function'
 	) {
 
-		return true;
+		var buffer = new Buffer(8);
+		if (
+			   typeof buffer.copy === 'function'
+			&& typeof buffer.length === 'number'
+			&& typeof buffer.toString === 'function'
+		) {
+
+			return true;
+
+		}
 
 	}
 

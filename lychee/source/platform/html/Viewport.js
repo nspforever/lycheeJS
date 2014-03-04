@@ -24,7 +24,7 @@ lychee.define('Viewport').tags({
 	 * EVENTS
 	 */
 
-	var _clock  = {
+	var _clock = {
 		orientationchange: null,
 		resize:            0
 	};
@@ -426,6 +426,30 @@ lychee.define('Viewport').tags({
 
 
 	Class.prototype = {
+
+		destroy: function() {
+
+			var found = false;
+
+			for (var i = 0, il = _instances.length; i < il; i++) {
+
+				if (_instances[i] === this) {
+					_instances.splice(i, 1);
+					found = true;
+					il--;
+					i--;
+				}
+
+			}
+
+			this.unbind();
+
+
+			return found;
+
+		},
+
+
 
 		/*
 		 * ENTITY API

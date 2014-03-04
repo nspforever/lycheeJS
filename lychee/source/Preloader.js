@@ -197,21 +197,26 @@
 			type = typeof type === 'string' ? type : null;
 
 
-			if (type === null) {
-				return false;
+			var found = false;
+
+			if (type !== null) {
+
+				if (this.___events[type] !== undefined) {
+					delete this.___events[type];
+					found = true;
+				}
+
+			} else {
+
+				for (var type in this.___events) {
+					delete this.___events[type];
+					found = true;
+				}
+
 			}
 
 
-			if (this.___events[type] !== undefined) {
-
-				delete this.___events[type];
-
-				return true;
-
-			}
-
-
-			return false;
+			return found;
 
 		},
 
@@ -220,6 +225,28 @@
 		/*
 		 * PUBLIC API
 		 */
+
+		destroy: function() {
+
+			var found = false;
+
+			for (var i = 0, il = _instances.length; i < il; i++) {
+
+				if (_instances[i] === this) {
+					_instances.splice(i, 1);
+					found = true;
+					il--;
+					i--;
+				}
+
+			}
+
+			this.unbind();
+
+
+			return found;
+
+		},
 
 		load: function(urls, map, extension) {
 

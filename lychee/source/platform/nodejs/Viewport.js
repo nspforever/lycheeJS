@@ -115,21 +115,60 @@ lychee.define('Viewport').tags({
 
 	Class.prototype = {
 
-		/*
-		 * PUBLIC API
-		 */
+		destroy: function() {
 
-		setFullscreen: function(fullscreen) {
+			var found = false;
 
-			if (fullscreen === true) {
+			for (var i = 0, il = _instances.length; i < il; i++) {
 
-			} else if (fullscreen === false) {
+				if (_instances[i] === this) {
+					_instances.splice(i, 1);
+					found = true;
+					il--;
+					i--;
+				}
 
 			}
 
+			this.unbind();
 
+
+			return found;
+
+		},
+
+
+
+		/*
+		 * ENTITY API
+		 */
+
+		// deserialize: function(blob) {},
+
+		serialize: function() {
+
+			var settings = {};
+
+
+			if (this.fullscreen !== false) settings.fullscreen = this.fullscreen;
+
+
+			return {
+				'constructor': 'lychee.Viewport',
+				'arguments':   [ settings ],
+				'blob':        null
+			};
+
+		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
+
+		setFullscreen: function(fullscreen) {
 			return false;
-
 		}
 
 	};

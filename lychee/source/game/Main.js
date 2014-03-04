@@ -6,7 +6,8 @@ lychee.define('lychee.game.Main').requires([
 	'lychee.game.Jukebox',
 	'lychee.game.Loop',
 	'lychee.game.State',
-	'lychee.net.Client'
+	'lychee.net.Client',
+	'lychee.net.Server'
 ]).includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
@@ -57,25 +58,23 @@ lychee.define('lychee.game.Main').requires([
 				this.settings.client = lychee.extend({}, settings);
 			}
 
-
-			preloader.unbind('ready');
-			preloader.unbind('error');
-
+			preloader.destroy();
 			this.init();
 
 		}, this);
 
 		preloader.bind('error', function(assets, mappings) {
 
-			preloader.unbind('ready');
-			preloader.unbind('error');
-
+			preloader.destroy();
 			this.init();
 
 		}, this);
 
 		preloader.load(url, null, 'json');
 
+	};
+
+	var _load_server = function(url) {
 	};
 
 
@@ -118,7 +117,7 @@ lychee.define('lychee.game.Main').requires([
 		},
 
 		client: null,
-		server: '/sorbet/module/Server'
+		server: null
 
 	};
 
@@ -284,7 +283,22 @@ lychee.define('lychee.game.Main').requires([
 
 		load: function() {
 
-			_load_client.call(this, this.settings.server || null);
+			var data = this.settings.client;
+			if (
+				   data === null
+				|| typeof data === 'string'
+			) {
+				_load_client.call(this, data);
+			}
+
+
+			var data = this.settings.server;
+			if (
+				   data === null
+				|| typeof data === 'string'
+			) {
+				_load_server.call(this, data);
+			}
 
 		},
 
