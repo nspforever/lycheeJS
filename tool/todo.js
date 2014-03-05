@@ -66,7 +66,7 @@ var _filepath_to_defpath = function(path) {
 var _filepath_to_docpath = function(path) {
 
 	var tmp        = path.replace('.js', '').split('/');
-	var output     = './external/lycheejs.org/docs/';
+	var output     = './external/lycheeJS-website/docs/';
 	var ignorelist = [ 'platform', 'html', 'v8gl', 'webgl', 'nodejs' ];
 
 
@@ -94,6 +94,14 @@ var exec = require('child_process').exec;
 
 
 var _cache = {};
+
+var missing = {
+	methods:          [],
+	methodsignatures: [],
+	definitions:      [],
+	todos:            []
+};
+
 
 
 exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
@@ -171,10 +179,6 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 
 	var length = 0;
 
-	var missing = {
-		methods:   [],
-		defblocks: []
-	};
 
 	for (var uid in _cache) {
 
@@ -182,7 +186,7 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 
 		if (entry.doc === null) {
 
-			missing.defblocks.push([
+			missing.definitions.push([
 				entry.filepath,
 				entry.defpath
 			]);
@@ -203,15 +207,30 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 
 			if (entry.doc !== null) {
 
-				var article  = "<article id=\"" + idpath + "\">";
-				var headline = "\) " + protopath + "(";
+				var article   = "<article id=\"" + idpath + "\">";
+				var headline  = "\) " + protopath + "(";
+
 
 				if (
 					   entry.doc.indexOf(article) !== -1
 					&& entry.doc.indexOf(headline) !== -1
 				) {
 
-					// TODO: Verification of method signatures
+					var signature = new RegExp(protopath + "\\(void\\)");
+					if (method.args.length > 0) {
+						signature = new RegExp(protopath + "\\(" + method.args.join("(\\s\\[)?(,\\s)") + "(\\]?)\\)");
+					}
+
+					if (!entry.doc.match(signature)) {
+
+						missing.methods.push([
+							entry.filepath,
+							protopath + " (DIFF)"
+						]);
+
+						length = Math.max(length, entry.filepath.length);
+
+					}
 
 				} else {
 
@@ -237,16 +256,16 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 
 	console.log('\n');
 	console.log('- - - - -');
-	console.log('Missing API Docs (Classes):');
+	console.log('Missing API Docs (Definitions):');
 	console.log('- - - - -');
 
-	for (var md = 0, mdl = missing.defblocks.length; md < mdl; md++) {
+	for (var md = 0, mdl = missing.definitions.length; md < mdl; md++) {
 
-		filepath = missing.defblocks[md][0];
+		filepath = missing.definitions[md][0];
 
 		str = filepath + ': ';
 		for (var l = 0; l < length - filepath.length; l++) str += ' ';
-		str += missing.defblocks[md][1];
+		str += missing.definitions[md][1];
 
 		console.log(str);
 
@@ -275,7 +294,6 @@ exec('grep -R ": function" ./lychee/source', function(error, stdout, stderr) {
 exec('grep -R "// TODO:" ./lychee/source', function(error, stdout, stderr) {
 
 	var length  = 0;
-	var missing = [];
 
 	var lines = stdout.split('\n');
 	for (var l = 0, ll = lines.length; l < ll; l++) {
@@ -298,7 +316,7 @@ exec('grep -R "// TODO:" ./lychee/source', function(error, stdout, stderr) {
 		var filepath = tmp[0].replace(':', '');
 		var message  = tmp[1].substr('// TODO:'.length);
 
-		missing.push([
+		missing.todos.push([
 			filepath, message
 		]);
 
@@ -316,13 +334,13 @@ exec('grep -R "// TODO:" ./lychee/source', function(error, stdout, stderr) {
 	console.log('Missing Functionality (TODO):');
 	console.log('- - - - -');
 
-	for (var m = 0, ml = missing.length; m < ml; m++) {
+	for (var mt = 0, mtl = missing.todos.length; mt < mtl; mt++) {
 
-		filepath = missing[m][0];
+		filepath = missing.todos[mt][0];
 
 		str = filepath + ': ';
 		for (var l = 0; l < length - filepath.length; l++) str += ' ';
-		str += missing[m][1];
+		str += missing.todos[mt][1];
 
 		console.log(str);
 
