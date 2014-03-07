@@ -187,7 +187,32 @@ lychee.define('lychee.game.Loop').includes([
 	Class.prototype = {
 
 		/*
-		 * PUBLIC API
+		 * ENTITY API
+		 */
+
+		// deserialize: function(blob) {},
+
+		serialize: function() {
+
+			var settings = {};
+
+
+			if (this.update !== 40) settings.update = this.update;
+			if (this.render !== 40) settings.render = this.render;
+
+
+			return {
+				'constructor': 'lychee.game.Loop',
+				'arguments':   [ settings ],
+				'blob':        null
+			};
+
+		},
+
+
+
+		/*
+		 * CUSTOM API
 		 */
 
 		start: function() {

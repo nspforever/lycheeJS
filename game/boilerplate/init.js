@@ -18,6 +18,8 @@ lychee.tag({
 
 lychee.build(function(lychee, global) {
 
+console.log(lychee.getEnvironment());
+
 	new game.Main();
 
 }, typeof global !== 'undefined' ? global : this);

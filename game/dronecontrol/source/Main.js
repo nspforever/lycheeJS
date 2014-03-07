@@ -1,7 +1,7 @@
 
 lychee.define('game.Main').requires([
-	'game.net.Client',
-	'game.state.Game'
+	'game.state.Game',
+	'game.net.Client'
 ]).includes([
 	'lychee.game.Main'
 ]).exports(function(lychee, game, global, attachments) {

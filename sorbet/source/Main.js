@@ -156,7 +156,7 @@ lychee.define('sorbet.Main').requires([
 
 		var that = this;
 		setTimeout(function() { that.modules.set('server',  new _module['Server'](that));  }, 1000);
-		setTimeout(function() { that.modules.set('project', new _module['Project'](that)); }, 1000);
+//		setTimeout(function() { that.modules.set('project', new _module['Project'](that)); }, 1000);
 
 	};
 

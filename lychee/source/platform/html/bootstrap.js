@@ -908,6 +908,7 @@
 	 * EXPORTS
 	 */
 
+	global.Buffer  = Buffer;
 	global.Font    = Font;
 	global.Music   = Music;
 	global.Sound   = Sound;

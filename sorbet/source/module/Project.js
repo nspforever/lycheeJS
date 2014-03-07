@@ -23,6 +23,13 @@ lychee.define('sorbet.module.Project').requires([
 		var data = JSON.parse(_fs.readFileSync(lychee_path + '/package.json'));
 		if (data !== null) {
 
+			var core = '';
+
+			core += _fs.readFileSync(lychee_path + '/core.js').toString();
+			core += _fs.readFileSync(lychee_path + '/Builder.js').toString();
+			core += _fs.readFileSync(lychee_path + '/Preloader.js').toString();
+
+
 			var platform = data.tags.platform || null;
 			if (platform !== null) {
 
@@ -30,10 +37,9 @@ lychee.define('sorbet.module.Project').requires([
 
 					try {
 
-						var url  = lychee_path + '/' + platform[type] + '/bootstrap.js';
-						var code = _fs.readFileSync(url).toString();
+						var code = _fs.readFileSync(lychee_path + '/' + platform[type] + '/bootstrap.js').toString();
 
-						_bootstrap[type] = code;
+						_bootstrap[type] = core + '\n' + code;
 
 					} catch(e) {
 					}
@@ -54,6 +60,8 @@ lychee.define('sorbet.module.Project').requires([
 	/*
 	 * HELPERS
 	 */
+
+	var _projects = {};
 
 	var _build_project = function(project) {
 
@@ -115,6 +123,7 @@ lychee.define('sorbet.module.Project').requires([
 		var that = this;
 		var root = data.project.root[0];
 
+
 		if (lychee.debug === true) {
 			console.log('sorbet.module.Project: Building source "' + data.source + '" of Project for ' + root);
 		}
@@ -132,8 +141,17 @@ lychee.define('sorbet.module.Project').requires([
 			fs.mkdir(directory);
 
 
-			var sandbox     = lychee.createSandbox();
-			var environment = lychee.createEnvironment();
+			var environment = null;
+			var sandbox     = null;
+
+			if (_projects[root] !== undefined) {
+				environment = _projects[root].environment;
+				sandbox     = _projects[root].sandbox;
+			} else {
+				environment = lychee.createEnvironment();
+				sandbox     = lychee.createSandbox();
+			}
+
 
 			lychee.setEnvironment(environment);
 
@@ -166,6 +184,7 @@ lychee.define('sorbet.module.Project').requires([
 
 
 			require(resolvedsource);
+console.log(resolvedsource, environment.tree);
 
 
 			// TODO: Asset integration
@@ -202,6 +221,12 @@ lychee.define('sorbet.module.Project').requires([
 				lychee.debug = true;
 				lychee.type  = 'source';
 				lychee.setEnvironment(null);
+
+
+				_projects[root] = {
+					environment: environment,
+					sandbox:     sandbox
+				};
 
 
 				fs.write(file, code, function(result) {

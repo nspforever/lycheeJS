@@ -165,29 +165,6 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 
 		},
 
-		// Allows sync(null, true) for reset
-		sync: function(clock, force) {
-
-			force = force === true;
-
-
-			if (force === true) {
-				this.__clock = clock;
-			}
-
-
-			if (this.__clock === null) {
-
-				if (this.__tween.active === true && this.__tween.start === null) {
-					this.__tween.start = clock;
-				}
-
-				this.__clock = clock;
-
-			}
-
-		},
-
 		// HINT: Renderer skips if no render() method exists
 		// render: function(renderer, offsetX, offsetY) {},
 
@@ -196,7 +173,13 @@ lychee.define('lychee.game.Entity').exports(function(lychee, global) {
 			// 1. Sync clocks initially
 			// (if Entity was created before loop started)
 			if (this.__clock === null) {
-				this.sync(clock);
+
+				if (this.__tween.active === true && this.__tween.start === null) {
+					this.__tween.start = clock;
+				}
+
+				this.__clock = clock;
+
 			}
 
 

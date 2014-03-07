@@ -157,7 +157,7 @@ lychee.define('lychee.game.State').requires([
 
 		},
 
-		enter: function() {
+		enter: function(data) {
 
 			var input = this.input;
 			if (input !== null) {

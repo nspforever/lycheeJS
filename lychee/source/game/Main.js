@@ -6,8 +6,8 @@ lychee.define('lychee.game.Main').requires([
 	'lychee.game.Jukebox',
 	'lychee.game.Loop',
 	'lychee.game.State',
-	'lychee.net.Client',
-	'lychee.net.Server'
+	'lychee.net.Client'
+//	'lychee.net.Server'
 ]).includes([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
@@ -198,18 +198,18 @@ lychee.define('lychee.game.Main').requires([
 		 * LOOP INTEGRATION
 		 */
 
-		render: function(t, dt) {
+		render: function(clock, delta) {
 
 			if (this.__state !== null) {
-				this.__state.render && this.__state.render(t, dt);
+				this.__state.render(clock, delta);
 			}
 
 		},
 
-		update: function(t, dt) {
+		update: function(clock, delta) {
 
 			if (this.__state !== null) {
-				this.__state.update && this.__state.update(t, dt);
+				this.__state.update(clock, delta);
 			}
 
 		},

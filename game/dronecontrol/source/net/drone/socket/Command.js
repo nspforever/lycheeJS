@@ -19,6 +19,8 @@ lychee.define('game.net.drone.socket.Command').tags({
 
 	var Class = function(ip) {
 
+console.log(ip);
+
 		this.sequence = 0;
 
 		this.__ip     = typeof ip === 'string' ? ip : '192.168.1.1';

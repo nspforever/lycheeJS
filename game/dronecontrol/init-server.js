@@ -11,7 +11,7 @@ require(path + '/platform/nodejs/bootstrap.js')(__dirname);
 require('./source/net/Server.js');
 
 
-// lychee.debug = true;
+lychee.debug = true;
 
 
 lychee.rebase({

@@ -136,20 +136,6 @@ lychee.define('lychee.ui.Entity').includes([
 
 		},
 
-		sync: function(clock) {
-
-			if (this.__clock === null) {
-
-				if (this.__tween.active === true && this.__tween.start === null) {
-					this.__tween.start = clock;
-				}
-
-				this.__clock = clock;
-
-			}
-
-		},
-
 		// HINT: Renderer skips if no render() method exists
 		// render: function(renderer, offsetX, offsetY) {},
 
@@ -158,7 +144,13 @@ lychee.define('lychee.ui.Entity').includes([
 			// 1. Sync clocks initially
 			// (if Entity was created before loop started)
 			if (this.__clock === null) {
-				this.sync(clock);
+
+				if (this.__tween.active === true && this.__tween.start === null) {
+					this.__tween.start = clock;
+				}
+
+				this.__clock = clock;
+
 			}
 
 
