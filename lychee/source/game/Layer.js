@@ -163,15 +163,6 @@ lychee.define('lychee.game.Layer').requires([
 
 		},
 
-		update: function(clock, delta) {
-
-			var entities = this.entities;
-			for (var e = 0, el = entities.length; e < el; e++) {
-				entities[e].update(clock, delta);
-			}
-
-		},
-
 		render: function(renderer, offsetX, offsetY) {
 
 			if (this.visible === false) return;
@@ -212,6 +203,15 @@ lychee.define('lychee.game.Layer').requires([
 					1
 				);
 
+			}
+
+		},
+
+		update: function(clock, delta) {
+
+			var entities = this.entities;
+			for (var e = 0, el = entities.length; e < el; e++) {
+				entities[e].update(clock, delta);
 			}
 
 		},

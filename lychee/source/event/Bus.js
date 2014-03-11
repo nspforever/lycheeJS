@@ -3,32 +3,53 @@ lychee.define('lychee.event.Bus').requires([
 	'lychee.event.Emitter'
 ]).exports(function(lychee, global) {
 
-	var _emitterId = 0;
+
+
+	/*
+	 * HELPERS
+	 */
+
+	var _roots = [];
 
 	var _trigger_channel = function(type, root) {
 
-		var id   = root.getEmitterId();
-		var args = [].splice.call(arguments, 1);
+		var index = _roots.indexOf(root);
+		if (index === -1) {
 
+			this.unbindChannel(type, root);
+
+			return false;
+
+		}
+
+
+		var args = [].splice.call(arguments, 1);
 
 		if (
 			   this.__channels[type] !== undefined
-			&& this.__channels[type][id] !== undefined
+			&& this.__channels[type][index] !== undefined
 		) {
 
-			for (var c = 1, cl = this.__channels[type][id].length; c < cl; c++) {
-
-				var emitter = this.__channels[type][id][c];
-
-				emitter.trigger(type, args);
-
+			var channel = this.__channels[type][index];
+			for (var c = 1, cl = channel.length; c < cl; c++) {
+				channel[c].trigger(type, args);
 			}
 
+
+			return true;
+
 		}
+
+
+		return false;
 
 	};
 
 
+
+	/*
+	 * IMPLEMENTATION
+	 */
 
 	var Class = function() {
 
@@ -43,7 +64,7 @@ lychee.define('lychee.event.Bus').requires([
 		 * PUBLIC API
 		 */
 
-		setChannel: function(type, emitters) {
+		bindChannel: function(type, emitters) {
 
 			type     = typeof type === 'string'  ? type     : null;
 			emitters = emitters instanceof Array ? emitters : null;
@@ -59,22 +80,6 @@ lychee.define('lychee.event.Bus').requires([
 				&& emitters !== null
 			) {
 
-				var channel = [];
-
-				for (var e = 0, el = emitters.length; e < el; e++) {
-
-					var emitter = emitters[e];
-					if (lychee.interfaceof(lychee.event.Emitter, emitter) === true) {
-
-					}
-
-				}
-
-			}
-
-
-			if (type !== null && emitters !== null) {
-
 				if (this.__channels[type] === undefined) {
 					this.__channels[type] = {};
 				}
@@ -85,12 +90,7 @@ lychee.define('lychee.event.Bus').requires([
 				for (var e = 0, el = emitters.length; e < el; e++) {
 
 					var emitter = emitters[e];
-
-					if (
-						   typeof emitter.bind === 'function'
-						&& typeof emitter.unbind === 'function'
-						&& typeof emitter.trigger === 'function'
-					) {
+					if (lychee.interfaceof(lychee.event.Emitter, emitter) === true) {
 						channel.push(emitter);
 					}
 
@@ -99,18 +99,16 @@ lychee.define('lychee.event.Bus').requires([
 
 				if (channel.length > 0) {
 
-					var root = channel[0];
-					if (root.getEmitterId() === null) {
-						root.setEmitterId(_emitterId++);
-					}
+					var root  = channel[0];
+					var index = _roots.indexOf(root);
+					if (index === -1) {
 
+						index = _roots.length;
+						_roots.push(root);
 
-					if (this.__channels[type][root.getEmitterId()] === undefined) {
+						root.bind('@' + type, _trigger_channel, this);
+						this.__channels[type][index] = channel;
 
-						root.unbind('@' + type, _trigger_channel, this);
-						root.bind('@' + type,   _trigger_channel, this);
-
-						this.__channels[type][root.getEmitterId()] = channel;
 
 						return true;
 
@@ -125,25 +123,31 @@ lychee.define('lychee.event.Bus').requires([
 
 		},
 
-		removeChannel: function(type, root) {
+		unbindChannel: function(type, root) {
 
-			type = typeof type === 'string'                ? type : null;
-			root = typeof root.getEmitterId === 'function' ? root : null;
+			type = typeof type === 'string'                       ? type : null;
+			root = lychee.interfaceof(lychee.event.Emitter, root) ? root : null;
 
 
 			if (
 				   type !== null
 				&& root !== null
-				&& this.__channels[type] !== undefined
 			) {
 
-				var rootId = root.getEmitterId();
-				if (this.__channels[type][rootId] !== undefined) {
+				var index = _roots.indexOf(root);
+				if (index !== -1) {
 
-					rootId.unbind('@' + type, _trigger_channel, this);
-					delete this.__channels[type][rootId];
+					if (this.__channels[type][index] !== undefined) {
 
-					return true;
+						_roots.splice(index, 1);
+
+						root.unbind('@' + type, _trigger_channel, this);
+						delete this.__channels[type][index];
+
+
+						return true;
+
+					}
 
 				}
 
