@@ -598,6 +598,7 @@
 	var _export_attachments = function(definitionblock) {
 
 		var id = definitionblock._space + '.' + definitionblock._name;
+		var classname = definitionblock._name;
 
 		var attachments = this.__attachments[id] || null;
 		if (attachments !== null) {
@@ -632,15 +633,13 @@
 		var data = null;
 		if (definitionblock._exports !== null) {
 
-			var attachments = definitionblock._attachments;
-
 			if (libspace === 'lychee') {
 
 				data = definitionblock._exports.call(
 					definitionblock._exports,
 					this.__scope.lychee,
 					this.__scope,
-					attachments
+					definitionblock._attaches
 				);
 
 			} else {
@@ -650,7 +649,7 @@
 					this.__scope.lychee,
 					this.__scope[libspace],
 					this.__scope,
-					attachments
+					definitionblock._attaches
 				);
 
 			}

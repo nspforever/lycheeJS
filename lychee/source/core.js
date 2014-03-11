@@ -607,15 +607,7 @@ if (typeof global !== 'undefined') {
 				if (attachments.hasOwnProperty(name)) {
 
 					var value = attachments[name];
-					if (
-						   value instanceof Texture
-						|| value instanceof Font
-						|| value instanceof Music
-						|| value instanceof Sound
-						|| value instanceof Object
-					) {
-						this._attachments[name] = value;
-					}
+					this._attaches[name] = value;
 
 				}
 
