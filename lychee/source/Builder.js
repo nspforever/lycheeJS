@@ -595,6 +595,31 @@
 
 	};
 
+	var _export_attachments = function(definitionblock) {
+
+		var id = definitionblock._space + '.' + definitionblock._name;
+
+		var attachments = this.__attachments[id] || null;
+		if (attachments !== null) {
+
+			var map = {};
+
+			for (var a = 0, al = attachments.length; a < al; a++) {
+
+				var url = attachments[a];
+				var tmp = url.split('/');
+				var id  = tmp[tmp.length - 1].substr(classname.length + 1);
+
+				map[id] = this.__preloader.get(url);
+
+			}
+
+			definitionblock.attaches(map);
+
+		}
+
+	};
+
 	var _export_definitionblock = function(definitionblock) {
 
 		var id        = definitionblock._space + '.' + definitionblock._name;
@@ -603,29 +628,11 @@
 		var namespace = _get_namespace(definitionblock._space, this.__scope);
 
 
-		// 1. Collect required Attachments
-		var attachmentsmap = null;
-		var attachments    = this.__attachments[id] || null;
-		if (attachments !== null) {
-
-			attachmentsmap = {};
-
-			for (var a = 0, al = attachments.length; a < al; a++) {
-
-				var url = attachments[a];
-				var tmp = url.split('/');
-				var id = tmp[tmp.length - 1].substr(classname.length + 1);
-
-				attachmentsmap[id] = this.__preloader.get(url);
-
-			}
-
-		}
-
-
-		// 2. Export the Class, Module or Callback
+		// 1. Export the Class, Module or Callback
 		var data = null;
 		if (definitionblock._exports !== null) {
+
+			var attachments = definitionblock._attachments;
 
 			if (libspace === 'lychee') {
 
@@ -633,7 +640,7 @@
 					definitionblock._exports,
 					this.__scope.lychee,
 					this.__scope,
-					attachmentsmap
+					attachments
 				);
 
 			} else {
@@ -643,7 +650,7 @@
 					this.__scope.lychee,
 					this.__scope[libspace],
 					this.__scope,
-					attachmentsmap
+					attachments
 				);
 
 			}
@@ -651,11 +658,11 @@
 		}
 
 
-		// 3. Extend the Class, Module or Callback
+		// 2. Extend the Class, Module or Callback
 		var includes = definitionblock._includes;
 		if (includes.length > 0 && data != null) {
 
-			// 3.1 Collect its own and already
+			// 2.1 Collect its own and already
 			// inherited methods
 			var proto = {};
 			for (var prop in data.prototype) {
@@ -663,7 +670,7 @@
 			}
 
 
-			// 3.2 Define the Class, Module or Callback
+			// 2.2 Define the Class, Module or Callback
 			// inside the namespace
 			Object.defineProperty(namespace, classname, {
 				value:        data,
@@ -673,11 +680,11 @@
 			});
 
 
-			// 3.3 Create a new prototype
+			// 2.3 Create a new prototype
 			namespace[classname].prototype = {};
 
 
-			// 3.4 Generate the arguments for
+			// 2.4 Generate the arguments for
 			// the lychee.extend() call.
 			var args = [
 				namespace[classname].prototype
@@ -701,7 +708,7 @@
 			}
 
 
-			// 3.5 Extend AND seal the prototype
+			// 2.5 Extend AND seal the prototype
 			args.push(proto);
 			lychee.extend.apply(lychee, args);
 
@@ -826,9 +833,14 @@
 
 				// TODO: Asset integration
 
+				for (var o = 0, ol = order.length; o < ol; o++) {
+					_export_attachments.call(this, this.__tree[order[o]]);
+				}
+
 			} else if (lychee.type === 'source') {
 
 				for (var o = 0, ol = order.length; o < ol; o++) {
+					_export_attachments.call(this, this.__tree[order[o]]);
 					_export_definitionblock.call(this, this.__tree[order[o]]);
 				}
 

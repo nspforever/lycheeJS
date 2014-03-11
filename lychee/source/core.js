@@ -530,6 +530,8 @@ if (typeof global !== 'undefined') {
 
 		this._space    = space;
 		this._name     = name;
+
+		this._attaches = {};
 		this._tags     = {};
 		this._requires = [];
 		this._includes = [];
@@ -589,6 +591,38 @@ if (typeof global !== 'undefined') {
 
 
 			return uid;
+
+		},
+
+		attaches: function(attachments) {
+
+			if (attachments instanceof Object === false) {
+				_throw_warning.call(this, 'attach({ name: new Texture(url) || new Font(url) || new Music(url) || new Sound(url) })');
+				return this;
+			}
+
+
+			for (var name in attachments) {
+
+				if (attachments.hasOwnProperty(name)) {
+
+					var value = attachments[name];
+					if (
+						   value instanceof Texture
+						|| value instanceof Font
+						|| value instanceof Music
+						|| value instanceof Sound
+						|| value instanceof Object
+					) {
+						this._attachments[name] = value;
+					}
+
+				}
+
+			}
+
+
+			return this;
 
 		},
 
