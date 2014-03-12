@@ -218,6 +218,181 @@
 
 
 	/*
+	 * MUSIC IMPLEMENTATION
+	 */
+
+	var _music_cache = {};
+
+
+	var _clone_music = function(origin, clone) {
+
+	};
+
+
+	var Music = function(url) {
+
+		url = typeof url === 'string' ? url : null;
+
+
+		this.url       = url;
+		this.onload    = null;
+		this.buffer    = null;
+		this.volume    = 0.0;
+		this.isIdle    = true;
+		this.isLooping = false;
+
+
+		var url = this.url;
+
+		if (_music_cache[url] !== undefined) {
+			_clone_music(_music_cache[url], this);
+		} else {
+			_music_cache[url] = this;
+		}
+
+	};
+
+
+	Music.prototype = {
+
+		serialize: function() {
+
+			return {
+				'constructor': 'Music',
+				'arguments':   [ this.url ]
+			};
+
+		},
+
+		load: function() {
+
+			if (this.onload instanceof Function) {
+				this.onload();
+			}
+
+		},
+
+		clone: function() {
+			return new Music(this.url);
+		},
+
+		play: function() {
+			this.isIdle = false;
+		},
+
+		pause: function() {
+			this.isIdle = true;
+		},
+
+		resume: function() {
+			this.isIdle = false;
+		},
+
+		stop: function() {
+			this.isIdle = true;
+		},
+
+		setVolume: function(volume) {
+
+			volume = typeof volume === 'number' ? volume : null;
+
+
+			return false;
+
+		}
+
+	};
+
+
+
+	/*
+	 * SOUND IMPLEMENTATION
+	 */
+
+	var _sound_cache = {};
+
+
+	var _clone_sound = function(origin, clone) {
+
+	};
+
+
+	var Sound = function(url) {
+
+		url = typeof url === 'string' ? url : null;
+
+
+		this.url    = url;
+		this.onload = null;
+		this.buffer = null;
+		this.volume = 0.0;
+		this.isIdle = true;
+
+
+		var url = this.url;
+
+		if (_sound_cache[url] !== undefined) {
+			_clone_sound(_sound_cache[url], this);
+		} else {
+			_sound_cache[url] = this;
+		}
+
+	};
+
+
+	Sound.prototype = {
+
+		serialize: function() {
+
+			return {
+				'constructor': 'Sound',
+				'arguments':   [ this.url ]
+			};
+
+		},
+
+		load: function() {
+
+			if (this.onload instanceof Function) {
+				this.onload();
+			}
+
+		},
+
+		clone: function() {
+			return new Sound(this.url);
+		},
+
+		play: function() {
+			this.isIdle = false;
+		},
+
+		pause: function() {
+			this.isIdle = true;
+		},
+
+		resume: function() {
+			this.isIdle = false;
+		},
+
+		stop: function() {
+			this.isIdle = true;
+		},
+
+		setVolume: function(volume) {
+
+			volume = typeof volume === 'number' ? volume : null;
+
+
+			return false;
+
+		}
+
+	};
+
+
+
+	/*
 	 * TEXTURE IMPLEMENTATION
 	 */
 
@@ -414,14 +589,42 @@
 			font.load();
 
 
-		// 5. CSS (won't affect NodeJS anyhow)
+		// 5. Music
+		} else if (type === 'msc') {
+
+			this.__pending[url] = true;
+
+			var music = new Music(url);
+			music.onload = function() {
+				that.__pending[url] = false;
+				_cache[url] = this;
+				that._progress(url, _cache);
+			};
+
+			music.load();
+
+		// 6. Sounds
+		} else if (type === 'snd') {
+
+			this.__pending[url] = true;
+
+			var sound = new Sound(url);
+			sound.onload = function() {
+				that.__pending[url] = false;
+				_cache[url] = this;
+				that._progress(url, _cache);
+			};
+
+			sound.load();
+
+		// 7. CSS (won't affect NodeJS anyhow)
 		} else if (type === 'css') {
 
 			this.__pending[url] = false;
 			_cache[url] = '';
 
 
-		// 6. Unknown File Types (will be loaded as text)
+		// 8. Unknown File Types (will be loaded as text)
 		} else {
 
 			this.__pending[url] = true;
@@ -727,6 +930,8 @@
 	 */
 
 	global.Font    = Font;
+	global.Music   = Music;
+	global.Sound   = Sound;
 	global.Texture = Texture;
 
 

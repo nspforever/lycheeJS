@@ -830,8 +830,6 @@
 
 			if (lychee.type === 'build') {
 
-				// TODO: Asset integration
-
 				for (var o = 0, ol = order.length; o < ol; o++) {
 					_export_attachments.call(this, this.__tree[order[o]]);
 				}

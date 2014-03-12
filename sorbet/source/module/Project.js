@@ -184,10 +184,13 @@ lychee.define('sorbet.module.Project').requires([
 
 
 			require(resolvedsource);
+
 console.log(resolvedsource, environment.tree);
 
 
-			// TODO: Asset integration
+			// TODO: Attachments of all DefinitionBlocks in environment.tree
+			// need to be remapped to the new URL after they've been copied
+			// JSON files can be ignored, because they are serialized directly
 
 			lychee.build(function(lychee, global, order) {
 
@@ -213,12 +216,12 @@ console.log(resolvedsource, environment.tree);
 
 
 				for (var o = 0, ol = order.length; o < ol; o++) {
-					code += environment.tree[order[o]].toString();
+					code += environment.tree[order[o]].serialize();
 					code += '\n';
 				}
 
 
-				lychee.debug = true;
+				lychee.debug = false;
 				lychee.type  = 'source';
 				lychee.setEnvironment(null);
 

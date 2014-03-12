@@ -520,6 +520,25 @@ if (typeof global !== 'undefined') {
 
 	};
 
+	var _to_uid = function(definitionblock) {
+
+		var uid = this._space + '.' + this._name;
+
+		var tags = [];
+		for (var id in this._tags) {
+			tags.push(id + '=' + this._tags[id]);
+		}
+
+
+		if (tags.length > 0) {
+			uid += ';' + tags.join(',');
+		}
+
+
+		return uid;
+
+	};
+
 
 	lychee.DefinitionBlock = function(space, name) {
 
@@ -546,9 +565,39 @@ if (typeof global !== 'undefined') {
 
 	lychee.DefinitionBlock.prototype = {
 
-		toString: function() {
+		serialize: function() {
 
 			var str = 'lychee.define(' + JSON.stringify(this._space + '.' + this._name) + ')';
+
+			if (Object.keys(this._attaches).length > 0) {
+
+				str += '.attaches({';
+
+				for (var id in this._attaches) {
+
+					str += '\n';
+
+					var attachment = this._attaches[id];
+					if (attachment instanceof Font) {
+						str += '\t"' + id + '": new Font("' + attachment.url + '"),';
+					} else if (attachment instanceof Music) {
+						str += '\t"' + id + '": new Music("' + attachment.url + '"),';
+					} else if (attachment instanceof Sound) {
+						str += '\t"' + id + '": new Sound("' + attachment.url + '"),';
+					} else if (attachment instanceof Texture) {
+						str += '\t"' + id + '": new Texture("' + attachment.url + '"),';
+					} else {
+						str += '\t"' + id + '": ' + JSON.stringify(attachment, null, '\t') + ',';
+					}
+
+				}
+
+				str = str.substr(str, str.length - 1);
+
+				str += '\n';
+				str += '})';
+
+			}
 
 			if (Object.keys(this._tags).length > 0) {
 				str += '.tags(' + JSON.stringify(this._tags, null, '\t') + ')';
@@ -572,25 +621,6 @@ if (typeof global !== 'undefined') {
 
 
 			return str;
-
-		},
-
-		toUIDString: function() {
-
-			var uid = this._space + '.' + this._name;
-
-			var tags = [];
-			for (var id in this._tags) {
-				tags.push(id + '=' + this._tags[id]);
-			}
-
-
-			if (tags.length > 0) {
-				uid += ';' + tags.join(',');
-			}
-
-
-			return uid;
 
 		},
 
@@ -749,7 +779,7 @@ if (typeof global !== 'undefined') {
 			}
 
 
-			var uid = this.toUIDString();
+			var uid = _to_uid.call(this);
 			if (_environment.unique[uid] == null) {
 				_environment.unique[uid] = this;
 			}
