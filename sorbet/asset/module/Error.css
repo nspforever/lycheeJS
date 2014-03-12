@@ -123,21 +123,9 @@ a:active {
 
 #wrapper #wrapper-hint {
 	font-weight: normal;
-	font-size: 0.6em;
-}
-
-#wrapper figcaption {
-	height: 48px;
-	margin: 16px;
-	line-height: 48px;
-	vertical-align: middle;
+	font-size: 0.8em;
 	text-align: center;
-	font-family: exolight;
-	font-size: 0.6em;
-	border: 2px solid #aa1b1b;
-	border-radius: 24px;
 }
-
 
 
 #kirby{width:120px;height:105px;margin:0 auto;position:relative;z-index:1;}

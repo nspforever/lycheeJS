@@ -16,9 +16,16 @@
 		},
 
 		"module": {
+
+			"honey": {
+				"Admin":  [ "js", "index.php", "config.php.bak" ],
+				"Robots": [ "js" ]
+			},
+
 			"Blacklist":  [ "js" ],
 			"Error":      [ "js", "html" ],
 			"File":       [ "js" ],
+			"Honey":      [ "js" ],
 			"Project":    [ "js" ],
 			"Redirect":   [ "js" ],
 			"Server":     [ "js" ],

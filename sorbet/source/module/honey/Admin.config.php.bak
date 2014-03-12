@@ -1,0 +1,44 @@
+<?php
+$config = array(
+	'APP_DEBUG'    => false,
+	'URL_MODEL'    => 3,
+
+	'DB_TYPE'      => 'mysql',
+	'DB_HOST'      => 'localhost',
+	'DB_NAME'      => 'admin',
+	'DB_USER'      => 'admin',
+	'DB_PWD'       => 'qTnm4BfmU8tcg46QGNPsSCj7',
+	'DB_PORT'      => '3306',
+	'DB_PREFIX'    => 'db_',
+
+	'SESSION_NAME' => 'session_',
+
+	// 'HTML_CACHE_ON' => false,
+	// 'ACTION_CACHE_ON' => false
+	'TMPL_CACHE_TIME' => 0
+);
+
+
+$privilege = array();
+$control   = array();
+
+$connection = mysql_connect($config['DB_HOST'], $config['DB_USER'], $config['DB_PWD']);
+mysql_select_db($config['DB_NAME'], $connection);
+
+$resultPrivilege = mysql_query('SELECT * FROM admin_privilege', $connection);
+$resultPrivilegeControl = mysql_query('SELECT * FROM admin_privilege_control', $connection);
+
+while($i = mysql_fetch_array($resultPrivilege)) {
+	$privilege[$i['name']] = $i['PID'];
+}
+while($i = mysql_fetch_array($resultPrivilegeControl)) {
+	$control[$i['name']] = $i['ID'];
+}
+
+$config = array_merge($config, $privilege);
+$config = array_merge($config, $control);
+
+
+return $config;
+
+?>

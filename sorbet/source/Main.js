@@ -3,6 +3,7 @@ lychee.define('sorbet.Main').requires([
 	'sorbet.module.Blacklist',
 	'sorbet.module.Error',
 	'sorbet.module.File',
+	'sorbet.module.Honey',
 	'sorbet.module.Project',
 	'sorbet.module.Redirect',
 	'sorbet.module.Server',
@@ -150,6 +151,7 @@ lychee.define('sorbet.Main').requires([
 		this.modules.set('blacklist', new _module['Blacklist'](this));
 		this.modules.set('error',     new _module['Error'](this));
 		this.modules.set('file',      new _module['File'](this));
+		this.modules.set('honey',     new _module['Honey'](this));
 		this.modules.set('redirect',  new _module['Redirect'](this));
 		this.modules.set('welcome',   new _module['Welcome'](this));
 
@@ -210,6 +212,7 @@ lychee.define('sorbet.Main').requires([
 			var _blacklist = this.modules.get('blacklist');
 			var _error     = this.modules.get('error');
 			var _file      = this.modules.get('file');
+			var _honey     = this.modules.get('honey');
 			var _redirect  = this.modules.get('redirect');
 			var _welcome   = this.modules.get('welcome');
 
@@ -228,10 +231,11 @@ lychee.define('sorbet.Main').requires([
 
 
 			/*
+			 * 0. Honeypots for Intruders
 			 * 0. Blacklist of known Intruders
 			 */
 
-			var result = _blacklist.check(host, response, {
+			var ishoney = _honey.check(host, response, {
 				host:      rawhost,
 				port:      rawport,
 				referer:   referer,
@@ -240,7 +244,30 @@ lychee.define('sorbet.Main').requires([
 				url:       url
 			});
 
-			if (result === true) {
+			var isblacklist = _blacklist.check(host, response, {
+				host:      rawhost,
+				port:      rawport,
+				referer:   referer,
+				remote:    remote,
+				useragent: request.headers['user-agent'],
+				url:       url
+			});
+
+
+			if (ishoney === true) {
+
+				_honey.process(host, response, {
+					host:      rawhost,
+					port:      rawport,
+					referer:   referer,
+					remote:    remote,
+					useragent: request.headers['user-agent'],
+					url:       url
+				});
+
+				return response;
+
+			} else if (isblacklist === true) {
 
 				_error.process(host, response, {
 					status:   403,
@@ -248,6 +275,8 @@ lychee.define('sorbet.Main').requires([
 					url:      url,
 					resolved: resolved
 				});
+
+				return response;
 
 			}
 

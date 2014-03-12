@@ -15,25 +15,30 @@ lychee.define('sorbet.module.Error').requires([
 
 
 	Class.STATUS = {
-		400: 'I could not understand the Request.',
-		401: 'You have no authorization to process this Request.',
-//		402: 'Payment Required',
-		403: 'This Request is forbidden.',
-		404: 'The requested file you were looking for could not be found.',
-		405: 'The requested Method is not allowed.',
-//		406: 'Not Acceptable.',
-//		407: 'You need to authorize to the Proxy before.',
-//		408: 'Request Timeout',
-		409: 'There was an access conflict for the requested resource.',
+		400: '私 იქნებოდა not understand на solicitud.',
+		401: 'Nice try ... NOT',
+		402: 'Gimme money. Bitches love money!',
+		403: 'You have no power here.',
+		404: 'Oh noez! I lost the file. It was here, I promise ... but it\'s gone now.',
+		405: 'The cake is a lie!',
+		406: 'Grumpy Webserver is grumpy.',
+		407: 'Bitches Proxy be like crazy.',
+		408: 'Go get some coffee. This might take a while ...',
+		409: 'It\'s dangerous to go alone.',
 		410: 'Oh noez! The requested resource has disappeared!',
-//		411: 'Length Required',
-//		412: 'Precondition Failed',
-//		413: 'Request Entity Too Large',
-//		414: 'Request-URI Too Long',
-		415: 'Unsupported Media Type',
-//		416: 'Request Range Not Statisfiable',
-		417: 'Expectation Failed',
-		500: 'Damn. You broke it!'
+		411: 'You mad bro? I need a Length.',
+		412: 'Y U NO Precondition?',
+		413: 'TL;DR - Too long, didn\'t read.',
+		414: 'TL;DR - Too long, didn\'t read.',
+		415: 'Trololo. Can\'t support this shit.',
+		416: 'Watch out! We got a badass Request Range over there!',
+		417: 'Expectation Failed. Nailed it.',
+		500: 'Damn. You broke it!',
+		501: 'Not sure if trolling or not implemented ...',
+		502: 'Bitches Gateway be like crazy.',
+		503: 'Ain\'t nobody time for that Service!',
+		504: 'Ain\'t nobody time for that Gateway!',
+		505: 'Wow. Many HTTP. Such Version. So not supported.'
 	};
 
 
