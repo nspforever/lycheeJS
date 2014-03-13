@@ -4,10 +4,10 @@ lychee.define('sorbet.module.Project').requires([
 	'sorbet.data.Project'
 ]).exports(function(lychee, sorbet, global, attachments) {
 
+	var _crypto      = require('crypto');
 	var _environment = lychee.getEnvironment();
 	var _fs          = require('fs');
 	var _project     = sorbet.data.Project;
-
 
 
 	/*
@@ -51,6 +51,40 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 	})();
+
+	var _parse_attachments = function(environment) {
+
+		var map = {};
+
+		for (var uid in environment.tree) {
+
+			var attachments = environment.tree[uid]._attaches;
+			for (var id in attachments) {
+
+				var attachment = attachments[id];
+				if (
+					   attachment instanceof Font
+					|| attachment instanceof Music
+					|| attachment instanceof Sound
+					|| attachment instanceof Texture
+				) {
+
+					if (map[uid] === undefined) {
+						map[uid] = [];
+					}
+
+					map[uid].push(attachment.url);
+
+				}
+
+			}
+
+		}
+
+
+		return map;
+
+	};
 
 
 
@@ -185,7 +219,34 @@ lychee.define('sorbet.module.Project').requires([
 
 			require(resolvedsource);
 
-console.log(resolvedsource, environment.tree);
+
+			// TODO: Evaluate if chroot feature in bootstrap.js makes sense
+			var chroot = this.main.root + '/sorbet';
+
+			var filemap = _parse_attachments(environment);
+			for (var mid in filemap) {
+
+				var files = filemap[mid];
+				for (var f = 0, fl = files.length; f < fl; f++) {
+
+					var file = fs.toAbs(chroot + '/' + files[f]);
+					var name = mid;
+					var hash = _crypto.createHash('md5').update(name).digest('hex');
+
+					var newext  = file.split('/').pop().split('.');
+					newext      = newext.slice(1, newext.length).join('.');
+					var newfile = './build/' + hash + '.' + newext;
+
+
+console.log('>>>>>', file, newfile);
+
+
+//					if (tmp[tmp.length - 0].substr(0, name.length) === name) {
+//					}
+
+				}
+
+			}
 
 
 			// TODO: Attachments of all DefinitionBlocks in environment.tree
