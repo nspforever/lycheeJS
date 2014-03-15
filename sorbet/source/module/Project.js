@@ -55,7 +55,7 @@ lychee.define('sorbet.module.Project').requires([
 
 	})();
 
-	var _generate_assets = function(chroot, root, fs, environment, data) {
+	var _generate_assets = function(chroot, root, fs, environment, cache) {
 
 		var map = {};
 
@@ -85,7 +85,7 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		var assetmap = [];
+		var assets = [];
 
 		for (var mid in map) {
 
@@ -101,7 +101,7 @@ lychee.define('sorbet.module.Project').requires([
 				var newfile = './build/' + hash + '.' + newext;
 
 
-				assetmap.push(
+				assets.push(
 					oldfile: file,
 					newfile: newfile
 				});
@@ -111,11 +111,13 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		return assetmap;
+		// TODO: write asset files to fs
+
+		console.log('TODO: Write asset files to vFS', assets);
 
 	};
 
-	var _generate_gamecode = function(chroot, root, fs, environment, output) {
+	var _generate_gamecode = function(chroot, root, fs, environment, cache) {
 
 		var gamecode = '';
 
@@ -135,50 +137,70 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		var order = output.order;
+		var order = cache.order;
 		for (var o = 0, ol = order.length; o < ol; o++) {
 			gamecode += environment.tree[order[o]].serialize();
 			gamecode += '\n';
 		}
 
 
-		output.content.gamecode = gamecode;
+		fs.write(cache.files.gamecode[0], gamecode, function(result) {
+
+			if (result === true) {
+
+				if (lychee.debug === true) {
+					console.log('sorbet.module.Project: Build succeeded for "' + cache.project + '"');
+				}
+
+			} else {
+
+				if (lychee.debug === true) {
+					console.error('sorbet.module.Project: Build failed for "' + cache.project + '"');
+				}
+
+			}
+
+		});
 
 	};
 
-	var _content_initcode = function(chroot, root, fs, environment, output) {
+	var _generate_initcode = function(chroot, root, fs, environment, cache) {
 
 		var initcode = '';
 
 
-		initcode += 'lychee.debug = ' + output.debug + ';\n';
+		initcode += 'lychee.debug = ' + cache.debug + ';\n';
 		initcode += 'lychee.tag(' + JSON.stringify(environment.tags, null, '\t') + ');\n';
 
 
-		output.content.initcode = initcode;
+		fs.write(cache.files.initcode[0], initcode);
 
 	};
 
-	var _content_template = function(chroot, root, fs, environment, output) {
+	var _generate_template = function(chroot, root, fs, environment, cache) {
 
 		var template = '';
 
 
-		var platform = environment.tags.platform || null;
+		var extension = '';
+		var platform  = environment.tags.platform || null;
 		if (platform !== null) {
 
 			var stop = false;
 
 			for (var p = 0, pl = platform.length; p < pl; p++) {
 
+				var type = platform[p];
 				if (stop === true) break;
 
-				if (_templates[platform[p]] instanceof sorbet.data.Template) {
+
+				if (_templates[type] instanceof sorbet.data.Template) {
 
 					try {
 
-						template = _templates[platform[p]].render(data);
-						stop = true;
+						extension = type;
+						template  = _templates[type].render(cache);
+						stop      = true;
 
 					} catch(e) {
 
@@ -194,7 +216,9 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		output.content.template = template;
+		var file = cache.files.template[0] + '.' + extension;
+
+		fs.write(file, template);
 
 	};
 
@@ -266,7 +290,6 @@ lychee.define('sorbet.module.Project').requires([
 
 	var _build_project_task = function(data) {
 
-		var that = this;
 		var root = data.project.root[0];
 		// TODO: Evaluate if chroot feature in bootstrap.js makes sense
 		var chroot  = this.main.root + '/sorbet';
@@ -340,12 +363,15 @@ lychee.define('sorbet.module.Project').requires([
 // need to be remapped to the new URL after they've been copied
 // JSON files can be ignored, because they are serialized directly
 
+
+			var that = this;
+
 			lychee.build(function(lychee, global, order) {
 
 				var file = fs.toAbs(root + '/' + data.build + '.js');
 
 				var cache = {
-					project: 'TODO: Project Title integration',
+					project: root,
 					debug:   data.debug === true,
 					order:   order,
 					content: {
@@ -357,9 +383,8 @@ lychee.define('sorbet.module.Project').requires([
 						assets:   [],
 						gamecode: [ fs.toAbs(root + '/' + data.build + '.js'), './' + data.build + '.js' ],
 						initcode: [ fs.toAbs(root + '/init.js'),               './init.js' ],
-						template: [ fs.toAbs(root + '/index.html'),            './index.html' ]
+						template: [ fs.toAbs(root + '/index'),                 './index' ]
 					}
-
 				};
 
 
@@ -381,25 +406,7 @@ lychee.define('sorbet.module.Project').requires([
 				};
 
 
-				fs.write(file, code, function(result) {
-
-					if (result === true) {
-
-						if (lychee.debug === true) {
-							console.log('sorbet.module.Project: Build succeeded for "' + data.source + '" at ' + file);
-						}
-
-					} else {
-
-						if (lychee.debug === true) {
-							console.error('sorbet.module.Project: Build failed for "' + data.source + '" at ' + file);
-						}
-
-					}
-
-					this.queue.flush();
-
-				}, that);
+				that.queue.flush();
 
 			}, sandbox);
 

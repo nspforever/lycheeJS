@@ -266,6 +266,10 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		read: function(url, callback, scope) {
 
+			callback = callback instanceof Function ? callback : function() {};
+			scope    = scope !== undefined          ? scope    : this;
+
+
 			_fs.readFile(url, function(err, data) {
 
 				if (err) {
@@ -289,6 +293,10 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 		},
 
 		write: function(url, data, callback, scope) {
+
+			callback = callback instanceof Function ? callback : function() {};
+			scope    = scope !== undefined          ? scope    : this;
+
 
 			var encoding = 'binary';
 
