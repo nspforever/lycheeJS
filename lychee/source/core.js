@@ -8,16 +8,23 @@ if (typeof global !== 'undefined') {
 
 (function(lychee, global) {
 
-	var _default = {
-		assets: {},
-		tree:   {},
-		unique: {},
-		tags:   {},
-		bases:  {
+	/*
+	 * ENVIRONMENT
+	 */
+
+	var Environment = function() {
+
+		this.assets = {};
+		this.tree   = {};
+		this.unique = {};
+		this.tags   = {};
+		this.bases  = {
 			'lychee': '/lychee/source'
-		}
+		};
+
 	};
 
+	var _default = new Environment();
 	var _environment = _default;
 
 
@@ -207,21 +214,13 @@ if (typeof global !== 'undefined') {
 
 	lychee.createEnvironment = function() {
 
-		var environment = {
-			assets: {},
-			tree:   {},
-			unique: {},
-			tags:   {},
-			bases:  {
-				'lychee': '/lychee/source'
-			}
-		};
+		var env = new Environment();
 
 
 		for (var id in _default.tree) {
 
 			if (id.substr(0, 6) === 'lychee') {
-				environment.tree[id] = _default.tree[id];
+				env.tree[id] = _default.tree[id];
 			}
 
 		}
@@ -230,13 +229,13 @@ if (typeof global !== 'undefined') {
 		for (var uid in _default.unique) {
 
 			if (uid.substr(0, 6) === 'lychee') {
-				environment.unique[uid] = _default.unique[uid];
+				env.unique[uid] = _default.unique[uid];
 			}
 
 		}
 
 
-		return environment;
+		return env;
 
 	};
 

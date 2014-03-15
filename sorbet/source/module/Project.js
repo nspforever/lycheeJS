@@ -8,6 +8,9 @@ lychee.define('sorbet.module.Project').requires([
 	var _environment = lychee.getEnvironment();
 	var _fs          = require('fs');
 	var _project     = sorbet.data.Project;
+	var _templates   = {
+		html: new sorbet.data.Template(attachments["html"])
+	};
 
 
 	/*
@@ -52,7 +55,7 @@ lychee.define('sorbet.module.Project').requires([
 
 	})();
 
-	var _parse_attachments = function(environment) {
+	var _generate_assets = function(chroot, root, fs, environment, data) {
 
 		var map = {};
 
@@ -82,7 +85,116 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		return map;
+		var assetmap = [];
+
+		for (var mid in map) {
+
+			var files = map[mid];
+			for (var f = 0, fl = files.length; f < fl; f++) {
+
+				var file = fs.toAbs(chroot + '/' + files[f]);
+				var name = mid;
+				var hash = _crypto.createHash('md5').update(name).digest('hex');
+
+				var newext  = file.split('/').pop().split('.');
+				newext      = newext.slice(1, newext.length).join('.');
+				var newfile = './build/' + hash + '.' + newext;
+
+
+				assetmap.push(
+					oldfile: file,
+					newfile: newfile
+				});
+
+			}
+
+		}
+
+
+		return assetmap;
+
+	};
+
+	var _generate_gamecode = function(chroot, root, fs, environment, output) {
+
+		var gamecode = '';
+
+
+		var platform = environment.tags.platform || null;
+		if (platform !== null) {
+
+			for (var p = 0, pl = platform.length; p < pl; p++) {
+
+				if (typeof _bootstrap[platform[p]] === 'string') {
+					gamecode += _bootstrap[platform[p]] + '\n';
+					break;
+				}
+
+			}
+
+		}
+
+
+		var order = output.order;
+		for (var o = 0, ol = order.length; o < ol; o++) {
+			gamecode += environment.tree[order[o]].serialize();
+			gamecode += '\n';
+		}
+
+
+		output.content.gamecode = gamecode;
+
+	};
+
+	var _content_initcode = function(chroot, root, fs, environment, output) {
+
+		var initcode = '';
+
+
+		initcode += 'lychee.debug = ' + output.debug + ';\n';
+		initcode += 'lychee.tag(' + JSON.stringify(environment.tags, null, '\t') + ');\n';
+
+
+		output.content.initcode = initcode;
+
+	};
+
+	var _content_template = function(chroot, root, fs, environment, output) {
+
+		var template = '';
+
+
+		var platform = environment.tags.platform || null;
+		if (platform !== null) {
+
+			var stop = false;
+
+			for (var p = 0, pl = platform.length; p < pl; p++) {
+
+				if (stop === true) break;
+
+				if (_templates[platform[p]] instanceof sorbet.data.Template) {
+
+					try {
+
+						template = _templates[platform[p]].render(data);
+						stop = true;
+
+					} catch(e) {
+
+						template = '';
+						stop = false;
+
+					}
+
+				}
+
+			}
+
+		}
+
+
+		output.content.template = template;
 
 	};
 
@@ -156,6 +268,8 @@ lychee.define('sorbet.module.Project').requires([
 
 		var that = this;
 		var root = data.project.root[0];
+		// TODO: Evaluate if chroot feature in bootstrap.js makes sense
+		var chroot  = this.main.root + '/sorbet';
 
 
 		if (lychee.debug === true) {
@@ -220,66 +334,40 @@ lychee.define('sorbet.module.Project').requires([
 			require(resolvedsource);
 
 
-			// TODO: Evaluate if chroot feature in bootstrap.js makes sense
-			var chroot = this.main.root + '/sorbet';
-
-			var filemap = _parse_attachments(environment);
-			for (var mid in filemap) {
-
-				var files = filemap[mid];
-				for (var f = 0, fl = files.length; f < fl; f++) {
-
-					var file = fs.toAbs(chroot + '/' + files[f]);
-					var name = mid;
-					var hash = _crypto.createHash('md5').update(name).digest('hex');
-
-					var newext  = file.split('/').pop().split('.');
-					newext      = newext.slice(1, newext.length).join('.');
-					var newfile = './build/' + hash + '.' + newext;
 
 
-console.log('>>>>>', file, newfile);
-
-
-//					if (tmp[tmp.length - 0].substr(0, name.length) === name) {
-//					}
-
-				}
-
-			}
-
-
-			// TODO: Attachments of all DefinitionBlocks in environment.tree
-			// need to be remapped to the new URL after they've been copied
-			// JSON files can be ignored, because they are serialized directly
+// TODO: Attachments of all DefinitionBlocks in environment.tree
+// need to be remapped to the new URL after they've been copied
+// JSON files can be ignored, because they are serialized directly
 
 			lychee.build(function(lychee, global, order) {
 
 				var file = fs.toAbs(root + '/' + data.build + '.js');
 
-
-				var code = '';
-
-				var platform = environment.tags.platform || null;
-				if (platform !== null) {
-
-					for (var p = 0, pl = platform.length; p < pl; p++) {
-
-						var type = platform[p];
-						if (typeof _bootstrap[type] === 'string') {
-							code += _bootstrap[type] + '\n';
-							break;
-						}
-
+				var cache = {
+					project: 'TODO: Project Title integration',
+					debug:   data.debug === true,
+					order:   order,
+					content: {
+						gamecode: '',
+						initcode: '',
+						template: ''
+					},
+					files:   {
+						assets:   [],
+						gamecode: [ fs.toAbs(root + '/' + data.build + '.js'), './' + data.build + '.js' ],
+						initcode: [ fs.toAbs(root + '/init.js'),               './init.js' ],
+						template: [ fs.toAbs(root + '/index.html'),            './index.html' ]
 					}
 
-				}
+				};
 
 
-				for (var o = 0, ol = order.length; o < ol; o++) {
-					code += environment.tree[order[o]].serialize();
-					code += '\n';
-				}
+				_generate_assets(  chroot, root, fs, environment, cache);
+				_generate_gamecode(chroot, root, fs, environment, cache);
+				_generate_initcode(chroot, root, fs, environment, cache);
+				_generate_template(chroot, root, fs, environment, cache);
+
 
 
 				lychee.debug = false;

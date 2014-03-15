@@ -343,16 +343,6 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		},
 
-		touch: function(path) {
-
-			var tmp  = path.split('/');
-			var file = tmp.pop();
-			var path = tmp.join('/');
-
-console.log(path, file);
-
-		},
-
 		mkdir: function(path) {
 
 			if (this.isDirectory(path) === false) {
