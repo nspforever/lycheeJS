@@ -85,35 +85,47 @@ lychee.define('sorbet.module.Project').requires([
 		}
 
 
-		var assets = [];
-
 		for (var mid in map) {
 
 			var files = map[mid];
 			for (var f = 0, fl = files.length; f < fl; f++) {
 
-				var file = fs.toAbs(chroot + '/' + files[f]);
-				var name = mid;
-				var hash = _crypto.createHash('md5').update(name).digest('hex');
+				var hash = _crypto.createHash('md5').update(mid).digest('hex');
 
-				var newext  = file.split('/').pop().split('.');
-				newext      = newext.slice(1, newext.length).join('.');
-				var newfile = './build/' + hash + '.' + newext;
+				var oldfile = [
+					fs.toAbs(chroot + '/' + files[f]),
+					files[f],
+				];
+
+				var ext = oldfile[1].split('/').pop().split('.');
+				ext = ext.slice(1, ext.length).join('.');
+
+				var newfile = [
+					fs.toAbs(root + '/build/' + hash + '.' + ext),
+					'./build/' + hash + '.' + ext
+				];
 
 
-				assets.push(
-					oldfile: file,
-					newfile: newfile
-				});
+				var attachments = environment.tree[mid]._attaches;
+				for (var aid in attachments) {
+
+					var attachments = attachments[aid];
+					if (typeof attachment.url === 'string') {
+
+						if (attachment.url === oldfile[1]) {
+							attachment.url = newfile[1];
+						}
+
+					}
+
+				}
+
+
+				fs.copy(oldfile[0], newfile[0]);
 
 			}
 
 		}
-
-
-		// TODO: write asset files to fs
-
-		console.log('TODO: Write asset files to vFS', assets);
 
 	};
 

@@ -264,19 +264,19 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		},
 
-		read: function(url, callback, scope) {
+		read: function(path, callback, scope) {
 
 			callback = callback instanceof Function ? callback : function() {};
 			scope    = scope !== undefined          ? scope    : this;
 
 
-			_fs.readFile(url, function(err, data) {
+			_fs.readFile(path, function(err, data) {
 
 				if (err) {
 					callback.call(scope, null);
 				} else {
 
-					_fs.stat(url, function(err, stat) {
+					_fs.stat(path, function(err, stat) {
 
 						if (err) {
 							callback.call(scope, null);
@@ -292,7 +292,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 
 		},
 
-		write: function(url, data, callback, scope) {
+		write: function(path, data, callback, scope) {
 
 			callback = callback instanceof Function ? callback : function() {};
 			scope    = scope !== undefined          ? scope    : this;
@@ -307,7 +307,7 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 			}
 
 
-			_fs.writeFile(url, data, encoding, function(err) {
+			_fs.writeFile(path, data, encoding, function(err) {
 
 				if (err) {
 					callback.call(scope, false);
@@ -315,6 +315,39 @@ lychee.define('sorbet.data.Filesystem').exports(function(lychee, sorbet, global,
 					callback.call(scope, true);
 				}
 
+			});
+
+		},
+
+		copy: function(path, dest, callback, scope) {
+
+			callback = callback instanceof Function ? callback : function() {};
+			scope    = scope !== undefined          ? scope    : this;
+
+
+console.log('copying', path, dest);
+
+return false;
+
+
+			var read  = _fs.createReadStream(path);
+
+			read.on('open', function() {
+
+				var write = _fs.createWriteStream(dest);
+
+				write.on('open', function() {
+					read.pipe(write);
+				});
+
+				write.on('error', function(err) {
+					callback.call(scope, false);
+				});
+
+			});
+
+			read.on('error', function(err) {
+				callback.call(scope, false);
 			});
 
 		},
