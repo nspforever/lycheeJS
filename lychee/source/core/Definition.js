@@ -110,7 +110,7 @@ lychee.Definition = (function(lychee, global) {
 
 		toDefinitionString: function() {
 
-			var str = 'lychee.define("' + this.id + '")';
+			var str = 'new lychee.Definition("' + this.id + '")';
 
 			if (Object.keys(this._attaches).length > 0) {
 

@@ -37,7 +37,76 @@ lychee.Environment = (function(lychee, global) {
 	 * STRUCTS
 	 */
 
-	var _sandbox = function() {
+	var _console = global.console;
+
+	var _sandbox = function(isolated) {
+
+		isolated = isolated === true;
+
+
+		if (isolated === true) {
+
+			this.console = {
+
+				_log: '',
+
+				log: function() {
+
+					var str = '\n';
+
+					for (var a = 0, al = arguments.length; a < al; a++) {
+
+						var arg = arguments[a];
+						if (typeof arg.toString === 'function') {
+							str += ' ' + arg.toString();
+						} else {
+							str += ' ' + arg;
+						}
+
+					}
+
+					this._log += str;
+
+				},
+
+				error: function() {
+
+					var args = [].slice.call(arguments);
+					args.reverse();
+					args.push('(E)\t');
+					args.reverse();
+
+					this.log.apply(this, args);
+
+				},
+
+				warn: function() {
+
+					var args = [].slice.call(arguments);
+					args.reverse();
+					args.push('(W)\t');
+					args.reverse();
+
+					this.log.apply(this, args);
+
+				},
+
+				group: function(title) {
+					this.log.call(this, '~ ~ ~ ' + title + ' ~ ~ ~');
+				},
+
+				groupEnd: function(title) {
+					this.log.call(this, '~ ~ ~ ~ ~ ~');
+				}
+
+			};
+
+		} else {
+
+			this.console = _console;
+
+		}
+
 
 		this.lychee = {};
 
@@ -56,6 +125,7 @@ lychee.Environment = (function(lychee, global) {
 			}
 
 		}
+
 
 		this.setTimeout = function(callback, timeout) {
 			global.setTimeout(callback, timeout);
@@ -79,7 +149,7 @@ lychee.Environment = (function(lychee, global) {
 
 
 		this.definitions = {};
-		this.sandbox     = new _sandbox();
+		this.sandbox     = new _sandbox(settings.isolated);
 		this.tags        = {};
 		this.bases       = {
 			'lychee': '/lychee/source'
@@ -100,8 +170,65 @@ lychee.Environment = (function(lychee, global) {
 
 	Class.prototype = {
 
-		toDefinitionString: function() {
+		/*
+		 * ENTITY API
+		 */
+
+		// deserialize: function(blob) {},
+
+		serialize: function() {
+
+			var settings = {};
+
+
+			if (Object.keys(this.bases).length > 0) {
+
+				settings.bases = {};
+
+				for (var id in this.bases) {
+					settings.bases[id] = this.bases[id];
+				}
+
+			}
+
+
+			// TODO: serialize Definitions
+
+
+			if (Object.keys(this.tags).length > 0) {
+
+				settings.tags = {};
+
+				for (var id in this.tags) {
+					settings.tags[id] = this.tags[id];
+				}
+
+			}
+
+
+			return {
+				'constructor': 'lychee.Environment',
+				'arguments':   [ settings ]
+			};
+
 		},
+
+		toDefinitionString: function() {
+
+			var data = this.serialize();
+
+			var settings = data['arguments'][0];
+
+
+			return 'new lychee.Environment(' + JSON.stringify(settings, null, '\t') + ');';
+
+		},
+
+
+
+		/*
+		 * CUSTOM API
+		 */
 
 		setBases: function(bases) {
 
