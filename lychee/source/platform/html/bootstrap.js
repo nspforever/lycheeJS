@@ -219,6 +219,10 @@
 
 	Font.prototype = {
 
+		toDefinitionString: function() {
+			return 'new Font("' + this.url + '")';
+		},
+
 		serialize: function() {
 
 			return {
@@ -339,6 +343,10 @@
 
 
 	Music.prototype = {
+
+		toDefinitionString: function() {
+			return 'new Music("' + this.url + '")';
+		},
 
 		serialize: function() {
 
@@ -505,6 +513,10 @@
 
 
 	Sound.prototype = {
+
+		toDefinitionString: function() {
+			return 'new Sound("' + this.url + '")';
+		},
 
 		serialize: function() {
 
@@ -673,6 +685,10 @@
 
 
 	Texture.prototype = {
+
+		toDefinitionString: function() {
+			return 'new Texture("' + this.url + '")';
+		},
 
 		serialize: function() {
 
